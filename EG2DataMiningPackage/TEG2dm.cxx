@@ -1,0 +1,62 @@
+#ifndef TEG2DM_CXX
+#define TEG2DM_CXX
+
+#include "TEG2dm.h"
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+TVector3 TEG2dm::EnergyLossCorrrection(TVector3 p){ // following Or Hen Analysis
+    Double_t Pmeasured = p.Mag();
+    Double_t CorrFactor= sqrt( pow((0.00135272 + 0.000845728/(pow((0.0746518+Pmeasured),2))+sqrt(pow(p.Mag(),2)+pow(Mp,2))),2)-pow(Mp,2))/p.Mag();
+    return (CorrFactor*p);
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+TVector3 TEG2dm::CoulombCorrection(TVector3 p , Float_t CoulombDeltaE){
+    // following Or Hen Analysis : p' = p x √(√((m^2+p^2)^2+∆E^2) - m^2)
+    return (sqrt(pow(sqrt(pow(Mp,2)+pow(p.Mag(),2))+CoulombDeltaE,2) - pow(Mp,2))/p.Mag())*p;
+}
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+TString TEG2dm::TargetAsString(int A, float *mA , float *CoulombDeltaE){
+    switch (A) {
+        case 12:// carbon (C12)
+            *mA              = 12.0107*0.931494;
+            *CoulombDeltaE   = 0.0029;
+            return "C12";
+            break;
+        case 27:// Aluminium (Al27)
+            *mA              = 26.982*0.931494;
+            *CoulombDeltaE   = 0.0056;
+            return "Al27";
+            break;
+        case 56:// iron (Fe56)
+            *mA              = 55.9349375*0.93149;
+            *CoulombDeltaE   = 0.0094;
+            return "Fe56";
+            break;
+        case 208:// lead (Pb208)
+            *mA              = 207.2*0.93149;
+            *CoulombDeltaE   = 0.0203;
+            return "Pb208";
+            break;
+        default:
+            return "No Target Found";
+            break;
+    }
+}
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void TEG2dm::RotateVec_To_qPmiss_frame( TVector3 * V, float q_phi, float q_theta, float Pmiss_phi){
+    // move to q-Pmiss system: q is the z axis, Pmiss is in x-z plane
+    V -> RotateZ(-q_phi);
+    V -> RotateY(-q_theta);
+    V -> RotateZ(-Pmiss_phi);
+}
+
+
+#endif
