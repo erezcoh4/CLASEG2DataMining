@@ -9,13 +9,15 @@
 TVector3 TEG2dm::EnergyLossCorrrection(TVector3 p){ // following Or Hen Analysis
     Double_t Pmeasured = p.Mag();
     Double_t CorrFactor= sqrt( pow((0.00135272 + 0.000845728/(pow((0.0746518+Pmeasured),2))+sqrt(pow(p.Mag(),2)+pow(Mp,2))),2)-pow(Mp,2))/p.Mag();
-    return (CorrFactor*p);
+    p = CorrFactor*p;
+    return p;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 TVector3 TEG2dm::CoulombCorrection(TVector3 p , Float_t CoulombDeltaE){
     // following Or Hen Analysis : p' = p x √(√((m^2+p^2)^2+∆E^2) - m^2)
-    return (sqrt(pow(sqrt(pow(Mp,2)+pow(p.Mag(),2))+CoulombDeltaE,2) - pow(Mp,2))/p.Mag())*p;
+    p = (sqrt(pow(sqrt(pow(Mp,2)+pow(p.Mag(),2))+CoulombDeltaE,2) - pow(Mp,2))/p.Mag())*p;
+    return p;
 }
 
 
