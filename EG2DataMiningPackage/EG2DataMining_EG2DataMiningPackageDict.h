@@ -31,6 +31,7 @@ extern void G__set_cpp_environmentEG2DataMining_EG2DataMiningPackageDict();
 
 #include "TObject.h"
 #include "TMemberInspector.h"
+#include "TAnalysisEG2.h"
 #include "TCalcPhysVarsEG2.h"
 #include "TEG2dm.h"
 #include "TSchemeDATA.h"
@@ -166,6 +167,8 @@ extern G__linked_taginfo G__EG2DataMining_EG2DataMiningPackageDictLN_vectorlETLo
 extern G__linked_taginfo G__EG2DataMining_EG2DataMiningPackageDictLN_vectorlETLorentzVectorcOallocatorlETLorentzVectorgRsPgRcLcLiterator;
 extern G__linked_taginfo G__EG2DataMining_EG2DataMiningPackageDictLN_reverse_iteratorlEvectorlETLorentzVectorcOallocatorlETLorentzVectorgRsPgRcLcLiteratorgR;
 extern G__linked_taginfo G__EG2DataMining_EG2DataMiningPackageDictLN_TEG2dm;
+extern G__linked_taginfo G__EG2DataMining_EG2DataMiningPackageDictLN_TAnalysisEG2;
+extern G__linked_taginfo G__EG2DataMining_EG2DataMiningPackageDictLN_TRandom3;
 extern G__linked_taginfo G__EG2DataMining_EG2DataMiningPackageDictLN_TCalcPhysVarsEG2;
 extern G__linked_taginfo G__EG2DataMining_EG2DataMiningPackageDictLN_TSchemeDATA;
 

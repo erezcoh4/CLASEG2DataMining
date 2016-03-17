@@ -61,4 +61,22 @@ void TEG2dm::RotateVec_To_qPmiss_frame( TVector3 * V, float q_phi, float q_theta
 }
 
 
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+Float_t TEG2dm::LCfraction(TLorentzVector v, Float_t A_over_mA ){
+    return A_over_mA * ( v.E() - v.Pz() );
+}
+
+
+
+
 #endif
+
+
+
+
+
+
+
+
+

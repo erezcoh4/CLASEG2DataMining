@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include "TEG2dm.h"
+#include "TRandom3.h"
 
 using namespace std;
 /**
@@ -34,6 +35,7 @@ public:
     TFile   * InFile    , * OutFile;
     TTree   * InTree    , * OutTree;
     TPlots  plot;
+    TRandom3  rand;
     
     int     Nentries    , Entry;
     
@@ -48,29 +50,27 @@ public:
     Float_t Xb          , Q2        , Nu        , W;
     Float_t PpX[20]     , PpY[20]   , PpZ[20]   ;  //proton momentum
     Float_t Px_e        , Py_e      , Pz_e      , X_e     ,   Y_e     ,   Z_e   ;
-    Float_t alpha_q     , alpha[20] , sum_alpha;
+    Float_t alpha_q     , sum_alpha;
     Float_t p_over_q    , theta_pq  ;
     Float_t q_phi       , q_theta   , Pmiss_phi;
     Float_t Emiss       , Mmiss;
     Float_t mA          , CoulombDeltaE         , A_over_mA;
     Float_t uns_CTOF[20];
+    Float_t Tp[20]      , Mrec                  , Trec;             // protons kinetic energy, recoil mass & kinetic energy
     
-    vector<Float_t>    pMag;
+    vector<Float_t>    alpha;
     
     
     
-    TVector3    q3vec   , eVertex;
-    TVector3    uns_p3vec[20];
-    TVector3    Plead   , Pmiss     , Pcm       , Prec;
-    
+    TVector3    eVertex;    
     vector<TVector3>   p3vec   , pVertex   ;
     
     
     
     
     
-    TLorentzVector  q   , TargetAtRest;
-    vector<TLorentzVector> Uprotons , protons ;
+    TLorentzVector          q     , NucleonAtRest     , TargetAtRest  ,   Plead   , Pmiss     , Pcm       , Prec;
+    vector<TLorentzVector>  protons ;
 
     
     
@@ -105,13 +105,16 @@ public:
     void        InitEvent ();
     
     
-    void  AcquireNucleons (int entry);
+    void  ComputePhysVars (int entry);
     void     sort_protons ();
-    vector<size_t> sort_pMag (const vector<float> &v);
     vector<size_t> sort_pMag (const vector<TVector3> &v);
     
     
+    void   Pmiss_q_frame ();
+    void    p23Randomize ();
     
+    
+    void       PrintData (int);
 };
 
 #endif

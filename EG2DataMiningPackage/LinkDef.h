@@ -19,7 +19,9 @@
 #pragma link C++ class TEG2dm+;
 #pragma link C++ class TSchemeDATA+;
 #pragma link C++ class TCalcPhysVarsEG2+;
+#pragma link C++ class TAnalysisEG2+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 

@@ -18,6 +18,7 @@
 #include "MySoftwarePackage/TPlots.h"
 #include "MySoftwarePackage/TCalculations.h"
 #include "MySoftwarePackage/TAnalysis.h"
+#define r2d TMath::RadToDeg()
 
 /**
    \class TEG2dm
@@ -46,6 +47,7 @@ public:
     TString            TargetAsString ( int, float *mA = 0 , float *CoulombDeltaE = 0);
     void    RotateVec_To_qPmiss_frame ( TVector3* , float , float , float);
 
+    Float_t                LCfraction ( TLorentzVector , Float_t );
 
 };
 

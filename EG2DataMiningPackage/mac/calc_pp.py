@@ -20,11 +20,13 @@ calc = TCalcPhysVarsEG2( InTree , OutTree , A )
 
 
 
-for entry in range(0, (int)(0.01*Nentries)):
+for entry in range(0, Nentries):
+    
+    calc.ComputePhysVars( entry );
+    calc.PrintData( entry );
 
-    calc.AcquireNucleons( entry );
-#    calc.ComputePhysVariables();
 
+print "done filling %d events" % OutTree.GetEntries()
 
-print "done"
-
+OutTree.Write()
+OutFile.Close()
