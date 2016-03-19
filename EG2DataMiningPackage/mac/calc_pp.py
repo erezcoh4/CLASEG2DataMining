@@ -1,8 +1,9 @@
 import ROOT
 from ROOT import TEG2dm
+from ROOT import TSchemeDATA
+from ROOT import TAnalysisEG2
 from ROOT import TCalcPhysVarsEG2
 
-dm = TEG2dm
 
 A           = 12
 Path        = "/Users/erezcohen/Desktop/DataMining"
@@ -16,11 +17,15 @@ Nentries    = InTree.GetEntries()
 OutFile     = ROOT.TFile(Path + "/AnaFiles/"+"Ana_"+"ppSRC_"+FileName+".root","recreate")
 OutTree     = ROOT.TTree("anaTree","physical variables ppSRC")
 
-calc = TCalcPhysVarsEG2( InTree , OutTree , A )
+calc    = TCalcPhysVarsEG2( InTree , OutTree , A , "data" , "Pmiss(z) - q(x-z) frame" ) 
+dm      = TEG2dm()
+scheme  = TSchemeDATA()
+anaEG2  = TAnalysisEG2()
+anaEG2.SetSRCCuts()
 
 
 
-for entry in range(0, Nentries):
+for entry in range(0, (int)(1.*Nentries)):
     
     calc.ComputePhysVars( entry );
     calc.PrintData( entry );
@@ -30,3 +35,7 @@ print "done filling %d events" % OutTree.GetEntries()
 
 OutTree.Write()
 OutFile.Close()
+
+
+
+scheme.SchemeOnTCut(Path+"/AnaFiles", "Ana_ppSRC_"+FileName+".root", "anaTree","Ana_ppSRC_"+FileName+"_FullCuts.root", anaEG2.ppSRCCut)

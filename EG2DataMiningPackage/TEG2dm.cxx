@@ -53,11 +53,19 @@ TString TEG2dm::TargetAsString(int A, float *mA , float *CoulombDeltaE){
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-void TEG2dm::RotateVec_To_qPmiss_frame( TVector3 * V, float q_phi, float q_theta, float Pmiss_phi){
+void TEG2dm::RotVec2_q_Pm_Frame( TVector3 * V, float q_phi, float q_theta, float Pmiss_phi){
     // move to q-Pmiss system: q is the z axis, Pmiss is in x-z plane
     V -> RotateZ(-q_phi);
     V -> RotateY(-q_theta);
     V -> RotateZ(-Pmiss_phi);
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void TEG2dm::RotVec2_Pm_q_Frame( TVector3 * V, float Pmiss_phi, float Pmiss_theta, float q_phi){
+    // move to Pmiss-q system: Pmiss is the z axis, q is in x-z plane
+    V -> RotateZ(-Pmiss_phi);
+    V -> RotateY(-Pmiss_theta);
+    V -> RotateZ(-q_phi);
 }
 
 

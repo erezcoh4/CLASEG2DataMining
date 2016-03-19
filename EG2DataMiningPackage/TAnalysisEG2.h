@@ -55,6 +55,20 @@ public:
     void          SetPath (TString path){Path = path;};
     
     
+    
+    // plots
+    void    DrawVarAnd2pSRCCut (TCanvas *, int, TString, int, float, float, TString, TString );
+    void  Draw2DVarAnd2pSRCCut (TCanvas *, int, TString, TString, int, float, float, int, float, float, TString, TString , TString);
+
+
+    
+    
+    // cuts
+    TCut    cutXb   ,   cutPmiss    ,   cutThetaPQ , cutPoverQ  , cutMmiss  , cutPlead  , cutPrec  , cutSRC;
+    TCut    ppSRCCut;
+    
+    void            SetSRCCuts ();
+
 };
 
 #endif

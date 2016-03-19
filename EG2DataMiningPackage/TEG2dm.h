@@ -45,7 +45,8 @@ public:
     TVector3    EnergyLossCorrrection ( TVector3 );
     TVector3        CoulombCorrection ( TVector3 , Float_t );
     TString            TargetAsString ( int, float *mA = 0 , float *CoulombDeltaE = 0);
-    void    RotateVec_To_qPmiss_frame ( TVector3* , float , float , float);
+    void           RotVec2_q_Pm_Frame ( TVector3* , float , float , float);
+    void           RotVec2_Pm_q_Frame ( TVector3* , float , float , float);
 
     Float_t                LCfraction ( TLorentzVector , Float_t );
 

@@ -38,7 +38,7 @@ public:
     TRandom3  rand;
     
     int     Nentries    , Entry;
-    
+    TString FrameName   ;          // prefered frame of axes to work in....
     
     
     
@@ -48,11 +48,11 @@ public:
     Int_t   P_cut[20]   , P_PID[20]  ;             //positive particles
     
     Float_t Xb          , Q2        , Nu        , W;
-    Float_t PpX[20]     , PpY[20]   , PpZ[20]   ;  //proton momentum
-    Float_t Px_e        , Py_e      , Pz_e      , X_e     ,   Y_e     ,   Z_e   ;
+    Float_t PpX[20]     , PpY[20]   , PpZ[20]   , Xp[20]  ,   Yp[20]  ,   Zp[20];   // proton momentum and vertex
+    Float_t Px_e        , Py_e      , Pz_e      , X_e     ,   Y_e     ,   Z_e   ;   // electron
     Float_t alpha_q     , sum_alpha;
     Float_t p_over_q    , theta_pq  ;
-    Float_t q_phi       , q_theta   , Pmiss_phi;
+    Float_t q_phi       , q_theta   , Pmiss_phi , Pmiss_theta;
     Float_t Emiss       , Mmiss;
     Float_t mA          , CoulombDeltaE         , A_over_mA;
     Float_t uns_CTOF[20];
@@ -79,7 +79,7 @@ public:
     
     /// Default constructor
     TCalcPhysVarsEG2    (){}
-    TCalcPhysVarsEG2    (TTree * fInTree, TTree * fOutTree, int fA = 12, TString fDataType = "data" );
+    TCalcPhysVarsEG2    (TTree * fInTree, TTree * fOutTree, int fA = 12, TString fDataType = "data" , TString fFrameName = "q(z) - Pmiss(x-z) frame");
 
  
     /// Default destructor
@@ -95,10 +95,9 @@ public:
     void          SetPath (TString path){Path = path;};
     void        SetInTree (TTree * tree){InTree = tree;};
     void       SetOutTree (TTree * tree){OutTree = tree;};
-
+    void     SetFrameName (TString name){FrameName = name;};
     
-    
-    
+    // initializations
     void    InitInputTree ();
     void   InitOutputTree ();
     void      InitGlobals ();
@@ -110,7 +109,10 @@ public:
     vector<size_t> sort_pMag (const vector<TVector3> &v);
     
     
+    void ChangeAxesFrame ();
+    void   q_Pmiss_frame ();
     void   Pmiss_q_frame ();
+    
     void    p23Randomize ();
     
     

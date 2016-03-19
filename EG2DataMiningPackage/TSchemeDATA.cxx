@@ -65,14 +65,26 @@ void TSchemeDATA::WriteOutFile(){
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-void TSchemeDATA::SchemeOnTCut(TCut cut)
+void TSchemeDATA::SchemeOnTCut(TString Path, TString fInFileName, TString fInTreeName, TString fOutFileName, TCut cut)
 {
-    for (Long64_t i = 0; i < Nentries ; i++) {
-        if (InTree -> Draw("Xb",cut,"goff",i,1)) {
-            if (i%1000==0) plot.PrintPercentStr((float)i/Nentries);
-            InTree -> GetEntry(i);
+    Printf("scheming to ");
+    cut.Print();
+    TFile * TmpInFile = new TFile(Form("%s/%s",Path.Data() , fInFileName.Data()));
+    TTree * TmpTree = (TTree*) TmpInFile -> Get(fInTreeName);
+    TFile * TmpOutFile = new TFile(Form("%s/%s",Path.Data(), fOutFileName.Data()),"recreate");
+    TTree * TmpOutTree = TmpTree -> CloneTree(0);
+    Printf("will scheme %lld events",TmpTree->GetEntries(cut));
+    int TmpNentries = TmpTree->GetEntries();
+    for (Long64_t i = 0; i < TmpNentries ; i++) {
+        if (i%(TmpNentries/10)==0) plot.PrintPercentStr((float)i/TmpNentries);
+        if (TmpTree -> Draw("Xb",cut,"O goff",1,i)==1) {
+            TmpTree -> GetEntry(i);
+            TmpOutTree -> Fill();
         }
     }
+    Printf("schemed from %s to %s (%lld events passed the cut)",TmpInFile->GetName(),TmpOutFile->GetName(),TmpOutTree->GetEntries());
+    TmpOutTree -> Write();
+    TmpOutFile -> Close();
 }
 
     
