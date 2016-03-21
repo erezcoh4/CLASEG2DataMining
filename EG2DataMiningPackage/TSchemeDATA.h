@@ -93,7 +93,7 @@ public:
     
     
     void     SchemeOnTCut (TString , TString , TString , TString , TCut);
-    void       SRCPmissXb (int fTargetType = 2 , float fXbMin = 1.05, int fNpMin = 1, int fNpMax= 5);
+    void       SRCPmissXb (int fTargetType = 2 , float fXbMin = 1.05, int fNpMin = 1, int fNpMax= 5, TString name="");
     
     
 };
