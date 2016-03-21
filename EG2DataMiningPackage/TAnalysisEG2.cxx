@@ -49,7 +49,6 @@ void TAnalysisEG2::DrawVarAnd2pSRCCut(TCanvas * c, int i , TString var
 
 
 
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TAnalysisEG2::Draw2DVarAnd2pSRCCut(TCanvas * c  , int i , TString varX , TString varY,
                                         int NbinsX , float Xmin , float Xmax,

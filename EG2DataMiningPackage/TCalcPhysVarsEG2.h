@@ -44,25 +44,25 @@ public:
     
     // PARTICLES....
     Int_t   targ_type   , A;
-    Int_t   Np          , Nn;
-    Int_t   P_cut[20]   , P_PID[20]  ;             //positive particles
+    Int_t   Np          ;
     
-    Float_t Xb          , Q2        , Nu        , W;
+    Float_t Xb          , Q2        , Nu        ;
     Float_t PpX[20]     , PpY[20]   , PpZ[20]   , Xp[20]  ,   Yp[20]  ,   Zp[20];   // proton momentum and vertex
     Float_t Px_e        , Py_e      , Pz_e      , X_e     ,   Y_e     ,   Z_e   ;   // electron
     Float_t alpha_q     , sum_alpha;
     Float_t p_over_q    , theta_pq  ;
     Float_t q_phi       , q_theta   , Pmiss_phi , Pmiss_theta;
     Float_t Emiss       , Mmiss;
-    Float_t mA          , CoulombDeltaE         , A_over_mA;
-    Float_t uns_CTOF[20];
-    Float_t Tp[20]      , Mrec                  , Trec;             // protons kinetic energy, recoil mass & kinetic energy
+    Float_t mA          , CoulombDeltaE         , A_over_mA ;
+    Float_t Tp[20]      , Mrec                  , Trec      ;             // protons kinetic energy, recoil mass & kinetic energy
+    Float_t uns_pEdep[20]           , uns_pCut[20]  , uns_pCTOF[20] , uns_pID[20]   ;
+    Float_t N_Px[20]    , N_Py[20]  , N_Pz[20]; // for raw data
     
-    vector<Float_t>    alpha;
+    vector<Float_t>     alpha    , pEdep         , pCTOF     ;
+    vector<Int_t>       pCut      , pID      ;
     
     
     
-    TVector3    eVertex;    
     vector<TVector3>   p3vec   , pVertex   ;
     
     

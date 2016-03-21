@@ -34,7 +34,7 @@ public:
     
     
     /// Default constructor
-    TAnalysisEG2 (){}
+    TAnalysisEG2 (){    SetSRCCuts();   }
     TAnalysisEG2 (TString fInFileName);
     
     

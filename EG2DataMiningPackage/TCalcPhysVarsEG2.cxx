@@ -23,27 +23,46 @@ TCalcPhysVarsEG2::TCalcPhysVarsEG2( TTree * fInTree, TTree * fOutTree, int fA , 
 void TCalcPhysVarsEG2::InitInputTree(){
     InTree -> SetBranchAddress("Xb"                 , &Xb);
     InTree -> SetBranchAddress("P_nmb"              , &Np);
+  
     if(DataType == "data") {
         InTree -> SetBranchAddress("Q2"             , &Q2);
         InTree -> SetBranchAddress("Nu"             , &Nu);
         InTree -> SetBranchAddress("Px_e"           , &Px_e);
         InTree -> SetBranchAddress("Py_e"           , &Py_e);
         InTree -> SetBranchAddress("Pz_e"           , &Pz_e);
-        InTree -> SetBranchAddress("W"              , &W);
         InTree -> SetBranchAddress("X_e"            , &X_e);
         InTree -> SetBranchAddress("Y_e"            , &Y_e);
         InTree -> SetBranchAddress("Z_e"            , &Z_e);
-        InTree -> SetBranchAddress("CTOF"           , &uns_CTOF);
         InTree -> SetBranchAddress("Px"             , &PpX);
         InTree -> SetBranchAddress("Py"             , &PpY);
         InTree -> SetBranchAddress("Pz"             , &PpZ);
         InTree -> SetBranchAddress("X"              , &Xp);
         InTree -> SetBranchAddress("Y"              , &Yp);
         InTree -> SetBranchAddress("Z"              , &Zp);
+        InTree -> SetBranchAddress("CTOF"           , &uns_pCTOF);
     }
+    
+    else if(DataType == "no ctof") {
+        InTree -> SetBranchAddress("N_Px"           , &N_Px);    // negative particles momenta (electron is the first)
+        InTree -> SetBranchAddress("N_Py"           , &N_Py);    // negative particles momenta (electron is the first)
+        InTree -> SetBranchAddress("N_Pz"           , &N_Pz);    // negative particles momenta (electron is the first)
+        InTree -> SetBranchAddress("P_Px"           , &PpX);    // protons momenta
+        InTree -> SetBranchAddress("P_Py"           , &PpY);
+        InTree -> SetBranchAddress("P_Pz"           , &PpZ);
+        InTree -> SetBranchAddress("P_X"            , &Xp);
+        InTree -> SetBranchAddress("P_Y"            , &Yp);
+        InTree -> SetBranchAddress("P_Z"            , &Zp);
+        InTree -> SetBranchAddress("P_CTOF"         , &uns_pCTOF);      // protons CTOF
+        InTree -> SetBranchAddress("P_PID"          , &uns_pID);        // positive particles momenta
+        InTree -> SetBranchAddress("P_cut"          , &uns_pCut);       // positive particles momenta
+        InTree -> SetBranchAddress("P_Edep"         , &uns_pEdep);
+    }
+    
     Nentries    = InTree -> GetEntries();
     std::cout << "Initialized Input InTree TCalcPhysVarsEG2 for " << InTree -> GetName() <<", Nentries = " <<  Nentries << std::endl;
 }
+
+
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -51,7 +70,9 @@ void TCalcPhysVarsEG2::InitOutputTree(){
 
     // Integer branches
     OutTree -> Branch("Np"                  ,&Np                    ,"Np/I");
-    
+    OutTree -> Branch("pID"                 ,&pID                   );// std::vector<Int_t>
+    OutTree -> Branch("pCut"                ,&pCut                  );// std::vector<Int_t>
+
     
     // Float_t branches
     OutTree -> Branch("Xb"                  ,&Xb                    , "Xb/F");
@@ -61,21 +82,24 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("theta_pq"            ,&theta_pq              , "theta_pq/F");
     OutTree -> Branch("p_over_q"            ,&p_over_q              , "p_over_q/F");
     OutTree -> Branch("alpha_q"             ,&alpha_q               , "alpha_q/F");
-    OutTree -> Branch("alpha"               ,&alpha                 , "alpha[Np]/F");
     OutTree -> Branch("sum_alpha"           ,&sum_alpha             , "sum_alpha/F");
+    OutTree -> Branch("alpha"               ,&alpha                 );// std::vector<Float_t>
+    OutTree -> Branch("pCTOF"               ,&pCTOF                 );// std::vector<Float_t>
+    OutTree -> Branch("pEdep"               ,&pEdep                 );// std::vector<Float_t>
+
 
     
-
+    // TVector3 branches
+    OutTree -> Branch("pVertex"             ,&pVertex);             // std::vector<TVector3>
+ 
     
     // TLorentzVector branches
-    OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
-    OutTree -> Branch("pVertex"             ,&pVertex);             // std::vector<TVector3>
     OutTree -> Branch("Pmiss"               ,"TLorentzVector"       ,&Pmiss);
     OutTree -> Branch("Pcm"                 ,"TLorentzVector"       ,&Pcm);
     OutTree -> Branch("Plead"               ,"TLorentzVector"       ,&Plead);
     OutTree -> Branch("Prec"                ,"TLorentzVector"       ,&Prec);
     OutTree -> Branch("q"                   ,"TLorentzVector"       ,&q);
-
+    OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
     
     
     
@@ -101,6 +125,10 @@ void TCalcPhysVarsEG2::InitEvent(){
     if (!protons.empty())   protons.clear();
     if (!pVertex.empty())   pVertex.clear();
     if (!alpha.empty())     alpha.clear();
+    if (!pCTOF.empty())     pCTOF.clear();
+    if (!pCut.empty())      pCut.clear();
+    if (!pID.empty())       pID.clear();
+    if (!pEdep.empty())     pEdep.clear();
     Plead = TLorentzVector();
 }
 
@@ -113,8 +141,12 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     InTree -> GetEntry(entry);
     
     // electron
-    q.SetPxPyPzE( - Px_e , - Py_e , 5.009 - Pz_e , Nu);
-    eVertex.SetXYZ( X_e , Y_e , Z_e );
+    if(DataType == "data") {
+        q.SetPxPyPzE( - Px_e , - Py_e , 5.009 - Pz_e , Nu);
+    }
+    else if (DataType == "no ctof"){
+        q.SetPxPyPzE( - N_Px[0] , - N_Py[0] , 5.009 - N_Pz[0], Nu);
+    }
     
     
    
@@ -237,12 +269,18 @@ void TCalcPhysVarsEG2::sort_protons(){
             RotVec2_q_Pm_Frame( & p3vec.at(i) , q_phi, q_theta, Pmiss_phi );
         else if(FrameName == "Pmiss(z) - q(x-z) frame")
             RotVec2_Pm_q_Frame( & p3vec.at(i) , Pmiss_phi, Pmiss_theta, q_phi );
-        protons.push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
+        protons .push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
         Pcm += protons.back();
         
         
         // proton vertex
         pVertex.push_back( TVector3( Xp[i] , Yp[i] , Zp[i] ) );
+        
+        // proton identification
+        pCut    .push_back( uns_pCut[i] );
+        pID     .push_back( uns_pID[i] );
+        pCTOF   .push_back( uns_pCTOF[i] );
+        pEdep   .push_back( uns_pEdep[i] );
         
  
         
