@@ -95,7 +95,8 @@ public:
     
     
     void     SchemeOnTCut (TString , TString , TString , TString , TCut);
-    void     SchemeOnTCut (TString , TString , TString , TString , const int N, TString * v, Float_t Min[N], Float_t Max[N]);
+    // DELETE April 21
+//    void     SchemeOnTCut (TString , TString , TString , TString , vector<TString> ,  vector<Float_t>,  vector<Float_t>);
     
     
 };

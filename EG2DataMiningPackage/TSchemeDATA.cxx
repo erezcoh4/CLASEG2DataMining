@@ -143,52 +143,43 @@ void TSchemeDATA::SchemeOnTCut(TString Path, TString fInFileName, TString fInTre
     TFile * TmpInFile = new TFile(Form("%s/%s",Path.Data() , fInFileName.Data()));
     TTree * TmpTree = (TTree*) TmpInFile -> Get(fInTreeName);
     TFile * TmpOutFile = new TFile(Form("%s/%s",Path.Data(), fOutFileName.Data()),"recreate");
-    TTree * TmpOutTree = TmpTree -> CloneTree(0);
-    Printf("will scheme %lld events",TmpTree->GetEntries(cut));
-    int TmpNentries = TmpTree->GetEntries();
-    for (Long64_t i = 0; i < TmpNentries ; i++) {
-        if (i%(TmpNentries/10)==0) plot.PrintPercentStr((float)i/TmpNentries);
-        if (TmpTree -> Draw("Xb",cut,"O goff",1,i)==1) {
-            TmpTree -> GetEntry(i);
-            TmpOutTree -> Fill();
-        }
-    }
+    TTree * TmpOutTree = TmpTree -> CopyTree(cut);
     Printf("schemed from %s to %s (%lld events passed the cut)",TmpInFile->GetName(),TmpOutFile->GetName(),TmpOutTree->GetEntries());
     TmpOutTree -> Write();
     TmpOutFile -> Close();
 }
 
 
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-void TSchemeDATA::SchemeOnTCut(TString Path, TString fInFileName, TString fInTreeName, TString fOutFileName, const int Nvars, TString * vars, Float_t Min[Nvars], Float_t Max[Nvars])
-{
-    TFile * TmpInFile = new TFile(Form("%s/%s",Path.Data() , fInFileName.Data()));
-    TTree * TmpTree = (TTree*) TmpInFile -> Get(fInTreeName);
-    Float_t x[Nvars];
-    for (int i = 0; i < Nvars; i++) {
-        TmpTree -> SetBranchAddress(vars[i] , &x[i]);
-    }
-    TFile * TmpOutFile = new TFile(Form("%s/%s",Path.Data(), fOutFileName.Data()),"recreate");
-    TTree * TmpOutTree = TmpTree -> CloneTree(0);
-    bool FillEvent;
-    
-    int TmpNentries = TmpTree->GetEntries();
-    for (Long64_t i = 0; i < TmpNentries ; i++) {
-        if (i%(TmpNentries/10)==0) plot.PrintPercentStr((float)i/TmpNentries);
-        FillEvent = true;
-        TmpTree -> GetEntry(i);
-        for ( int i = 0 ; i < Nvars ; i++ ) {
-            FillEvent = FillEvent && (Min[i] < x[i] && x[i] < Max[i]);
-        }
-        if (FillEvent == true) {
-            TmpOutTree -> Fill();
-        }
-    }
-    Printf("schemed from %s to %s (%lld events passed the cut)",TmpInFile->GetName(),TmpOutFile->GetName(),TmpOutTree->GetEntries());
-    TmpOutTree -> Write();
-    TmpOutFile -> Close();
-}
+// DELETE April 21
+////....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//void TSchemeDATA::SchemeOnTCut(TString Path, TString fInFileName, TString fInTreeName, TString fOutFileName, vector<TString> vars, vector<Float_t> Min, vector<Float_t> Max)
+//{
+//    TFile * TmpInFile = new TFile(Form("%s/%s",Path.Data() , fInFileName.Data()));
+//    TTree * TmpTree = (TTree*) TmpInFile -> Get(fInTreeName);
+//    vector<Float_t> x;
+//    for (int i = 0; i < vars.size() ; i++) {
+//        TmpTree -> SetBranchAddress(vars.at(i) , &x.at(i));
+//    }
+//    TFile * TmpOutFile = new TFile(Form("%s/%s",Path.Data(), fOutFileName.Data()),"recreate");
+//    TTree * TmpOutTree = TmpTree -> CloneTree(0);
+//    bool FillEvent;
+//    
+//    int TmpNentries = TmpTree->GetEntries();
+//    for (Long64_t i = 0; i < TmpNentries ; i++) {
+//        if (i%(TmpNentries/10)==0) plot.PrintPercentStr((float)i/TmpNentries);
+//        FillEvent = true;
+//        TmpTree -> GetEntry(i);
+//        for ( size_t i = 0 ; i < vars.size() ; i++ ) {
+//            FillEvent = FillEvent && (Min.at(i) <= x.at(i) && x.at(i) <= Max.at(i));
+//        }
+//        if (FillEvent == true) {
+//            TmpOutTree -> Fill();
+//        }
+//    }
+//    Printf("schemed from %s to %s (%lld events passed the cut)",TmpInFile->GetName(),TmpOutFile->GetName(),TmpOutTree->GetEntries());
+//    TmpOutTree -> Write();
+//    TmpOutFile -> Close();
+//}
 
 
 

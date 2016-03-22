@@ -58,12 +58,15 @@ public:
     Float_t uns_pEdep[20]           , uns_pCut[20]  , uns_pCTOF[20] , uns_pID[20]   ;
     Float_t N_Px[20]    , N_Py[20]  , N_Pz[20]; // for raw data
     
-    vector<Float_t>     alpha    , pEdep         , pCTOF     ;
-    vector<Int_t>       pCut      , pID      ;
+    
+    Double_t    pcmX    , pcmY      , pcmZ  ;
+    
+    vector<Float_t>     alpha       , pEdep         , pCTOF     ;
+    vector<Int_t>       pCut        , pID      ;
     
     
     
-    vector<TVector3>   p3vec   , pVertex   ;
+    vector<TVector3>   p3vec        , pVertex   ;
     
     
     

@@ -103,6 +103,12 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     
     
     
+    // p(cm) for rooFit
+    OutTree -> Branch("pcmX"               ,&pcmX                   , "pcmX/D");
+    OutTree -> Branch("pcmY"               ,&pcmY                   , "pcmY/D");
+    OutTree -> Branch("pcmZ"               ,&pcmZ                   , "pcmZ/D");
+
+    
     std::cout << "Initialized Output Tree TCalcPhysVarsEG2 on " << OutTree -> GetTitle() << std::endl;
 
 
@@ -205,7 +211,9 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     if (Np==3) p23Randomize();
 
     
-    
+    pcmX = Pcm.Px();
+    pcmY = Pcm.Py();
+    pcmZ = Pcm.Pz();
     
     // finally, fill the TTree output
     OutTree -> Fill();
