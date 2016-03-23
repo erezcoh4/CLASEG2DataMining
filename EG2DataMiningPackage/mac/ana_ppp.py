@@ -13,13 +13,13 @@ DoCuts      = True
 
 
 Nbins   = 50
-ana     = TAnalysisEG2("NoCTofDATA_C12")
+ana     = TAnalysisEG2("NoCTofDATA_C12" , ROOT.TCut("1.05 <= Xb"))
 cut     = ROOT.TCut()
 
 
 
 if DoCuts:
-    cSRC = ana.CreateCanvas("SRCcuts","DivideSquare",4)
+    cSRC = ana.CreateCanvas("SRCcuts","Divide",3,4 )
     
     ana.Draw1DVarAndCut(cSRC , 1 , "Xb"         , Nbins , 1     , 2.5
                         , "Bjorken x"   ,"x" , ana.cutSRC , True )
@@ -29,11 +29,32 @@ if DoCuts:
                         
     ana.Draw2DVarAndCut(cSRC , 3 , "p_over_q"  ,  "theta_pq"   , Nbins , 0.2   , 1  , Nbins , 0   , 50
                         , "p/q vs. #theta (p,q)" , "p/q" , "#theta (p,q) [deg.]" , ana.cutSRC )
-    #ADD :
-    # prec(2) vs. prec(3) with both cut on >0.3
-    # CTOF p1
-    # CTOF p2 vs. CTOF p3
-    # Edep p1, Edep p2 , Edep p3
+                        
+    ana.Draw2DVarAndCut(cSRC , 4 , "protons[1].P()"  ,  "protons[2].P()"   , Nbins , 0.2   , 1  , Nbins , 0.2   , 1
+                                 , "recoil protons momenta" , "p(2) [GeV/c]" , "p(3) [GeV/c]" , ana.pppSRCCut )
+
+    ana.Draw2DVarAndCut(cSRC , 5 , "pCTOF[1]"  ,  "pCTOF[2]"   , Nbins , -20   , 20  , Nbins , -20   , 20
+                    , "recoil protons CTOF" , "CTOF p(2) [ns]" , "CTOF p(3) [ns]" , ana.pppSRCCut )
     
+    
+    ana.Draw2DVarAndCut(cSRC , 7 ,  "protons[0].P()"   , "pEdep[0]"  , Nbins , 0.2   , 2  , Nbins , 0   , 70
+                                , "p(lead) Edep in TOF scintillators" , "proton momentum [GeV/c]" , "Edep [MeV]" , ana.pppSRCCut )
+                                
+    ana.Draw2DVarAndCut(cSRC , 8 ,  "protons[1].P()"   , "pEdep[1]"  , Nbins , 0.2   , 2  , Nbins , 0   , 70
+                                , "p(2) Edep in TOF scintillators" , "proton momentum [GeV/c]" , "Edep [MeV]" , ana.pppSRCCut )
+                     
+    ana.Draw2DVarAndCut(cSRC , 9 ,  "protons[2].P()"   , "pEdep[2]"  , Nbins , 0.2   , 2  , Nbins , 0   , 70
+                                    , "p(3) Edep in TOF scintillators" , "proton momentum [GeV/c]" , "Edep [MeV]" , ana.pppSRCCut )
+                                    
+    ana.Draw1DVarAndCut(cSRC , 10 , "pVertex[0].Z()"  , Nbins , -34   , -20
+                                    , "leading proton vertex" , "(p vertex)^{z} [cm]" , ana.pppSRCCut )
+                                    
+    ana.Draw1DVarAndCut(cSRC , 11 , "pVertex[1].Z()"  , Nbins , -34   , -20
+                                  , "proton 2 vertex" , "(p vertex)^{z} [cm]" , ana.pppSRCCut )
+                                                    
+    ana.Draw1DVarAndCut(cSRC , 12 , "pVertex[2].Z()"  , Nbins , -34   , -20
+                                  , "proton 3 vertex" , "(p vertex)^{z} [cm]" , ana.pppSRCCut )
+                                                
+    cSRC.Update()
     wait()
 

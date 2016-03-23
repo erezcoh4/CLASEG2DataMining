@@ -50,6 +50,9 @@ public:
 
     Float_t                LCfraction ( TLorentzVector , Float_t );
 
+    
+    TCutG                  * pEdepCut (int);
+
 };
 
 #endif

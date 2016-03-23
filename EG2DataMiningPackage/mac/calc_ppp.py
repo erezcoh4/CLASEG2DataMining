@@ -26,17 +26,17 @@ OutFile     = ROOT.TFile(Path + "/AnaFiles/"+"Ana_"+FileName+".root","recreate")
 OutTree     = ROOT.TTree("anaTree","physical variables ppp SRC")
 
 calc        = TCalcPhysVarsEG2( InTree , OutTree , A , DataType , "q(z) - Pmiss(x-z) frame" )
-dm          = TEG2dm()
-scheme      = TSchemeDATA()
-anaEG2      = TAnalysisEG2()
-anaEG2.SetSRCCuts()
+#dm          = TEG2dm()
+#scheme      = TSchemeDATA()
+#anaEG2      = TAnalysisEG2()
 
 
 
 for entry in range(0, (int)(1.*Nentries)):
     
     calc.ComputePhysVars( entry );
-#    calc.PrintData( entry );
+    if (calc.Np >= 3):
+        calc.PrintData( entry );
 
 
 print "done filling %d events" % OutTree.GetEntries()
@@ -46,5 +46,3 @@ OutTree.Write()
 OutFile.Close()
 
 
-
-#scheme.SchemeOnTCut(Path+"/AnaFiles", "Ana_ppSRC_"+FileName+".root", "anaTree","Ana_ppSRC_"+FileName+"_FullCuts.root", anaEG2.ppSRCCut)

@@ -70,8 +70,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
 
     // Integer branches
     OutTree -> Branch("Np"                  ,&Np                    ,"Np/I");
-    OutTree -> Branch("pID"                 ,&pID                   );// std::vector<Int_t>
-    OutTree -> Branch("pCut"                ,&pCut                  );// std::vector<Int_t>
+    OutTree -> Branch("pCTOFCut"            ,&pCTOFCut              );// std::vector<Int_t>
 
     
     // Float_t branches
@@ -132,8 +131,7 @@ void TCalcPhysVarsEG2::InitEvent(){
     if (!pVertex.empty())   pVertex.clear();
     if (!alpha.empty())     alpha.clear();
     if (!pCTOF.empty())     pCTOF.clear();
-    if (!pCut.empty())      pCut.clear();
-    if (!pID.empty())       pID.clear();
+    if (!pCTOFCut.empty())  pCTOFCut.clear();
     if (!pEdep.empty())     pEdep.clear();
     Plead = TLorentzVector();
 }
@@ -195,7 +193,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
     
     // sort the protons and loop on them for variables calculations only once more!
-    sort_protons();
+    loop_protons();
 
     
     // all recoil protons together (just without the leading proton)
@@ -267,7 +265,7 @@ void TCalcPhysVarsEG2::Pmiss_q_frame(){
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-void TCalcPhysVarsEG2::sort_protons(){
+void TCalcPhysVarsEG2::loop_protons(){
 
 
     for (auto i: sort_pMag( p3vec )){
@@ -277,18 +275,18 @@ void TCalcPhysVarsEG2::sort_protons(){
             RotVec2_q_Pm_Frame( & p3vec.at(i) , q_phi, q_theta, Pmiss_phi );
         else if(FrameName == "Pmiss(z) - q(x-z) frame")
             RotVec2_Pm_q_Frame( & p3vec.at(i) , Pmiss_phi, Pmiss_theta, q_phi );
+        
         protons .push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
-        Pcm += protons.back();
+        Pcm     += protons.back();
         
         
         // proton vertex
-        pVertex.push_back( TVector3( Xp[i] , Yp[i] , Zp[i] ) );
+        pVertex .push_back( TVector3( Xp[i] , Yp[i] , Zp[i] ) );
         
         // proton identification
-        pCut    .push_back( uns_pCut[i] );
-        pID     .push_back( uns_pID[i] );
-        pCTOF   .push_back( uns_pCTOF[i] );
-        pEdep   .push_back( uns_pEdep[i] );
+        pCTOFCut.push_back( uns_pCut[i] * uns_pID[i] );
+        pCTOF   .push_back( uns_pCTOF[i]  );
+        pEdep   .push_back( uns_pEdep[i]  );
         
  
         
@@ -322,9 +320,14 @@ vector<size_t> TCalcPhysVarsEG2::sort_pMag(const vector<TVector3> &v) {
 void TCalcPhysVarsEG2::p23Randomize(){
         // If we have 3 protons, randomly choose which is p₂ and which is p₃ with a probablity of 50%
         if( rand.Uniform() > 0.5 ){
-            TLorentzVector pTmp  = protons[1];
-            protons[1]  = protons[2];
-            protons[2]  = pTmp;
+            
+            std::iter_swap(protons.begin()+1    ,protons.begin()+2);
+            std::iter_swap(pCTOFCut.begin()+1   ,pCTOFCut.begin()+2);
+            std::iter_swap(pCTOF.begin()+1      ,pCTOF.begin()+2);
+            std::iter_swap(pEdep.begin()+1      ,pEdep.begin()+2);
+            std::iter_swap(pVertex.begin()+1    ,pVertex.begin()+2);
+            std::iter_swap(alpha.begin()+1      ,alpha.begin()+2);
+            
         }
 }
 
@@ -339,6 +342,9 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOWvectorTLorentzVector(protons);
     SHOWstdTVector3(pVertex);
     SHOWvectorFloat_t(alpha);
+    SHOW(alpha_q);
+    SHOWvectorInt_t(pCTOFCut);
+    SHOWvectorFloat_t(pEdep);
     SHOWTLorentzVector(Plead);
     SHOW(sum_alpha);
     SHOWTLorentzVector(Pmiss);

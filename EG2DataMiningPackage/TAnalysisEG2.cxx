@@ -7,12 +7,12 @@
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-TAnalysisEG2::TAnalysisEG2(TString fInFileName):
-TPlots("$DataMiningAnaFiles/Ana_" + fInFileName + ".root","anaTree",fInFileName,true){
+TAnalysisEG2::TAnalysisEG2(TString fInFileName, TCut XbCut):
+TPlots("$DataMiningAnaFiles/Ana_" + fInFileName + ".root","anaTree",fInFileName,false){
     SetPath("$DataMiningAnaFiles");
     SetInFileName( "Ana_" + fInFileName + ".root");
     
-    SetSRCCuts();
+    SetSRCCuts(XbCut);
     SetInFile( new TFile( "$DataMiningAnaFiles/" + InFileName ));
     SetTree ((TTree*) InFile->Get( "anaTree" ));
 }
@@ -20,21 +20,44 @@ TPlots("$DataMiningAnaFiles/Ana_" + fInFileName + ".root","anaTree",fInFileName,
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-void TAnalysisEG2::SetSRCCuts(){
+void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC cuts
+
     // important (constant) cuts
     
-    cutXb       = "1.2 <= Xb";
+    cutXb       = XbCut;
     cutPmiss    = "0.3 < Pmiss.P() && Pmiss.P() < 1.0";
     cutThetaPQ  = "theta_pq < 25";
     cutPoverQ   = "0.62 < p_over_q && p_over_q < 0.96";
     cutMmiss    = "Mmiss < 1.1";
     
-    cutPlead    = cutThetaPQ && cutPoverQ && cutPmiss && "-24.5 < pVertex[0].Z() && pVertex[0].Z() < -20";
-    cutPrec     = "0.35 < Prec.P()  &&  (-24.5 < pVertex[1].Z() && pVertex[1].Z() < -20)";
-    cutSRC      = cutXb && cutPlead;
+    cutSRC      = cutXb && cutThetaPQ && cutPoverQ && cutPmiss;
     
-    ppSRCCut    = cutSRC && cutMmiss && " 2 <= Np" && cutPrec;
-   
+    for (int i = 0; i < 3; i++ ) {
+                pEdepCut[i] = TEG2dm::pEdepCut(i);
+                pCTOFCut[i] = Form("pID[%d] && pCTOF[%d]",i,i); // CTOF polynomial cut & momentum < 2.8 GeV/c
+    }
+    ppEdepCut   = Form("%s && %s",pEdepCut[0]->GetName(),pEdepCut[1]->GetName());
+    ppCTOFCut   = pCTOFCut[0] && pCTOFCut[1] ;
+    pppEdepCut  = Form("%s && %s && %s",pEdepCut[0]->GetName(),pEdepCut[1]->GetName(),pEdepCut[2]->GetName());
+    pppCTOFCut  = "pCTOFCut[0] && pCTOFCut[1] && pCTOFCut[2]";
+
+    
+    // 2p-SRC following Or Hen' cuts
+    cutPlead    = "-24.5 < pVertex[0].Z() && pVertex[0].Z() < -20";
+    cutPrec     = "0.35 < Prec.P()  &&  (-24.5 < pVertex[1].Z() && pVertex[1].Z() < -20)";
+
+    ppSRCCut    = cutSRC && cutMmiss && " 2 <= Np" && cutPlead && cutPrec;
+    
+    
+    
+    
+    // 3p-SRC
+    cutP1       = "(-27 < pVertex[1].Z() && pVertex[1].Z() < -20)";
+    cutP2       = "0.3 < protons[1].P() && (-27 < pVertex[1].Z() && pVertex[1].Z() < -20)";
+    cutP3       = "0.3 < protons[2].P() && (-27 < pVertex[2].Z() && pVertex[2].Z() < -20)";
+    
+    // pID from ∆E (dep.) in TOF scintillators
+    pppSRCCut   = cutSRC && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut;
 }
 
 

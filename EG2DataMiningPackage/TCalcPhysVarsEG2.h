@@ -17,6 +17,7 @@
 #include <iostream>
 #include "TEG2dm.h"
 #include "TRandom3.h"
+#include <algorithm> 
 
 using namespace std;
 /**
@@ -24,7 +25,7 @@ using namespace std;
    User defined class TCalcPhysVarsEG2 ... these comments are used to generate
    doxygen documentation!
  */
-class TCalcPhysVarsEG2 : public TEG2dm{
+class TCalcPhysVarsEG2 : public TEG2dm, public TCalculations{
 
 public:
 
@@ -45,6 +46,7 @@ public:
     // PARTICLES....
     Int_t   targ_type   , A;
     Int_t   Np          ;
+    Int_t   uns_pCut[20], uns_pID[20];
     
     Float_t Xb          , Q2        , Nu        ;
     Float_t PpX[20]     , PpY[20]   , PpZ[20]   , Xp[20]  ,   Yp[20]  ,   Zp[20];   // proton momentum and vertex
@@ -55,14 +57,14 @@ public:
     Float_t Emiss       , Mmiss;
     Float_t mA          , CoulombDeltaE         , A_over_mA ;
     Float_t Tp[20]      , Mrec                  , Trec      ;             // protons kinetic energy, recoil mass & kinetic energy
-    Float_t uns_pEdep[20]           , uns_pCut[20]  , uns_pCTOF[20] , uns_pID[20]   ;
+    Float_t uns_pCTOF[20], uns_pEdep[20]     ;
     Float_t N_Px[20]    , N_Py[20]  , N_Pz[20]; // for raw data
     
     
     Double_t    pcmX    , pcmY      , pcmZ  ;
     
     vector<Float_t>     alpha       , pEdep         , pCTOF     ;
-    vector<Int_t>       pCut        , pID      ;
+    vector<Int_t>       pCTOFCut      ;
     
     
     
@@ -108,7 +110,7 @@ public:
     
     
     void  ComputePhysVars (int entry);
-    void     sort_protons ();
+    void     loop_protons ();
     vector<size_t> sort_pMag (const vector<TVector3> &v);
     
     

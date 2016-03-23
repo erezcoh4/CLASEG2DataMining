@@ -23,7 +23,7 @@
    User defined class TAnalysisEG2 ... these comments are used to generate
    doxygen documentation!
  */
-class TAnalysisEG2 : public TPlots , public TAnalysis{
+class TAnalysisEG2 : public TPlots , public TAnalysis , public TEG2dm{
 
 public:
 
@@ -35,7 +35,7 @@ public:
     
     /// Default constructor
     TAnalysisEG2 (){    SetSRCCuts();   }
-    TAnalysisEG2 ( TString fInFileName );
+    TAnalysisEG2 ( TString fInFileName , TCut XbCut = "1.2 <= Xb" );
     
     
     
@@ -58,16 +58,20 @@ public:
     
     
     
-    // plots
     
     
     // cuts
-    TCut    cutXb   ,   cutPmiss    ,   cutThetaPQ , cutPoverQ  , cutMmiss  , cutPlead  , cutPrec  , cutSRC;
-    TCut    ppSRCCut;
+    TCut    cutXb       , cutPmiss    , cutThetaPQ , cutPoverQ  , cutMmiss  , cutPlead  , cutPrec  , cutP1 , cutP2 , cutP3;
+    TCutG   * pEdepCut[3];
+    TCut    pCTOFCut[3] , ppEdepCut   , ppCTOFCut   , pppEdepCut , pppCTOFCut  ;
+    TCut    cutSRC      , ppSRCCut    , pppSRCCut;
     
-    void      SetSRCCuts ();
+    void      SetSRCCuts ( TCut XbCut = "1.2 <= Xb");
 
-    TMatrix  RooFitCM (Float_t PmissMin, Float_t PmissMax);
+    
+    
+    // rooFit
+    TMatrix     RooFitCM (Float_t PmissMin, Float_t PmissMax);
 };
 
 #endif
