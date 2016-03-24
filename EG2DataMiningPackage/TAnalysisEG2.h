@@ -67,7 +67,7 @@ public:
     TCut    cutSRC      , ppSRCCut    , pppSRCCut;
     
     void      SetSRCCuts ( TCut XbCut = "1.2 <= Xb");
-
+    void     PrintInCuts ();
     
     
     // rooFit

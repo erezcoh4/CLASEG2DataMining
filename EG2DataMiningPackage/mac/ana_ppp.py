@@ -6,9 +6,9 @@ ROOT.gStyle.SetOptStat(0000)
 
 
 
-DoCuts      = True
-
-
+DoCuts              = False
+DoCTOFsubtraction   = False
+DoCount_p_2p_3p     = True
 
 
 
@@ -58,3 +58,17 @@ if DoCuts:
     cSRC.Update()
     wait()
 
+
+
+if DoCTOFsubtraction:
+    cCTOF = ana.CreateCanvas( "cCTOF" )
+#    cut = ana.pppEdepCut 
+    hCTOF23 = ana.H2( "pCTOF[1]"  ,  "pCTOF[2]"  , cut , "colz" , Nbins , -20   , 20  , Nbins , -20   , 20
+           , "recoil protons CTOF" , "CTOF p(2) [ns]" , "CTOF p(3) [ns]" )
+    x = ana.SubtractBackground(hCTOF23,  4 , 16 , True)
+    x.Print()
+    cCTOF.Update()
+    wait()
+
+if DoCount_p_2p_3p:
+    ana.PrintInCuts()

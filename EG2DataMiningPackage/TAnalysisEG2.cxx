@@ -34,7 +34,7 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     
     for (int i = 0; i < 3; i++ ) {
                 pEdepCut[i] = TEG2dm::pEdepCut(i);
-                pCTOFCut[i] = Form("pID[%d] && pCTOF[%d]",i,i); // CTOF polynomial cut & momentum < 2.8 GeV/c
+//                pCTOFCut[i] = Form("pID[%d] && pCTOF[%d]",i,i); // CTOF polynomial cut & momentum < 2.8 GeV/c
     }
     ppEdepCut   = Form("%s && %s",pEdepCut[0]->GetName(),pEdepCut[1]->GetName());
     ppCTOFCut   = pCTOFCut[0] && pCTOFCut[1] ;
@@ -58,6 +58,19 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     
     // pID from ∆E (dep.) in TOF scintillators
     pppSRCCut   = cutSRC && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void TAnalysisEG2::PrintInCuts(){
+    PrintLine();
+    Printf("Number of events in different cuts ( %s ):" , ((TString)cutXb).Data());
+    PrintLine();
+    Printf( "%d A(e,e'p) events"   , GetEntries(""));
+    Printf( "%d A(e,e'p) events in SRC kinematics"   , GetEntries(cutSRC));
+    Printf( "%d A(e,e'pp) events in SRC kinematics with recoil proton momemntum > 0.3 GeV/c"
+           , GetEntries(cutSRC && " 2 <= Np" && cutP1 && cutP2 && ppEdepCut && ppCTOFCut) );
+    Printf( "%d A(e,e'ppp) events in SRC kinematics with 2 recoil protons momemnta > 0.3 GeV/c"
+           , GetEntries( cutSRC && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut) );
 }
 
 
