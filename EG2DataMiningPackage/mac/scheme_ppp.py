@@ -7,9 +7,9 @@ DataType  = "no ctof"
 
 
 if DataType == "data":
-    FileName    = "DATA_C12"
+    FileName    = "DATA_Pb208"
 else :
-    FileName    = "NoCTofDATA_C12"
+    FileName    = "NoCTofDATA_Pb208"
 
 
 scheme = TSchemeDATA(DataType,"/Users/erezcohen/Desktop/DataMining",FileName,"T")

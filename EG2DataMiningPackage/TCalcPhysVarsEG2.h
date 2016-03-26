@@ -48,7 +48,7 @@ public:
     Int_t   Np          ;
     Int_t   uns_pCut[20], uns_pID[20];
     
-    Float_t Xb          , Q2        , Nu        ;
+    Float_t Xb          , Q2        , Nu        , XbMoving;
     Float_t PpX[20]     , PpY[20]   , PpZ[20]   , Xp[20]  ,   Yp[20]  ,   Zp[20];   // proton momentum and vertex
     Float_t Px_e        , Py_e      , Pz_e      , X_e     ,   Y_e     ,   Z_e   ;   // electron
     Float_t alpha_q     , sum_alpha;

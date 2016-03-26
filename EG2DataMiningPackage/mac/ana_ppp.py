@@ -13,7 +13,7 @@ DoCount_p_2p_3p     = True
 
 
 Nbins   = 50
-ana     = TAnalysisEG2("NoCTofDATA_C12" , ROOT.TCut("1.05 <= Xb"))
+ana     = TAnalysisEG2("NoCTofDATA_Pb208" , ROOT.TCut("1.05 <= Xb"))
 cut     = ROOT.TCut()
 
 

@@ -22,6 +22,7 @@ TCalcPhysVarsEG2::TCalcPhysVarsEG2( TTree * fInTree, TTree * fOutTree, int fA , 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::InitInputTree(){
     InTree -> SetBranchAddress("Xb"                 , &Xb);
+    InTree -> SetBranchAddress("Q2"                 , &Q2);
     InTree -> SetBranchAddress("P_nmb"              , &Np);
   
     if(DataType == "data") {
@@ -75,6 +76,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     
     // Float_t branches
     OutTree -> Branch("Xb"                  ,&Xb                    , "Xb/F");
+    OutTree -> Branch("XbMoving"            ,&XbMoving              , "XbMoving/F");
     OutTree -> Branch("Q2"                  ,&Q2                    , "Q2/F");
     OutTree -> Branch("Mmiss"               ,&Mmiss                 , "Mmiss/F");
     OutTree -> Branch("Emiss"               ,&Emiss                 , "Emiss/F");
@@ -150,6 +152,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     }
     else if (DataType == "no ctof"){
         q.SetPxPyPzE( - N_Px[0] , - N_Py[0] , 5.009 - N_Pz[0], Nu);
+        Q2 = -q.Mag2();
     }
     
     
@@ -170,6 +173,10 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     theta_pq    = r2d * Plead.Vect().Angle(q.Vect());
     p_over_q    = Plead.P() / q.P();
 
+    
+    // Bjorken scaling for a moving nucleon
+    TLorentzVector p ( Pmiss.Vect() , sqrt( Pmiss.P()*Pmiss.P() + Mp*Mp ) );
+    XbMoving    = Q2 / ( 2. * p * q );
     
     // move to prefered axes frame
     ChangeAxesFrame();
@@ -337,6 +344,9 @@ void TCalcPhysVarsEG2::p23Randomize(){
 void TCalcPhysVarsEG2::PrintData(int entry){
     
     SHOW(entry);
+    SHOW(Xb);
+    SHOW(Q2);
+    SHOW(XbMoving);
     SHOWTLorentzVector(q);
     SHOW(alpha_q);
     SHOWvectorTLorentzVector(protons);
