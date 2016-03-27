@@ -2,12 +2,13 @@ import ROOT
 from ROOT import TPlots
 from ROOT import TAnalysisEG2
 from rootpy.interactive import wait
+import time
 ROOT.gStyle.SetOptStat(0000)
 
 
 DoDrawCM3D              = False
-DoPrintParameterVectors = True
-
+DoPrintParameterVectors = False
+DoPrintPcm              = True
 
 PmissMin    = [0.3  , 0.45 , 0.55 , 0.65 , 0.75]
 PmissMax    = [0.45 , 0.55 , 0.65 , 0.75 , 1.0 ]
@@ -80,8 +81,6 @@ if DoDrawCM3D :
 
 
 
-
-
 if DoPrintParameterVectors:
     outfile = open("/Users/erezcohen/Desktop/CMparametes.dat", "wb")
     outfile.write("mean(x) \t sigma(x) \t mean(y) \t sigma(y) \t mean(z) \t sigma(z) \t p(miss) min \t p(miss) max\n")
@@ -89,7 +88,24 @@ if DoPrintParameterVectors:
     for i in range(0,5):
         x = ana.RooFitCM(PmissMin[i],PmissMax[i]) # RooFitCM return a parameter vector
         outfile.write("%f \t %f \t %f \t %f \t %f \t %f \t %f \t %f\n" % (x(0,0) , x(1,0) , x(2,0) , x(3,0) , x(4,0) , x(5,0) , PmissMin[i] , PmissMax[i] ))
-    
     outfile.close()
     print "done calculating parameters, output can be found in the file: ", outfile.name
     print '\n\n'
+
+
+
+
+if DoPrintPcm:
+    outfile = open("/Users/erezcohen/Desktop/CMdata.dat", "wb")
+    outfile.write("c.m. momentum vectors - %d large sample from C12, \t Units:GeV/c, \t" % ana.GetEntries(ROOT.TCut()) )
+    outfile.write( time.strftime('%l:%M%p %Z on %b %d, %Y \n') )
+    outfile.write("-------------------------------------------------------------------------------------------------------------------------\n")
+    outfile.write("p(c.m.)-x \t p(c.m.)-y  \t p(c.m.)-z  \t |p(miss)| \n")
+    outfile.write("-------------------------------------------------------------------------------------------------------------------------\n")
+    for i in range(0,ana.GetEntries(ROOT.TCut())):
+        PcmPmiss = ana.GetPcmEntry(i)
+        outfile.write("%f \t %f \t %f \t %f \n" % (PcmPmiss.at(0) , PcmPmiss.at(1) , PcmPmiss.at(2) , PcmPmiss.at(3)))
+    outfile.close()
+    print "done calculating parameters, output can be found in the file: ", outfile.name
+    print '\n\n'
+

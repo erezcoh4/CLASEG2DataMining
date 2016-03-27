@@ -105,4 +105,44 @@ TMatrix  TAnalysisEG2::RooFitCM(Float_t PmissMin, Float_t PmissMax){
 }
 
 
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+vector<Float_t> TAnalysisEG2::GetPcmEntry(int entry){
+    // return a vector including the c.m. momentum (3-vector) and the missing momentum magnitude
+    TLorentzVector * Pcm = 0 , *Pmiss = 0;
+    Tree -> SetBranchAddress("Pcm"      , &Pcm);
+    Tree -> SetBranchAddress("Pmiss"    , &Pmiss);
+    Tree -> GetEntry(entry);
+    vector<Float_t> res;
+    res.push_back(Pcm->Px());
+    res.push_back(Pcm->Py());
+    res.push_back(Pcm->Pz());
+    res.push_back(Pmiss->P());
+    return res;
+}
+
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -51,10 +51,10 @@ public:
     
     
     // SETs
-    void    SetInFileName (TString name){InFileName = name;};
-    void        SetInFile (TFile * file){InFile = file;};
-    void          SetTree (TTree * tree){Tree = tree;};
-    void          SetPath (TString path){Path = path;};
+    void        SetInFileName (TString name){InFileName = name;};
+    void            SetInFile (TFile * file){InFile = file;};
+    void              SetTree (TTree * tree){Tree = tree;};
+    void              SetPath (TString path){Path = path;};
     
     
     
@@ -66,12 +66,13 @@ public:
     TCut    pCTOFCut[3] , ppEdepCut   , ppCTOFCut   , pppEdepCut , pppCTOFCut  ;
     TCut    cutSRC      , ppSRCCut    , pppSRCCut;
     
-    void      SetSRCCuts ( TCut XbCut = "1.2 <= Xb");
-    void     PrintInCuts ();
+    void         SetSRCCuts ( TCut XbCut = "1.2 <= Xb");
+    void        PrintInCuts ();
     
     
     // rooFit
-    TMatrix     RooFitCM (Float_t PmissMin, Float_t PmissMax);
+    TMatrix        RooFitCM (Float_t PmissMin, Float_t PmissMax);
+    vector<Float_t> GetPcmEntry (int);
 };
 
 #endif
