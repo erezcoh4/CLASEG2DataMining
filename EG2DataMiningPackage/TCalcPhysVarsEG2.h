@@ -59,6 +59,7 @@ public:
     Float_t Tp[20]      , Mrec                  , Trec      ;             // protons kinetic energy, recoil mass & kinetic energy
     Float_t uns_pCTOF[20], uns_pEdep[20]     ;
     Float_t N_Px[20]    , N_Py[20]  , N_Pz[20]; // for raw data
+    Float_t thetaMiss23 , phiMiss23;
     
     
     Double_t    pcmX    , pcmY      , pcmZ  ;

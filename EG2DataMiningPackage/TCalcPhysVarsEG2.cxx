@@ -70,6 +70,7 @@ void TCalcPhysVarsEG2::InitInputTree(){
 void TCalcPhysVarsEG2::InitOutputTree(){
 
     // Integer branches
+    OutTree -> Branch("A"                   ,&A                     ,"A/I");
     OutTree -> Branch("Np"                  ,&Np                    ,"Np/I");
     OutTree -> Branch("pCTOFCut"            ,&pCTOFCut              );// std::vector<Int_t>
 
@@ -84,6 +85,8 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("p_over_q"            ,&p_over_q              , "p_over_q/F");
     OutTree -> Branch("alpha_q"             ,&alpha_q               , "alpha_q/F");
     OutTree -> Branch("sum_alpha"           ,&sum_alpha             , "sum_alpha/F");
+    OutTree -> Branch("thetaMiss23"         ,&thetaMiss23           , "thetaMiss23/F");
+    OutTree -> Branch("phiMiss23"           ,&phiMiss23             , "phiMiss23/F");
     OutTree -> Branch("alpha"               ,&alpha                 );// std::vector<Float_t>
     OutTree -> Branch("pCTOF"               ,&pCTOF                 );// std::vector<Float_t>
     OutTree -> Branch("pEdep"               ,&pEdep                 );// std::vector<Float_t>
@@ -205,7 +208,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     // all recoil protons together (just without the leading proton)
     Plead       = protons.at(0);            // now Plead is calculated in q-Pmiss frame
-    Prec        = Pcm - (Plead - q);
+    Prec        = Pcm - (Plead - q);        // Prec is the 4-vector sum of all recoiling protons
     
     
     // A(e,e'p) missing mass M²(miss) = (q + 2mN - Plead)² , all 4-vectors
@@ -213,7 +216,11 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
     
     // if we have 3 protons, randomize protons 2 and 3
-    if (Np==3) p23Randomize();
+    if (Np==3) {
+        p23Randomize();
+        thetaMiss23 = r2d*Pmiss.Vect().Angle(Prec.Vect());
+        phiMiss23   = 90 - r2d*( Pmiss.Vect().Angle(protons.at(1).Vect().Cross(protons.at(2).Vect()).Unit()) );
+    }
 
     
     pcmX = Pcm.Px();

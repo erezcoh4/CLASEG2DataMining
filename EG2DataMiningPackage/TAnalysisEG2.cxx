@@ -8,7 +8,7 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 TAnalysisEG2::TAnalysisEG2(TString fInFileName, TCut XbCut):
-TPlots("$DataMiningAnaFiles/Ana_" + fInFileName + ".root","anaTree",fInFileName,false){
+TPlots("$DataMiningAnaFiles/Ana_" + fInFileName + ".root","anaTree",fInFileName,Tree){
     SetPath("$DataMiningAnaFiles");
     SetInFileName( "Ana_" + fInFileName + ".root");
     
@@ -16,8 +16,6 @@ TPlots("$DataMiningAnaFiles/Ana_" + fInFileName + ".root","anaTree",fInFileName,
     SetInFile( new TFile( "$DataMiningAnaFiles/" + InFileName ));
     SetTree ((TTree*) InFile->Get( "anaTree" ));
 }
-
-
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC cuts
@@ -73,8 +71,6 @@ void TAnalysisEG2::PrintInCuts(){
            , GetEntries( cutSRC && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut) );
 }
 
-
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 TMatrix  TAnalysisEG2::RooFitCM(Float_t PmissMin, Float_t PmissMax){
     // returns a parameter matrix: (μ-x,𝜎-x,μ-y,𝜎-y,μ-z,𝜎-z) and their uncertainties (𝚫μ-x,𝚫𝜎-x,𝚫μ-y,𝚫𝜎-y,𝚫μ-z,𝚫𝜎-z)
@@ -103,10 +99,6 @@ TMatrix  TAnalysisEG2::RooFitCM(Float_t PmissMin, Float_t PmissMax){
     
     return res;
 }
-
-
-
-
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 vector<Float_t> TAnalysisEG2::GetPcmEntry(int entry){

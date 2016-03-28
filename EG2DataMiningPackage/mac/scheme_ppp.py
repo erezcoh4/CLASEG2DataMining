@@ -1,15 +1,17 @@
 from ROOT import TSchemeDATA
+from ROOT import TEG2dm
 
 # options are: "data" / "no ctof"
-DataType  = "no ctof"
+A           = 208
+DataType    = "no ctof"
 
 
 
-
+dm          = TEG2dm()
 if DataType == "data":
-    FileName    = "DATA_Pb208"
+    FileName    = "DATA_%s"% dm.Target(A)
 else :
-    FileName    = "NoCTofDATA_Pb208"
+    FileName    = "NoCTofDATA_%s"% dm.Target(A)
 
 
 scheme = TSchemeDATA(DataType,"/Users/erezcohen/Desktop/DataMining",FileName,"T")

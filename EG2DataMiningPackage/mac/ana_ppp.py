@@ -1,4 +1,6 @@
 import ROOT
+import os, sys
+from ROOT import TEG2dm
 from ROOT import TPlots
 from ROOT import TAnalysisEG2
 from rootpy.interactive import wait
@@ -8,12 +10,17 @@ ROOT.gStyle.SetOptStat(0000)
 
 DoCuts              = False
 DoCTOFsubtraction   = False
-DoCount_p_2p_3p     = True
+DoCount_p_2p_3p     = False
+DoCombineTargets    = True
+DoGenCombinedFile   = False
 
 
-
+A       = 208
 Nbins   = 50
-ana     = TAnalysisEG2("NoCTofDATA_Pb208" , ROOT.TCut("1.05 <= Xb"))
+XbMin   = 1.05
+XbCut   = ROOT.TCut("%f <= Xb"%XbMin)
+dm      = TEG2dm()
+ana     = TAnalysisEG2("NoCTofDATA_%s"% dm.Target(A), XbCut )
 cut     = ROOT.TCut()
 
 
@@ -58,8 +65,6 @@ if DoCuts:
     cSRC.Update()
     wait()
 
-
-
 if DoCTOFsubtraction:
     cCTOF = ana.CreateCanvas( "cCTOF" )
 #    cut = ana.pppEdepCut 
@@ -72,3 +77,22 @@ if DoCTOFsubtraction:
 
 if DoCount_p_2p_3p:
     ana.PrintInCuts()
+
+
+if DoCombineTargets:
+    if DoGenCombinedFile:
+        if ( int(input("re-create the merged file (all targets together): [0-no/ 1-yes]")) == 1 ):
+            os.system("rm %s/Ana_C12_Fe56_Pb28.root"%ana.GetPath())
+            anaAll  = [TAnalysisEG2("NoCTofDATA_C12",XbCut) , TAnalysisEG2("NoCTofDATA_Fe56",XbCut) , TAnalysisEG2("NoCTofDATA_Pb208",XbCut)]
+            os.system("hadd %s/Ana_C12_Fe56_Pb28.root %s %s %s"%(ana.GetPath() , anaAll[0].GetFileName() , anaAll[1].GetFileName() , anaAll[2].GetFileName() ))
+    anaEG2  = TAnalysisEG2("C12_Fe56_Pb28",XbCut)
+    cSRC = anaEG2.CreateCanvas("All targets together","Divide",2,2 )
+    cSRC.cd(1)
+    anaEG2.H1("Pcm.P()" , anaEG2.pppSRCCut , "BAR E" , 20 , 0 , 1.1, "c.m. momentum - stacked ^{12}C ^{56}Fe ^{208}Pb","|#vec{p}(c.m.)| [GeV/c]")
+#    anaEG2.Draw1DVarAndCut(cSRC , 1 , "Pcm.P()" , Nbins , 0 , 1.5, "c.m. momentum - stacked ^{12}C ^{56}Fe ^{208}Pb","|#vec{p}(c.m.)| [GeV/c]" , anaEG2.pppSRCCut , True , "SRC")
+    cSRC.cd(2)
+    anaEG2.H2("fabs(phiMiss23)" , "thetaMiss23" , anaEG2.pppSRCCut , "" , Nbins , 0 , 80 , Nbins , 80 , 180 , "#phi vs. #theta - stacked  ^{12}C ^{56}Fe ^{208}Pb","|#phi| [deg.]","#theta [deg.]")
+    cSRC.Update()
+    wait()
+
+

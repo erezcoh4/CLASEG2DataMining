@@ -6,17 +6,17 @@ from ROOT import TCalcPhysVarsEG2
 
 
 # options are: "data" / "no ctof"
+A           = 208
 DataType    = "no ctof"
 
 
-A           = 12
 Path        = "/Users/erezcohen/Desktop/DataMining"
 SchemeType  = "SRCPmissXb"
-
+dm          = TEG2dm()
 if DataType == "data":
-    FileName    = "DATA_C12"
+    FileName    = "DATA_%s"% dm.Target(A)
 else :
-    FileName    = "NoCTofDATA_C12"
+    FileName    = "NoCTofDATA_%s"% dm.Target(A)
 
 InFile      = ROOT.TFile(Path + "/Schemed_EG2_DATA/"+"Schemed_"+SchemeType+"_"+FileName+".root")
 InTree      = InFile.Get("T")
@@ -26,7 +26,6 @@ OutFile     = ROOT.TFile(Path + "/AnaFiles/"+"Ana_"+FileName+".root","recreate")
 OutTree     = ROOT.TTree("anaTree","physical variables ppp SRC")
 
 calc        = TCalcPhysVarsEG2( InTree , OutTree , A , DataType , "q(z) - Pmiss(x-z) frame" )
-#dm          = TEG2dm()
 #scheme      = TSchemeDATA()
 #anaEG2      = TAnalysisEG2()
 

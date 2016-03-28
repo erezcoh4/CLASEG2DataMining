@@ -48,6 +48,8 @@ public:
     
     
     // GETs
+    TString           GetPath (){return Path;};
+
     
     
     // SETs

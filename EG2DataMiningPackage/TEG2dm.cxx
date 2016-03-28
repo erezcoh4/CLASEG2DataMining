@@ -22,6 +22,12 @@ TVector3 TEG2dm::CoulombCorrection(TVector3 p , Float_t CoulombDeltaE){
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+TString TEG2dm::Target(int A){
+    float mAdummy , CoulombDeltaEdummy ;
+    return TargetAsString( A, &mAdummy , &CoulombDeltaEdummy );
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 TString TEG2dm::TargetAsString(int A, float *mA , float *CoulombDeltaE){
     switch (A) {
         case 12:// carbon (C12)
