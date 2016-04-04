@@ -5,7 +5,7 @@ analysis = TAnalysis()
 
 
 
-DoDraw  = True
+DoDraw  = False
 
 
 Path = "/Users/erezcohen/Desktop/DataMining"
@@ -18,12 +18,11 @@ if (DoDraw) : wait()
 sim3p.Imp_ppElasticHisto( DoDraw )
 if (DoDraw) : wait()
 sim3p.ImpMomentumDist( DoDraw )
-if (DoDraw) : sim3p.SRCk4Tail.Draw()
 if (DoDraw) : wait()
 
 
 
-sim3p.RunInteractions( 5 , True )       # run interactions and fill output tree
+sim3p.RunInteractions( 5 , False )       # run interactions and fill output tree
 print "done filling %d events " % OutTree.GetEntries() + "in " + OutTree.GetTitle()
 OutTree.Write()
 OutFile.Close()

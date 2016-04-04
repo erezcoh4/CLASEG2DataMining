@@ -15,10 +15,13 @@ void T3pSimulation::InitOutTree(){
     
     OutTree -> Branch("q"           ,"TLorentzVector"       ,&q);
     OutTree -> Branch("struck_p"    ,"TLorentzVector"       ,&struck_p);
+    // knocked by q, before rescattering
     OutTree -> Branch("p_knocked"   ,"TLorentzVector"       ,&p_knocked);
-    OutTree -> Branch("p1_ppPair"   ,"TLorentzVector"       ,&p1_ppPair);
+    // pp-SRC pair
     OutTree -> Branch("pcm_ppPair"  ,"TLorentzVector"       ,&pcm_ppPair);
+    OutTree -> Branch("p1_ppPair"   ,"TLorentzVector"       ,&p1_ppPair);
     OutTree -> Branch("p2_ppPair"   ,"TLorentzVector"       ,&p2_ppPair);
+    // after rescattering
     OutTree -> Branch("p_knocked_r" ,"TLorentzVector"       ,&p_knocked_r); // rescattered
     OutTree -> Branch("p1_ppPair_r" ,"TLorentzVector"       ,&p1_ppPair_r); // rescattered
     OutTree -> Branch("p2_ppPair_r" ,"TLorentzVector"       ,&p2_ppPair_r); // rescattered
@@ -30,15 +33,10 @@ void T3pSimulation::InitOutTree(){
     OutTree -> Branch("protons"     ,&protons);             // std::vector<TLorentzVector>
 }
 
-
-
-
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void T3pSimulation::RunInteractions ( int Ninteractions , bool DoPrint ){
     for ( int i = 0 ; i < Ninteractions ; i++ ) {
-//        if (i%(Ninteractions/20)==0) plot.PrintPercentStr((float)i/Ninteractions);
-        
+        //        if (i%(Ninteractions/20)==0) plot.PrintPercentStr((float)i/Ninteractions);
         Gen_q();
         Gen_struck_p();
         q_struck_p();
@@ -58,7 +56,6 @@ void T3pSimulation::Gen_q(){
     q.SetPxPyPzE( 0 , 0 , q3Mag , omega );
 }
 
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void T3pSimulation::Gen_struck_p(){
     // a proton going backwards with FG momentum
@@ -67,11 +64,9 @@ void T3pSimulation::Gen_struck_p(){
     struck_p.SetVectM( TVector3(Px , Py , -fabs(Pz)) , Mp );
 }
 
-
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void T3pSimulation::q_struck_p(){
-    p_knocked = struck_p + q;
+    p_knocked.SetVectM ( (struck_p + q).Vect() , Mp );
 }
 
 
@@ -99,15 +94,10 @@ void T3pSimulation::p_rescatter_ppPair(){
     
     // boost to c.m. frame of p_knocked and p1_ppPair
     p1_pk_cm    = p1_ppPair + p_knocked;
-    SHOWTLorentzVector(p1_pk_cm);
     p1_p1_pk_cm = p1_ppPair;
-    SHOWTLorentzVector(p1_p1_pk_cm);
     p1_p1_pk_cm.Boost( -p1_pk_cm.BoostVector() );
-    SHOWTLorentzVector(p1_p1_pk_cm);
     pk_p1_pk_cm = p_knocked;
-    SHOWTLorentzVector(pk_p1_pk_cm);
     pk_p1_pk_cm.Boost( -p1_pk_cm.BoostVector() );
-    SHOWTLorentzVector(pk_p1_pk_cm);
  
     // generate a scattering angle according to cross-section dependence on energy and angle
     
@@ -122,22 +112,26 @@ void T3pSimulation::p_rescatter_ppPair(){
     pk_p1_pk_cm.RotateZ(-rot_phi);
     pk_p1_pk_cm.RotateY(-rot_theta);
 
+    PrintLine();
+    SHOWTLorentzVector(p1_pk_cm);
+    SHOWTLorentzVector(p1_p1_pk_cm);
+    SHOWTLorentzVector(pk_p1_pk_cm);
 
     
     
     
     // Define the angles of the scattering in the c.m.
     binEcm      = h_ppElastic -> GetXaxis() -> FindBin( p1_pk_cm.E() );
-    SHOW( p1_pk_cm.E() );
-    SHOW(binEcm);
-    TH1F* hTheta = (TH1F*) h_ppElastic->ProjectionY("hTheta",binEcm,binEcm);
-    Theta_cm    = r2d * hTheta -> GetRandom();
+    Theta_cm    = r2d * ((TH1F*) h_ppElastic->ProjectionY("hTheta",binEcm,binEcm)) -> GetRandom();
     Phi_cm      = r2d * gRandom -> Uniform(0 , 180);  // phi distributes uniformly
     
     
     // Calculate outgoing protons in the 90 degrees scattering reaction
     p1_ppPair_r.SetVectM( p1_p1_pk_cm.Pz()* TVector3 ( sin(Theta_cm)*cos(Phi_cm),  sin(Theta_cm)*sin(Phi_cm) , cos(Theta_cm) ) , Mp);
     p_knocked_r.SetVectM( - p1_ppPair_r.Vect() , Mp);
+    
+    SHOWTLorentzVector(p1_ppPair_r);
+    SHOWTLorentzVector(p_knocked_r);
     
     
     // Rotate all back from the z axis in the c.m. frame.
@@ -150,13 +144,19 @@ void T3pSimulation::p_rescatter_ppPair(){
     p_knocked_r.RotateY(rot_theta);
     p_knocked_r.RotateZ(rot_phi);
     
+    SHOWTLorentzVector(p1_ppPair_r);
+    SHOWTLorentzVector(p_knocked_r);
+    
     
     
     // boost back to lab frame
-    p1_p1_pk_cm.Boost( p1_pk_cm.BoostVector() );
-    pk_p1_pk_cm.Boost( p1_pk_cm.BoostVector() );
+    p1_ppPair_r.Boost( p1_pk_cm.BoostVector() );
+    p_knocked_r.Boost( p1_pk_cm.BoostVector() );
     
+    SHOWTLorentzVector(p1_ppPair_r);
+    SHOWTLorentzVector(p_knocked_r);
     
+   
     
     
     // the third protn (p2_ppPair) is a spectator and does not change
@@ -167,6 +167,7 @@ void T3pSimulation::p_rescatter_ppPair(){
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void T3pSimulation::PrintDATA(int entry){
+    SHOW(entry);
     SHOWTLorentzVector(q);
     SHOWTLorentzVector(struck_p);
     SHOWTLorentzVector(p_knocked);
@@ -177,6 +178,7 @@ void T3pSimulation::PrintDATA(int entry){
     SHOWTLorentzVector(Pmiss);
     SHOWTLorentzVector(Pcm);
     SHOWTLorentzVector(Prec);
+    PrintLine();
 }
     
     
@@ -197,7 +199,7 @@ void T3pSimulation::Imp_q_Histo ( TH2F * h , bool DoPlot ){
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void T3pSimulation::Imp_ppElasticHisto ( bool DoPlot ){
 
-    TH2F * h = new TH2F("h_ppElastic","pp Elastic; c.m. energy [GeV]; #theta(c.m.) [deg.]",100,0,2,100,0,180);
+    TH2F * h = new TH2F("h_ppElastic","pp Elastic; c.m. energy [GeV]; #theta(c.m.) [deg.]",100,0,5,100,0,180);
 
     for (int binx = 0; binx < h->GetNbinsX() ; binx++) {
         for (int biny = 0; biny < h->GetNbinsY() ; biny++) {
