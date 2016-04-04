@@ -37,7 +37,7 @@ void T3pSimulation::InitOutTree(){
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void T3pSimulation::RunInteractions ( int Ninteractions , bool DoPrint ){
     for ( int i = 0 ; i < Ninteractions ; i++ ) {
-        if (i%(Ninteractions/20)==0) plot.PrintPercentStr((float)i/Ninteractions);
+//        if (i%(Ninteractions/20)==0) plot.PrintPercentStr((float)i/Ninteractions);
         
         Gen_q();
         Gen_struck_p();
@@ -96,24 +96,69 @@ void T3pSimulation::p_rescatter_ppPair(){
     // move to c.m. frame of p_knocked and p1_ppPair
     // calculate the scattering and the decide on the c.m. angle by weight of the scattering Xsec
     // and return to lab frame to show the final state two protons
-    TLorentzVector p1_pk_cm , p1_p1_pk_cm , pk_p1_pk_cm;
     
-    // move to c.m. frame of p_knocked and p1_ppPair
+    // boost to c.m. frame of p_knocked and p1_ppPair
     p1_pk_cm    = p1_ppPair + p_knocked;
     SHOWTLorentzVector(p1_pk_cm);
     p1_p1_pk_cm = p1_ppPair;
     SHOWTLorentzVector(p1_p1_pk_cm);
-    p1_p1_pk_cm.Boost( p1_pk_cm.BoostVector() );
+    p1_p1_pk_cm.Boost( -p1_pk_cm.BoostVector() );
     SHOWTLorentzVector(p1_p1_pk_cm);
     pk_p1_pk_cm = p_knocked;
     SHOWTLorentzVector(pk_p1_pk_cm);
-    pk_p1_pk_cm.Boost( p1_pk_cm.BoostVector() );
+    pk_p1_pk_cm.Boost( -p1_pk_cm.BoostVector() );
     SHOWTLorentzVector(pk_p1_pk_cm);
  
     // generate a scattering angle according to cross-section dependence on energy and angle
-    binEcm = h_ppElastic -> GetXaxis() -> FindBin( p1_pk_cm.E() );
-    Theta_cm = ((TH1F*)( h_ppElastic->ProjectionX(Form("hTheta",binEcm,binEcm+1)) )) -> GetRandom();
+    
+    
+    
+    // Rotate the vectors in the c.m. to go along the z-axis
+    Double_t rot_phi     = p1_p1_pk_cm.Phi();
+    Double_t rot_theta   = p1_p1_pk_cm.Theta();
+    
+    p1_p1_pk_cm.RotateZ(-rot_phi);
+    p1_p1_pk_cm.RotateY(-rot_theta);
+    pk_p1_pk_cm.RotateZ(-rot_phi);
+    pk_p1_pk_cm.RotateY(-rot_theta);
 
+
+    
+    
+    
+    // Define the angles of the scattering in the c.m.
+    binEcm      = h_ppElastic -> GetXaxis() -> FindBin( p1_pk_cm.E() );
+    SHOW( p1_pk_cm.E() );
+    SHOW(binEcm);
+    TH1F* hTheta = (TH1F*) h_ppElastic->ProjectionY("hTheta",binEcm,binEcm);
+    Theta_cm    = r2d * hTheta -> GetRandom();
+    Phi_cm      = r2d * gRandom -> Uniform(0 , 180);  // phi distributes uniformly
+    
+    
+    // Calculate outgoing protons in the 90 degrees scattering reaction
+    p1_ppPair_r.SetVectM( p1_p1_pk_cm.Pz()* TVector3 ( sin(Theta_cm)*cos(Phi_cm),  sin(Theta_cm)*sin(Phi_cm) , cos(Theta_cm) ) , Mp);
+    p_knocked_r.SetVectM( - p1_ppPair_r.Vect() , Mp);
+    
+    
+    // Rotate all back from the z axis in the c.m. frame.
+    p1_p1_pk_cm.RotateY(rot_theta);
+    p1_p1_pk_cm.RotateZ(rot_phi);
+    pk_p1_pk_cm.RotateY(rot_theta);
+    pk_p1_pk_cm.RotateZ(rot_phi);
+    p1_ppPair_r.RotateY(rot_theta);
+    p1_ppPair_r.RotateZ(rot_phi);
+    p_knocked_r.RotateY(rot_theta);
+    p_knocked_r.RotateZ(rot_phi);
+    
+    
+    
+    // boost back to lab frame
+    p1_p1_pk_cm.Boost( p1_pk_cm.BoostVector() );
+    pk_p1_pk_cm.Boost( p1_pk_cm.BoostVector() );
+    
+    
+    
+    
     // the third protn (p2_ppPair) is a spectator and does not change
     p2_ppPair_r = p2_ppPair;
     
@@ -162,11 +207,15 @@ void T3pSimulation::Imp_ppElasticHisto ( bool DoPlot ){
     
     Set_ppElasticHisto(h);
     if (DoPlot) {
-        h -> Draw("colz");
+        TCanvas * c = plot.CreateCanvas("ppElastic","Divide",2,1);
+        c -> cd(1);
+        h_ppElastic -> Draw("colz");
+        TH1F* hTheta = (TH1F*) h_ppElastic->ProjectionY("hTheta",10,10);
+        c -> cd(2);
+        hTheta -> Draw("HIST");
+        c -> SaveAs("~/Desktop/ppElastic.pdf");
     }
 }
-
-
 
 
 

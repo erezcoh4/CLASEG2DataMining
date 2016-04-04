@@ -35,6 +35,7 @@ public:
 
     
     TF1     * SRCk4Tail;
+    TH1F    * hCFG ;
     TH2F    * h_q , * h_ppElastic;
     
     
@@ -43,9 +44,11 @@ public:
     TLorentzVector q , struck_p , p_knocked , p1_ppPair , pcm_ppPair , p2_ppPair;
     TLorentzVector p_knocked_r , p1_ppPair_r , p2_ppPair_r;
     TLorentzVector Pcm , Plead , Pmiss , Prec;
+    TLorentzVector p1_pk_cm , p1_p1_pk_cm , pk_p1_pk_cm;
+
     std::vector<TLorentzVector> protons;
 
-    Float_t     Theta_cm;
+    Float_t     Theta_cm , Phi_cm;
     Int_t       binEcm;
     
     
@@ -63,7 +66,7 @@ public:
     void Set_ppElasticHisto ( TH2F * h ) {h_ppElastic = h;};
   
     
-    void    ImpMomentumDist ( bool DoPlot){calculations.CFGMomentumDist(DoPlot,SRCk4Tail);}
+    void    ImpMomentumDist ( bool DoPlot){SRCk4Tail = calculations.CFGMomentumDist(DoPlot);}
     void        Imp_q_Histo ( TH2F * h , bool DoPlot = false );
     void Imp_ppElasticHisto ( bool DoPlot = false );
 
