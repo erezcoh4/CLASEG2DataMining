@@ -2,7 +2,7 @@ from ROOT import TSchemeDATA
 from ROOT import TEG2dm
 
 # options are: "data" / "no ctof"
-A           = 208
+A           = 27
 DataType    = "no ctof"
 
 

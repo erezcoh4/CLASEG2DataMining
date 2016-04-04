@@ -20,8 +20,10 @@
 #pragma link C++ class TSchemeDATA+;
 #pragma link C++ class TCalcPhysVarsEG2+;
 #pragma link C++ class TAnalysisEG2+;
+#pragma link C++ class T3pSimulation+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 

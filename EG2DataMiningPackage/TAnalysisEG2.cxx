@@ -8,7 +8,7 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 TAnalysisEG2::TAnalysisEG2(TString fInFileName, TCut XbCut):
-TPlots("$DataMiningAnaFiles/Ana_" + fInFileName + ".root","anaTree",fInFileName,Tree){
+TPlots("$DataMiningAnaFiles/Ana_" + fInFileName + ".root","anaTree",fInFileName){
     SetPath("$DataMiningAnaFiles");
     SetInFileName( "Ana_" + fInFileName + ".root");
     
@@ -53,9 +53,14 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     cutP1       = "(-27 < pVertex[1].Z() && pVertex[1].Z() < -20)";
     cutP2       = "0.3 < protons[1].P() && (-27 < pVertex[1].Z() && pVertex[1].Z() < -20)";
     cutP3       = "0.3 < protons[2].P() && (-27 < pVertex[2].Z() && pVertex[2].Z() < -20)";
+
+    cutAngles2p = Form("%s > 150", TPlots::Theta("Pmiss.Vect()","Prec.Vect()").Data());
+    cutAngles3p = "thetaMiss23 > 155 && fabs(phiMiss23) < 15";
+    
     
     // pID from ∆E (dep.) in TOF scintillators
     pppSRCCut   = cutSRC && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut;
+    Final3pCut  = pppSRCCut && cutAngles3p;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -67,8 +72,12 @@ void TAnalysisEG2::PrintInCuts(){
     Printf( "%d A(e,e'p) events in SRC kinematics"   , GetEntries(cutSRC));
     Printf( "%d A(e,e'pp) events in SRC kinematics with recoil proton momemntum > 0.3 GeV/c"
            , GetEntries(cutSRC && " 2 <= Np" && cutP1 && cutP2 && ppEdepCut && ppCTOFCut) );
+    Printf( "%d A(e,e'pp) with theta > 155"
+           , GetEntries(cutSRC && " 2 <= Np" && cutP1 && cutP2 && ppEdepCut && ppCTOFCut && cutAngles2p) );
     Printf( "%d A(e,e'ppp) events in SRC kinematics with 2 recoil protons momemnta > 0.3 GeV/c"
            , GetEntries( cutSRC && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut) );
+    Printf( "%d A(e,e'ppp) with theta > 155 & phi < 15"
+           , GetEntries( cutSRC && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut && cutAngles3p) );
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
