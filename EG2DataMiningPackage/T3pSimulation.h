@@ -16,13 +16,14 @@
 
 #include <iostream>
 #include "TEG2dm.h"
+#include "TCalcPhysVarsEG2.h"
 #include "TRandom3.h"
 /**
    \class T3pSimulation
    User defined class T3pSimulation ... these comments are used to generate
    doxygen documentation!
  */
-class T3pSimulation{
+class T3pSimulation: public TEG2dm, public TCalculations{
 
 public:
 
@@ -30,7 +31,7 @@ public:
     TAnalysis analysis;
     TCalculations calculations;
     TRandom3  rand;
-    
+    TCalcPhysVarsEG2 calcEG2;
     TTree   * OutTree;
 
     
@@ -38,8 +39,18 @@ public:
     TH1F    * hCFG ;
     TH2F    * h_q , * h_ppElastic;
     
+    Int_t       binEcm;
     
+    Float_t     Xb          , Q2 ;
+    Float_t     PpX[3]      , PpY[3]    , PpZ[3];
+    Float_t     p_over_q    , theta_pq  ;
+    Float_t     q_phi       , q_theta   , Pmiss_phi;
+    Float_t     thetaMiss23 , phiMiss23;
+    Float_t     Theta_cm , Phi_cm;
+
     Double_t    Px  , Py    , Pz    , Pp;
+    
+    vector<TVector3>   p3vec;
     
     TLorentzVector q , struck_p , p_knocked , p1_ppPair , pcm_ppPair , p2_ppPair;
     TLorentzVector p_knocked_r , p1_ppPair_r , p2_ppPair_r;
@@ -48,8 +59,6 @@ public:
 
     std::vector<TLorentzVector> protons;
 
-    Float_t     Theta_cm , Phi_cm;
-    Int_t       binEcm;
     
     
     /// Default constructor
@@ -78,6 +87,9 @@ public:
     void p_rescatter_ppPair ();
     void          PrintDATA ( int);
     void    RunInteractions ( int Ninteractions = 0 , bool DoPrint = false );
+    void    ComputePhysVars ( );
+    void          InitEvent ();
+    void      q_Pmiss_frame ();
 
 
 

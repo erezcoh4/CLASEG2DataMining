@@ -28,7 +28,7 @@ void TSchemeDATA::LoadInTree(){
     
     InTree -> SetBranchAddress("P_nmb"          , &Np);
     InTree -> SetBranchAddress("Xb"             , &Xb);
-    InTree -> SetBranchAddress("targ_type"      , &targ_type);
+    InTree -> SetBranchAddress("targ_type"      , &targ_type); // for Al27 remove this
     
     if (DataType == "data") {
         InTree -> SetBranchAddress("Px"             , &PpX);
@@ -84,8 +84,9 @@ void TSchemeDATA::SRCPmissXb(int fTargetType , float fXbMin, int fNpMin, int fNp
             }
         }
     }
-    
     else if (DataType == "no ctof") {
+        // targ_type = 2; // for Al27
+
         for (Long64_t i = 0; i < Nentries ; i++) {
             if (i%(Nentries/20)==0) plot.PrintPercentStr((float)i/Nentries);
             InTree -> GetEntry(i);

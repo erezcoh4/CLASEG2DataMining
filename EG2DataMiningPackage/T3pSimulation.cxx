@@ -31,6 +31,15 @@ void T3pSimulation::InitOutTree(){
     OutTree -> Branch("Plead"       ,"TLorentzVector"       ,&Plead);
     OutTree -> Branch("Prec"        ,"TLorentzVector"       ,&Prec);
     OutTree -> Branch("protons"     ,&protons);             // std::vector<TLorentzVector>
+    
+    // Float_t branches
+    OutTree -> Branch("Xb"                  ,&Xb                    , "Xb/F");
+    OutTree -> Branch("Q2"                  ,&Q2                    , "Q2/F");
+    OutTree -> Branch("theta_pq"            ,&theta_pq              , "theta_pq/F");
+    OutTree -> Branch("p_over_q"            ,&p_over_q              , "p_over_q/F");
+    OutTree -> Branch("thetaMiss23"         ,&thetaMiss23           , "thetaMiss23/F");
+    OutTree -> Branch("phiMiss23"           ,&phiMiss23             , "phiMiss23/F");
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -42,10 +51,13 @@ void T3pSimulation::RunInteractions ( int Ninteractions , bool DoPrint ){
         q_struck_p();
         Gen_ppPair();
         p_rescatter_ppPair();
+        ComputePhysVars();
         if(DoPrint) PrintDATA(i);
         OutTree -> Fill();
     }
 }
+
+
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -163,6 +175,96 @@ void T3pSimulation::p_rescatter_ppPair(){
     p2_ppPair_r = p2_ppPair;
     
 }
+
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void T3pSimulation::InitEvent(){
+    if (!p3vec.empty())     p3vec.clear();   // unsorted protons
+    if (!protons.empty())   protons.clear();
+    Plead = TLorentzVector();
+}
+
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void T3pSimulation::ComputePhysVars( ){
+    // play the game as if the data came from a regular data-mining tree
+    // with 3 protons...
+    PpX[0] = p_knocked_r.Px(); PpY[0] = p_knocked_r.Py(); PpZ[0] = p_knocked_r.Pz();
+    PpX[1] = p1_ppPair_r.Px(); PpY[1] = p1_ppPair_r.Py(); PpZ[1] = p1_ppPair_r.Pz();
+    PpX[2] = p2_ppPair_r.Px(); PpY[2] = p2_ppPair_r.Py(); PpZ[2] = p2_ppPair_r.Pz();
+
+    // and implement calculation as in TCalcPhysVarsEG2
+    InitEvent();
+    
+    Q2 = -q.Mag2();
+    Xb = Q2 / (2*Mp);
+    
+    // get protons - energy loss correction and Coulomb corrections
+    for (int p = 0 ; p < 3 ; p++ ){
+        
+        p3vec.push_back( TVector3 (PpX[p],PpY[p],PpZ[p] ) );
+        if ( p3vec.back().Mag() > Plead.P() ){
+            Plead.SetVectM( p3vec.back() , Mp ) ;           // Plead is first calculated in Lab-Frame
+        }
+    }
+    
+    // Pmiss , p/q , 𝜃(p,q)
+    Pmiss       = Plead - q;
+    theta_pq    = r2d * Plead.Vect().Angle(q.Vect());
+    p_over_q    = Plead.P() / q.P();
+    
+    // move to prefered axes frame
+    q_Pmiss_frame();
+    
+    // c.m. momentum
+    Pcm         = -q;
+    
+    // sort the protons and loop on them for variables calculations only once more!
+    for (auto i: calcEG2.sort_pMag( p3vec )){
+        // protons
+        RotVec2_q_Pm_Frame( & p3vec.at(i) , q_phi, q_theta, Pmiss_phi );
+        protons .push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
+        Pcm     += protons.back();
+    }
+
+    
+    // all recoil protons together (just without the leading proton)
+    Plead       = protons.at(0);            // now Plead is calculated in q-Pmiss frame
+    Prec        = Pcm - (Plead - q);        // Prec is the 4-vector sum of all recoiling protons
+
+    // randomize protons 2 and 3
+    if( rand.Uniform() > 0.5 ){
+        std::iter_swap(protons.begin()+1    ,protons.begin()+2);
+    }
+    thetaMiss23 = r2d*Pmiss.Vect().Angle(Prec.Vect());
+    phiMiss23   = 90 - r2d*( Pmiss.Vect().Angle(protons.at(1).Vect().Cross(protons.at(2).Vect()).Unit()) );
+    
+}
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void T3pSimulation::q_Pmiss_frame(){
+    //     q is the z axis, Pmiss is in x-z plane: Pmiss=(Pmiss[x],0,Pmiss[q])
+    q_phi   = q.Phi();
+    q_theta = q.Theta();
+    
+    Pmiss.RotateZ(-q_phi);
+    Pmiss.RotateY(-q_theta);
+    Pmiss_phi = Pmiss.Phi();
+    Pmiss.RotateZ(-Pmiss_phi);
+    
+    q.RotateZ(-q_phi);
+    q.RotateY(-q_theta);
+}
+
+
+
+
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

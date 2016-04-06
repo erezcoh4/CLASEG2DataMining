@@ -6,7 +6,7 @@ from ROOT import TCalcPhysVarsEG2
 
 
 # options are: "data" / "no ctof"
-A           = 208
+A           = 27
 DataType    = "no ctof"
 
 
