@@ -8,6 +8,7 @@
 T3pSimulation::T3pSimulation( TTree * fOutTree ){
     SetOutTree(fOutTree);
     InitOutTree();
+    Np = 3;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -33,6 +34,7 @@ void T3pSimulation::InitOutTree(){
     OutTree -> Branch("protons"     ,&protons);             // std::vector<TLorentzVector>
     
     // Float_t branches
+    OutTree -> Branch("Np"                  ,&Np                    , "Np/I");
     OutTree -> Branch("Xb"                  ,&Xb                    , "Xb/F");
     OutTree -> Branch("Q2"                  ,&Q2                    , "Q2/F");
     OutTree -> Branch("theta_pq"            ,&theta_pq              , "theta_pq/F");
@@ -124,10 +126,10 @@ void T3pSimulation::p_rescatter_ppPair(){
     pk_p1_pk_cm.RotateZ(-rot_phi);
     pk_p1_pk_cm.RotateY(-rot_theta);
 
-    PrintLine();
-    SHOWTLorentzVector(p1_pk_cm);
-    SHOWTLorentzVector(p1_p1_pk_cm);
-    SHOWTLorentzVector(pk_p1_pk_cm);
+//    PrintLine();
+//    SHOWTLorentzVector(p1_pk_cm);
+//    SHOWTLorentzVector(p1_p1_pk_cm);
+//    SHOWTLorentzVector(pk_p1_pk_cm);
 
     
     
@@ -142,8 +144,8 @@ void T3pSimulation::p_rescatter_ppPair(){
     p1_ppPair_r.SetVectM( p1_p1_pk_cm.Pz()* TVector3 ( sin(Theta_cm)*cos(Phi_cm),  sin(Theta_cm)*sin(Phi_cm) , cos(Theta_cm) ) , Mp);
     p_knocked_r.SetVectM( - p1_ppPair_r.Vect() , Mp);
     
-    SHOWTLorentzVector(p1_ppPair_r);
-    SHOWTLorentzVector(p_knocked_r);
+//    SHOWTLorentzVector(p1_ppPair_r);
+//    SHOWTLorentzVector(p_knocked_r);
     
     
     // Rotate all back from the z axis in the c.m. frame.
@@ -156,17 +158,17 @@ void T3pSimulation::p_rescatter_ppPair(){
     p_knocked_r.RotateY(rot_theta);
     p_knocked_r.RotateZ(rot_phi);
     
-    SHOWTLorentzVector(p1_ppPair_r);
-    SHOWTLorentzVector(p_knocked_r);
-    
+//    SHOWTLorentzVector(p1_ppPair_r);
+//    SHOWTLorentzVector(p_knocked_r);
+//    
     
     
     // boost back to lab frame
     p1_ppPair_r.Boost( p1_pk_cm.BoostVector() );
     p_knocked_r.Boost( p1_pk_cm.BoostVector() );
     
-    SHOWTLorentzVector(p1_ppPair_r);
-    SHOWTLorentzVector(p_knocked_r);
+//    SHOWTLorentzVector(p1_ppPair_r);
+//    SHOWTLorentzVector(p_knocked_r);
     
    
     

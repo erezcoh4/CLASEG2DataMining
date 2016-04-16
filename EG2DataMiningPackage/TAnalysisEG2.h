@@ -66,7 +66,7 @@ public:
     TCut    cutXb       , cutPmiss    , cutThetaPQ , cutPoverQ  , cutMmiss  , cutPlead  , cutPrec  , cutP1 , cutP2 , cutP3 , cutAngles2p , cutAngles3p;
     TCutG   * pEdepCut[3];
     TCut    pCTOFCut[3] , ppEdepCut   , ppCTOFCut   , pppEdepCut , pppCTOFCut  ;
-    TCut    cutSRC      , ppSRCCut    , pppSRCCut   , Final3pCut;
+    TCut    cutSRC      , ppSRCCut    , pppSRCCut   , Final3pCut , Sim3pSRCCut;
     
     void         SetSRCCuts ( TCut XbCut = "1.2 <= Xb");
     void        PrintInCuts ();

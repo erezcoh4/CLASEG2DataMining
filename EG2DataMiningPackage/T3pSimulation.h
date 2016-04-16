@@ -39,7 +39,7 @@ public:
     TH1F    * hCFG ;
     TH2F    * h_q , * h_ppElastic;
     
-    Int_t       binEcm;
+    Int_t       binEcm      , Np;
     
     Float_t     Xb          , Q2 ;
     Float_t     PpX[3]      , PpY[3]    , PpZ[3];
