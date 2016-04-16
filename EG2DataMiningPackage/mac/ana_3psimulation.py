@@ -1,6 +1,9 @@
-import ROOT , sys
+import sys , ROOT
 from ROOT import TPlots , TAnalysis , TAnalysisEG2
 from rootpy.interactive import wait
+sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
+import Initiation as init
+init.createnewdir()
 ROOT.gStyle.SetOptStat(0000)
 
 
@@ -37,7 +40,7 @@ if DoAllVariables:
                         
     cSRC.Update()
     wait()
-    cSRC.SaveAs("~/Desktop/ana_3p_simulation.pdf")
+    c.SaveAs(init.dirname()+"/ana_3p_simulation.pdf")
 
 
 
