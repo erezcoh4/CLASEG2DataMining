@@ -46,9 +46,9 @@ public:
     Float_t     p_over_q    , theta_pq  ;
     Float_t     q_phi       , q_theta   , Pmiss_phi;
     Float_t     thetaMiss23 , phiMiss23;
-    Float_t     Theta_cm , Phi_cm;
+    Float_t     Theta_cm    , Phi_cm;
 
-    Double_t    Px  , Py    , Pz    , Pp;
+    Double_t    Px  , Py    , Pz    , Pp    ,   Ecm;
     
     vector<TVector3>   p3vec;
     
@@ -92,6 +92,7 @@ public:
     void      q_Pmiss_frame ();
 
 
+    float   ppElastic_angle (Double_t);
 
 };
 

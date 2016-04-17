@@ -135,9 +135,14 @@ void T3pSimulation::p_rescatter_ppPair(){
     
     
     // Define the angles of the scattering in the c.m.
-    binEcm      = h_ppElastic -> GetXaxis() -> FindBin( p1_pk_cm.E() );
-    Theta_cm    = r2d * ((TH1F*) h_ppElastic->ProjectionY("hTheta",binEcm,binEcm)) -> GetRandom();
-    Phi_cm      = r2d * gRandom -> Uniform(0 , 180);  // phi distributes uniformly
+    Ecm         =  p1_pk_cm.E();
+//    binEcm      = h_ppElastic -> GetXaxis() -> FindBin( Ecm );
+//    Theta_cm    = r2d * ((TH1F*) h_ppElastic->ProjectionY("hTheta",binEcm,binEcm)) -> GetRandom();
+    // choose c.m. scattering angle
+    Theta_cm    = ppElastic_angle( Ecm );
+
+    // c.m. phi distributes uniformly
+    Phi_cm      = r2d * gRandom -> Uniform(0 , 180);
     
     
     // Calculate outgoing protons in the 90 degrees scattering reaction
@@ -324,6 +329,170 @@ void T3pSimulation::Imp_ppElasticHisto ( bool DoPlot ){
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+Double_t T3pSimulation::a0(Double_t Ecm){
+    if ( 1.9 < Ecm  && Ecm < 2.1) {
+        return (exp(90.16161 - 42.54657*Ecm) + 250.6459 - 82.64069 * Ecm); // f0
+    }
+    else if ( 2.1 < Ecm  && Ecm < 4.2) {
+        return (208.6132 - 85.75014*pow(Ecm,1) + 9.606524 * pow(Ecm,2) ); // f2
+    }
+    else{
+        Printf("%f outside range for E(c.m.)",Ecm);
+        return 0;
+    }
+}
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+Double_t T3pSimulation::a1(Double_t Ecm){
+    if ( 1.9 < Ecm  && Ecm < 2.1) {
+        return (81.46621 - 2.442514*pow(Ecm,1)); // f1
+    }
+    else if ( 2.1 < Ecm  && Ecm < 4.2) {
+        return (1e-2 * (9014.328 - 249.0616*pow(Ecm,1) + 26.35260 * pow(Ecm,2) + 3.374141 * pow(Ecm,3) )); // f3
+    }
+    else{
+        Printf("%f outside range for E(c.m.)",Ecm);
+        return 0;
+    }
+}
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+Double_t T3pSimulation::a2(Double_t Ecm){
+    if ( 1.9 < Ecm  && Ecm < 2.1) {
+        return (-1.613531 - 1.424601*pow(Ecm,1)); // f1
+    }
+    else if ( 2.1 < Ecm  && Ecm < 4.2) {
+        return (1e-1 * (1.403383 - 4.544666*pow(Ecm,1) )); // f1
+    }
+    else{
+        Printf("%f outside range for E(c.m.)",Ecm);
+        return 0;
+    }
+}
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+Double_t T3pSimulation::a3(Double_t Ecm){
+    if ( 1.9 < Ecm  && Ecm < 2.1) {
+        return (222.9465-125.6755*pow(Ecm,1)-23.42175*pow(Ecm,2)+15.85506*pow(Ecm,3)); // f3
+    }
+    else if ( 2.1 < Ecm  && Ecm < 4.2) {
+        return (1e-2 * (816000.1 - 1924544.*pow(Ecm,1)+1962241.*pow(Ecm,2)-1126850.*pow(Ecm,3)+397754.5*pow(Ecm,4)-88173.33*pow(Ecm,5)+11948.51*pow(Ecm,6) -896.5965*pow(Ecm,7)+27.03873*pow(Ecm,8)+.1756284*pow(Ecm,9))); // f9
+    }
+    else{
+        Printf("%f outside range for E(c.m.)",Ecm);
+        return 0;
+    }
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+Double_t T3pSimulation::a4(Double_t Ecm){
+    if ( 1.9 < Ecm  && Ecm < 2.1) {
+        return (1e-2 * (1.675475-1.718991*pow(Ecm,1)+0.4285591*pow(Ecm,2)) ); // f2
+    }
+    else if ( 2.1 < Ecm  && Ecm < 4.2) {
+        return (1e-5 * (-535576.2 +1179326.*pow(Ecm,1)-1056764.*pow(Ecm,2)+478358.4*pow(Ecm,3)-100020.3*pow(Ecm,4)-1995.474*pow(Ecm,5)+5989.377*pow(Ecm,6) +-1358.871*pow(Ecm,7)+135.3221*pow(Ecm,8)-5.257673*pow(Ecm,9))); // f9
+    }
+    else{
+        Printf("%f outside range for E(c.m.)",Ecm);
+        return 0;
+    }
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+Double_t T3pSimulation::a5(Double_t Ecm){
+    if ( 1.9 < Ecm  && Ecm < 2.1) {
+        return (1e-4 * (-2.464428+2.413957*pow(Ecm,1)-0.5908636*pow(Ecm,2)	) ); // f2
+    }
+    else if ( 2.1 < Ecm  && Ecm < 4.2) {
+        return (1e-7 * (6069.216-15344.59*pow(Ecm,1) + 15584.70*pow(Ecm,2)- 8343.774*pow(Ecm,3) + 2567.415*pow(Ecm,4) - 458.0696*pow(Ecm,5)	+ 44.27438*pow(Ecm,6)	-1.805952 * pow(Ecm,7))); // f7
+    }
+    else{
+        Printf("%f outside range for E(c.m.)",Ecm);
+        return 0;
+    }
+}
+
+
+Double_t a0 (Double_t);
+Double_t a1 (Double_t);
+Double_t a2 (Double_t);
+Double_t a3 (Double_t);
+Double_t a4 (Double_t);
+Double_t a5 (Double_t);
+
+Double_t g_p (Double_t , Double_t);
+Double_t f_Theta_cm (Double_t , Double_t);
+
+void Set_ppElastic ();
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+Double_t T3pSimulation::g_p(Double_t Ecm, Double_t Theta_cm){
+    return a0(Ecm)*( exp(- pow((90 - Theta_cm - a1(Ecm))/a2(Ecm)),2) + exp(- pow(( Theta_cm - 90 - a1(Ecm))/a2(Ecm)),2)  );
+}
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+Double_t T3pSimulation::f_Theta_cm(Double_t Ecm, Double_t Theta_cm){
+    return (g_p(Ecm,Theta_cm) + g_W(Ecm,Theta_cm)*g_v(Ecm,Theta_cm) + g_q(Ecm,Theta_cm));
+}
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void T3pSimulation::Set_ppElastic(){
+    // build pp-eastic c.m. scattering angle following GSI ppElastic analysis [http://web-docs.gsi.de/~webhades/computing/pluto/NN/pp_elastic.html#ref*]
+    // two invariant mass regions: 1.9 < Ecm < 2.1 GeV/c2, and 2.1 < Ecm < 4.2 GeV/c2
+    TF1 *f_a0 = new TF1("f_a0","a0(x)",1.9,4.2);
+
+}
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+float T3pSimulation::ppElastic_angle(Double_t Ecm){
+    // choose c.m. scattering angle following GSI ppElastic analysis [http://web-docs.gsi.de/~webhades/computing/pluto/NN/pp_elastic.html#ref*]
+    SHOW(Ecm);
+    SHOW(Theta_cm);
+
+    return Theta_cm;
+}
 
     
 #endif

@@ -1,6 +1,9 @@
-import ROOT
+import ROOT, sys
 from ROOT import T3pSimulation , TAnalysis
 from rootpy.interactive import wait
+sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
+import Initiation as init
+init.createnewdir()
 analysis = TAnalysis()
 
 
@@ -22,7 +25,7 @@ if (DoDraw) : wait()
 
 
 
-sim3p.RunInteractions( 10000 , True )       # run interactions and fill output tree
+sim3p.RunInteractions( 1000 , True )       # run interactions and fill output tree
 print "done filling %d events " % OutTree.GetEntries() + "in " + OutTree.GetTitle()
 OutTree.Write()
 OutFile.Close()
