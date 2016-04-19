@@ -95,7 +95,6 @@ public:
     void      q_Pmiss_frame ();
 
 
-    float   ppElastic_angle (Double_t);
 
 };
 
