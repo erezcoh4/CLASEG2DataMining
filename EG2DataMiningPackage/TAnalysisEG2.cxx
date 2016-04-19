@@ -66,6 +66,12 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     // For 3p simulation...
     Sim3pSRCCut = cutSRC && " 3 <= Np" && "0.3 < protons[1].P() && 0.3 < protons[2].P()";
 
+    
+    Printf("Set Cuts:");
+    PrintLine();
+    cutXb.Print();
+    cutPrec.Print();
+    Final3pCut.Print();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -7,6 +7,9 @@ from ROOT import TEG2dm
 from ROOT import TPlots
 from ROOT import TAnalysisEG2
 from rootpy.interactive import wait
+sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
+import Initiation as init
+init.createnewdir()
 ROOT.gStyle.SetOptStat(0000)
 
 
@@ -17,15 +20,15 @@ DoCount_p_2p_3p     = False
 DoCombineTargets    = True
 DoGenCombinedFile   = False
 
-
-Nbins   = 25
+Var     = "Pcm"
+Nbins   = 50
 XbMin   = 1.05
 cut     = ROOT.TCut()
 XbCut   = ROOT.TCut("%f <= Xb"%XbMin)
 dm      = TEG2dm()
 if len(sys.argv)>1:
-    A       = int(sys.argv[1])
-    ana     = TAnalysisEG2("NoCTofDATA_%s"% dm.Target(A), XbCut )
+    A   = int(sys.argv[1])
+    ana = TAnalysisEG2("NoCTofDATA_%s"% dm.Target(A), XbCut )
 
 
 
@@ -90,17 +93,40 @@ if DoCombineTargets:
             anaAll  = [TAnalysisEG2("NoCTofDATA_C12",XbCut) , TAnalysisEG2("NoCTofDATA_Al27",XbCut) , TAnalysisEG2("NoCTofDATA_Fe56",XbCut) , TAnalysisEG2("NoCTofDATA_Pb208",XbCut)]
             os.system("hadd $DataMiningAnaFiles/Ana_C12_Al27_Fe56_Pb28.root %s %s %s %s"%(anaAll[0].GetFileName() , anaAll[1].GetFileName() , anaAll[2].GetFileName() , anaAll[3].GetFileName() ))
     anaEG2  = TAnalysisEG2("C12_Al27_Fe56_Pb28",XbCut)
-    cSRC = anaEG2.CreateCanvas("All targets together","Divide",3,1 )
-    cSRC.cd(1)
-    anaEG2.H1("Pcm.P()" , anaEG2.pppSRCCut , "BAR E" , 20 , 0 , 1.1, "c.m. momentum - stacked ^{12}C ^{56}Fe ^{208}Pb","|#vec{p}(c.m.)| [GeV/c]")
-#    anaEG2.Draw1DVarAndCut(cSRC , 1 , "Pcm.P()" , Nbins , 0 , 1.5, "c.m. momentum - stacked ^{12}C ^{56}Fe ^{208}Pb","|#vec{p}(c.m.)| [GeV/c]" , anaEG2.pppSRCCut , True , "SRC")
-    cSRC.cd(2)
-    anaEG2.H2("fabs(phiMiss23)" , "thetaMiss23" , anaEG2.pppSRCCut , "" , Nbins , 0 , 80 , Nbins , 80 , 180 , "#phi vs. #theta - stacked  ^{12}C ^{27}Al ^{56}Fe ^{208}Pb","|#phi| [deg.]","#theta [deg.]")
-    cSRC.cd(3)
-    anaEG2.H1("Xb" , anaEG2.pppSRCCut , "BAR E" , Nbins , 1 , 2 , "Bjorken x - stacked  ^{12}C ^{27}Al ^{56}Fe ^{208}Pb","Bjorken x","")
-    anaEG2.H1("Xb" , anaEG2.Final3pCut , "BAR E same" , Nbins , 1 , 2 , "Bjorken x - stacked  ^{12}C ^{27}Al ^{56}Fe ^{208}Pb","Bjorken x","",1,2)
-    cSRC.Update()
+    c = anaEG2.CreateCanvas("All targets together")
+    if (Var=="Pcm"):
+        anaEG2.H1("Pcm.P()" , anaEG2.pppSRCCut , "BAR E" , Nbins , 0 , 1.4 , "","| #vec{p} (c.m.) | [GeV/c]")
+        anaEG2.H1("Pcm.P()" , anaEG2.Final3pCut , "BAR E same", Nbins , 0 , 1.4 , "","| #vec{p} (c.m.) | [GeV/c]","",1,1)
+    if (Var=="Xb"):
+        anaEG2.H1(Var , anaEG2.pppSRCCut , "BAR E" , Nbins , 0 , 2, "","Bjorken x")
+        anaEG2.H1(Var , anaEG2.Final3pCut , "BAR E same", Nbins , 0 , 2, "","Bjorken x","",1,1)
+    elif (Var=="XbMoving"):
+        anaEG2.H1(Var , anaEG2.pppSRCCut , "BAR E" , Nbins , 0 , 2, "","Bjorken x' (moving nucleon)")
+        anaEG2.H1(Var , anaEG2.Final3pCut , "BAR E same", Nbins , 0 , 2, "","Bjorken x' (moving nucleon)","",1,1)
+    elif (Var=="opening_angle"):
+        var = anaEG2.CosTheta("Pmiss.Vect()","Prec.Vect()")
+        anaEG2.H1(var , anaEG2.pppSRCCut , "BAR E" , Nbins , -1 , 1, "","cos (#theta)")
+        anaEG2.H1(var , anaEG2.Final3pCut , "BAR E same" , Nbins , -1 , 1, "","cos (#theta)","",1,1)
+    elif (Var=="theta_vs_phi"):
+        anaEG2.H2("fabs(phiMiss23)" , "thetaMiss23" , anaEG2.pppSRCCut , "" , Nbins , 0 , 80 , Nbins , 80 , 180 , "","|#phi| [deg.]","#theta [deg.]",4,20,0.5)
+        anaEG2.H2("fabs(phiMiss23)" , "thetaMiss23" , anaEG2.Final3pCut , "same" , Nbins , 0 , 80 , Nbins , 80 , 180 , "","|#phi| [deg.]","#theta [deg.]",2,20,0.5)
+        anaEG2.Box(0,154,15,180,1,0.1)
+    c.Update()
     wait()
-    cSRC.SaveAs("~/Desktop/C12_Al_27_Fe56_Pb28.pdf")
+    c.SaveAs(init.dirname()+"/C12_Al_27_Fe56_Pb28_"+Var+".pdf")
 
+#
+#
+#    cSRC.cd(1)
+#    anaEG2.H1("Pcm.P()" , anaEG2.pppSRCCut , "BAR E" , 20 , 0 , 1.1, "c.m. momentum - stacked ^{12}C ^{56}Fe ^{208}Pb","|#vec{p}(c.m.)| [GeV/c]")
+##    anaEG2.Draw1DVarAndCut(cSRC , 1 , "Pcm.P()" , Nbins , 0 , 1.5, "c.m. momentum - stacked ^{12}C ^{56}Fe ^{208}Pb","|#vec{p}(c.m.)| [GeV/c]" , anaEG2.pppSRCCut , True , "SRC")
+#    cSRC.cd(2)
+#    anaEG2.H2("fabs(phiMiss23)" , "thetaMiss23" , anaEG2.pppSRCCut , "" , Nbins , 0 , 80 , Nbins , 80 , 180 , "#phi vs. #theta - stacked  ^{12}C ^{27}Al ^{56}Fe ^{208}Pb","|#phi| [deg.]","#theta [deg.]")
+#    cSRC.cd(3)
+#    anaEG2.H1("Xb" , anaEG2.pppSRCCut , "BAR E" , Nbins , 1 , 2 , "Bjorken x - stacked  ^{12}C ^{27}Al ^{56}Fe ^{208}Pb","Bjorken x","")
+#    anaEG2.H1("Xb" , anaEG2.Final3pCut , "BAR E same" , Nbins , 1 , 2 , "Bjorken x - stacked  ^{12}C ^{27}Al ^{56}Fe ^{208}Pb","Bjorken x","",1,2)
+#    c.Update()
+#    wait()
+#    c.SaveAs(init.dirname()+"C12_Al_27_Fe56_Pb28"+Var+".pdf")
+#
 

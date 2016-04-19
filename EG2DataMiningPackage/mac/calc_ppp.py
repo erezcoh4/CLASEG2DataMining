@@ -1,12 +1,13 @@
-import ROOT
-from ROOT import TEG2dm
-from ROOT import TSchemeDATA
-from ROOT import TAnalysisEG2
-from ROOT import TCalcPhysVarsEG2
+# run:
+# > python mac/calc_ppp.py <target A>
+
+import ROOT , os , sys 
+from ROOT import TEG2dm , TSchemeDATA , TAnalysisEG2 , TCalcPhysVarsEG2
 
 
 # options are: "data" / "no ctof"
-A           = 27
+if len(sys.argv)>1:
+    A       = int(sys.argv[1])
 DataType    = "no ctof"
 
 

@@ -85,7 +85,7 @@ void TSchemeDATA::SRCPmissXb(int fTargetType , float fXbMin, int fNpMin, int fNp
         }
     }
     else if (DataType == "no ctof") {
-        // targ_type = 2; // for Al27
+//         targ_type = 2; // for Al27
 
         for (Long64_t i = 0; i < Nentries ; i++) {
             if (i%(Nentries/20)==0) plot.PrintPercentStr((float)i/Nentries);
