@@ -18,6 +18,7 @@
 #include "TEG2dm.h"
 #include "TCalcPhysVarsEG2.h"
 #include "TRandom3.h"
+#include "MySoftwarePackage/ppElastic.h"
 /**
    \class T3pSimulation
    User defined class T3pSimulation ... these comments are used to generate
@@ -30,6 +31,8 @@ public:
     TPlots    plot;
     TAnalysis analysis;
     TCalculations calculations;
+    ppElastic pp_elastic;
+    
     TRandom3  rand;
     TCalcPhysVarsEG2 calcEG2;
     TTree   * OutTree;
@@ -46,9 +49,9 @@ public:
     Float_t     p_over_q    , theta_pq  ;
     Float_t     q_phi       , q_theta   , Pmiss_phi;
     Float_t     thetaMiss23 , phiMiss23;
-    Float_t     Theta_cm    , Phi_cm;
+    Float_t     Theta_cm    , Phi_cm    , Mpp;
 
-    Double_t    Px  , Py    , Pz    , Pp    ,   Ecm;
+    Double_t    Px  , Py    , Pz    , Pp    ,   Ecm ;
     
     vector<TVector3>   p3vec;
     

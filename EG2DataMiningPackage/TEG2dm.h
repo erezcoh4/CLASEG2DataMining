@@ -19,6 +19,7 @@
 #include "MySoftwarePackage/TCalculations.h"
 #include "MySoftwarePackage/TAnalysis.h"
 #define r2d TMath::RadToDeg()
+#define d2r TMath::DegToRad()
 
 /**
    \class TEG2dm

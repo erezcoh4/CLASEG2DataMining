@@ -9,6 +9,7 @@ T3pSimulation::T3pSimulation( TTree * fOutTree ){
     SetOutTree(fOutTree);
     InitOutTree();
     Np = 3;
+    pp_elastic.CreateXsec();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -22,6 +23,12 @@ void T3pSimulation::InitOutTree(){
     OutTree -> Branch("pcm_ppPair"  ,"TLorentzVector"       ,&pcm_ppPair);
     OutTree -> Branch("p1_ppPair"   ,"TLorentzVector"       ,&p1_ppPair);
     OutTree -> Branch("p2_ppPair"   ,"TLorentzVector"       ,&p2_ppPair);
+    // rescattering process
+    OutTree -> Branch("Mpp"                 ,&Mpp                   , "Mpp/F");
+    OutTree -> Branch("Theta_cm"            ,&Theta_cm              , "Theta_cm/F");
+    OutTree -> Branch("Phi_cm"              ,&Phi_cm                , "Phi_cm/F");
+
+    
     // after rescattering
     OutTree -> Branch("p_knocked_r" ,"TLorentzVector"       ,&p_knocked_r); // rescattered
     OutTree -> Branch("p1_ppPair_r" ,"TLorentzVector"       ,&p1_ppPair_r); // rescattered
@@ -115,8 +122,6 @@ void T3pSimulation::p_rescatter_ppPair(){
  
     // generate a scattering angle according to cross-section dependence on energy and angle
     
-    
-    
     // Rotate the vectors in the c.m. to go along the z-axis
     Double_t rot_phi     = p1_p1_pk_cm.Phi();
     Double_t rot_theta   = p1_p1_pk_cm.Theta();
@@ -125,33 +130,20 @@ void T3pSimulation::p_rescatter_ppPair(){
     p1_p1_pk_cm.RotateY(-rot_theta);
     pk_p1_pk_cm.RotateZ(-rot_phi);
     pk_p1_pk_cm.RotateY(-rot_theta);
-
-//    PrintLine();
-//    SHOWTLorentzVector(p1_pk_cm);
-//    SHOWTLorentzVector(p1_p1_pk_cm);
-//    SHOWTLorentzVector(pk_p1_pk_cm);
-
-    
     
     
     // Define the angles of the scattering in the c.m.
-    Ecm         =  p1_pk_cm.E();
-//    binEcm      = h_ppElastic -> GetXaxis() -> FindBin( Ecm );
-//    Theta_cm    = r2d * ((TH1F*) h_ppElastic->ProjectionY("hTheta",binEcm,binEcm)) -> GetRandom();
     // choose c.m. scattering angle
-    Theta_cm    = ppElastic_angle( Ecm );
-
+    Mpp         = p1_pk_cm.M();
+    Theta_cm    = d2r * pp_elastic.RandomTheta( Mpp );
     // c.m. phi distributes uniformly
-    Phi_cm      = r2d * gRandom -> Uniform(0 , 180);
+    Phi_cm      = d2r * gRandom -> Uniform(0 , 180);
     
     
     // Calculate outgoing protons in the 90 degrees scattering reaction
     p1_ppPair_r.SetVectM( p1_p1_pk_cm.Pz()* TVector3 ( sin(Theta_cm)*cos(Phi_cm),  sin(Theta_cm)*sin(Phi_cm) , cos(Theta_cm) ) , Mp);
     p_knocked_r.SetVectM( - p1_ppPair_r.Vect() , Mp);
-    
-//    SHOWTLorentzVector(p1_ppPair_r);
-//    SHOWTLorentzVector(p_knocked_r);
-    
+
     
     // Rotate all back from the z axis in the c.m. frame.
     p1_p1_pk_cm.RotateY(rot_theta);
@@ -163,19 +155,10 @@ void T3pSimulation::p_rescatter_ppPair(){
     p_knocked_r.RotateY(rot_theta);
     p_knocked_r.RotateZ(rot_phi);
     
-//    SHOWTLorentzVector(p1_ppPair_r);
-//    SHOWTLorentzVector(p_knocked_r);
-//    
-    
     
     // boost back to lab frame
     p1_ppPair_r.Boost( p1_pk_cm.BoostVector() );
     p_knocked_r.Boost( p1_pk_cm.BoostVector() );
-    
-//    SHOWTLorentzVector(p1_ppPair_r);
-//    SHOWTLorentzVector(p_knocked_r);
-    
-   
     
     
     // the third protn (p2_ppPair) is a spectator and does not change
@@ -282,6 +265,9 @@ void T3pSimulation::PrintDATA(int entry){
     SHOWTLorentzVector(p_knocked);
     SHOWTLorentzVector(p1_ppPair);
     SHOWTLorentzVector(p2_ppPair);
+    SHOW(Mpp);
+    SHOW(Theta_cm);
+    SHOW(Phi_cm);
     SHOWTLorentzVector(p1_ppPair_r);
     SHOWTLorentzVector(p2_ppPair_r);
     SHOWTLorentzVector(Pmiss);
@@ -349,150 +335,6 @@ void T3pSimulation::Imp_ppElasticHisto ( bool DoPlot ){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-Double_t T3pSimulation::a0(Double_t Ecm){
-    if ( 1.9 < Ecm  && Ecm < 2.1) {
-        return (exp(90.16161 - 42.54657*Ecm) + 250.6459 - 82.64069 * Ecm); // f0
-    }
-    else if ( 2.1 < Ecm  && Ecm < 4.2) {
-        return (208.6132 - 85.75014*pow(Ecm,1) + 9.606524 * pow(Ecm,2) ); // f2
-    }
-    else{
-        Printf("%f outside range for E(c.m.)",Ecm);
-        return 0;
-    }
-}
-
-
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-Double_t T3pSimulation::a1(Double_t Ecm){
-    if ( 1.9 < Ecm  && Ecm < 2.1) {
-        return (81.46621 - 2.442514*pow(Ecm,1)); // f1
-    }
-    else if ( 2.1 < Ecm  && Ecm < 4.2) {
-        return (1e-2 * (9014.328 - 249.0616*pow(Ecm,1) + 26.35260 * pow(Ecm,2) + 3.374141 * pow(Ecm,3) )); // f3
-    }
-    else{
-        Printf("%f outside range for E(c.m.)",Ecm);
-        return 0;
-    }
-}
-
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-Double_t T3pSimulation::a2(Double_t Ecm){
-    if ( 1.9 < Ecm  && Ecm < 2.1) {
-        return (-1.613531 - 1.424601*pow(Ecm,1)); // f1
-    }
-    else if ( 2.1 < Ecm  && Ecm < 4.2) {
-        return (1e-1 * (1.403383 - 4.544666*pow(Ecm,1) )); // f1
-    }
-    else{
-        Printf("%f outside range for E(c.m.)",Ecm);
-        return 0;
-    }
-}
-
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-Double_t T3pSimulation::a3(Double_t Ecm){
-    if ( 1.9 < Ecm  && Ecm < 2.1) {
-        return (222.9465-125.6755*pow(Ecm,1)-23.42175*pow(Ecm,2)+15.85506*pow(Ecm,3)); // f3
-    }
-    else if ( 2.1 < Ecm  && Ecm < 4.2) {
-        return (1e-2 * (816000.1 - 1924544.*pow(Ecm,1)+1962241.*pow(Ecm,2)-1126850.*pow(Ecm,3)+397754.5*pow(Ecm,4)-88173.33*pow(Ecm,5)+11948.51*pow(Ecm,6) -896.5965*pow(Ecm,7)+27.03873*pow(Ecm,8)+.1756284*pow(Ecm,9))); // f9
-    }
-    else{
-        Printf("%f outside range for E(c.m.)",Ecm);
-        return 0;
-    }
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-Double_t T3pSimulation::a4(Double_t Ecm){
-    if ( 1.9 < Ecm  && Ecm < 2.1) {
-        return (1e-2 * (1.675475-1.718991*pow(Ecm,1)+0.4285591*pow(Ecm,2)) ); // f2
-    }
-    else if ( 2.1 < Ecm  && Ecm < 4.2) {
-        return (1e-5 * (-535576.2 +1179326.*pow(Ecm,1)-1056764.*pow(Ecm,2)+478358.4*pow(Ecm,3)-100020.3*pow(Ecm,4)-1995.474*pow(Ecm,5)+5989.377*pow(Ecm,6) +-1358.871*pow(Ecm,7)+135.3221*pow(Ecm,8)-5.257673*pow(Ecm,9))); // f9
-    }
-    else{
-        Printf("%f outside range for E(c.m.)",Ecm);
-        return 0;
-    }
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-Double_t T3pSimulation::a5(Double_t Ecm){
-    if ( 1.9 < Ecm  && Ecm < 2.1) {
-        return (1e-4 * (-2.464428+2.413957*pow(Ecm,1)-0.5908636*pow(Ecm,2)	) ); // f2
-    }
-    else if ( 2.1 < Ecm  && Ecm < 4.2) {
-        return (1e-7 * (6069.216-15344.59*pow(Ecm,1) + 15584.70*pow(Ecm,2)- 8343.774*pow(Ecm,3) + 2567.415*pow(Ecm,4) - 458.0696*pow(Ecm,5)	+ 44.27438*pow(Ecm,6)	-1.805952 * pow(Ecm,7))); // f7
-    }
-    else{
-        Printf("%f outside range for E(c.m.)",Ecm);
-        return 0;
-    }
-}
-
-
-Double_t a0 (Double_t);
-Double_t a1 (Double_t);
-Double_t a2 (Double_t);
-Double_t a3 (Double_t);
-Double_t a4 (Double_t);
-Double_t a5 (Double_t);
-
-Double_t g_p (Double_t , Double_t);
-Double_t f_Theta_cm (Double_t , Double_t);
-
-void Set_ppElastic ();
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-Double_t T3pSimulation::g_p(Double_t Ecm, Double_t Theta_cm){
-    return a0(Ecm)*( exp(- pow((90 - Theta_cm - a1(Ecm))/a2(Ecm)),2) + exp(- pow(( Theta_cm - 90 - a1(Ecm))/a2(Ecm)),2)  );
-}
-
-
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-Double_t T3pSimulation::f_Theta_cm(Double_t Ecm, Double_t Theta_cm){
-    return (g_p(Ecm,Theta_cm) + g_W(Ecm,Theta_cm)*g_v(Ecm,Theta_cm) + g_q(Ecm,Theta_cm));
-}
-
-
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-void T3pSimulation::Set_ppElastic(){
-    // build pp-eastic c.m. scattering angle following GSI ppElastic analysis [http://web-docs.gsi.de/~webhades/computing/pluto/NN/pp_elastic.html#ref*]
-    // two invariant mass regions: 1.9 < Ecm < 2.1 GeV/c2, and 2.1 < Ecm < 4.2 GeV/c2
-    TF1 *f_a0 = new TF1("f_a0","a0(x)",1.9,4.2);
-
-}
-
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-float T3pSimulation::ppElastic_angle(Double_t Ecm){
-    // choose c.m. scattering angle following GSI ppElastic analysis [http://web-docs.gsi.de/~webhades/computing/pluto/NN/pp_elastic.html#ref*]
-    SHOW(Ecm);
-    SHOW(Theta_cm);
-
-    return Theta_cm;
-}
 
     
 #endif
