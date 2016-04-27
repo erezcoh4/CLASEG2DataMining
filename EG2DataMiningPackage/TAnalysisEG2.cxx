@@ -29,6 +29,7 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     cutMmiss    = "Mmiss < 1.1";
     
     cutSRC      = cutXb && cutThetaPQ && cutPoverQ && cutPmiss;
+    cut1pSRC    = cutXb && cutThetaPQ && cutPoverQ && cutPmiss && "Np==1";
     
     for (int i = 0; i < 3; i++ ) {
                 pEdepCut[i] = TEG2dm::pEdepCut(i);

@@ -70,23 +70,23 @@ void TCalcPhysVarsEG2::InitInputTree(){
 void TCalcPhysVarsEG2::InitOutputTree(){
 
     // Integer branches
-    OutTree -> Branch("A"                   ,&A                     ,"A/I");
-    OutTree -> Branch("Np"                  ,&Np                    ,"Np/I");
+    OutTree -> Branch("target atomic mass"  ,&A                     ,"A/I");
+    OutTree -> Branch("number of protons"   ,&Np                    ,"Np/I");
     OutTree -> Branch("pCTOFCut"            ,&pCTOFCut              );// std::vector<Int_t>
 
     
     // Float_t branches
-    OutTree -> Branch("Xb"                  ,&Xb                    , "Xb/F");
-    OutTree -> Branch("XbMoving"            ,&XbMoving              , "XbMoving/F");
+    OutTree -> Branch("Bjorken x"           ,&Xb                    , "Xb/F");
+    OutTree -> Branch("Bjorken x (moving p)",&XbMoving              , "XbMoving/F");
     OutTree -> Branch("Q2"                  ,&Q2                    , "Q2/F");
-    OutTree -> Branch("Mmiss"               ,&Mmiss                 , "Mmiss/F");
-    OutTree -> Branch("Emiss"               ,&Emiss                 , "Emiss/F");
-    OutTree -> Branch("theta_pq"            ,&theta_pq              , "theta_pq/F");
-    OutTree -> Branch("p_over_q"            ,&p_over_q              , "p_over_q/F");
-    OutTree -> Branch("alpha_q"             ,&alpha_q               , "alpha_q/F");
-    OutTree -> Branch("sum_alpha"           ,&sum_alpha             , "sum_alpha/F");
-    OutTree -> Branch("thetaMiss23"         ,&thetaMiss23           , "thetaMiss23/F");
-    OutTree -> Branch("phiMiss23"           ,&phiMiss23             , "phiMiss23/F");
+    OutTree -> Branch("missing mass"        ,&Mmiss                 , "Mmiss/F");
+    OutTree -> Branch("missing energy"      ,&Emiss                 , "Emiss/F");
+    OutTree -> Branch("theta (pq)"          ,&theta_pq              , "theta_pq/F");
+    OutTree -> Branch("p/q"                 ,&p_over_q              , "p_over_q/F");
+    OutTree -> Branch("q LC fraction"       ,&alpha_q               , "alpha_q/F");
+    OutTree -> Branch("sum of LC fractions" ,&sum_alpha             , "sum_alpha/F");
+    OutTree -> Branch("theta p(miss)-p2 p3" ,&thetaMiss23           , "thetaMiss23/F");
+    OutTree -> Branch("phi p(miss)-p2 p3"   ,&phiMiss23             , "phiMiss23/F");
     OutTree -> Branch("alpha"               ,&alpha                 );// std::vector<Float_t>
     OutTree -> Branch("pCTOF"               ,&pCTOF                 );// std::vector<Float_t>
     OutTree -> Branch("pEdep"               ,&pEdep                 );// std::vector<Float_t>
@@ -108,9 +108,9 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     
     
     // p(cm) for rooFit
-    OutTree -> Branch("pcmX"               ,&pcmX                   , "pcmX/D");
-    OutTree -> Branch("pcmY"               ,&pcmY                   , "pcmY/D");
-    OutTree -> Branch("pcmZ"               ,&pcmZ                   , "pcmZ/D");
+    OutTree -> Branch("p(c.m.) x direction" ,&pcmX                   , "pcmX/D");
+    OutTree -> Branch("p(c.m.) y direction" ,&pcmY                   , "pcmY/D");
+    OutTree -> Branch("p(c.m.) z direction" ,&pcmZ                   , "pcmZ/D");
 
     
     std::cout << "Initialized Output Tree TCalcPhysVarsEG2 on " << OutTree -> GetTitle() << std::endl;
@@ -126,6 +126,9 @@ void TCalcPhysVarsEG2::InitGlobals(){
     TargetAtRest.SetVectM( TVector3() , mA  );   // Target initially at rest relative to beam
     NucleonAtRest.SetVectM( TVector3() , Mp  );   // Target initially at rest relative to beam
     A_over_mA  = (float)A/mA;
+    pA.SetVectM( TVector3() , Mp * A  );
+    Beam = TLorentzVector( 0 , 0 , 5.009 , 5.009 );
+
 }
 
 
@@ -151,19 +154,23 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     // electron
     if(DataType == "data") {
-        q.SetPxPyPzE( - Px_e , - Py_e , 5.009 - Pz_e , Nu);
+        Pe      = TVector3( Px_e , Py_e , Pz_e );
+        //        q.SetPxPyPzE( - Px_e , - Py_e , 5.009 - Pz_e , Nu); delete may 27
     }
     else if (DataType == "no ctof"){
-        q.SetPxPyPzE( - N_Px[0] , - N_Py[0] , 5.009 - N_Pz[0], Nu);
-        Q2 = -q.Mag2();
+        Pe = TVector3( N_Px[0] , N_Py[0] , N_Pz[0] );
+        //        q.SetPxPyPzE( - N_Px[0] , - N_Py[0] , 5.009 - N_Pz[0], Nu); delete may 27
     }
+    e.SetVectM( Pe , Me );
+    q = Beam - e;
+    Q2 = -q.Mag2();
     
     
    
     // get protons - energy loss correction and Coulomb corrections
-    for (int p = 0 ; p < Np ; p++ ){
+    for (int i = 0 ; i < Np ; i++ ){
 
-        p3vec.push_back( TVector3 (PpX[p],PpY[p],PpZ[p] ) );
+        p3vec.push_back( TVector3 (PpX[i],PpY[i],PpZ[i] ) );
         EnergyLossCorrrection( p3vec.back() );
         CoulombCorrection( p3vec.back() , CoulombDeltaE );
         if ( p3vec.back().Mag() > Plead.P() )
@@ -176,10 +183,15 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     theta_pq    = r2d * Plead.Vect().Angle(q.Vect());
     p_over_q    = Plead.P() / q.P();
 
+
     
     // Bjorken scaling for a moving nucleon
-    TLorentzVector p ( Pmiss.Vect() , sqrt( Pmiss.P()*Pmiss.P() + Mp*Mp ) );
-    XbMoving    = Q2 / ( 2. * p * q );
+    // Invariant mass of the system produced in the interaction of balancing nucleon with a virtual photon
+    pA_Np_1.SetVectM( TVector3() , Mp * (A - Np - 1)  );
+    Wtilde      = pA - pA_Np_1 + q ;
+    
+    
+    
     
     // move to prefered axes frame
     ChangeAxesFrame();
@@ -213,6 +225,15 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     // A(e,e'p) missing mass M²(miss) = (q + 2mN - Plead)² , all 4-vectors
     Mmiss       = (q + 2*NucleonAtRest - Plead).Mag();
+
+    
+    // Bjorken scaling for a moving nucleon
+    XbMoving    = Q2 / ( Wtilde.Mag2() + Q2 - Mp2  ); // = Q2 / 2pq [Q2 / ( 2. * (Pmiss * q) )]
+    SHOWTLorentzVector(Wtilde);
+    SHOW(Wtilde.Mag2());
+    SHOW(Mp2);
+    SHOW(Xb);
+    SHOW(XbMoving);
 
     
     // if we have 3 protons, randomize protons 2 and 3
@@ -314,6 +335,8 @@ void TCalcPhysVarsEG2::loop_protons(){
         Emiss      -= protons.back().E() - Mp;
      
         
+        // Invariant mass of the system produced in the interaction of balancing nucleon with a virtual photon
+        Wtilde     -= protons.back();
     }
     
     

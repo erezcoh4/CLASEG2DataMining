@@ -14,13 +14,14 @@ ROOT.gStyle.SetOptStat(0000)
 
 
 
+DoDrawVar           = True
 DoCuts              = False
 DoCTOFsubtraction   = False
 DoCount_p_2p_3p     = False
-DoCombineTargets    = True
+DoCombineTargets    = False
 DoGenCombinedFile   = False
 
-Var     = "Pcm"
+Var     = "XbMoving"
 Nbins   = 50
 XbMin   = 1.05
 cut     = ROOT.TCut()
@@ -30,6 +31,23 @@ if len(sys.argv)>1:
     A   = int(sys.argv[1])
     ana = TAnalysisEG2("NoCTofDATA_%s"% dm.Target(A), XbCut )
 
+
+
+if DoDrawVar:
+    c = ana.CreateCanvas(Var)
+    cut = ROOT.TCut()
+    if (Var=="XbMoving"):
+        xAxis = [0 , 2, "Bjorken x' (moving nucleon)"]
+    elif (Var=="Q2"):
+        xAxis = [0 , 4 , "Q ^{2} (GeV/c) ^{2}"]
+    elif (Var=="Xb"):
+        xAxis = [0.8 , 2 , "Bjorken x"]
+    ana.H1(Var , ana.cut1pSRC , "BAR E" , Nbins , xAxis[0] , xAxis[1] , "" , xAxis[2] )
+    ana.H1(Var , ana.ppSRCCut , "BAR E same" , Nbins , xAxis[0] , xAxis[1] , "" , xAxis[2] , "", 2 , 2 )
+    ana.H1(Var , ana.pppSRCCut , "BAR E same" , Nbins , xAxis[0] , xAxis[1] , "" , xAxis[2] , "" , 3 , 3)
+    c.Update()
+    wait()
+    c.SaveAs(init.dirname()+"/%s"%dm.Target(A)+"_"+Var+".pdf")
 
 
 if DoCuts:
@@ -85,13 +103,13 @@ if DoCTOFsubtraction:
 if DoCount_p_2p_3p:
     ana.PrintInCuts()
 
+if DoGenCombinedFile:
+    if ( int(input("re-create the merged file (all targets together): [0-no/ 1-yes]")) == 1 ):
+        os.system("rm $DataMiningAnaFiles/Ana_C12_Al27_Fe56_Pb28.root")
+        anaAll  = [TAnalysisEG2("NoCTofDATA_C12",XbCut) , TAnalysisEG2("NoCTofDATA_Al27",XbCut) , TAnalysisEG2("NoCTofDATA_Fe56",XbCut) , TAnalysisEG2("NoCTofDATA_Pb208",XbCut)]
+        os.system("hadd $DataMiningAnaFiles/Ana_C12_Al27_Fe56_Pb28.root %s %s %s %s"%(anaAll[0].GetFileName() , anaAll[1].GetFileName() , anaAll[2].GetFileName() , anaAll[3].GetFileName() ))
 
 if DoCombineTargets:
-    if DoGenCombinedFile:
-        if ( int(input("re-create the merged file (all targets together): [0-no/ 1-yes]")) == 1 ):
-            os.system("rm $DataMiningAnaFiles/Ana_C12_Al27_Fe56_Pb28.root")
-            anaAll  = [TAnalysisEG2("NoCTofDATA_C12",XbCut) , TAnalysisEG2("NoCTofDATA_Al27",XbCut) , TAnalysisEG2("NoCTofDATA_Fe56",XbCut) , TAnalysisEG2("NoCTofDATA_Pb208",XbCut)]
-            os.system("hadd $DataMiningAnaFiles/Ana_C12_Al27_Fe56_Pb28.root %s %s %s %s"%(anaAll[0].GetFileName() , anaAll[1].GetFileName() , anaAll[2].GetFileName() , anaAll[3].GetFileName() ))
     anaEG2  = TAnalysisEG2("C12_Al27_Fe56_Pb28",XbCut)
     c = anaEG2.CreateCanvas("All targets together")
     if (Var=="Pcm"):
@@ -114,19 +132,4 @@ if DoCombineTargets:
     c.Update()
     wait()
     c.SaveAs(init.dirname()+"/C12_Al_27_Fe56_Pb28_"+Var+".pdf")
-
-#
-#
-#    cSRC.cd(1)
-#    anaEG2.H1("Pcm.P()" , anaEG2.pppSRCCut , "BAR E" , 20 , 0 , 1.1, "c.m. momentum - stacked ^{12}C ^{56}Fe ^{208}Pb","|#vec{p}(c.m.)| [GeV/c]")
-##    anaEG2.Draw1DVarAndCut(cSRC , 1 , "Pcm.P()" , Nbins , 0 , 1.5, "c.m. momentum - stacked ^{12}C ^{56}Fe ^{208}Pb","|#vec{p}(c.m.)| [GeV/c]" , anaEG2.pppSRCCut , True , "SRC")
-#    cSRC.cd(2)
-#    anaEG2.H2("fabs(phiMiss23)" , "thetaMiss23" , anaEG2.pppSRCCut , "" , Nbins , 0 , 80 , Nbins , 80 , 180 , "#phi vs. #theta - stacked  ^{12}C ^{27}Al ^{56}Fe ^{208}Pb","|#phi| [deg.]","#theta [deg.]")
-#    cSRC.cd(3)
-#    anaEG2.H1("Xb" , anaEG2.pppSRCCut , "BAR E" , Nbins , 1 , 2 , "Bjorken x - stacked  ^{12}C ^{27}Al ^{56}Fe ^{208}Pb","Bjorken x","")
-#    anaEG2.H1("Xb" , anaEG2.Final3pCut , "BAR E same" , Nbins , 1 , 2 , "Bjorken x - stacked  ^{12}C ^{27}Al ^{56}Fe ^{208}Pb","Bjorken x","",1,2)
-#    c.Update()
-#    wait()
-#    c.SaveAs(init.dirname()+"C12_Al_27_Fe56_Pb28"+Var+".pdf")
-#
 

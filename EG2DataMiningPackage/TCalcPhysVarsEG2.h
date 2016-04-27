@@ -61,17 +61,17 @@ public:
     Float_t N_Px[20]    , N_Py[20]  , N_Pz[20]; // for raw data
     Float_t thetaMiss23 , phiMiss23;
     
-    
     Double_t    pcmX    , pcmY      , pcmZ  ;
     
     vector<Float_t>     alpha       , pEdep         , pCTOF     ;
     vector<Int_t>       pCTOFCut      ;
     
     
-    
-    vector<TVector3>   p3vec        , pVertex   ;
-    
-    
+    TVector3            Pbeam        , Pe;
+    vector<TVector3>    p3vec        , pVertex   ;
+    TLorentzVector      Beam         , e        ,  p;
+    TLorentzVector      Wtilde       , pA       ,  pA_Np_1;
+
     
     
     

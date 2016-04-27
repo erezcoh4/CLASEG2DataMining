@@ -8,6 +8,9 @@ from ROOT import TEG2dm , TSchemeDATA , TAnalysisEG2 , TCalcPhysVarsEG2
 # options are: "data" / "no ctof"
 if len(sys.argv)>1:
     A       = int(sys.argv[1])
+else:
+    print '\n run this script with: \n > python mac/calc_ppp.py <target A> \n\n'
+    exit(0)
 DataType    = "no ctof"
 
 
