@@ -2,10 +2,8 @@
 # > python mac/ana_ppp.py <target A>
 
 import ROOT
-import os, sys
-from ROOT import TEG2dm
-from ROOT import TPlots
-from ROOT import TAnalysisEG2
+import os, sys , math
+from ROOT import TEG2dm , TPlots , TAnalysisEG2
 from rootpy.interactive import wait
 sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
 import Initiation as init
@@ -14,15 +12,15 @@ ROOT.gStyle.SetOptStat(0000)
 
 
 
-DoDrawVar           = True
+DoDrawVar           = False
 DoCuts              = False
 DoCTOFsubtraction   = False
 DoCount_p_2p_3p     = False
-DoCombineTargets    = False
 DoGenCombinedFile   = False
+DoCombineTargets    = True
 
-Var     = "XbMoving"
-Nbins   = 50
+Var     = "pMiss_p2_p3"
+Nbins   = 25
 XbMin   = 1.05
 cut     = ROOT.TCut()
 XbCut   = ROOT.TCut("%f <= Xb"%XbMin)
@@ -33,7 +31,7 @@ if len(sys.argv)>1:
 
 
 
-if DoDrawVar:
+if len(sys.argv)>1 and DoDrawVar:
     c = ana.CreateCanvas(Var)
     cut = ROOT.TCut()
     if (Var=="XbMoving"):
@@ -112,23 +110,37 @@ if DoGenCombinedFile:
 if DoCombineTargets:
     anaEG2  = TAnalysisEG2("C12_Al27_Fe56_Pb28",XbCut)
     c = anaEG2.CreateCanvas("All targets together")
-    if (Var=="Pcm"):
-        anaEG2.H1("Pcm.P()" , anaEG2.pppSRCCut , "BAR E" , Nbins , 0 , 1.4 , "","| #vec{p} (c.m.) | [GeV/c]")
-        anaEG2.H1("Pcm.P()" , anaEG2.Final3pCut , "BAR E same", Nbins , 0 , 1.4 , "","| #vec{p} (c.m.) | [GeV/c]","",1,1)
-    if (Var=="Xb"):
-        anaEG2.H1(Var , anaEG2.pppSRCCut , "BAR E" , Nbins , 0 , 2, "","Bjorken x")
-        anaEG2.H1(Var , anaEG2.Final3pCut , "BAR E same", Nbins , 0 , 2, "","Bjorken x","",1,1)
-    elif (Var=="XbMoving"):
-        anaEG2.H1(Var , anaEG2.pppSRCCut , "BAR E" , Nbins , 0 , 2, "","Bjorken x' (moving nucleon)")
-        anaEG2.H1(Var , anaEG2.Final3pCut , "BAR E same", Nbins , 0 , 2, "","Bjorken x' (moving nucleon)","",1,1)
-    elif (Var=="opening_angle"):
-        var = anaEG2.CosTheta("Pmiss.Vect()","Prec.Vect()")
-        anaEG2.H1(var , anaEG2.pppSRCCut , "BAR E" , Nbins , -1 , 1, "","cos (#theta)")
-        anaEG2.H1(var , anaEG2.Final3pCut , "BAR E same" , Nbins , -1 , 1, "","cos (#theta)","",1,1)
-    elif (Var=="theta_vs_phi"):
+    if (Var=="theta_vs_phi"):
         anaEG2.H2("fabs(phiMiss23)" , "thetaMiss23" , anaEG2.pppSRCCut , "" , Nbins , 0 , 80 , Nbins , 80 , 180 , "","|#phi| [deg.]","#theta [deg.]",4,20,0.5)
-        anaEG2.H2("fabs(phiMiss23)" , "thetaMiss23" , anaEG2.Final3pCut , "same" , Nbins , 0 , 80 , Nbins , 80 , 180 , "","|#phi| [deg.]","#theta [deg.]",2,20,0.5)
-        anaEG2.Box(0,154,15,180,1,0.1)
+        anaEG2.Box(0,155,15,180,1,0.1)
+        evts = anaEG2.GetEntries(anaEG2.pppSRCCut)
+        evtsErr = math.sqrt(evts)
+        print "%d +/- %d events"%(evts,evtsErr)
+        evts_in_box = anaEG2.GetEntries(anaEG2.Final3pCut)
+        evts_in_boxErr = math.sqrt(evts_in_box)
+        print "%d +/- %d events in box"%(evts_in_box,evts_in_boxErr)
+        percentage = 100*(float(evts_in_box)/evts)
+        percentageErr = percentage*math.sqrt( math.pow(evtsErr/evts,2) +  math.pow(evts_in_boxErr/evts_in_box,2))
+        anaEG2.Text(20,160,"%d events (%.1f #pm %.1f %%)"%(evts_in_box , percentage , percentageErr))
+    elif (Var=="pMiss_p2_p3"):
+        hp2 = anaEG2.H2("Pmiss.P()" , "protons[1].P()", anaEG2.pppSRCCut ,"" , Nbins , 0.25 , 1.1 , Nbins , 0.25 , 1.1
+                     ,"","|#bf{p}(miss)| [GeV/c]","recoil protons momenta [GeV/c]" , 3 , 20 , 1 , 0.8)
+        hp3 = anaEG2.H2("Pmiss.P()" , "protons[2].P()", anaEG2.pppSRCCut ,"same" , Nbins , 0.25 , 1.1 , Nbins , 0.25 , 1.1
+                                ,"","|#bf{p}(miss)| [GeV/c]","recoil protons momenta [GeV/c]" , 4 ,  20 , 1 , 0.8)
+        anaEG2.AddLegend(hp2,"p(2)",hp3,"p(3)")
+
+    else:
+        if (Var=="Pcm"):
+            xAxis = ["Pcm.P()" , 0 , 1.4, "| #vec{p} (c.m.) | [GeV/c]"]
+        if (Var=="Xb"):
+            xAxis = [Var , 1 , 2, "Bjorken x"]
+        elif (Var=="XbMoving"):
+            xAxis = [Var , 0 , 2, "Bjorken x' (moving nucleon)"]
+        elif (Var=="opening_angle"):
+            xAxis = [anaEG2.CosTheta("Pmiss.Vect()","Prec.Vect()") , -1 , 1, "cos (#theta)"]
+        anaEG2.H1(xAxis[0] , anaEG2.pppSRCCut , "BAR E" , Nbins , xAxis[1] , xAxis[2] , "",xAxis[3])
+        anaEG2.H1(xAxis[0] , anaEG2.Final3pCut , "BAR E same" , Nbins , xAxis[1] , xAxis[2] , "",xAxis[3],"",1,1)
+
     c.Update()
     wait()
     c.SaveAs(init.dirname()+"/C12_Al_27_Fe56_Pb28_"+Var+".pdf")

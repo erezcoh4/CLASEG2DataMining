@@ -55,7 +55,7 @@ public:
     
     vector<TVector3>   p3vec;
     
-    TLorentzVector q , struck_p , p_knocked , p1_ppPair , pcm_ppPair , p2_ppPair;
+    TLorentzVector e , q , struck_p , p_knocked , p1_ppPair , pcm_ppPair , p2_ppPair;
     TLorentzVector p_knocked_r , p1_ppPair_r , p2_ppPair_r;
     TLorentzVector Pcm , Plead , Pmiss , Prec;
     TLorentzVector p1_pk_cm , p1_p1_pk_cm , pk_p1_pk_cm;

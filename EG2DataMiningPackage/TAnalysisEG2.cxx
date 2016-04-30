@@ -66,6 +66,7 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     
     // For 3p simulation...
     Sim3pSRCCut = cutSRC && " 3 <= Np" && "0.3 < protons[1].P() && 0.3 < protons[2].P()";
+    FinalSim3pSRCCut = cutSRC && " 3 <= Np" && "0.3 < protons[1].P() && 0.3 < protons[2].P()" && cutAngles3p;
 
     
     Printf("Set Cuts:");
@@ -135,6 +136,59 @@ vector<Float_t> TAnalysisEG2::GetPcmEntry(int entry){
     res.push_back(Pmiss->P());
     return res;
 }
+
+
+
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+vector<Float_t> TAnalysisEG2::GetGSIMEvt(int entry){
+
+    TLorentzVector * e = 0 ,*Pmiss = 0;
+    vector <TLorentzVector> * p = 0;
+    Tree -> SetBranchAddress("e"        , &e);
+    Tree -> SetBranchAddress("Pmiss"    , &Pmiss);
+    Tree -> SetBranchAddress("protons"  , &p);
+    Tree -> GetEntry(entry);
+
+    vector<Float_t> res;
+    res.push_back(4);
+    res.push_back(11);
+    res.push_back(e->Px()/e->P());
+    res.push_back(e->Py()/e->P());
+    res.push_back(e->Pz()/e->P());
+    res.push_back(e->P());
+    res.push_back(Me);
+    res.push_back(-1);
+    for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
+    res.push_back(2212);
+    res.push_back(Pmiss->Px()/Pmiss->P());
+    res.push_back(Pmiss->Py()/Pmiss->P());
+    res.push_back(Pmiss->Pz()/Pmiss->P());
+    res.push_back(Pmiss->P());
+    res.push_back(Mp);
+    res.push_back(1);
+    for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
+    res.push_back(2212);
+    res.push_back(p->at(1).Px()/p->at(1).P());
+    res.push_back(p->at(1).Py()/p->at(1).P());
+    res.push_back(p->at(1).Pz()/p->at(1).P());
+    res.push_back(p->at(1).P());
+    res.push_back(Mp);
+    res.push_back(1);
+    for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
+    res.push_back(2212);
+    res.push_back(p->at(2).Px()/p->at(2).P());
+    res.push_back(p->at(2).Py()/p->at(2).P());
+    res.push_back(p->at(2).Pz()/p->at(2).P());
+    res.push_back(p->at(2).P());
+    res.push_back(Mp);
+    res.push_back(1);
+    for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
+    return res;
+}
+
 
 #endif
 

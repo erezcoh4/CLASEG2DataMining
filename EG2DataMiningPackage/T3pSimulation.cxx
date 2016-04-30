@@ -35,6 +35,7 @@ void T3pSimulation::InitOutTree(){
     OutTree -> Branch("p2_ppPair_r" ,"TLorentzVector"       ,&p2_ppPair_r); // rescattered
 
     OutTree -> Branch("Pmiss"       ,"TLorentzVector"       ,&Pmiss);
+    OutTree -> Branch("e"           ,"TLorentzVector"       ,&e);
     OutTree -> Branch("Pcm"         ,"TLorentzVector"       ,&Pcm);
     OutTree -> Branch("Plead"       ,"TLorentzVector"       ,&Plead);
     OutTree -> Branch("Prec"        ,"TLorentzVector"       ,&Prec);
@@ -190,6 +191,7 @@ void T3pSimulation::ComputePhysVars( ){
     // and implement calculation as in TCalcPhysVarsEG2
     InitEvent();
     
+    e  = TLorentzVector( -0.137*4.306 , -0.339*4.306 , 0.956*4.306 , 5.009 - q.E() ); // a single electron that passes RECSIS cuts...
     Q2 = -q.Mag2();
     Xb = Q2 / (2*Mp);
     

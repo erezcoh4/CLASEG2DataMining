@@ -183,6 +183,12 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     theta_pq    = r2d * Plead.Vect().Angle(q.Vect());
     p_over_q    = Plead.P() / q.P();
 
+//        XbMoving    = Q2 / ( 2. * (Pmiss * q) ); // = Q2 / 2pq [Q2 / ( 2. * (Pmiss * q) )]
+//    SHOWTLorentzVector(Plead);
+//    SHOWTLorentzVector(q);
+//    SHOWTLorentzVector(Pmiss);
+//        SHOW(Xb);
+//        SHOW(XbMoving);
 
     
     // Bjorken scaling for a moving nucleon
