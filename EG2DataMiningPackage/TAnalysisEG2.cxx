@@ -8,7 +8,7 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 TAnalysisEG2::TAnalysisEG2(TString fInFileName, TCut XbCut):
-TPlots("$DataMiningAnaFiles/Ana_" + fInFileName + ".root","anaTree",fInFileName){
+TPlots("$DataMiningAnaFiles/Ana_" + fInFileName + ".root","anaTree",fInFileName, false){
     SetPath("$DataMiningAnaFiles");
     SetInFileName( "Ana_" + fInFileName + ".root");
     
@@ -162,11 +162,19 @@ vector<Float_t> TAnalysisEG2::GetGSIMEvt(int entry){
     res.push_back(Me);
     res.push_back(-1);
     for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
+//    res.push_back(2212);
+//    res.push_back(Pmiss->Px()/Pmiss->P());
+//    res.push_back(Pmiss->Py()/Pmiss->P());
+//    res.push_back(Pmiss->Pz()/Pmiss->P());
+//    res.push_back(Pmiss->P());
+//    res.push_back(Mp);
+//    res.push_back(1);
+//    for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
     res.push_back(2212);
-    res.push_back(Pmiss->Px()/Pmiss->P());
-    res.push_back(Pmiss->Py()/Pmiss->P());
-    res.push_back(Pmiss->Pz()/Pmiss->P());
-    res.push_back(Pmiss->P());
+    res.push_back(p->at(0).Px()/p->at(0).P());
+    res.push_back(p->at(0).Py()/p->at(0).P());
+    res.push_back(p->at(0).Pz()/p->at(0).P());
+    res.push_back(p->at(0).P());
     res.push_back(Mp);
     res.push_back(1);
     for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);

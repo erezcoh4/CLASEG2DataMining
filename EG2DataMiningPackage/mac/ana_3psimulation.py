@@ -7,18 +7,18 @@ init.createnewdir()
 ROOT.gStyle.SetOptStat(0000)
 
 
-DoPrint2GSIM    = True
-DoAllVariables  = False
-Do1D            = False
+DoAllVariables  = True
+Do1D            = True
 Do2D            = False
+DoPrint2GSIM    = False
 
-Var         = "pMiss_p2_p3"
+Var         = "Pmiss"
 Path        = "/Users/erezcohen/Desktop/DataMining/AnaFiles"
 analysis    = TAnalysis()
 Nbins       = 50
 XbMin       = 1.05
 XbCut       = ROOT.TCut("%f <= Xb"%XbMin)
-ana         = TAnalysisEG2("FSI3pSimulation", XbCut )
+ana         = TAnalysisEG2("GSIM_run0088_eep", XbCut )
 
 
 # April - 07
@@ -39,9 +39,8 @@ if DoAllVariables:
         elif (Var=="theta_vs_phi"):
             xyAxes = ["fabs(phiMiss23)" , "thetaMiss23" , 0 , 80 ,  80 , 180 , "|#phi| [deg.]","#theta [deg.]" , ana.Sim3pSRCCut , "3pSRC"]
         elif (Var=="pp_scattering_CMtheta_vs_Mpp"):
-            ana.H2("Mpp" , "(180/3.1415)*Theta_cm" , ROOT.TCut() ,"surf2" , Nbins , 1.9 , 4.2 , Nbins , 0 , 180
-                   ,"#theta vs. #sqrt{s}","m(pp) [GeV/c^{2}]","#theta [deg.]" )
-    c = ana.Draw2DVarAndCut(xyAxes[0] ,  xyAxes[1]   , Nbins , xyAxes[2]  , xyAxes[3]  , Nbins , xyAxes[4]   , xyAxes[5] , "" , xyAxes[6] , xyAxes[7] , xyAxes[8] , True  , xyAxes[9])
+            ana.H2("Mpp" , "(180/3.1415)*Theta_cm" , ROOT.TCut() ,"surf2" , Nbins , 1.9 , 4.2 , Nbins , 0 , 180 ,"#theta vs. #sqrt{s}","m(pp) [GeV/c^{2}]","#theta [deg.]" )
+        c = ana.Draw2DVarAndCut(xyAxes[0] ,  xyAxes[1]   , Nbins , xyAxes[2]  , xyAxes[3]  , Nbins , xyAxes[4]   , xyAxes[5] , "" , xyAxes[6] , xyAxes[7] , xyAxes[8] , True  , xyAxes[9])
     if (Var=="theta_vs_phi"):
         ana.Box(0,155,15,180,1,0.1)
         evts = ana.GetEntries(ana.Sim3pSRCCut)
@@ -70,13 +69,14 @@ if DoAllVariables:
 
 # April - 30
 if DoPrint2GSIM:
+    ana     = TAnalysisEG2("FSI3pSimulation", XbCut )
     outfile = open(Path+"/FSI3p_events.txt", "wb")
     for i in range(0,ana.GetEntries(ROOT.TCut())):
         evt = ana.GetGSIMEvt(i)
         outfile.write("%d\n" % evt.at(0))
         for j in range(0,4):
             outfile.write("%d  %f  %f  %f  %f \n" % (evt.at(1+11*j) , evt.at(2+11*j) , evt.at(3+11*j) , evt.at(4+11*j), evt.at(5+11*j)))
-            outfile.write("%f  %f \n" % (evt.at(6) , evt.at(7)))
-            outfile.write("%f  %f  %f  %f  %f \n" % (evt.at(8) , evt.at(9) , evt.at(10) , evt.at(11) , evt.at(12)))
+            outfile.write("%f  %d \n" % (evt.at(6) , evt.at(7)))
+            outfile.write("%d  %d  %d  %d  %d \n" % (evt.at(8) , evt.at(9) , evt.at(10) , evt.at(11) , evt.at(12)))
     outfile.close()
     print "\ndone writing %d events to "%ana.GetEntries(ROOT.TCut()) + outfile.name

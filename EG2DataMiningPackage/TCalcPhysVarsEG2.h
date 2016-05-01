@@ -48,6 +48,12 @@ public:
     Int_t   Np          ;
     Int_t   uns_pCut[20], uns_pID[20];
     
+    // for GSIM: generated
+    Float_t Xb_g          , Q2_g        , Nu_g        ;
+    Float_t PpX_g[20]     , PpY_g[20]   , PpZ_g[20]   ;   // proton momentum and vertex
+    Float_t Px_e_g        , Py_e_g      , Pz_e_g      , X_e_g     ,   Y_e_g     ,   Z_e_g   ;   // electron
+
+    // reconstructed
     Float_t Xb          , Q2        , Nu        , XbMoving;
     Float_t PpX[20]     , PpY[20]   , PpZ[20]   , Xp[20]  ,   Yp[20]  ,   Zp[20];   // proton momentum and vertex
     Float_t Px_e        , Py_e      , Pz_e      , X_e     ,   Y_e     ,   Z_e   ;   // electron

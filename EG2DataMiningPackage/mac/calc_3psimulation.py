@@ -25,7 +25,7 @@ if (DoDraw) : wait()
 
 
 
-sim3p.RunInteractions( 10000 , False )       # run interactions and fill output tree
+sim3p.RunInteractions( 100000 , False )       # run interactions and fill output tree
 print "done filling %d events " % OutTree.GetEntries() + "in " + OutTree.GetTitle()
 OutTree.Write()
 OutFile.Close()

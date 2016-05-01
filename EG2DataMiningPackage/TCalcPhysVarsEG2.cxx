@@ -25,8 +25,7 @@ void TCalcPhysVarsEG2::InitInputTree(){
     InTree -> SetBranchAddress("Q2"                 , &Q2);
     InTree -> SetBranchAddress("P_nmb"              , &Np);
   
-    if(DataType == "data") {
-        InTree -> SetBranchAddress("Q2"             , &Q2);
+    if(DataType == "data" || DataType == "GSIM") {
         InTree -> SetBranchAddress("Nu"             , &Nu);
         InTree -> SetBranchAddress("Px_e"           , &Px_e);
         InTree -> SetBranchAddress("Py_e"           , &Py_e);
@@ -47,7 +46,7 @@ void TCalcPhysVarsEG2::InitInputTree(){
         InTree -> SetBranchAddress("N_Px"           , &N_Px);    // negative particles momenta (electron is the first)
         InTree -> SetBranchAddress("N_Py"           , &N_Py);    // negative particles momenta (electron is the first)
         InTree -> SetBranchAddress("N_Pz"           , &N_Pz);    // negative particles momenta (electron is the first)
-        InTree -> SetBranchAddress("P_Px"           , &PpX);    // protons momenta
+        InTree -> SetBranchAddress("P_Px"           , &PpX);     // protons momenta
         InTree -> SetBranchAddress("P_Py"           , &PpY);
         InTree -> SetBranchAddress("P_Pz"           , &PpZ);
         InTree -> SetBranchAddress("P_X"            , &Xp);
@@ -57,6 +56,19 @@ void TCalcPhysVarsEG2::InitInputTree(){
         InTree -> SetBranchAddress("P_PID"          , &uns_pID);        // positive particles momenta
         InTree -> SetBranchAddress("P_cut"          , &uns_pCut);       // positive particles momenta
         InTree -> SetBranchAddress("P_Edep"         , &uns_pEdep);
+    }
+    
+    if(DataType == "GSIM") {
+        InTree -> SetBranchAddress("Nu_g"           , &Nu_g);
+        InTree -> SetBranchAddress("Px_e_g"         , &Px_e_g);
+        InTree -> SetBranchAddress("Py_e_g"         , &Py_e_g);
+        InTree -> SetBranchAddress("Pz_e_g"         , &Pz_e_g);
+        InTree -> SetBranchAddress("X_e_g"          , &X_e_g);
+        InTree -> SetBranchAddress("Y_e_g"          , &Y_e_g);
+        InTree -> SetBranchAddress("Z_e_g"          , &Z_e_g);
+        InTree -> SetBranchAddress("Px_g"           , &PpX_g);
+        InTree -> SetBranchAddress("Py_g"           , &PpY_g);
+        InTree -> SetBranchAddress("Pz_g"           , &PpZ_g);
     }
     
     Nentries    = InTree -> GetEntries();
@@ -108,10 +120,16 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     
     
     // p(cm) for rooFit
-    OutTree -> Branch("p(c.m.) x direction" ,&pcmX                   , "pcmX/D");
-    OutTree -> Branch("p(c.m.) y direction" ,&pcmY                   , "pcmY/D");
-    OutTree -> Branch("p(c.m.) z direction" ,&pcmZ                   , "pcmZ/D");
+    OutTree -> Branch("p(c.m.) x direction" ,&pcmX                  , "pcmX/D");
+    OutTree -> Branch("p(c.m.) y direction" ,&pcmY                  , "pcmY/D");
+    OutTree -> Branch("p(c.m.) z direction" ,&pcmZ                  , "pcmZ/D");
 
+    
+    if(DataType == "GSIM") {
+        OutTree -> Branch("generated Q2"            ,&Q2_g          , "Q2_g/F");
+        OutTree -> Branch("generated Bjorken x"     ,&Xb_g          , "Xb_g/F");
+
+    }
     
     std::cout << "Initialized Output Tree TCalcPhysVarsEG2 on " << OutTree -> GetTitle() << std::endl;
 
@@ -151,9 +169,9 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
     InitEvent();
     InTree -> GetEntry(entry);
-    
+
     // electron
-    if(DataType == "data") {
+    if(DataType == "data" || DataType == "GSIM" ) {
         Pe      = TVector3( Px_e , Py_e , Pz_e );
         //        q.SetPxPyPzE( - Px_e , - Py_e , 5.009 - Pz_e , Nu); delete may 27
     }
@@ -183,31 +201,26 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     theta_pq    = r2d * Plead.Vect().Angle(q.Vect());
     p_over_q    = Plead.P() / q.P();
 
-//        XbMoving    = Q2 / ( 2. * (Pmiss * q) ); // = Q2 / 2pq [Q2 / ( 2. * (Pmiss * q) )]
-//    SHOWTLorentzVector(Plead);
-//    SHOWTLorentzVector(q);
-//    SHOWTLorentzVector(Pmiss);
-//        SHOW(Xb);
-//        SHOW(XbMoving);
 
     
     // Bjorken scaling for a moving nucleon
     // Invariant mass of the system produced in the interaction of balancing nucleon with a virtual photon
     pA_Np_1.SetVectM( TVector3() , Mp * (A - Np - 1)  );
     Wtilde      = pA - pA_Np_1 + q ;
-    
+    //        XbMoving    = Q2 / ( 2. * (Pmiss * q) ); // = Q2 / 2pq [Q2 / ( 2. * (Pmiss * q) )]
+   
     
     
     
     // move to prefered axes frame
     ChangeAxesFrame();
-    
+
     
     // α-s
     alpha_q     = LCfraction(q , A_over_mA);
     sum_alpha   = -alpha_q;
     
-    
+
     // c.m. momentum
     Pcm         = -q;
     
@@ -217,17 +230,16 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     Mrec        = mA - Np * Mp;            // taking out the 1 proton off the initial target
     Trec        = sqrt( Pmiss.P()*Pmiss.P() + Mrec*Mrec) - Mrec;
     Emiss       = Nu - Trec;
-    
+
 
     
     // sort the protons and loop on them for variables calculations only once more!
     loop_protons();
 
-    
     // all recoil protons together (just without the leading proton)
     Plead       = protons.at(0);            // now Plead is calculated in q-Pmiss frame
     Prec        = Pcm - (Plead - q);        // Prec is the 4-vector sum of all recoiling protons
-    
+
     
     // A(e,e'p) missing mass M²(miss) = (q + 2mN - Plead)² , all 4-vectors
     Mmiss       = (q + 2*NucleonAtRest - Plead).Mag();
@@ -235,13 +247,13 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     // Bjorken scaling for a moving nucleon
     XbMoving    = Q2 / ( Wtilde.Mag2() + Q2 - Mp2  ); // = Q2 / 2pq [Q2 / ( 2. * (Pmiss * q) )]
-    SHOWTLorentzVector(Wtilde);
-    SHOW(Wtilde.Mag2());
-    SHOW(Mp2);
-    SHOW(Xb);
-    SHOW(XbMoving);
+//    SHOWTLorentzVector(Wtilde);
+//    SHOW(Wtilde.Mag2());
+//    SHOW(Mp2);
+//    SHOW(Xb);
+//    SHOW(XbMoving);
 
-    
+
     // if we have 3 protons, randomize protons 2 and 3
     if (Np==3) {
         p23Randomize();
@@ -249,7 +261,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         phiMiss23   = 90 - r2d*( Pmiss.Vect().Angle(protons.at(1).Vect().Cross(protons.at(2).Vect()).Unit()) );
     }
 
-    
+
     pcmX = Pcm.Px();
     pcmY = Pcm.Py();
     pcmZ = Pcm.Pz();
@@ -325,10 +337,14 @@ void TCalcPhysVarsEG2::loop_protons(){
         pVertex .push_back( TVector3( Xp[i] , Yp[i] , Zp[i] ) );
         
         // proton identification
-        pCTOFCut.push_back( uns_pCut[i] * uns_pID[i] );
-        pCTOF   .push_back( uns_pCTOF[i]  );
-        pEdep   .push_back( uns_pEdep[i]  );
-        
+        if (DataType == "no ctof") {
+            
+            pCTOFCut.push_back( uns_pCut[i] * uns_pID[i] );
+            pCTOF   .push_back( uns_pCTOF[i]  );
+            pEdep   .push_back( uns_pEdep[i]  );
+
+        }
+
  
         
         // α-s
@@ -365,12 +381,14 @@ void TCalcPhysVarsEG2::p23Randomize(){
         if( rand.Uniform() > 0.5 ){
             
             std::iter_swap(protons.begin()+1    ,protons.begin()+2);
-            std::iter_swap(pCTOFCut.begin()+1   ,pCTOFCut.begin()+2);
-            std::iter_swap(pCTOF.begin()+1      ,pCTOF.begin()+2);
-            std::iter_swap(pEdep.begin()+1      ,pEdep.begin()+2);
             std::iter_swap(pVertex.begin()+1    ,pVertex.begin()+2);
             std::iter_swap(alpha.begin()+1      ,alpha.begin()+2);
             
+            if (DataType == "no ctof") {
+                std::iter_swap(pCTOFCut.begin()+1   ,pCTOFCut.begin()+2);
+                std::iter_swap(pCTOF.begin()+1      ,pCTOF.begin()+2);
+                std::iter_swap(pEdep.begin()+1      ,pEdep.begin()+2);
+            }
         }
 }
 
