@@ -19,7 +19,7 @@ DoCount_p_2p_3p     = False
 DoGenCombinedFile   = False
 DoCombineTargets    = True
 
-Var     = "pMiss_p2_p3"
+Var     = "DalitzPlot"
 Nbins   = 25
 XbMin   = 1.05
 cut     = ROOT.TCut()
@@ -128,6 +128,8 @@ if DoCombineTargets:
         hp3 = anaEG2.H2("Pmiss.P()" , "protons[2].P()", anaEG2.pppSRCCut ,"same" , Nbins , 0.25 , 1.1 , Nbins , 0.25 , 1.1
                                 ,"","|#bf{p}(miss)| [GeV/c]","recoil protons momenta [GeV/c]" , 4 ,  20 , 1 , 0.8)
         anaEG2.AddLegend(hp2,"p(2)",hp3,"p(3)")
+    elif (Var=="DalitzPlot"):
+        anaEG2.Dalitz("Pmiss","protons[1]","protons[2]",anaEG2.pppSRCCut,100,0,5,100,0,5);
 
     else:
         if (Var=="Pcm"):

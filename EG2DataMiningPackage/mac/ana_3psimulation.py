@@ -8,17 +8,18 @@ ROOT.gStyle.SetOptStat(0000)
 
 
 DoAllVariables  = True
-Do1D            = True
+Do1D            = False
 Do2D            = False
 DoPrint2GSIM    = False
 
-Var         = "Pmiss"
+Var         = "DalitzPlot"
 Path        = "/Users/erezcohen/Desktop/DataMining/AnaFiles"
 analysis    = TAnalysis()
 Nbins       = 50
 XbMin       = 1.05
 XbCut       = ROOT.TCut("%f <= Xb"%XbMin)
-ana         = TAnalysisEG2("GSIM_run0088_eep", XbCut )
+#ana         = TAnalysisEG2("GSIM_run0088_eep", XbCut )
+ana     = TAnalysisEG2("FSI3pSimulation", XbCut )
 
 
 # April - 07
@@ -41,6 +42,10 @@ if DoAllVariables:
         elif (Var=="pp_scattering_CMtheta_vs_Mpp"):
             ana.H2("Mpp" , "(180/3.1415)*Theta_cm" , ROOT.TCut() ,"surf2" , Nbins , 1.9 , 4.2 , Nbins , 0 , 180 ,"#theta vs. #sqrt{s}","m(pp) [GeV/c^{2}]","#theta [deg.]" )
         c = ana.Draw2DVarAndCut(xyAxes[0] ,  xyAxes[1]   , Nbins , xyAxes[2]  , xyAxes[3]  , Nbins , xyAxes[4]   , xyAxes[5] , "" , xyAxes[6] , xyAxes[7] , xyAxes[8] , True  , xyAxes[9])
+    if (Var=="DalitzPlot"):
+        c = ana.CreateCanvas("Dalitz")
+        ana.Dalitz("Pmiss","protons[1]","protons[2]",ana.Sim3pSRCCut,100,0,5,100,0,5);
+
     if (Var=="theta_vs_phi"):
         ana.Box(0,155,15,180,1,0.1)
         evts = ana.GetEntries(ana.Sim3pSRCCut)
