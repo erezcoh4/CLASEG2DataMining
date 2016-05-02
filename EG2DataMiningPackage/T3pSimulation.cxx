@@ -5,8 +5,10 @@
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-T3pSimulation::T3pSimulation( TTree * fOutTree ){
+T3pSimulation::T3pSimulation( TTree * fOutTree , TString fFrameName ){
     SetOutTree(fOutTree);
+    SetFrameName(fFrameName);
+    cout << "calculate in " << fFrameName << "..." << endl;
     InitOutTree();
     Np = 3;
     pp_elastic.CreateXsec();
@@ -55,7 +57,7 @@ void T3pSimulation::InitOutTree(){
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void T3pSimulation::RunInteractions ( int Ninteractions , bool DoPrint ){
     for ( int i = 0 ; i < Ninteractions ; i++ ) {
-        //        if (i%(Ninteractions/20)==0) plot.PrintPercentStr((float)i/Ninteractions);
+        if (i%(Ninteractions/20)==0) plot.PrintPercentStr((float)i/Ninteractions);
         Gen_q();
         Gen_struck_p();
         q_struck_p();
@@ -190,8 +192,8 @@ void T3pSimulation::ComputePhysVars( ){
 
     // and implement calculation as in TCalcPhysVarsEG2
     InitEvent();
-    
-    e  = TLorentzVector( -0.137*4.306 , -0.339*4.306 , 0.956*4.306 , 5.009 - q.E() ); // a single electron that passes RECSIS cuts...
+    Pe = Ee = 5.009 - q.E();
+    e  = TLorentzVector( -0.137*Pe , -0.339*Pe , 0.956*Pe , Ee ); // a single electron that passes RECSIS cuts...
     Q2 = -q.Mag2();
     Xb = Q2 / (2*Mp);
     
@@ -210,7 +212,8 @@ void T3pSimulation::ComputePhysVars( ){
     p_over_q    = Plead.P() / q.P();
     
     // move to prefered axes frame
-    q_Pmiss_frame();
+    if (FrameName == "q(z) - Pmiss(x-z) frame")
+        q_Pmiss_frame();
     
     // c.m. momentum
     Pcm         = -q;
@@ -218,7 +221,8 @@ void T3pSimulation::ComputePhysVars( ){
     // sort the protons and loop on them for variables calculations only once more!
     for (auto i: calcEG2.sort_pMag( p3vec )){
         // protons
-        RotVec2_q_Pm_Frame( & p3vec.at(i) , q_phi, q_theta, Pmiss_phi );
+        if (FrameName == "q(z) - Pmiss(x-z) frame")
+            RotVec2_q_Pm_Frame( & p3vec.at(i) , q_phi, q_theta, Pmiss_phi );
         protons .push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
         Pcm     += protons.back();
     }
@@ -272,9 +276,13 @@ void T3pSimulation::PrintDATA(int entry){
     SHOW(Phi_cm);
     SHOWTLorentzVector(p1_ppPair_r);
     SHOWTLorentzVector(p2_ppPair_r);
-    SHOWTLorentzVector(Pmiss);
     SHOWTLorentzVector(Pcm);
     SHOWTLorentzVector(Prec);
+    SHOWTLorentzVector(Pmiss);
+    SHOWTLorentzVector(Plead);
+    SHOWTLorentzVector(q);
+    SHOWTLorentzVector(TLorentzVector(Plead-q));
+    SHOWvectorTLorentzVector(protons);
     PrintLine();
 }
     

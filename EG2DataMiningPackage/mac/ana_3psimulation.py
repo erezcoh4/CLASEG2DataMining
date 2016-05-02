@@ -7,27 +7,28 @@ init.createnewdir()
 ROOT.gStyle.SetOptStat(0000)
 
 
-DoAllVariables  = True
-Do1D            = False
+DoAllVariables  = False
+Do1D            = True
 Do2D            = False
-DoPrint2GSIM    = False
+DoPrint2GSIM    = True
 
-Var         = "DalitzPlot"
+Var         = "Pmiss"
 Path        = "/Users/erezcohen/Desktop/DataMining/AnaFiles"
 analysis    = TAnalysis()
 Nbins       = 50
 XbMin       = 1.05
 XbCut       = ROOT.TCut("%f <= Xb"%XbMin)
-#ana         = TAnalysisEG2("GSIM_run0088_eep", XbCut )
-ana     = TAnalysisEG2("FSI3pSimulation", XbCut )
 
 
 # April - 07
 if DoAllVariables:
+    ana         = TAnalysisEG2("GSIM_run0088_eep", XbCut )
     if Do1D:
         if (Var=="Xb"):
             xAxis = [Var , 1  , 2.5, "Bjorken x" , ana.cutSRC , "SRC"]
-        if (Var=="Pmiss"):
+        elif (Var=="Q2"):
+            xAxis = [Var , 0  , 4, "Q^{2} [GeV/c]" , ana.cutSRC , "SRC"]
+        elif (Var=="Pmiss"):
             xAxis = ["Pmiss.P()" , 0  , 2.5 , "#vec{p}(miss) = #vec{p}(lead) - #vec{q} [GeV/c]"  , ana.cutSRC , "SRC"]
         c = ana.Draw1DVarAndCut(xAxis[0] , Nbins , xAxis[1]  , xAxis[2]  , ""   , xAxis[3] , xAxis[4] , True  , xAxis[5])
     elif Do2D:
@@ -77,7 +78,7 @@ if DoPrint2GSIM:
     ana     = TAnalysisEG2("FSI3pSimulation", XbCut )
     outfile = open(Path+"/FSI3p_events.txt", "wb")
     for i in range(0,ana.GetEntries(ROOT.TCut())):
-        evt = ana.GetGSIMEvt(i)
+        evt = ana.GetGSIMEvt(i,True)
         outfile.write("%d\n" % evt.at(0))
         for j in range(0,4):
             outfile.write("%d  %f  %f  %f  %f \n" % (evt.at(1+11*j) , evt.at(2+11*j) , evt.at(3+11*j) , evt.at(4+11*j), evt.at(5+11*j)))

@@ -36,6 +36,7 @@ public:
     TRandom3  rand;
     TCalcPhysVarsEG2 calcEG2;
     TTree   * OutTree;
+    TString FrameName   ;          // prefered frame of axes to work in....
 
     
     TF1     * SRCk4Tail;
@@ -44,7 +45,7 @@ public:
     
     Int_t       binEcm      , Np;
     
-    Float_t     Xb          , Q2 ;
+    Float_t     Xb          , Q2        , Pe ,  Ee;
     Float_t     PpX[3]      , PpY[3]    , PpZ[3];
     Float_t     p_over_q    , theta_pq  ;
     Float_t     q_phi       , q_theta   , Pmiss_phi;
@@ -66,7 +67,7 @@ public:
     
     /// Default constructor
     T3pSimulation(){}
-    T3pSimulation( TTree * fOutTree );
+    T3pSimulation( TTree * fOutTree , TString fFrameName = "q(z) - Pmiss(x-z) frame");
     
     ~T3pSimulation(){}
 
@@ -76,6 +77,7 @@ public:
     // SETs
     void         SetOutTree ( TTree * fOutTree ) {OutTree = fOutTree;};
     void Set_ppElasticHisto ( TH2F * h ) {h_ppElastic = h;};
+    void       SetFrameName (TString name){FrameName = name;};
   
     
     void    ImpMomentumDist ( bool DoPlot){SRCk4Tail = calculations.CFGMomentumDist(DoPlot);}

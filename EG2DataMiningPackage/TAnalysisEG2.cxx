@@ -143,17 +143,23 @@ vector<Float_t> TAnalysisEG2::GetPcmEntry(int entry){
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-vector<Float_t> TAnalysisEG2::GetGSIMEvt(int entry){
+vector<Float_t> TAnalysisEG2::GetGSIMEvt(int entry, bool DoPrint){
 
     TLorentzVector * e = 0 ,*Pmiss = 0;
     vector <TLorentzVector> * p = 0;
     Tree -> SetBranchAddress("e"        , &e);
     Tree -> SetBranchAddress("Pmiss"    , &Pmiss);
     Tree -> SetBranchAddress("protons"  , &p);
+
     Tree -> GetEntry(entry);
 
+    TLorentzVector  Beam(0,0,5.009,5.009);
+    TLorentzVector  q = Beam - *e;
+    TLorentzVector  pLead = *Pmiss + q;
     vector<Float_t> res;
     res.push_back(4);
+
+    // electron
     res.push_back(11);
     res.push_back(e->Px()/e->P());
     res.push_back(e->Py()/e->P());
@@ -162,38 +168,52 @@ vector<Float_t> TAnalysisEG2::GetGSIMEvt(int entry){
     res.push_back(Me);
     res.push_back(-1);
     for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
+ 
+    
+    // 3 protons
+    for (int j = 0; j < 3; j++) {
+        
+        res.push_back(2212);
+        res.push_back(p->at(j).Px()/p->at(j).P());
+        res.push_back(p->at(j).Py()/p->at(j).P());
+        res.push_back(p->at(j).Pz()/p->at(j).P());
+        res.push_back(p->at(j).P());
+        res.push_back(Mp);
+        res.push_back(1);
+        for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
+
+    }
 //    res.push_back(2212);
-//    res.push_back(Pmiss->Px()/Pmiss->P());
-//    res.push_back(Pmiss->Py()/Pmiss->P());
-//    res.push_back(Pmiss->Pz()/Pmiss->P());
-//    res.push_back(Pmiss->P());
+//    res.push_back(p->at(1).Px()/p->at(1).P());
+//    res.push_back(p->at(1).Py()/p->at(1).P());
+//    res.push_back(p->at(1).Pz()/p->at(1).P());
+//    res.push_back(p->at(1).P());
 //    res.push_back(Mp);
 //    res.push_back(1);
 //    for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
-    res.push_back(2212);
-    res.push_back(p->at(0).Px()/p->at(0).P());
-    res.push_back(p->at(0).Py()/p->at(0).P());
-    res.push_back(p->at(0).Pz()/p->at(0).P());
-    res.push_back(p->at(0).P());
-    res.push_back(Mp);
-    res.push_back(1);
-    for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
-    res.push_back(2212);
-    res.push_back(p->at(1).Px()/p->at(1).P());
-    res.push_back(p->at(1).Py()/p->at(1).P());
-    res.push_back(p->at(1).Pz()/p->at(1).P());
-    res.push_back(p->at(1).P());
-    res.push_back(Mp);
-    res.push_back(1);
-    for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
-    res.push_back(2212);
-    res.push_back(p->at(2).Px()/p->at(2).P());
-    res.push_back(p->at(2).Py()/p->at(2).P());
-    res.push_back(p->at(2).Pz()/p->at(2).P());
-    res.push_back(p->at(2).P());
-    res.push_back(Mp);
-    res.push_back(1);
-    for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
+//    res.push_back(2212);
+//    res.push_back(p->at(2).Px()/p->at(2).P());
+//    res.push_back(p->at(2).Py()/p->at(2).P());
+//    res.push_back(p->at(2).Pz()/p->at(2).P());
+//    res.push_back(p->at(2).P());
+//    res.push_back(Mp);
+//    res.push_back(1);
+//    for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
+    if (DoPrint) {
+        
+        SHOWTLorentzVector(q);
+        TLorentzVector electron = *e;
+        SHOWTLorentzVector(electron);
+        SHOWTLorentzVector(pLead);
+        TLorentzVector Pm = *Pmiss;
+        SHOWTLorentzVector(Pm);
+        vector <TLorentzVector> protons = *p;
+        SHOWvectorTLorentzVector(protons);
+        TLorentzVector Pm1 = protons.at(0) - q;
+        SHOWTLorentzVector(Pm1);
+        PrintLine();
+        
+    }
     return res;
 }
 

@@ -59,6 +59,7 @@ void TCalcPhysVarsEG2::InitInputTree(){
     }
     
     if(DataType == "GSIM") {
+        InTree -> SetBranchAddress("Q2_g"           , &Q2_g);
         InTree -> SetBranchAddress("Nu_g"           , &Nu_g);
         InTree -> SetBranchAddress("Px_e_g"         , &Px_e_g);
         InTree -> SetBranchAddress("Py_e_g"         , &Py_e_g);

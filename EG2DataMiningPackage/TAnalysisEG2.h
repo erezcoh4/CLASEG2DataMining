@@ -75,7 +75,7 @@ public:
     // rooFit
     TMatrix        RooFitCM (Float_t PmissMin, Float_t PmissMax);
     vector<Float_t> GetPcmEntry (int);
-    vector<Float_t> GetGSIMEvt (int);
+    vector<Float_t> GetGSIMEvt (int, bool DoPrint = false);
 };
 
 #endif
