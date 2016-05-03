@@ -57,7 +57,7 @@ void T3pSimulation::InitOutTree(){
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void T3pSimulation::RunInteractions ( int Ninteractions , bool DoPrint ){
     for ( int i = 0 ; i < Ninteractions ; i++ ) {
-        if (i%(Ninteractions/20)==0) plot.PrintPercentStr((float)i/Ninteractions);
+//        if (i%(Ninteractions/20)==0) plot.PrintPercentStr((float)i/Ninteractions);
         Gen_q();
         Gen_struck_p();
         q_struck_p();
@@ -194,6 +194,9 @@ void T3pSimulation::ComputePhysVars( ){
     InitEvent();
     Pe = Ee = 5.009 - q.E();
     e  = TLorentzVector( -0.137*Pe , -0.339*Pe , 0.956*Pe , Ee ); // a single electron that passes RECSIS cuts...
+    Beam = TLorentzVector( 0 , 0 , 5.009 , 5.009 );
+    //    e  = Beam - q; // a single electron that passes RECSIS cuts...
+    q = Beam - e;
     Q2 = -q.Mag2();
     Xb = Q2 / (2*Mp);
     

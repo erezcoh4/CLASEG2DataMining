@@ -80,9 +80,10 @@ if DoPrint2GSIM:
     for i in range(0,ana.GetEntries(ROOT.TCut())):
         evt = ana.GetGSIMEvt(i,True)
         outfile.write("%d\n" % evt.at(0))
+#    print 'size = %d' % evt.size()
         for j in range(0,4):
             outfile.write("%d  %f  %f  %f  %f \n" % (evt.at(1+11*j) , evt.at(2+11*j) , evt.at(3+11*j) , evt.at(4+11*j), evt.at(5+11*j)))
-            outfile.write("%f  %d \n" % (evt.at(6) , evt.at(7)))
-            outfile.write("%d  %d  %d  %d  %d \n" % (evt.at(8) , evt.at(9) , evt.at(10) , evt.at(11) , evt.at(12)))
+            outfile.write("%f  %d \n" % (evt.at(6+11*j) , evt.at(7+11*j)))
+            outfile.write("%d  %d  %d  %d  %d \n" % (evt.at(8+11*j) , evt.at(9+11*j) , evt.at(10+11*j) , evt.at(11+11*j) , evt.at(11+11*j)))
     outfile.close()
     print "\ndone writing %d events to "%ana.GetEntries(ROOT.TCut()) + outfile.name
