@@ -6,11 +6,9 @@ import Initiation as init
 init.createnewdir()
 ROOT.gStyle.SetOptStat(0000)
 
-
-DoAllVariables  = False
+Operation = "Print data for GSIMulation"
 Do1D            = True
 Do2D            = False
-DoPrint2GSIM    = True
 
 Var         = "Pmiss"
 Path        = "/Users/erezcohen/Desktop/DataMining/AnaFiles"
@@ -21,8 +19,8 @@ XbCut       = ROOT.TCut("%f <= Xb"%XbMin)
 
 
 # April - 07
-if DoAllVariables:
-    ana         = TAnalysisEG2("GSIM_run0088_eep", XbCut )
+if (Operation == "plot variables"):
+    ana = TAnalysisEG2("GSIM_run0088_eep", XbCut ) # TAnalysisEG2("FSI3pSimulation", XbCut )
     if Do1D:
         if (Var=="Xb"):
             xAxis = [Var , 1  , 2.5, "Bjorken x" , ana.cutSRC , "SRC"]
@@ -46,7 +44,6 @@ if DoAllVariables:
     if (Var=="DalitzPlot"):
         c = ana.CreateCanvas("Dalitz")
         ana.Dalitz("Pmiss","protons[1]","protons[2]",ana.Sim3pSRCCut,100,0,5,100,0,5);
-
     if (Var=="theta_vs_phi"):
         ana.Box(0,155,15,180,1,0.1)
         evts = ana.GetEntries(ana.Sim3pSRCCut)
@@ -74,13 +71,12 @@ if DoAllVariables:
 
 
 # April - 30
-if DoPrint2GSIM:
+if (Operation == "Print data for GSIMulation"):
     ana     = TAnalysisEG2("FSI3pSimulation", XbCut )
     outfile = open(Path+"/FSI3p_events.txt", "wb")
     for i in range(0,ana.GetEntries(ROOT.TCut())):
-        evt = ana.GetGSIMEvt(i,True)
+        evt = ana.GetGSIMEvt(i,False)
         outfile.write("%d\n" % evt.at(0))
-#    print 'size = %d' % evt.size()
         for j in range(0,4):
             outfile.write("%d  %f  %f  %f  %f \n" % (evt.at(1+11*j) , evt.at(2+11*j) , evt.at(3+11*j) , evt.at(4+11*j), evt.at(5+11*j)))
             outfile.write("%f  %d \n" % (evt.at(6+11*j) , evt.at(7+11*j)))

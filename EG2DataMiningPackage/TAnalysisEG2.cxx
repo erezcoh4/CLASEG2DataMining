@@ -169,7 +169,6 @@ vector<Float_t> TAnalysisEG2::GetGSIMEvt(int entry, bool DoPrint){
     res.push_back(-1);
     for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
  
-    
     // 3 protons
     for (int j = 0; j < 3; j++) {
         
@@ -183,34 +182,18 @@ vector<Float_t> TAnalysisEG2::GetGSIMEvt(int entry, bool DoPrint){
         for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
 
     }
-//    res.push_back(2212);
-//    res.push_back(p->at(1).Px()/p->at(1).P());
-//    res.push_back(p->at(1).Py()/p->at(1).P());
-//    res.push_back(p->at(1).Pz()/p->at(1).P());
-//    res.push_back(p->at(1).P());
-//    res.push_back(Mp);
-//    res.push_back(1);
-//    for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
-//    res.push_back(2212);
-//    res.push_back(p->at(2).Px()/p->at(2).P());
-//    res.push_back(p->at(2).Py()/p->at(2).P());
-//    res.push_back(p->at(2).Pz()/p->at(2).P());
-//    res.push_back(p->at(2).P());
-//    res.push_back(Mp);
-//    res.push_back(1);
-//    for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
     if (DoPrint) {
         
-        SHOWTLorentzVector(q);
-        TLorentzVector electron = *e;
-        SHOWTLorentzVector(electron);
+//        TLorentzVector electron = *e;
+//        SHOWTLorentzVector(electron);
         SHOWTLorentzVector(pLead);
+        SHOWTLorentzVector(q);
         TLorentzVector Pm = *Pmiss;
         SHOWTLorentzVector(Pm);
         vector <TLorentzVector> protons = *p;
         SHOWvectorTLorentzVector(protons);
-        TLorentzVector Pm1 = protons.at(0) - q;
-        SHOWTLorentzVector(Pm1);
+//        TLorentzVector Pm1 = protons.at(0) - q;
+//        SHOWTLorentzVector(Pm1);
         PrintLine();
         
     }

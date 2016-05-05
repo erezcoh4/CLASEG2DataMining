@@ -57,7 +57,7 @@ void T3pSimulation::InitOutTree(){
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void T3pSimulation::RunInteractions ( int Ninteractions , bool DoPrint ){
     for ( int i = 0 ; i < Ninteractions ; i++ ) {
-//        if (i%(Ninteractions/20)==0) plot.PrintPercentStr((float)i/Ninteractions);
+        if (i%(Ninteractions/20)==0) plot.PrintPercentStr((float)i/Ninteractions);
         Gen_q();
         Gen_struck_p();
         q_struck_p();
@@ -75,9 +75,11 @@ void T3pSimulation::RunInteractions ( int Ninteractions , bool DoPrint ){
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void T3pSimulation::Gen_q(){
     // take the proton from inclusive 12C(e,e') data
-    Double_t q3Mag, omega;
-    h_q -> GetRandom2 (q3Mag, omega);
-    q.SetPxPyPzE( 0 , 0 , q3Mag , omega );
+    Beam = TLorentzVector( 0 , 0 , 5.009 , 5.009 );
+    rand_kin_entry = rand.Integer(N_kin_entries);
+    kinematics_tree -> GetEntry(rand_kin_entry);
+    e.SetVectM( TVector3(Px_e , Py_e , Pz_e) , Me ); // electrons from Fe56 data - that passed the cuts
+    q = Beam - e;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -192,11 +194,6 @@ void T3pSimulation::ComputePhysVars( ){
 
     // and implement calculation as in TCalcPhysVarsEG2
     InitEvent();
-    Pe = Ee = 5.009 - q.E();
-    e  = TLorentzVector( -0.137*Pe , -0.339*Pe , 0.956*Pe , Ee ); // a single electron that passes RECSIS cuts...
-    Beam = TLorentzVector( 0 , 0 , 5.009 , 5.009 );
-    //    e  = Beam - q; // a single electron that passes RECSIS cuts...
-    q = Beam - e;
     Q2 = -q.Mag2();
     Xb = Q2 / (2*Mp);
     
@@ -211,6 +208,7 @@ void T3pSimulation::ComputePhysVars( ){
     
     // Pmiss , p/q , 𝜃(p,q)
     Pmiss       = Plead - q;
+
     theta_pq    = r2d * Plead.Vect().Angle(q.Vect());
     p_over_q    = Plead.P() / q.P();
     
@@ -289,20 +287,7 @@ void T3pSimulation::PrintDATA(int entry){
     PrintLine();
 }
     
-    
-
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-void T3pSimulation::Imp_q_Histo ( TH2F * h , bool DoPlot ){
-    h_q = h;
-    if(DoPlot) {
-        TCanvas * c = plot.CreateCanvas("q");
-        h_q -> Draw("colz");
-        c -> SaveAs("q.pdf");
-    }
-}
-
-
+  
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void T3pSimulation::Imp_ppElasticHisto ( bool DoPlot ){
@@ -329,6 +314,21 @@ void T3pSimulation::Imp_ppElasticHisto ( bool DoPlot ){
 
 
 
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void T3pSimulation::Imp_kinematics ( TTree * kin_tree , bool DoPlot ){
+    kinematics_tree = kin_tree;
+    kinematics_tree -> SetBranchAddress("p(e') - x [GeV/c]"      , &Px_e);
+    kinematics_tree -> SetBranchAddress("p(e') - y [GeV/c]"      , &Py_e);
+    kinematics_tree -> SetBranchAddress("p(e') - z [GeV/c]"      , &Pz_e);
+    kinematics_tree -> SetBranchAddress("E-transfer w [GeV]"     , &omega);
+    N_kin_entries = kinematics_tree->GetEntries();
+    if (DoPlot) {
+        TCanvas * c = plot.CreateCanvas("ppElastic");
+        kin_tree -> Draw("omega:q>>h_omega_q(100,1,3.5,100,0.4,2.2)","Xb>1.05","colz");
+        c -> SaveAs("~/Desktop/q_kinematics.pdf");
+    }
+}
 
 
 

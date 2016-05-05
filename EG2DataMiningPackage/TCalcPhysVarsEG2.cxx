@@ -199,6 +199,11 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
     // Pmiss , p/q , 𝜃(p,q)
     Pmiss       = Plead - q;
+    SHOWTLorentzVector(Plead);
+    SHOWTLorentzVector(q);
+    SHOWTLorentzVector(Pmiss);
+    PrintLine();
+    
     theta_pq    = r2d * Plead.Vect().Angle(q.Vect());
     p_over_q    = Plead.P() / q.P();
 
@@ -402,6 +407,7 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOW(Xb);
     SHOW(Q2);
     SHOW(XbMoving);
+    SHOWTLorentzVector(e);
     SHOWTLorentzVector(q);
     SHOW(alpha_q);
     SHOWvectorTLorentzVector(protons);

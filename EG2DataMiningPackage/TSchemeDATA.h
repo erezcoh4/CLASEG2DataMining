@@ -95,8 +95,6 @@ public:
     
     
     void     SchemeOnTCut (TString , TString , TString , TString , TCut);
-    // DELETE April 21
-//    void     SchemeOnTCut (TString , TString , TString , TString , vector<TString> ,  vector<Float_t>,  vector<Float_t>);
     
     
 };
