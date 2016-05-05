@@ -6,9 +6,9 @@ import Initiation as init
 init.createnewdir()
 ROOT.gStyle.SetOptStat(0000)
 
-Operation = "Print data for GSIMulation"
-Do1D            = True
-Do2D            = False
+Operation   = "plot variables"
+Do1D        = True
+Do2D        = False
 
 Var         = "Pmiss"
 Path        = "/Users/erezcohen/Desktop/DataMining/AnaFiles"

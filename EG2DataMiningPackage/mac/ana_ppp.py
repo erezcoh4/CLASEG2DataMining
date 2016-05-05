@@ -20,7 +20,7 @@ DoGenCombinedFile   = False
 DoCombineTargets    = True
 
 Var     = "DalitzPlot"
-Nbins   = 25
+Nbins   = 50
 XbMin   = 1.05
 cut     = ROOT.TCut()
 XbCut   = ROOT.TCut("%f <= Xb"%XbMin)
@@ -129,12 +129,14 @@ if DoCombineTargets:
                                 ,"","|#bf{p}(miss)| [GeV/c]","recoil protons momenta [GeV/c]" , 4 ,  20 , 1 , 0.8)
         anaEG2.AddLegend(hp2,"p(2)",hp3,"p(3)")
     elif (Var=="DalitzPlot"):
-        anaEG2.Dalitz("Pmiss","protons[1]","protons[2]",anaEG2.pppSRCCut,100,0,5,100,0,5);
+        anaEG2.Dalitz("Tp[0]","Tp[1]","Tp[2]",ROOT.TCut("Np==3"));
 
     else:
         if (Var=="Pcm"):
             xAxis = ["Pcm.P()" , 0 , 1.4, "| #vec{p} (c.m.) | [GeV/c]"]
-        if (Var=="Xb"):
+        elif (Var=="Tp" or Var=="TpMiss"):
+            xAxis = [Var , 0 , 2 , "T(p) [GeV]"]
+        elif (Var=="Xb"):
             xAxis = [Var , 1 , 2, "Bjorken x"]
         elif (Var=="XbMoving"):
             xAxis = [Var , 0 , 2, "Bjorken x' (moving nucleon)"]

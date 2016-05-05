@@ -103,6 +103,8 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("alpha"               ,&alpha                 );// std::vector<Float_t>
     OutTree -> Branch("pCTOF"               ,&pCTOF                 );// std::vector<Float_t>
     OutTree -> Branch("pEdep"               ,&pEdep                 );// std::vector<Float_t>
+    OutTree -> Branch("TpMiss"              ,&TpMiss                , "TpMiss/F");
+    OutTree -> Branch("Tp"                  ,&Tp                    );// std::vector<Float_t> - kinetic energies
 
 
     
@@ -117,7 +119,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("Prec"                ,"TLorentzVector"       ,&Prec);
     OutTree -> Branch("q"                   ,"TLorentzVector"       ,&q);
     OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
-    
+
     
     
     // p(cm) for rooFit
@@ -160,6 +162,7 @@ void TCalcPhysVarsEG2::InitEvent(){
     if (!pCTOF.empty())     pCTOF.clear();
     if (!pCTOFCut.empty())  pCTOFCut.clear();
     if (!pEdep.empty())     pEdep.clear();
+    if (!Tp.empty())        Tp.clear();
     Plead = TLorentzVector();
 }
 
@@ -199,10 +202,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
     // Pmiss , p/q , 𝜃(p,q)
     Pmiss       = Plead - q;
-    SHOWTLorentzVector(Plead);
-    SHOWTLorentzVector(q);
-    SHOWTLorentzVector(Pmiss);
-    PrintLine();
+    TpMiss      = Pmiss.E() - Mp;
     
     theta_pq    = r2d * Plead.Vect().Angle(q.Vect());
     p_over_q    = Plead.P() / q.P();
@@ -342,6 +342,9 @@ void TCalcPhysVarsEG2::loop_protons(){
         // proton vertex
         pVertex .push_back( TVector3( Xp[i] , Yp[i] , Zp[i] ) );
         
+        // kinetic energies
+        Tp      .push_back( protons.back().E() - protons.back().M() );
+        
         // proton identification
         if (DataType == "no ctof") {
             
@@ -416,9 +419,11 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOW(alpha_q);
     SHOWvectorInt_t(pCTOFCut);
     SHOWvectorFloat_t(pEdep);
+    SHOWvectorFloat_t(Tp);
     SHOWTLorentzVector(Plead);
     SHOW(sum_alpha);
     SHOWTLorentzVector(Pmiss);
+    SHOW(TpMiss);
     SHOWTLorentzVector(Prec);
     SHOWTLorentzVector(Pcm);
     SHOW(theta_pq);
