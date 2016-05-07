@@ -30,8 +30,6 @@ OutFile     = ROOT.TFile(Path + "/AnaFiles/"+"Ana_"+FileName+".root","recreate")
 OutTree     = ROOT.TTree("anaTree","physical variables ppp SRC")
 
 calc        = TCalcPhysVarsEG2( InTree , OutTree , A , DataType , "q(z) - Pmiss(x-z) frame" )
-#scheme      = TSchemeDATA()
-#anaEG2      = TAnalysisEG2()
 
 
 

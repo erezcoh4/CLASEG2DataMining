@@ -146,6 +146,7 @@ void TCalcPhysVarsEG2::InitGlobals(){
     TargetAsString( A      , &mA   , &CoulombDeltaE);
     TargetAtRest.SetVectM( TVector3() , mA  );   // Target initially at rest relative to beam
     NucleonAtRest.SetVectM( TVector3() , Mp  );   // Target initially at rest relative to beam
+    m_A_1 = mA - Mp;
     A_over_mA  = (float)A/mA;
     pA.SetVectM( TVector3() , Mp * A  );
     Beam = TLorentzVector( 0 , 0 , 5.009 , 5.009 );
@@ -202,8 +203,11 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
     // Pmiss , p/q , 𝜃(p,q)
     Pmiss       = Plead - q;
-    TpMiss      = Pmiss.E() - Mp;
-    
+    // p(A-1) = -p(init) , and E(A-1) + E(p(init)) = m(A) => E(p(init)) = m(A) - E(A-1)
+    E_p_init    = mA - sqrt( pow( m_A_1 , 2 ) + pow( Pmiss.P() , 2 ) );
+    M_p_init    = Mp;
+    TpMiss      = E_p_init - M_p_init; // should be < 0, since the nucleon is bound - the p is off the energy shell
+
     theta_pq    = r2d * Plead.Vect().Angle(q.Vect());
     p_over_q    = Plead.P() / q.P();
 
@@ -211,10 +215,11 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     // Bjorken scaling for a moving nucleon
     // Invariant mass of the system produced in the interaction of balancing nucleon with a virtual photon
-    pA_Np_1.SetVectM( TVector3() , Mp * (A - Np - 1)  );
+    pA_Np_1.SetVectM( TVector3() , Mp * (A - Np + 1)  );
     Wtilde      = pA - pA_Np_1 + q ;
     //        XbMoving    = Q2 / ( 2. * (Pmiss * q) ); // = Q2 / 2pq [Q2 / ( 2. * (Pmiss * q) )]
-   
+//    pq = E_p_init * q.E() - Pmiss.Vect().Dot(q.Vect());
+//    XbMoving = Q2 / (2*pq);
     
     
     
@@ -234,7 +239,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     // A(e,e'p)X missing energy
     Mrec        = mA - Np * Mp;            // taking out the 1 proton off the initial target
-    Trec        = sqrt( Pmiss.P()*Pmiss.P() + Mrec*Mrec) - Mrec;
+    Trec        = sqrt( Pmiss.P()*Pmiss.P() + Mrec*Mrec ) - Mrec;
     Emiss       = Nu - Trec;
 
 
@@ -253,11 +258,11 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     // Bjorken scaling for a moving nucleon
     XbMoving    = Q2 / ( Wtilde.Mag2() + Q2 - Mp2  ); // = Q2 / 2pq [Q2 / ( 2. * (Pmiss * q) )]
-//    SHOWTLorentzVector(Wtilde);
-//    SHOW(Wtilde.Mag2());
-//    SHOW(Mp2);
-//    SHOW(Xb);
-//    SHOW(XbMoving);
+    SHOWTLorentzVector(Wtilde);
+    SHOW(Wtilde.Mag2());
+    SHOW(Mp2);
+    SHOW(Xb);
+    SHOW(XbMoving);
 
 
     // if we have 3 protons, randomize protons 2 and 3
@@ -409,6 +414,8 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOW(entry);
     SHOW(Xb);
     SHOW(Q2);
+    SHOW(M_p_init);
+    SHOW(E_p_init);
     SHOW(XbMoving);
     SHOWTLorentzVector(e);
     SHOWTLorentzVector(q);

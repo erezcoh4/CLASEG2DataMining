@@ -33,7 +33,6 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     
     for (int i = 0; i < 3; i++ ) {
                 pEdepCut[i] = TEG2dm::pEdepCut(i);
-//                pCTOFCut[i] = Form("pID[%d] && pCTOF[%d]",i,i); // CTOF polynomial cut & momentum < 2.8 GeV/c
     }
     ppEdepCut   = Form("%s && %s",pEdepCut[0]->GetName(),pEdepCut[1]->GetName());
     ppCTOFCut   = pCTOFCut[0] && pCTOFCut[1] ;
@@ -68,12 +67,7 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     Sim3pSRCCut = cutSRC && " 3 <= Np" && "0.3 < protons[1].P() && 0.3 < protons[2].P()";
     FinalSim3pSRCCut = cutSRC && " 3 <= Np" && "0.3 < protons[1].P() && 0.3 < protons[2].P()" && cutAngles3p;
 
-    
-    Printf("Set Cuts:");
-    PrintLine();
-    cutXb.Print();
-    cutPrec.Print();
-    Final3pCut.Print();
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -153,9 +147,7 @@ vector<Float_t> TAnalysisEG2::GetGSIMEvt(int entry, bool DoPrint){
 
     Tree -> GetEntry(entry);
 
-    TLorentzVector  Beam(0,0,5.009,5.009);
-    TLorentzVector  q = Beam - *e;
-    TLorentzVector  pLead = *Pmiss + q;
+    TLorentzVector  Beam(0,0,5.009,5.009) , q = Beam - *e , pLead = *Pmiss + q;
     vector<Float_t> res;
     res.push_back(4);
 
@@ -184,16 +176,12 @@ vector<Float_t> TAnalysisEG2::GetGSIMEvt(int entry, bool DoPrint){
     }
     if (DoPrint) {
         
-//        TLorentzVector electron = *e;
-//        SHOWTLorentzVector(electron);
         SHOWTLorentzVector(pLead);
         SHOWTLorentzVector(q);
         TLorentzVector Pm = *Pmiss;
         SHOWTLorentzVector(Pm);
         vector <TLorentzVector> protons = *p;
         SHOWvectorTLorentzVector(protons);
-//        TLorentzVector Pm1 = protons.at(0) - q;
-//        SHOWTLorentzVector(Pm1);
         PrintLine();
         
     }

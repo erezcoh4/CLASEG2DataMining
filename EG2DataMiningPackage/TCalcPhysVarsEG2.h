@@ -62,14 +62,13 @@ public:
     Float_t q_phi       , q_theta   , Pmiss_phi , Pmiss_theta;
     Float_t Emiss       , Mmiss;
     Float_t mA          , CoulombDeltaE         , A_over_mA ;
-    Float_t Mrec        , Trec      ;             // protons kinetic energy, recoil mass & kinetic energy
+    Float_t Mrec        , Trec      ;                           // protons kinetic energy, recoil mass & kinetic energy
     Float_t uns_pCTOF[20], uns_pEdep[20]     ;
-    Float_t N_Px[20]    , N_Py[20]  , N_Pz[20]; // for raw data
+    Float_t N_Px[20]    , N_Py[20]  , N_Pz[20];                 // for raw data
     Float_t thetaMiss23 , phiMiss23;
     
-    Double_t    pcmX    , pcmY      , pcmZ  ;
-    
-    Float_t             TpMiss      ;
+    Double_t            pcmX        , pcmY          , pcmZ          ;
+    Float_t             TpMiss      , m_A_1         , E_p_init      , M_p_init , pq;
     vector<Float_t>     alpha       , pEdep         , pCTOF         , Tp;
     vector<Int_t>       pCTOFCut    ;
     

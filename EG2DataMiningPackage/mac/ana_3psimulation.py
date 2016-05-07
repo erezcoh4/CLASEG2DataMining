@@ -7,13 +7,14 @@ init.createnewdir()
 ROOT.gStyle.SetOptStat(0000)
 
 Operation   = "plot variables"
-Do1D        = True
+Do1D        = False
 Do2D        = False
 
-Var         = "Pmiss"
+Var         = "pMiss_p2_p3"
 Path        = "/Users/erezcohen/Desktop/DataMining/AnaFiles"
 analysis    = TAnalysis()
-Nbins       = 50
+plot        = TPlots()
+Nbins       = 200
 XbMin       = 1.05
 XbCut       = ROOT.TCut("%f <= Xb"%XbMin)
 
@@ -33,9 +34,9 @@ if (Operation == "plot variables"):
         if (Var=="q_vs_omega"):
             ana.H2("q.P()" , "q.E()" , ROOT.TCut() , "colz" , 100 , 0 , 5 , 100 , 0 , 4 , "","|#vec{q}| [GeV/c]","#omega [GeV]")
         elif (Var=="PoverQ_vs_ThetaPQ"):
-            xyAxes = ["p_over_q" ,  "theta_pq" , 0.6   , 1.1 ,  0   , 50 , "p(2) [GeV/c]" , "p(3) [GeV/c]" , ana.cutSRC , "SRC"]
+            xyAxes = ["p_over_q" ,  "theta_pq" , 0.6   , 1.1 ,  0   , 50 , "p/q" , "#theta (p,q) [deg.]" , ana.cutSRC , "SRC"]
         elif (Var=="RecoilProtons"):
-            xyAxes = ["protons[1].P()" ,  "protons[2].P()" , 0.2   , 1.1 ,  0.2   , 1.1 , "p/q" , "#theta (p,q) [deg.]" , ana.Sim3pSRCCut , "3pSRC"]
+            xyAxes = ["protons[1].P()" ,  "protons[2].P()" , 0.2   , 1.1 ,  0.2   , 1.1 , "p(2) [GeV/c]" , "p(3) [GeV/c]" , ana.Sim3pSRCCut , "3pSRC"]
         elif (Var=="theta_vs_phi"):
             xyAxes = ["fabs(phiMiss23)" , "thetaMiss23" , 0 , 80 ,  80 , 180 , "|#phi| [deg.]","#theta [deg.]" , ana.Sim3pSRCCut , "3pSRC"]
         elif (Var=="pp_scattering_CMtheta_vs_Mpp"):
@@ -43,7 +44,8 @@ if (Operation == "plot variables"):
         c = ana.Draw2DVarAndCut(xyAxes[0] ,  xyAxes[1]   , Nbins , xyAxes[2]  , xyAxes[3]  , Nbins , xyAxes[4]   , xyAxes[5] , "" , xyAxes[6] , xyAxes[7] , xyAxes[8] , True  , xyAxes[9])
     if (Var=="DalitzPlot"):
         c = ana.CreateCanvas("Dalitz")
-        ana.Dalitz("Pmiss","protons[1]","protons[2]",ana.Sim3pSRCCut,100,0,5,100,0,5);
+        ana.Dalitz("protons[1].P()","protons[2].P()","Pmiss.P()",ana.Sim3pSRCCut,100,-1.7,1.7,100,-1.1,2,"p_{2}","p_{3}","p_{miss}") # "Modified" Dalitz plot since T is not
+
     if (Var=="theta_vs_phi"):
         ana.Box(0,155,15,180,1,0.1)
         evts = ana.GetEntries(ana.Sim3pSRCCut)
@@ -61,7 +63,7 @@ if (Operation == "plot variables"):
                      ,"","|#bf{p}(miss)| [GeV/c]","recoil protons momenta [GeV/c]" , 3 , 20 , 1 , 0.8)
         hp3 = ana.H2("Pmiss.P()" , "protons[2].P()", ana.Sim3pSRCCut ,"same" , Nbins , 0.25 , 1.1 , Nbins , 0.25 , 1.1
                                   ,"","|#bf{p}(miss)| [GeV/c]","recoil protons momenta [GeV/c]" , 4 ,  20 , 1 , 0.8)
-        ana.AddLegend(hp2,"p(2)",hp3,"p(3)")
+#        plot.AddLegend(hp2,"p(2)",hp3,"p(3)")
     c.Update()
     wait()
     c.SaveAs(init.dirname()+"/FSI3p_sim_"+Var+".pdf")

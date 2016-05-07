@@ -110,6 +110,7 @@ if DoGenCombinedFile:
 if DoCombineTargets:
     anaEG2  = TAnalysisEG2("C12_Al27_Fe56_Pb28",XbCut)
     c = anaEG2.CreateCanvas("All targets together")
+    
     if (Var=="theta_vs_phi"):
         anaEG2.H2("fabs(phiMiss23)" , "thetaMiss23" , anaEG2.pppSRCCut , "" , Nbins , 0 , 80 , Nbins , 80 , 180 , "","|#phi| [deg.]","#theta [deg.]",4,20,0.5)
         anaEG2.Box(0,155,15,180,1,0.1)
@@ -122,26 +123,39 @@ if DoCombineTargets:
         percentage = 100*(float(evts_in_box)/evts)
         percentageErr = percentage*math.sqrt( math.pow(evtsErr/evts,2) +  math.pow(evts_in_boxErr/evts_in_box,2))
         anaEG2.Text(20,160,"%d events (%.1f #pm %.1f %%)"%(evts_in_box , percentage , percentageErr))
+    
+    
     elif (Var=="pMiss_p2_p3"):
         hp2 = anaEG2.H2("Pmiss.P()" , "protons[1].P()", anaEG2.pppSRCCut ,"" , Nbins , 0.25 , 1.1 , Nbins , 0.25 , 1.1
                      ,"","|#bf{p}(miss)| [GeV/c]","recoil protons momenta [GeV/c]" , 3 , 20 , 1 , 0.8)
         hp3 = anaEG2.H2("Pmiss.P()" , "protons[2].P()", anaEG2.pppSRCCut ,"same" , Nbins , 0.25 , 1.1 , Nbins , 0.25 , 1.1
                                 ,"","|#bf{p}(miss)| [GeV/c]","recoil protons momenta [GeV/c]" , 4 ,  20 , 1 , 0.8)
         anaEG2.AddLegend(hp2,"p(2)",hp3,"p(3)")
-    elif (Var=="DalitzPlot"):
-        anaEG2.Dalitz("Tp[0]","Tp[1]","Tp[2]",ROOT.TCut("Np==3"));
 
+
+    elif (Var=="DalitzPlot"):
+        #        anaEG2.Dalitz("Tp[0]","Tp[1]","Tp[2]",ROOT.TCut("Np==3"))
+#        anaEG2.Dalitz("alpha[0]-alpha_q","alpha[1]","alpha[2]",ROOT.TCut("Np==3")) # "Modified" Dalitz plot since T is not conserved
+#        anaEG2.Dalitz("protons[1].P()","protons[2].P()","Pmiss.P()",ROOT.TCut("Np==3")) # "Modified" Dalitz plot since T is not conserved
+        anaEG2.Dalitz("protons[1].P()","protons[2].P()","Pmiss.P()",anaEG2.pppSRCCut,100,-1.7,1.7,100,-1.1,2,"p_{2}","p_{3}","p_{miss}") # "Modified" Dalitz plot since T is not
     else:
         if (Var=="Pcm"):
             xAxis = ["Pcm.P()" , 0 , 1.4, "| #vec{p} (c.m.) | [GeV/c]"]
+        
         elif (Var=="Tp" or Var=="TpMiss"):
             xAxis = [Var , 0 , 2 , "T(p) [GeV]"]
+
         elif (Var=="Xb"):
             xAxis = [Var , 1 , 2, "Bjorken x"]
+
         elif (Var=="XbMoving"):
-            xAxis = [Var , 0 , 2, "Bjorken x' (moving nucleon)"]
+            xAxis = [Var , 0 , 10, "Bjorken x' (moving nucleon)"]
+
+
         elif (Var=="opening_angle"):
             xAxis = [anaEG2.CosTheta("Pmiss.Vect()","Prec.Vect()") , -1 , 1, "cos (#theta)"]
+
+
         anaEG2.H1(xAxis[0] , anaEG2.pppSRCCut , "BAR E" , Nbins , xAxis[1] , xAxis[2] , "",xAxis[3])
         anaEG2.H1(xAxis[0] , anaEG2.Final3pCut , "BAR E same" , Nbins , xAxis[1] , xAxis[2] , "",xAxis[3],"",1,1)
 
