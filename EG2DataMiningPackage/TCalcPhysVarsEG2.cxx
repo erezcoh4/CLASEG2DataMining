@@ -84,7 +84,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
 
     // Integer branches
     OutTree -> Branch("target atomic mass"  ,&A                     ,"A/I");
-    OutTree -> Branch("number of protons"   ,&Np                    ,"Np/I");
+    OutTree -> Branch("Np"                  ,&Np                    ,"Np/I");
     OutTree -> Branch("pCTOFCut"            ,&pCTOFCut              );// std::vector<Int_t>
 
     

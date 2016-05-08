@@ -66,7 +66,10 @@ public:
     TCut    cutXb       , cutPmiss    , cutThetaPQ , cutPoverQ  , cutMmiss  , cutPlead  , cutPrec  , cutP1 , cutP2 , cutP3 , cutAngles2p , cutAngles3p;
     TCutG   * pEdepCut[3];
     TCut    pCTOFCut[3] , ppEdepCut   , ppCTOFCut   , pppEdepCut , pppCTOFCut  ;
-    TCut    cutSRC      , cut1pSRC    , ppSRCCut    , pppSRCCut   , Final3pCut , Sim3pSRCCut , FinalSim3pSRCCut;
+    TCut    cutSRC      , cut1pSRC    , ppSRCCut    ;
+    TCut    pppSRCCut   , Final3pCut ;
+    TCut    Sim3pSRCCut , FinalSim3pSRCCut;
+    TCut    Mix3pSRCCut , FinalMix3pSRCCut;
     
     void         SetSRCCuts ( TCut XbCut = "1.2 <= Xb");
     void        PrintInCuts ();
@@ -76,6 +79,7 @@ public:
     TMatrix        RooFitCM (Float_t PmissMin, Float_t PmissMax);
     vector<Float_t> GetPcmEntry (int);
     vector<Float_t> GetGSIMEvt (int, bool DoPrint = false);
+    void            MixEvents (TTree *, bool DoPrint = false);
 };
 
 #endif

@@ -65,8 +65,13 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     
     // For 3p simulation...
     Sim3pSRCCut = cutSRC && " 3 <= Np" && "0.3 < protons[1].P() && 0.3 < protons[2].P()";
-    FinalSim3pSRCCut = cutSRC && " 3 <= Np" && "0.3 < protons[1].P() && 0.3 < protons[2].P()" && cutAngles3p;
+    FinalSim3pSRCCut = Sim3pSRCCut && cutAngles3p;
 
+    
+    // For mixed 3p...
+    Mix3pSRCCut = ""; // mixed, by definition, passes all kinematics cuts (mixed from pppSRC cuts...)
+    FinalMix3pSRCCut = Mix3pSRCCut && cutAngles3p;
+    
 
 }
 
@@ -133,9 +138,6 @@ vector<Float_t> TAnalysisEG2::GetPcmEntry(int entry){
 
 
 
-
-
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 vector<Float_t> TAnalysisEG2::GetGSIMEvt(int entry, bool DoPrint){
 
@@ -187,6 +189,66 @@ vector<Float_t> TAnalysisEG2::GetGSIMEvt(int entry, bool DoPrint){
     }
     return res;
 }
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void TAnalysisEG2::MixEvents(TTree * OutTree, bool DoPrint){
+    int Np;
+    Float_t         thetaMiss23 , phiMiss23 ;
+    TLorentzVector  *Pm = 0     , *q4 = 0   , Pmiss , q;
+    vector <TLorentzVector> * p = 0 , protons;
+    Tree -> SetBranchAddress("q"        , &q4);
+    Tree -> SetBranchAddress("Pmiss"    , &Pm);
+    Tree -> SetBranchAddress("protons"  , &p);
+    Tree -> SetBranchAddress("Np"       , &Np);
+    int N = Tree->GetEntries()*(Tree->GetEntries()-1)*(Tree->GetEntries()-2);
+    OutTree -> Branch("q"               ,"q"                    ,&q);
+    OutTree -> Branch("Pmiss"           ,"TLorentzVector"       ,&Pmiss);
+    OutTree -> Branch("protons"         ,&protons);             // std::vector<TLorentzVector>
+    OutTree -> Branch("theta p(miss)-p2 p3" ,&thetaMiss23           , "thetaMiss23/F");
+    OutTree -> Branch("phi p(miss)-p2 p3"   ,&phiMiss23             , "phiMiss23/F");
+
+    for (int i1 = 0; i1 < Tree->GetEntries() ; i1++) {
+        
+        for (int i2 = 0; i2 < Tree->GetEntries() ; i2++) {
+            if (i1 != i2) {
+
+                for (int i3 = 0; i3 < Tree->GetEntries() ; i3++) {
+                    if (i1 != i3 && i2 != i3) {
+                        
+                        // Fill entry with mixed protons...
+                        if(!protons.empty()) protons.clear();
+                        Tree -> GetEntry(i1);
+                        q = *q4;
+                        Pmiss = *Pm;
+                        protons.push_back(p->at(0));
+                        Tree -> GetEntry(i2);
+                        protons.push_back(p->at(1));
+                        Tree -> GetEntry(i3);
+                        protons.push_back(p->at(2));
+                        
+                        thetaMiss23 = r2d*Pmiss.Vect().Angle((p->at(1)+p->at(2)).Vect());
+                        phiMiss23   = 90 - r2d*( Pmiss.Vect().Angle(protons.at(1).Vect().Cross(protons.at(2).Vect()).Unit()) );
+                        
+                        OutTree -> Fill();
+                        
+                        // print out info
+                        if (DoPrint) {
+                            SHOWTLorentzVector(q);
+                            SHOWTLorentzVector(Pmiss);
+                            SHOWvectorTLorentzVector(protons);
+                            PrintLine();
+                        }
+                        if (OutTree->GetEntries()%(N/10) == 0) {
+                            Printf("\t[%.0f%%]",100*(float)OutTree->GetEntries()/N);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 
 #endif
