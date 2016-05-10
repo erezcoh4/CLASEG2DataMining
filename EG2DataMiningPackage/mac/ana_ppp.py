@@ -20,8 +20,8 @@ DoGenCombinedFile   = False
 DoMixEvents         = False
 DoCombineTargets    = True
 
-DataType= "FSI-3 Simulation"
-Var     = "DalitzPlot"
+DataType= "Data"
+Var     = "pMiss_p2_p3"
 Nbins   = 50
 XbMin   = 1.05
 cut     = ROOT.TCut()
