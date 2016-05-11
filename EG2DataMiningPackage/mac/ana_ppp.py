@@ -20,8 +20,8 @@ DoGenCombinedFile   = False
 DoMixEvents         = False
 DoCombineTargets    = True
 
-DataType= "Data"
-Var     = "pMiss_p2_p3"
+DataType= "FSI-3 Simulation"
+Var     = "DalitzPlot"
 Nbins   = 50
 XbMin   = 1.05
 cut     = ROOT.TCut()
@@ -161,7 +161,10 @@ if DoCombineTargets:
 
 
     elif (Var=="DalitzPlot"):
-        anaEG2[0].Dalitz("protons[1].P()","protons[2].P()","Pmiss.P()",anaEG2[2],100,-1.7,1.7,100,-1.1,2,"p_{2}","p_{3}","p_{miss}") # "Modified" Dalitz plot since T is not
+        anaEG2[0].Dalitz("protons[1].P()","protons[2].P()","Pmiss.P()",anaEG2[1],1000,-1.7,1.7,1000,-1.1,2,"p_{2}","p_{3}","p_{miss}","",1) # "Modified" Dalitz plot since T is not conserved
+        anaEG2[0].Dalitz("protons[1].P()","protons[2].P()","Pmiss.P()",anaEG2[2],1000,-1.7,1.7,1000,-1.1,2,"p_{2}","p_{3}","p_{miss}","same",4,True)
+
+
 
     else:
         if (Var=="Pcm"):
@@ -186,5 +189,5 @@ if DoCombineTargets:
 
     c.Update()
     wait()
-    c.SaveAs(init.dirname()+"/C12_Al_27_Fe56_Pb28_"+Var+".pdf")
+    c.SaveAs(init.dirname()+"/"+DataType+"C12_Al_27_Fe56_Pb28_"+Var+".pdf")
 
