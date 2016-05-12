@@ -20,9 +20,9 @@ DoGenCombinedFile   = False
 DoMixEvents         = False
 DoCombineTargets    = True
 
-DataType= "FSI-3 Simulation"
-Var     = "DalitzPlot"
-Nbins   = 50
+DataType= "FSI-3 Simulation" # "FSI-3 Simulation" / "Data" / "Mixed"
+Var     = "Xb"
+Nbins   = 25
 XbMin   = 1.05
 cut     = ROOT.TCut()
 XbCut   = ROOT.TCut("%f <= Xb"%XbMin)
@@ -135,7 +135,7 @@ if DoCombineTargets:
         anaMix = TAnalysisEG2("Mixed_C12_Al27_Fe56_Pb28",XbCut)
         anaEG2 = [anaMix , anaMix.Mix3pSRCCut , anaMix.FinalMix3pSRCCut]
 
-    c = anaEG2[0].CreateCanvas("All targets together")
+    c = anaEG2[0].CreateCanvas(DataType)
 
 
     if (Var=="theta_vs_phi"):
@@ -172,6 +172,9 @@ if DoCombineTargets:
         
         elif (Var=="Tp" or Var=="TpMiss"):
             xAxis = [Var , 0 , 2 , "T(p) [GeV]"]
+
+        elif (Var=="Pmiss"):
+            xAxis = ["Pmiss.P()" , 0.2 , 1.1 , "|#vec{p} (miss)| [GeV/c]"]
 
         elif (Var=="Xb"):
             xAxis = [Var , 1 , 2, "Bjorken x"]
