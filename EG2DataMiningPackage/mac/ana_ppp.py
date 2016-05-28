@@ -21,7 +21,7 @@ DoMixEvents         = False
 DoCombineTargets    = True
 
 DataType= "FSI-3 Simulation" # "FSI-3 Simulation" / "Data" / "Mixed"
-Var     = "Xb"
+Var     = "pMiss_p2_p3"
 Nbins   = 25
 XbMin   = 1.05
 cut     = ROOT.TCut()

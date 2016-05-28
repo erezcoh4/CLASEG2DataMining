@@ -6,7 +6,7 @@ import Initiation as init
 init.createnewdir()
 ROOT.gStyle.SetOptStat(0000)
 
-Operation   = "plot variables"
+Operation   = "protons in the process"
 Do1D        = False
 Do2D        = False
 
@@ -69,9 +69,6 @@ if (Operation == "plot variables"):
     c.SaveAs(init.dirname()+"/FSI3p_sim_"+Var+".pdf")
 
 
-
-
-
 # April - 30
 if (Operation == "Print data for GSIMulation"):
     ana     = TAnalysisEG2("FSI3pSimulation", XbCut )
@@ -85,3 +82,37 @@ if (Operation == "Print data for GSIMulation"):
             outfile.write("%d  %d  %d  %d  %d \n" % (evt.at(8+11*j) , evt.at(9+11*j) , evt.at(10+11*j) , evt.at(11+11*j) , evt.at(11+11*j)))
     outfile.close()
     print "\ndone writing %d events to "%ana.GetEntries(ROOT.TCut()) + outfile.name
+
+
+
+
+# May-26
+if (Operation == "protons in the process"):
+    ana = TAnalysisEG2("FSI3pSimulation", XbCut )
+    cut = ROOT.TCut() # ana.cutSRC
+    c = plot.CreateCanvas(Operation,"Divide",3,3)
+    c.cd(1)
+    ana.H1("struck_p.P()" , cut,"hist",50, 0 , 0.3 , "struck proton (before hit)" , "p [GeV/c]" )
+    c.cd(2)
+    ana.H1("p_knocked.P()", cut,"hist",50, 1.0 , 3.2 , "knocked proton" , "p [GeV/c]" )
+    c.cd(3)
+    ana.H2("pcm_ppPair.Px()" ,"pcm_ppPair.Py()" , cut,"colz",50, -0.5, 0.5, 50, -0.5, 0.5, "p(c.m.) of the pp-pair" , "p_{x} [GeV/c]", "p_{y} [GeV/c]" )
+    c.cd(4)
+    ana.H1("p1_ppPair.P()" , cut,"hist", 50, 0, 1, "proton 1 from pp-pair before rescattering" , "p [GeV/c]" )
+    c.cd(5)
+    ana.H1("p2_ppPair.P()" , cut,"hist", 50, 0, 1, "proton 2 from pp-pair before rescattering" , "p [GeV/c]" )
+    c.cd(6)
+    ana.H2("p1_ppPair.P()" ,"p2_ppPair.P()" , cut,"colz",50, 0.2, 0.75, 50, 0, 1, "pp-pair momenta (p_{1} from k^{-4} tail)" , "p_{1} [GeV/c]", "p_{2} [GeV/c]" )
+    c.cd(7)
+    ana.H1("p_knocked_r.P()" , cut,"hist", 50, 0, 3.1, "knocked proton after rescattering" , "p [GeV/c]" )
+    c.cd(8)
+    hLowTheta = ana.H1("p1_ppPair_r.P()" , ROOT.TCut("(180/3.1415)*Theta_cm<90") ,"hist", 50, 0, 3.1, "p-1 (pp-pair) after rescattering" , "p [GeV/c]","",2,2 )
+    ana.Text(0.5,0.8*hLowTheta.GetMaximum(),"#theta(c.m.) < 90^{0}",2)
+    hHighTheta = ana.H1("p1_ppPair_r.P()" , ROOT.TCut("(180/3.1415)*Theta_cm>90") ,"hist same", 50, 0, 3.1, "" , "","",4,4 )
+    ana.Text(1.9,0.8*hHighTheta.GetMaximum(),"#theta(c.m.) > 90^{0}",4)
+    c.cd(9)
+    ana.H1("p2_ppPair_r.P()" , cut,"hist", 50, 0, 1.1, "proton 2 from pp-pair after rescattering" , "p [GeV/c]" )
+    c.Update()
+    
+    wait()
+    c.SaveAs(init.dirname()+"/protons-in-the-process.pdf")
