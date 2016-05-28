@@ -64,7 +64,7 @@ public:
     TLorentzVector p1_pk_cm , p1_p1_pk_cm , pk_p1_pk_cm;
 
     std::vector<TLorentzVector> protons;
-
+    bool        AcceptEvent;
     
     
     /// Default constructor

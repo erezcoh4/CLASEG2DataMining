@@ -65,8 +65,8 @@ void T3pSimulation::RunInteractions ( int Ninteractions , bool DoPrint ){
         Gen_ppPair();
         p_rescatter_ppPair();
         ComputePhysVars();
-        if(DoPrint) PrintDATA(i);
-        OutTree -> Fill();
+        if(DoPrint)     PrintDATA(i);
+        if(AcceptEvent) OutTree -> Fill();
     }
 }
 
@@ -109,7 +109,14 @@ void T3pSimulation::Gen_ppPair(){
     p1_ppPair.SetVectM( TVector3(Px , Py , Pz) , Mp );
     pcm_ppPair = TLorentzVector( rand.Gaus(0,0.14) , rand.Gaus(0,0.14) , rand.Gaus(0,0.14) , 2*Mp );
     p2_ppPair.SetVectM( (pcm_ppPair - p1_ppPair).Vect()  , Mp );
-
+    
+    AcceptEvent = (p2_ppPair.P() < 0.25) ? false : true;
+    // allow scattering from either p1 or p2 by 50% to switch vectors of 1 and 2 between themselfs and continue
+    if( rand.Uniform() > 0.5 ){
+        TLorentzVector tmp = p1_ppPair;
+        p1_ppPair = p2_ppPair;
+        p2_ppPair = tmp;
+    }
 }
 
 
@@ -161,16 +168,9 @@ void T3pSimulation::p_rescatter_ppPair(){
     p_knocked_r.RotateY(rot_theta);
     p_knocked_r.RotateZ(rot_phi);
     
-    Printf("boosting after re-scattering");
-    
-    SHOWTLorentzVector(p1_ppPair_r);
-    SHOWTLorentzVector(p_knocked_r);
-    SHOWTLorentzVector(p1_pk_cm);
-    // boost back to lab frame
+     // boost back to lab frame
     p1_ppPair_r.Boost( p1_pk_cm.BoostVector() );
     p_knocked_r.Boost( p1_pk_cm.BoostVector() );
-    SHOWTLorentzVector(p1_ppPair_r);
-    SHOWTLorentzVector(p_knocked_r);
     
     
     // the third protn (p2_ppPair) is a spectator and does not change
@@ -274,25 +274,25 @@ void T3pSimulation::q_Pmiss_frame(){
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void T3pSimulation::PrintDATA(int entry){
     SHOW(entry);
-//    SHOWTLorentzVector(q);
-//    SHOWTLorentzVector(struck_p);
-//    SHOWTLorentzVector(p_knocked);
-//    SHOWTLorentzVector(p1_ppPair);
-//    SHOW(p1_ppPair.Vect()*p_knocked.Vect());
-//    SHOWTLorentzVector(p2_ppPair);
-//    SHOW(Mpp);
-//    SHOW(Theta_cm);
-//    SHOW(Phi_cm);
-//    SHOWTLorentzVector(p_knocked_r);
-//    SHOWTLorentzVector(p1_ppPair_r);
-//    SHOWTLorentzVector(p2_ppPair_r);
-//    SHOWTLorentzVector(Pcm);
-//    SHOWTLorentzVector(Prec);
-//    SHOWTLorentzVector(Pmiss);
-//    SHOWTLorentzVector(Plead);
-//    SHOWTLorentzVector(q);
-//    SHOWTLorentzVector(TLorentzVector(Plead-q));
-//    SHOWvectorTLorentzVector(protons);
+    SHOWTLorentzVector(q);
+    SHOWTLorentzVector(struck_p);
+    SHOWTLorentzVector(p_knocked);
+    SHOWTLorentzVector(p1_ppPair);
+    SHOW(p1_ppPair.Vect()*p_knocked.Vect());
+    SHOWTLorentzVector(p2_ppPair);
+    SHOW(Mpp);
+    SHOW(Theta_cm);
+    SHOW(Phi_cm);
+    SHOWTLorentzVector(p_knocked_r);
+    SHOWTLorentzVector(p1_ppPair_r);
+    SHOWTLorentzVector(p2_ppPair_r);
+    SHOWTLorentzVector(Pcm);
+    SHOWTLorentzVector(Prec);
+    SHOWTLorentzVector(Pmiss);
+    SHOWTLorentzVector(Plead);
+    SHOWTLorentzVector(q);
+    SHOWTLorentzVector(TLorentzVector(Plead-q));
+    SHOWvectorTLorentzVector(protons);
     PrintLine();
 }
     

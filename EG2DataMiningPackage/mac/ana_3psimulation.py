@@ -90,7 +90,7 @@ if (Operation == "Print data for GSIMulation"):
 if (Operation == "protons in the process"):
     ana = TAnalysisEG2("FSI3pSimulation", XbCut )
     cut = ROOT.TCut() # ana.cutSRC
-    c = plot.CreateCanvas(Operation,"Divide",3,3)
+    c = plot.CreateCanvas(Operation,"Divide",3,5)
     c.cd(1)
     ana.H1("struck_p.P()" , cut,"hist",50, 0 , 0.3 , "struck proton (before hit)" , "p [GeV/c]" )
     c.cd(2)
@@ -102,7 +102,7 @@ if (Operation == "protons in the process"):
     c.cd(5)
     ana.H1("p2_ppPair.P()" , cut,"hist", 50, 0, 1, "proton 2 from pp-pair before rescattering" , "p [GeV/c]" )
     c.cd(6)
-    ana.H2("p1_ppPair.P()" ,"p2_ppPair.P()" , cut,"colz",50, 0.2, 0.75, 50, 0, 1, "pp-pair momenta (p_{1} from k^{-4} tail)" , "p_{1} [GeV/c]", "p_{2} [GeV/c]" )
+    ana.H2("p1_ppPair.P()" ,"p2_ppPair.P()" , cut,"colz",50, 0.2, 0.75, 50, 0.2, 0.75, "pp-pair momenta (p_{1} from k^{-4} tail)" , "p_{1} [GeV/c]", "p_{2} [GeV/c]" )
     c.cd(7)
     ana.H1("p_knocked_r.P()" , cut,"hist", 50, 0, 3.1, "knocked proton after rescattering" , "p [GeV/c]" )
     c.cd(8)
@@ -112,6 +112,14 @@ if (Operation == "protons in the process"):
     ana.Text(1.9,0.8*hHighTheta.GetMaximum(),"#theta(c.m.) > 90^{0}",4)
     c.cd(9)
     ana.H1("p2_ppPair_r.P()" , cut,"hist", 50, 0, 1.1, "proton 2 from pp-pair after rescattering" , "p [GeV/c]" )
+    c.cd(10)
+    ana.H2("p_knocked.P()" ,"p_knocked_r.P()" , cut,"colz",50, 1., 3, 50, 0, 3, "p-knocked, before and after re-scattering" , "p_{knocked} before [GeV/c]", "p_{knocked} re-scatterd [GeV/c]" )
+    c.cd(11)
+    ana.H2("p1_ppPair.P()" ,"p1_ppPair_r.P()" , cut,"colz",50, 0.2, 1, 50, 0, 1, "p-1, before and after re-scattering" , "p_{1} before [GeV/c]", "p_{1} re-scatterd [GeV/c]" )
+    c.cd(12)
+    ana.H2("p2_ppPair.P()" ,"p2_ppPair_r.P()" , cut,"colz",50, 0.2, 1, 50, 0.2, 1, "p-2, before and after re-scattering" , "p_{2} before [GeV/c]", "p_{2} re-scatterd [GeV/c]" )
+    c.cd(13)
+    ana.H2("p_knocked.P()" ,"p1_ppPair_r.P()" , cut,"colz",50, 1., 3, 50, 0.2, 1, "p-knocked, after re-scattering vs. p-1 after re-scattering" , "p_{knocked} before [GeV/c]", "p_{1} re-scatterd [GeV/c]" )
     c.Update()
     
     wait()
