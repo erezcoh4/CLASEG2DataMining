@@ -11,29 +11,23 @@ init.createnewdir()
 ROOT.gStyle.SetOptStat(0000)
 
 
+# "Draw variable"/ "Show SRC Cuts" / "CTOF subtraction" / "count e,e'p/pp/ppp"  / "combine 12C+27Al+56Fe+208Pb "/ "Mix 12C+27Al+56Fe+208Pb" / "Draw stacked 12C+27Al+56Fe+208Pb"
 
-DoDrawVar           = False
-DoCuts              = False
-DoCTOFsubtraction   = False
-DoCount_p_2p_3p     = False
-DoGenCombinedFile   = False
-DoMixEvents         = False
-DoCombineTargets    = True
-
-DataType= "FSI-3 Simulation" # "FSI-3 Simulation" / "Data" / "Mixed"
-Var     = "pMiss_p2_p3"
-Nbins   = 25
-XbMin   = 1.05
-cut     = ROOT.TCut()
-XbCut   = ROOT.TCut("%f <= Xb"%XbMin)
-dm      = TEG2dm()
+Operation   = "Draw stacked 12C+27Al+56Fe+208Pb"
+DataType    = "Data" # "FSI-3 Simulation" / "Data" / "Mixed"
+Var         = "theta_vs_phi"
+Nbins       = 25
+XbMin       = 1.05
+cut         = ROOT.TCut()
+XbCut       = ROOT.TCut("%f <= Xb"%XbMin)
+dm          = TEG2dm()
 if len(sys.argv)>1:
     A   = int(sys.argv[1])
     ana = TAnalysisEG2("NoCTofDATA_%s"% dm.Target(A), XbCut )
 
 
 
-if len(sys.argv)>1 and DoDrawVar:
+if len(sys.argv)>1 and Operation == "Draw variable":
     c = ana.CreateCanvas(Var)
     cut = ROOT.TCut()
     if (Var=="XbMoving"):
@@ -50,7 +44,7 @@ if len(sys.argv)>1 and DoDrawVar:
     c.SaveAs(init.dirname()+"/%s"%dm.Target(A)+"_"+Var+".pdf")
 
 
-if DoCuts:
+if Operation == "Show SRC Cuts":
     cSRC = ana.CreateCanvas("SRCcuts","Divide",3,4 )
     
     ana.Draw1DVarAndCut(cSRC , 1 , "Xb"         , Nbins , 1     , 2.5
@@ -90,7 +84,7 @@ if DoCuts:
     cSRC.Update()
     wait()
 
-if DoCTOFsubtraction:
+elif Operation == "CTOF subtraction":
     cCTOF = ana.CreateCanvas( "cCTOF" )
 #    cut = ana.pppEdepCut 
     hCTOF23 = ana.H2( "pCTOF[1]"  ,  "pCTOF[2]"  , cut , "colz" , Nbins , -20   , 20  , Nbins , -20   , 20
@@ -100,16 +94,16 @@ if DoCTOFsubtraction:
     cCTOF.Update()
     wait()
 
-if DoCount_p_2p_3p:
+elif len(sys.argv)>1 and Operation == "count e,e'p/pp/ppp":
     ana.PrintInCuts()
 
-if DoGenCombinedFile:
+elif Operation == "combine 12C+27Al+56Fe+208Pb ":
     if ( int(input("re-create the merged file (all targets together): [0-no/ 1-yes]")) == 1 ):
         os.system("rm $DataMiningAnaFiles/Ana_C12_Al27_Fe56_Pb28.root")
         anaAll  = [TAnalysisEG2("NoCTofDATA_C12",XbCut) , TAnalysisEG2("NoCTofDATA_Al27",XbCut) , TAnalysisEG2("NoCTofDATA_Fe56",XbCut) , TAnalysisEG2("NoCTofDATA_Pb208",XbCut)]
         os.system("hadd $DataMiningAnaFiles/Ana_C12_Al27_Fe56_Pb28.root %s %s %s %s"%(anaAll[0].GetFileName() , anaAll[1].GetFileName() , anaAll[2].GetFileName() , anaAll[3].GetFileName() ))
 
-if DoMixEvents:
+elif Operation == "Mix 12C+27Al+56Fe+208Pb":
     scheme = TSchemeDATA()
     anaEG2 = TAnalysisEG2("C12_Al27_Fe56_Pb28",XbCut)
     if ( int(input("re-mix (all targets together): [0-no/ 1-yes]")) == 1 ):
@@ -123,7 +117,7 @@ if DoMixEvents:
         print 'done mixing....'
 
 
-if DoCombineTargets:
+elif Operation == "Draw stacked 12C+27Al+56Fe+208Pb":
     
     if DataType == "Data":
         anaDat = TAnalysisEG2("C12_Al27_Fe56_Pb28",XbCut)
