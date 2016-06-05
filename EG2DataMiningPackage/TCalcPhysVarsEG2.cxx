@@ -89,10 +89,10 @@ void TCalcPhysVarsEG2::InitOutputTree(){
 
     
     // Float_t branches
-    OutTree -> Branch("Bjorken x"           ,&Xb                    , "Xb/F");
+    OutTree -> Branch("Xb"           ,&Xb                    , "Xb/F");
     OutTree -> Branch("Bjorken x (moving p)",&XbMoving              , "XbMoving/F");
     OutTree -> Branch("Q2"                  ,&Q2                    , "Q2/F");
-    OutTree -> Branch("missing mass"        ,&Mmiss                 , "Mmiss/F");
+    OutTree -> Branch("Mmiss"               ,&Mmiss                 , "Mmiss/F");
     OutTree -> Branch("missing energy"      ,&Emiss                 , "Emiss/F");
     OutTree -> Branch("theta (pq)"          ,&theta_pq              , "theta_pq/F");
     OutTree -> Branch("p/q"                 ,&p_over_q              , "p_over_q/F");

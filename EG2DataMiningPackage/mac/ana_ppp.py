@@ -15,19 +15,18 @@ ROOT.gStyle.SetOptStat(0000)
 
 Operation   = "Draw stacked 12C+27Al+56Fe+208Pb"
 DataType    = "Data" # "FSI-3 Simulation" / "Data" / "Mixed"
-Var         = "theta_vs_phi"
-Nbins       = 25
+Var         = "phi"
+Nbins       = 50
 XbMin       = 1.05
 cut         = ROOT.TCut()
 XbCut       = ROOT.TCut("%f <= Xb"%XbMin)
 dm          = TEG2dm()
-if len(sys.argv)>1:
-    A   = int(sys.argv[1])
-    ana = TAnalysisEG2("NoCTofDATA_%s"% dm.Target(A), XbCut )
-
 
 
 if len(sys.argv)>1 and Operation == "Draw variable":
+    A   = int(sys.argv[1])
+    ana = TAnalysisEG2("NoCTofDATA_%s"% dm.Target(A), XbCut )
+    
     c = ana.CreateCanvas(Var)
     cut = ROOT.TCut()
     if (Var=="XbMoving"):
@@ -44,7 +43,7 @@ if len(sys.argv)>1 and Operation == "Draw variable":
     c.SaveAs(init.dirname()+"/%s"%dm.Target(A)+"_"+Var+".pdf")
 
 
-if Operation == "Show SRC Cuts":
+elif Operation == "Show SRC Cuts":
     cSRC = ana.CreateCanvas("SRCcuts","Divide",3,4 )
     
     ana.Draw1DVarAndCut(cSRC , 1 , "Xb"         , Nbins , 1     , 2.5
@@ -97,7 +96,7 @@ elif Operation == "CTOF subtraction":
 elif len(sys.argv)>1 and Operation == "count e,e'p/pp/ppp":
     ana.PrintInCuts()
 
-elif Operation == "combine 12C+27Al+56Fe+208Pb ":
+elif Operation == "combine 12C+27Al+56Fe+208Pb":
     if ( int(input("re-create the merged file (all targets together): [0-no/ 1-yes]")) == 1 ):
         os.system("rm $DataMiningAnaFiles/Ana_C12_Al27_Fe56_Pb28.root")
         anaAll  = [TAnalysisEG2("NoCTofDATA_C12",XbCut) , TAnalysisEG2("NoCTofDATA_Al27",XbCut) , TAnalysisEG2("NoCTofDATA_Fe56",XbCut) , TAnalysisEG2("NoCTofDATA_Pb208",XbCut)]
@@ -118,6 +117,11 @@ elif Operation == "Mix 12C+27Al+56Fe+208Pb":
 
 
 elif Operation == "Draw stacked 12C+27Al+56Fe+208Pb":
+
+    if len(sys.argv)>1:
+        Var     = sys.argv[1]
+    else:
+        Var     = "PmissTransversalLongitudinal"
     
     if DataType == "Data":
         anaDat = TAnalysisEG2("C12_Al27_Fe56_Pb28",XbCut)
@@ -134,6 +138,7 @@ elif Operation == "Draw stacked 12C+27Al+56Fe+208Pb":
 
     if (Var=="theta_vs_phi"):
         anaEG2[0].H2("fabs(phiMiss23)" , "thetaMiss23" , anaEG2[1] , "" , Nbins , 0 , 80 , Nbins , 80 , 180 , "","|#phi| [deg.]","#theta [deg.]",4,20,0.5)
+        anaEG2[0].H2("fabs(phiMiss23)" , "thetaMiss23" , ROOT.TCut("%s && Pcm.Mag()<2.802"%anaEG2[1]) , "same" , Nbins , 0 , 80 , Nbins , 80 , 180 , "","|#phi| [deg.]","#theta [deg.]",2,21,0.8)
         anaEG2[0].Box(0,155,15,180,1,0.1)
         evts = anaEG2[0].GetEntries(anaEG2[1])
         evtsErr = math.sqrt(evts)
@@ -144,7 +149,7 @@ elif Operation == "Draw stacked 12C+27Al+56Fe+208Pb":
         percentage = 100*(float(evts_in_box)/evts)
         percentageErr = percentage*math.sqrt( math.pow(evtsErr/evts,2) +  math.pow(evts_in_boxErr/evts_in_box,2))
         anaEG2[0].Text(20,160,"%d events (%.1f #pm %.1f %%)"%(evts_in_box , percentage , percentageErr))
-    
+
     
     elif (Var=="pMiss_p2_p3"):
         hp2 = anaEG2[0].H2("Pmiss.P()" , "protons[1].P()", anaEG2[1] ,"" , Nbins , 0.25 , 1.1 , Nbins , 0.25 , 1.1
@@ -169,20 +174,47 @@ elif Operation == "Draw stacked 12C+27Al+56Fe+208Pb":
 
         elif (Var=="Pmiss"):
             xAxis = ["Pmiss.P()" , 0.2 , 1.1 , "|#vec{p} (miss)| [GeV/c]"]
-
+        
         elif (Var=="Xb"):
             xAxis = [Var , 1 , 2, "Bjorken x"]
+        
+        elif (Var=="phi"):
+            xAxis = ["fabs(phiMiss23)" , 0 , 90, "|#phi| [deg.]"]
+        
+        elif (Var=="Mmiss"):
+            xAxis = ["Pcm.Mag()" , 1.5 , 5, "#sqrt{|p^{#mu}_{lead}+p^{#mu}_{2}+p^{#mu}_{3}-q^{#mu}|^{2}} [GeV/c ^{2}]"]
+        
+        
+        elif (Var=="Mmiss23"):
+            xAxis = ["Prec.Mag()" , 1.8 , 4.1, "#sqrt{|p^{#mu}_{2}+p^{#mu}_{3}|^{2}} [GeV/c ^{2}]"]
 
+        
         elif (Var=="XbMoving"):
             xAxis = [Var , 0 , 10, "Bjorken x' (moving nucleon)"]
-
-
+        
+        
         elif (Var=="opening_angle"):
             xAxis = [anaEG2.CosTheta("Pmiss.Vect()","Prec.Vect()") , -1 , 1, "cos (#theta)"]
+        
 
+        elif (Var=="MmissVsPmiss"):
+            xyAxes = ["Pcm.Mag()" , "Pmiss.P()" , -2 , 5 , 0 , 2 , "#sqrt{|p^{#mu}_{lead}+p^{#mu}_{2}+p^{#mu}_{3}-q^{#mu}|^{2}} [GeV/c ^{2}]" , "|p_{miss}| [GeV/c]" ]
+        
+        
+        elif (Var=="MmissVsXb"):
+            xyAxes = ["Pcm.Mag()" , "Xb" , -2 , 5 , 0 , 2 , "#sqrt{|p^{#mu}_{lead}+p^{#mu}_{2}+p^{#mu}_{3}-q^{#mu}|^{2}} [GeV/c ^{2}]" , "Bjorken x" ]
+            
 
-        anaEG2[0].H1(xAxis[0] , anaEG2[1] , "BAR E" , Nbins , xAxis[1] , xAxis[2] , "",xAxis[3])
-        anaEG2[0].H1(xAxis[0] , anaEG2[2] , "BAR E same" , Nbins , xAxis[1] , xAxis[2] , "",xAxis[3],"",1,1)
+        elif (Var=="PmissTransversalLongitudinal"):
+                xyAxes = ["Pcm.Pt()" , "Pcm.Pz()" , 0 , 1 , -1 , 1 , "|#vec{p} (miss)|-T [GeV/c]" , "|#vec{p} (miss)|-L [GeV/c]" ]
+        
+        if 'xAxis' in locals():
+            anaEG2[0].H1(xAxis[0] , anaEG2[1] , "hist" , Nbins , xAxis[1] , xAxis[2] , "" ,xAxis[3] , "" ,38)
+            anaEG2[0].H1(xAxis[0] , anaEG2[2] , "hist same" , Nbins , xAxis[1] , xAxis[2] , "" ,xAxis[3] , "" ,1,1)
+            
+        elif 'xyAxes' in locals():
+                
+            anaEG2[0].H2(xyAxes[0] , xyAxes[1], anaEG2[1] , "colz" , Nbins , xyAxes[2] , xyAxes[3], Nbins , xyAxes[4] , xyAxes[5] , "" ,xyAxes[6] , xyAxes[7] )
 
     c.Update()
     wait()
