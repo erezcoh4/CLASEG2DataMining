@@ -1,8 +1,13 @@
+import ROOT , os , sys
 from ROOT import TSchemeDATA
 from ROOT import TEG2dm
 
 # options are: "data" / "no ctof"
-A           = 27
+if len(sys.argv)>1:
+    A       = int(sys.argv[1])
+else:
+    print '\n run this script with: \n > python mac/scheme_ppp.py <target A> \n\n'
+    exit(0)
 DataType    = "no ctof"
 
 
@@ -29,7 +34,7 @@ DoScheme3pSRC   = False
 
 if DoSchemeSRC:
     
-    scheme.SRCPmissXb( 2 , 1.0 ) # target-type = 2, Bjorken x > 1.0
+    scheme.SRCPmissXb( 2 , 0.9 ) # target-type = 2, Bjorken x > 1.0
     print 'schemed for SRC in nuclear target (1 > p(miss) > 0.3 GeV/c) and Xb > 1.0'
 
 if DoScheme3pSRC:

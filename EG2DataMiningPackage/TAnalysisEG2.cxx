@@ -24,9 +24,11 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     
     cutXb       = XbCut;
     cutPmiss    = "0.3 < Pmiss.P() && Pmiss.P() < 1.0";
+    cutPmT      = "Pmiss.Pt() < 0.4";
     cutThetaPQ  = "theta_pq < 25";
     cutPoverQ   = "0.62 < p_over_q && p_over_q < 0.96";
     
+    cutSRCNoPm  = cutXb && cutThetaPQ && cutPoverQ ;
     cutSRC      = cutXb && cutThetaPQ && cutPoverQ && cutPmiss;
     cut1pSRC    = cutXb && cutThetaPQ && cutPoverQ && cutPmiss && "Np==1";
     
@@ -39,10 +41,15 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     pppCTOFCut  = "pCTOFCut[0] && pCTOFCut[1] && pCTOFCut[2]";
 
     
+    
+    // (e,e'p) in our cuts
+    eepFinalCut = cutXb && cutThetaPQ && cutPoverQ && cutPmiss && cutPmT;
+    
+    
+    
     // 2p-SRC following Or Hen' cuts
     cutPlead    = "-24.5 < pVertex[0].Z() && pVertex[0].Z() < -20";
     cutPrec     = "0.35 < Prec.P()  &&  (-24.5 < pVertex[1].Z() && pVertex[1].Z() < -20)";
-
     ppSRCCut    = cutSRC && " 2 <= Np" && cutPlead && cutPrec;
     
     
@@ -52,15 +59,18 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     cutP1       = "(-27 < pVertex[1].Z() && pVertex[1].Z() < -20)";
     cutP2       = "0.3 < protons[1].P() && (-27 < pVertex[1].Z() && pVertex[1].Z() < -20)";
     cutP3       = "0.3 < protons[2].P() && (-27 < pVertex[2].Z() && pVertex[2].Z() < -20)";
-    cutMmiss    = "Pcm.Mag() < 2.802"; // lower than 3He mass
-
+    cutMmiss    = "Pcm.Mag() < 3*0.938";
     cutAngles2p = Form("%s > 150", TPlots::Theta("Pmiss.Vect()","Prec.Vect()").Data());
     cutAngles3p = "thetaMiss23 > 155 && fabs(phiMiss23) < 15";
     
     
     // pID from ∆E (dep.) in TOF scintillators
-    pppSRCCut   = cutSRC && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut;
-    pppSRCMmiss = pppSRCCut && cutMmiss;
+    pppRandomBkg= cutSRC && cutPmT && " 3 <= Np" && cutP1 && cutP2 && cutP3 && !pppEdepCut && !pppCTOFCut;
+    pppCut      = cutSRC && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut;
+    pppCutPmT   = pppCut && cutPmT;
+    pppCutPmTMm = pppCutPmT && cutMmiss;
+    pppSRCCut   = cutSRC && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut && cutPmT && cutMmiss;
+//    pppSRCMmiss = pppSRCCut && cutMmiss;
     Final3pCut  = pppSRCMmiss && cutAngles3p;
     
     
@@ -68,10 +78,12 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     Sim3pSRCCut = cutSRC && " 3 <= Np" && "0.3 < protons[1].P() && 0.3 < protons[2].P()";
     FinalSim3pSRCCut = Sim3pSRCCut && cutAngles3p;
 
-    
+
     // For mixed 3p...
-    Mix3pSRCCut = ""; // mixed, by definition, passes all kinematics cuts (mixed from pppSRC cuts...)
-    FinalMix3pSRCCut = Mix3pSRCCut && cutAngles3p;
+    Mix3pSRCCut     = ""; // mixed, by definition, passes all (e,e'p) kinematical cuts (mixed from pppSRC cuts...)
+    Mix3pPmT        = cutPmT ; // mixed, by definition, passes all (e,e'p) kinematical cuts (mixed from pppSRC cuts...)
+    Mix3pPmTMm      = cutPmT && cutMmiss; // mixed, by definition, passes all (e,e'p) kinematical cuts (mixed from pppSRC cuts...)
+    FinalMix3pSRCCut= Mix3pPmTMm && cutAngles3p;
     
 
 }
@@ -141,19 +153,19 @@ vector<Float_t> TAnalysisEG2::GetPcmEntry(int entry){
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 vector<Float_t> TAnalysisEG2::GetGSIMEvt(int entry, bool DoPrint){
-
+    
     TLorentzVector * e = 0 ,*Pmiss = 0;
     vector <TLorentzVector> * p = 0;
     Tree -> SetBranchAddress("e"        , &e);
     Tree -> SetBranchAddress("Pmiss"    , &Pmiss);
     Tree -> SetBranchAddress("protons"  , &p);
-
+    
     Tree -> GetEntry(entry);
-
+    
     TLorentzVector  Beam(0,0,5.009,5.009) , q = Beam - *e , pLead = *Pmiss + q;
     vector<Float_t> res;
     res.push_back(4);
-
+    
     // electron
     res.push_back(11);
     res.push_back(e->Px()/e->P());
@@ -163,7 +175,7 @@ vector<Float_t> TAnalysisEG2::GetGSIMEvt(int entry, bool DoPrint){
     res.push_back(Me);
     res.push_back(-1);
     for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
- 
+    
     // 3 protons
     for (int j = 0; j < 3; j++) {
         
@@ -175,8 +187,71 @@ vector<Float_t> TAnalysisEG2::GetGSIMEvt(int entry, bool DoPrint){
         res.push_back(Mp);
         res.push_back(1);
         for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
-
+        
     }
+    
+    if (DoPrint) {
+        
+        SHOWTLorentzVector(pLead);
+        SHOWTLorentzVector(q);
+        TLorentzVector Pm = *Pmiss;
+        SHOWTLorentzVector(Pm);
+        vector <TLorentzVector> protons = *p;
+        SHOWvectorTLorentzVector(protons);
+        PrintLine();
+        
+    }
+    return res;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+vector<Float_t> TAnalysisEG2::GetGSIMeep_pp_Evt(int entry, bool DoPrint){
+    // take p(miss) from real data, and generate two uniformly-distributed random protons
+    
+    TLorentzVector * e = 0 ,*Pmiss = 0;
+    vector <TLorentzVector> * p = 0;
+    Tree -> SetBranchAddress("e"        , &e);
+    Tree -> SetBranchAddress("Pmiss"    , &Pmiss);
+    Tree -> SetBranchAddress("protons"  , &p);
+    
+    Tree -> GetEntry(entry);
+    
+    TLorentzVector  Beam(0,0,5.009,5.009) , q = Beam - *e ;
+    vector<Float_t> res;
+    res.push_back(4);
+    
+    // electron
+    res.push_back(11);
+    res.push_back(e->Px()/e->P());
+    res.push_back(e->Py()/e->P());
+    res.push_back(e->Pz()/e->P());
+    res.push_back(e->P());
+    res.push_back(Me);
+    res.push_back(-1);
+    for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
+
+    // generate two random (recoiling) protons with uniform momenta 0.3-0.7 and uniform angular distribution
+    Pp = rand.Uniform( 0.3 , 0.7 );
+    
+    rand.Sphere(Px,Py,Pz,Pp);
+    p->at(1).SetVectM( TVector3(Px , Py , Pz) , Mp);
+    
+    rand.Sphere(Px,Py,Pz,Pp);
+    p->at(2).SetVectM( Px , Py , Pz , Mp);
+    
+    // 3 protons
+    for (int j = 0; j < 3; j++) {
+            
+            res.push_back(2212);
+            res.push_back(p->at(j).Px()/p->at(j).P());
+            res.push_back(p->at(j).Py()/p->at(j).P());
+            res.push_back(p->at(j).Pz()/p->at(j).P());
+            res.push_back(p->at(j).P());
+            res.push_back(Mp);
+            res.push_back(1);
+            for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
+            
+        }
     if (DoPrint) {
         
         SHOWTLorentzVector(pLead);
@@ -196,7 +271,7 @@ vector<Float_t> TAnalysisEG2::GetGSIMEvt(int entry, bool DoPrint){
 void TAnalysisEG2::MixEvents(TTree * OutTree, bool DoPrint){
     int Np;
     Float_t         thetaMiss23 , phiMiss23 ;
-    TLorentzVector  *Pm = 0     , *q4 = 0   , Pmiss , q;
+    TLorentzVector  *Pm = 0     , *q4 = 0   , Pmiss , q , Pcm , Prec;
     vector <TLorentzVector> * p = 0 , protons;
     Tree -> SetBranchAddress("q"        , &q4);
     Tree -> SetBranchAddress("Pmiss"    , &Pm);
@@ -204,6 +279,8 @@ void TAnalysisEG2::MixEvents(TTree * OutTree, bool DoPrint){
     Tree -> SetBranchAddress("Np"       , &Np);
     int N = Tree->GetEntries()*(Tree->GetEntries()-1)*(Tree->GetEntries()-2);
     OutTree -> Branch("q"               ,"q"                    ,&q);
+    OutTree -> Branch("Pcm"             ,"TLorentzVector"       ,&Pcm);
+    OutTree -> Branch("Prec"            ,"TLorentzVector"       ,&Prec);
     OutTree -> Branch("Pmiss"           ,"TLorentzVector"       ,&Pmiss);
     OutTree -> Branch("protons"         ,&protons);             // std::vector<TLorentzVector>
     OutTree -> Branch("theta p(miss)-p2 p3" ,&thetaMiss23           , "thetaMiss23/F");
@@ -228,6 +305,8 @@ void TAnalysisEG2::MixEvents(TTree * OutTree, bool DoPrint){
                         Tree -> GetEntry(i3);
                         protons.push_back(p->at(2));
                         
+                        Pcm  = Pmiss + protons.at(1) + protons.at(2);
+                        Prec = protons.at(1) + protons.at(2);
                         thetaMiss23 = r2d*Pmiss.Vect().Angle((p->at(1)+p->at(2)).Vect());
                         phiMiss23   = 90 - r2d*( Pmiss.Vect().Angle(protons.at(1).Vect().Cross(protons.at(2).Vect()).Unit()) );
                         
@@ -237,6 +316,7 @@ void TAnalysisEG2::MixEvents(TTree * OutTree, bool DoPrint){
                         if (DoPrint) {
                             SHOWTLorentzVector(q);
                             SHOWTLorentzVector(Pmiss);
+                            SHOWTLorentzVector(Pcm);
                             SHOWvectorTLorentzVector(protons);
                             PrintLine();
                         }
