@@ -118,6 +118,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("Plead"               ,"TLorentzVector"       ,&Plead);
     OutTree -> Branch("Prec"                ,"TLorentzVector"       ,&Prec);
     OutTree -> Branch("q"                   ,"TLorentzVector"       ,&q);
+    OutTree -> Branch("e"                   ,"TLorentzVector"       ,&e);
     OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
 
     

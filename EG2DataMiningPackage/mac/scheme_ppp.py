@@ -34,8 +34,8 @@ DoScheme3pSRC   = False
 
 if DoSchemeSRC:
     
-    scheme.SRCPmissXb( 2 , 0.9 ) # target-type = 2, Bjorken x > 1.0
-    print 'schemed for SRC in nuclear target (1 > p(miss) > 0.3 GeV/c) and Xb > 1.0'
+    scheme.SRCPmissXb( 2 , 0.9 ) # target-type = 2, Bjorken x > 0.9
+    print 'schemed for SRC in nuclear target (1 > p(miss) > 0.3 GeV/c) and Xb > 0.9'
 
 if DoScheme3pSRC:
     

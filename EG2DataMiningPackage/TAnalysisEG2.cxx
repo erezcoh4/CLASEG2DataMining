@@ -209,14 +209,32 @@ vector<Float_t> TAnalysisEG2::GetGSIMeep_pp_Evt(int entry, bool DoPrint){
     // take p(miss) from real data, and generate two uniformly-distributed random protons
     
     TLorentzVector * e = 0 ,*Pmiss = 0;
-    vector <TLorentzVector> * p = 0;
+    Float_t Mmiss = 0;
+    vector <TLorentzVector> *p = 0 , protons ;
     Tree -> SetBranchAddress("e"        , &e);
     Tree -> SetBranchAddress("Pmiss"    , &Pmiss);
     Tree -> SetBranchAddress("protons"  , &p);
     
     Tree -> GetEntry(entry);
     
-    TLorentzVector  Beam(0,0,5.009,5.009) , q = Beam - *e ;
+    TLorentzVector  Beam(0,0,5.009,5.009) , q = Beam - *e , pLead = *Pmiss + q ;
+    // take the first proton from the data
+    protons.push_back( p->at(0) );
+    
+    // generate two random (recoiling) protons with uniform momenta 0.3-0.7 and uniform angular distribution
+    Pp = rand.Uniform( 0.3 , 0.7 );
+    rand.Sphere(Px,Py,Pz,Pp);
+    protons.push_back(TLorentzVector( Px , Py , Pz , sqrt(Pp*Pp + Mp*Mp) ));
+    
+    Pp = rand.Uniform( 0.3 , 0.7 );
+    rand.Sphere(Px,Py,Pz,Pp);
+    protons.emplace_back( Px , Py , Pz , sqrt(Pp*Pp + Mp*Mp) );
+    
+    Mmiss = (*Pmiss + protons[1] + protons[2]).Mag();
+
+    
+    
+    
     vector<Float_t> res;
     res.push_back(4);
     
@@ -229,40 +247,33 @@ vector<Float_t> TAnalysisEG2::GetGSIMeep_pp_Evt(int entry, bool DoPrint){
     res.push_back(Me);
     res.push_back(-1);
     for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
-
-    // generate two random (recoiling) protons with uniform momenta 0.3-0.7 and uniform angular distribution
-    Pp = rand.Uniform( 0.3 , 0.7 );
     
-    rand.Sphere(Px,Py,Pz,Pp);
-    p->at(1).SetVectM( TVector3(Px , Py , Pz) , Mp);
-    
-    rand.Sphere(Px,Py,Pz,Pp);
-    p->at(2).SetVectM( Px , Py , Pz , Mp);
     
     // 3 protons
     for (int j = 0; j < 3; j++) {
-            
-            res.push_back(2212);
-            res.push_back(p->at(j).Px()/p->at(j).P());
-            res.push_back(p->at(j).Py()/p->at(j).P());
-            res.push_back(p->at(j).Pz()/p->at(j).P());
-            res.push_back(p->at(j).P());
-            res.push_back(Mp);
-            res.push_back(1);
-            for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
-            
-        }
+        
+        res.push_back(2212);
+        res.push_back(protons.at(j).Px()/protons.at(j).P());
+        res.push_back(protons.at(j).Py()/protons.at(j).P());
+        res.push_back(protons.at(j).Pz()/protons.at(j).P());
+        res.push_back(protons.at(j).P());
+        res.push_back(Mp);
+        res.push_back(1);
+        for (int i = 0 ; i < 4 ; i++ ) res.push_back(0);
+        
+    }
     if (DoPrint) {
         
-        SHOWTLorentzVector(pLead);
-        SHOWTLorentzVector(q);
-        TLorentzVector Pm = *Pmiss;
-        SHOWTLorentzVector(Pm);
-        vector <TLorentzVector> protons = *p;
+        SHOW(entry);
         SHOWvectorTLorentzVector(protons);
+        SHOW(Mmiss);
         PrintLine();
         
     }
+    res.push_back(Pp);
+    res.push_back(Mmiss);
+
+    protons.clear();
     return res;
 }
 

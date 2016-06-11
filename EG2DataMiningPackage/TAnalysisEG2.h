@@ -28,10 +28,11 @@ class TAnalysisEG2 : public TPlots , public TAnalysis , public TEG2dm{
 public:
 
     
-    
+    TRandom3 rand;
     TString Path , InFileName;
     TFile * InFile;
     TTree * Tree;
+    Double_t Pp , Px , Py , Pz;
     
     /// Default constructor
     TAnalysisEG2 (){    SetSRCCuts();   }

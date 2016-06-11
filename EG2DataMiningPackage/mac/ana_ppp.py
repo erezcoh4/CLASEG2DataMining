@@ -21,6 +21,7 @@ XbMin       = 1.05
 cut         = ROOT.TCut()
 XbCut       = ROOT.TCut("%f <= Xb"%XbMin)
 dm          = TEG2dm()
+Path        = "/Users/erezcohen/Desktop/DataMining/AnaFiles"
 
 
 # ------------------------------------------------------------------ #
@@ -337,16 +338,31 @@ elif Operation == "elastic scattering x=1":
 # ------------------------------------------------------------------ #
 elif Operation == "generate (e,e'p)+pp for GSIM":
     ana     = TAnalysisEG2("C12_Al27_Fe56_Pb28",XbCut)
+    h = ROOT.TH2F("hMmiss","M(miss), recoiling protons momenta 0.3-0.5 GeV/c ; recoiling protons generated momentum [GeV/c] ; M(miss) [GeV/c ^{2}]",100,0.25,0.75,100,0,8)
     outfile = open(Path+"/eep_pp_events.txt", "wb")
-    for i in range(0,ana.GetEntries(ROOT.TCut())):
-        evt = ana.GetGSIMeepEvt(i,False)
-        outfile.write("%d\n" % evt.at(0))
-        for j in range(0,4):
-            outfile.write("%d  %f  %f  %f  %f \n" % (evt.at(1+11*j) , evt.at(2+11*j) , evt.at(3+11*j) , evt.at(4+11*j), evt.at(5+11*j)))
-            outfile.write("%f  %d \n" % (evt.at(6+11*j) , evt.at(7+11*j)))
-            outfile.write("%d  %d  %d  %d  %d \n" % (evt.at(8+11*j) , evt.at(9+11*j) , evt.at(10+11*j) , evt.at(11+11*j) , evt.at(11+11*j)))
+    for i in range(0,int(1.*ana.GetEntries(ana.eepFinalCut))): # eepFinalCut = cutXb && cutThetaPQ && cutPoverQ && cutPmiss && cutPmT
+        if (i%1000==0):
+            print "[%.2f%%]"%(100.*i/ana.GetEntries(ana.eepFinalCut))
+        for j in range (0,10): # for each (e,e'p) event generate 10 (e,e'ppp) events
+            evt = ana.GetGSIMeep_pp_Evt(i,False)
+            rec_2p_momentum = evt.at(evt.size()-2)
+            Mmiss = evt.at(evt.size()-1)
+            h.Fill(rec_2p_momentum,Mmiss)
+            if Mmiss<(3.*0.938): # consider only events which crossed the Mmiss cut (?)
+                outfile.write("%d\n" % evt.at(0))
+                for j in range(0,4):
+                    outfile.write("%d  %f  %f  %f  %f \n" % (evt.at(1+11*j) , evt.at(2+11*j) , evt.at(3+11*j) , evt.at(4+11*j), evt.at(5+11*j)))
+                    outfile.write("%f  %d \n" % (evt.at(6+11*j) , evt.at(7+11*j)))
+                    outfile.write("%d  %d  %d  %d  %d \n" % (evt.at(8+11*j) , evt.at(9+11*j) , evt.at(10+11*j) , evt.at(11+11*j) , evt.at(11+11*j)))
     outfile.close()
     print "\ndone writing %d events to "%ana.GetEntries(ROOT.TCut()) + outfile.name
+    c = ana.CreateCanvas("Mmiss")
+    h.Draw("colz")
+    ana.Line(0.25,2.814,0.75,2.814,2,3)
+    c.Update()
+    wait()
+    c.SaveAs(init.dirname()+"/Mmiss_eep_pp.pdf")
+
 
 
 
