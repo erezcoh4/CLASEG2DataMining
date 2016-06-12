@@ -11,12 +11,12 @@ init.createnewdir()
 ROOT.gStyle.SetOptStat(0000)
 
 
-# "Draw variable"/ "Show SRC Cuts" / "CTOF subtraction" / "count e,e'p/pp/ppp"  / "combine 12C+27Al+56Fe+208Pb "/ "Mix 12C+27Al+56Fe+208Pb" / "Draw 12C+27Al+56Fe+208Pb" / "elastic scattering x=1" / "DataVsMix" / "generate (e,e'p)+pp for GSIM"
+# "Draw variable"/ "Show SRC Cuts" / "CTOF subtraction" / "count e,e'p/pp/ppp"  / "combine targets"/ "Mix events" / "Draw" / "elastic x=1" / "DataVsMix" / "generate (e,e'p)+pp for GSIM"
 
 Operation   = "generate (e,e'p)+pp for GSIM"
-DataType    = "Data" # "FSI-3 Simulation" / "Data" / "Mixed" / "RandomBkg"
+DataType    = "Data" # "FSI-3 Simulation" / "Data" / "NoPhysics3p" / "Mixed" / "RandomBkg"
 Var         = sys.argv[1] if len(sys.argv)>1 else "Xb"
-Nbins       = 1000
+Nbins       = 40
 XbMin       = 1.05
 cut         = ROOT.TCut()
 XbCut       = ROOT.TCut("%f <= Xb"%XbMin)
@@ -105,7 +105,7 @@ elif len(sys.argv)>1 and Operation == "count e,e'p/pp/ppp":
 # ------------------------------------------------------------------ #
 
 # ------------------------------------------------------------------ #
-elif Operation == "combine 12C+27Al+56Fe+208Pb":
+elif Operation == "combine targets":
     if ( int(input("re-create the merged file (all targets together): [0-no/ 1-yes]")) == 1 ):
         os.system("rm $DataMiningAnaFiles/Ana_C12_Al27_Fe56_Pb28.root")
         anaAll  = [TAnalysisEG2("NoCTofDATA_C12",XbCut) , TAnalysisEG2("NoCTofDATA_Al27",XbCut) , TAnalysisEG2("NoCTofDATA_Fe56",XbCut) , TAnalysisEG2("NoCTofDATA_Pb208",XbCut)]
@@ -113,7 +113,7 @@ elif Operation == "combine 12C+27Al+56Fe+208Pb":
 # ------------------------------------------------------------------ #
 
 # ------------------------------------------------------------------ #
-elif Operation == "Mix 12C+27Al+56Fe+208Pb":
+elif Operation == "Mix events":
     scheme = TSchemeDATA()
     anaEG2 = TAnalysisEG2("C12_Al27_Fe56_Pb28",XbCut)
     if ( int(input("re-mix (all targets together): [0-no/ 1-yes]")) == 1 ):
@@ -128,15 +128,18 @@ elif Operation == "Mix 12C+27Al+56Fe+208Pb":
 # ------------------------------------------------------------------ #
 
 # ------------------------------------------------------------------ #
-elif Operation == "Draw 12C+27Al+56Fe+208Pb":
+elif Operation == "Draw":
 
 
     if DataType == "Data":
         anaDat = TAnalysisEG2("C12_Al27_Fe56_Pb28",XbCut)
-        anaEG2 = [anaDat , anaDat.pppCutPmTMm , anaDat.Final3pCut]
-    elif DataType == "FSI-3 Simulation":
+        anaEG2 = [anaDat , anaDat.pppCutPmTMm , anaDat.Final3pCut] 
+    elif DataType == "FSI3_Simulation":
         anaSim = TAnalysisEG2("GSIM_run0088_eep",XbCut)
         anaEG2 = [anaSim , anaSim.Sim3pSRCCut , anaSim.FinalSim3pSRCCut]
+    elif DataType == "NoPhysics3p":
+        anaGSM = TAnalysisEG2("GSIM_run0089_eep",XbCut)
+        anaEG2 = [anaGSM , anaGSM.Sim3pSRCCut , anaGSM.FinalSim3pSRCCut]
     elif DataType == "Mixed":
         anaMix = TAnalysisEG2("Mixed_C12_Al27_Fe56_Pb28",XbCut)
         anaEG2 = [anaMix , anaMix.Mix3pSRCCut , anaMix.FinalMix3pSRCCut]
@@ -145,21 +148,6 @@ elif Operation == "Draw 12C+27Al+56Fe+208Pb":
         anaEG2 = [anaDat , anaDat.pppRandomBkg , anaDat.Final3pCut]
 
     c = anaEG2[0].CreateCanvas(DataType)
-
-
-#    if (Var=="theta_vs_phi"):
-#        anaEG2[0].H2("fabs(phiMiss23)" , "thetaMiss23" , anaEG2[1] , "" , Nbins , 0 , 80 , Nbins , 80 , 180 , "","|#phi| [deg.]","#theta [deg.]",2,21,1,1)
-#        anaEG2[0].H2("fabs(phiMiss23)" , "thetaMiss23" , ROOT.TCut("%s && Pcm.Mag()<2.802"%anaEG2[1]) , "same" , Nbins , 0 , 80 , Nbins , 80 , 180 , "","|#phi| [deg.]","#theta [deg.]",2,21,0.8)
-#        anaEG2[0].Box(0,155,15,180,1,0.1)
-#        evts = anaEG2[0].GetEntries(anaEG2[1])
-#        evtsErr = math.sqrt(evts)
-#        print "%d +/- %d events"%(evts,evtsErr)
-#        evts_in_box = anaEG2[0].GetEntries(anaEG2[2])
-#        evts_in_boxErr = math.sqrt(evts_in_box)
-#        print "%d +/- %d events in box"%(evts_in_box,evts_in_boxErr)
-#        percentage = 100*(float(evts_in_box)/evts)
-#        percentageErr = percentage*math.sqrt( math.pow(evtsErr/evts,2) +  math.pow(evts_in_boxErr/evts_in_box,2))
-#        anaEG2[0].Text(20,160,"%d events (%.1f #pm %.1f %%)"%(evts_in_box , percentage , percentageErr))
 
 
     if (Var=="pMiss_p2_p3"):
@@ -175,7 +163,6 @@ elif Operation == "Draw 12C+27Al+56Fe+208Pb":
         anaEG2[0].Dalitz("protons[1].P()","protons[2].P()","Pmiss.P()",anaEG2[2],1000,-1.7,1.7,1000,-1.1,2,"p_{2}","p_{3}","p_{miss}","same",4,True)
 
 
-
     else:
         if (Var=="Pcm"):
             xAxis = ["Pcm.P()" , 0 , 1.4, "| #vec{p} (c.m.) | [GeV/c]"]
@@ -183,7 +170,9 @@ elif Operation == "Draw 12C+27Al+56Fe+208Pb":
         elif (Var=="theta_Pcm_q"):
             xAxis = [anaEG2[0].Theta("Pcm.Vect()","q.Vect()") , 0 , 360 , "#theta(q,p(c.m.)) [deg.]"]
         
-
+        elif (Var=="Np"):
+            xAxis = [Var , 0 , 4 , "numebr of reconstruncted protons"]
+            anaEG2[1] = ROOT.TCut("100./%f"%anaEG2[0].GetEntries())
 
         elif (Var=="Tp" or Var=="TpMiss"):
             xAxis = [Var , 0 , 2 , "T(p) [GeV]"]
@@ -201,8 +190,9 @@ elif Operation == "Draw 12C+27Al+56Fe+208Pb":
             xAxis = ["Pmiss.Pt()*Pmiss.Pt()" , 0.0 , 3. , "(#vec{p} (miss) _{#perp})^{2} [GeV/c]"]
         
         elif (Var=="Xb"):
-            xAxis = [Var , 1 , 2, "Bjorken x"]
-        
+            xAxis = [Var , 0.9 , 2, "Bjorken x"]
+            anaEG2[1] = anaEG2[0].eepFinalCut
+
         elif (Var=="phi"):
             xAxis = ["fabs(phiMiss23)" , 0 , 90, "|#phi| [deg.]"]
         
@@ -257,8 +247,8 @@ elif Operation == "Draw 12C+27Al+56Fe+208Pb":
 
         elif 'xyAxes' in locals():
                 
-            anaEG2[0].H2(xyAxes[0] , xyAxes[1], anaEG2[1] , "" , Nbins , xyAxes[2] , xyAxes[3], Nbins , xyAxes[4] , xyAxes[5] , "" ,xyAxes[6] , xyAxes[7] , 1, 20 , 2 )
-            anaEG2[0].H2(xyAxes[0] , xyAxes[1], ROOT.TCut("%s && Pcm.P()<0.3"%anaEG2[1]) , "same" , Nbins , xyAxes[2] , xyAxes[3], Nbins , xyAxes[4] , xyAxes[5] , "" ,xyAxes[6] , xyAxes[7] , 4, 21 , 2 )
+            anaEG2[0].H2(xyAxes[0] , xyAxes[1], anaEG2[1] , "" , Nbins , xyAxes[2] , xyAxes[3], Nbins , xyAxes[4] , xyAxes[5] , "" ,xyAxes[6] , xyAxes[7] , 1, 20 , 3 )
+#            anaEG2[0].H2(xyAxes[0] , xyAxes[1], ROOT.TCut("%s && Pcm.P()<0.3"%anaEG2[1]) , "same" , Nbins , xyAxes[2] , xyAxes[3], Nbins , xyAxes[4] , xyAxes[5] , "" ,xyAxes[6] , xyAxes[7] , 4, 21 , 2 )
 
     c.Update()
     wait()
@@ -291,7 +281,7 @@ elif Operation == "DataVsMix":
 # ------------------------------------------------------------------ #
 
 # ------------------------------------------------------------------ #
-elif Operation == "elastic scattering x=1":
+elif Operation == "elastic x=1":
     
     XbCut   = ROOT.TCut("0.95 < Xb && Xb < 1.05")
 #    XbCut   = ROOT.TCut("1.05 < Xb")
@@ -338,11 +328,16 @@ elif Operation == "elastic scattering x=1":
 # ------------------------------------------------------------------ #
 elif Operation == "generate (e,e'p)+pp for GSIM":
     ana     = TAnalysisEG2("C12_Al27_Fe56_Pb28",XbCut)
-    h = ROOT.TH2F("hMmiss","M(miss), recoiling protons momenta 0.3-0.5 GeV/c ; recoiling protons generated momentum [GeV/c] ; M(miss) [GeV/c ^{2}]",100,0.25,0.75,100,0,8)
+    scheme  = TSchemeDATA()
+    scheme.SchemeOnTCut( Path, "Ana_C12_Al27_Fe56_Pb28.root", "anaTree", "Ana_C12_Al27_Fe56_Pb28_eep.root", ana.eepFinalCut)
+    ana     = TAnalysisEG2("C12_Al27_Fe56_Pb28_eep",XbCut)
     outfile = open(Path+"/eep_pp_events.txt", "wb")
-    for i in range(0,int(1.*ana.GetEntries(ana.eepFinalCut))): # eepFinalCut = cutXb && cutThetaPQ && cutPoverQ && cutPmiss && cutPmT
+    h = ROOT.TH2F("hMmiss","M(miss), recoiling protons momenta 0.3-0.5 GeV/c ; recoiling protons generated momentum [GeV/c] ; M(miss) [GeV/c ^{2}]",100,0.25,0.75,100,0,8)
+
+    
+    for i in range(0,int(1.*ana.GetEntries())): # eepFinalCut = cutXb && cutThetaPQ && cutPoverQ && cutPmiss && cutPmT
         if (i%1000==0):
-            print "[%.2f%%]"%(100.*i/ana.GetEntries(ana.eepFinalCut))
+            print "[%.2f%%]"%(100.*i/ana.GetEntries())
         for j in range (0,10): # for each (e,e'p) event generate 10 (e,e'ppp) events
             evt = ana.GetGSIMeep_pp_Evt(i,False)
             rec_2p_momentum = evt.at(evt.size()-2)
@@ -362,6 +357,7 @@ elif Operation == "generate (e,e'p)+pp for GSIM":
     c.Update()
     wait()
     c.SaveAs(init.dirname()+"/Mmiss_eep_pp.pdf")
+# ------------------------------------------------------------------ #
 
 
 

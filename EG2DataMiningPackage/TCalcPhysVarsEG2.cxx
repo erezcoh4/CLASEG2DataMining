@@ -190,7 +190,6 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     Q2 = -q.Mag2();
     
     
-   
     // get protons - energy loss correction and Coulomb corrections
     for (int i = 0 ; i < Np ; i++ ){
 
@@ -236,7 +235,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     // c.m. momentum
     Pcm         = -q;
     
-    
+
     
     // A(e,e'p)X missing energy
     Mrec        = mA - Np * Mp;            // taking out the 1 proton off the initial target
@@ -259,12 +258,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     // Bjorken scaling for a moving nucleon
     XbMoving    = Q2 / ( Wtilde.Mag2() + Q2 - Mp2  ); // = Q2 / 2pq [Q2 / ( 2. * (Pmiss * q) )]
-    SHOWTLorentzVector(Wtilde);
-    SHOW(Wtilde.Mag2());
-    SHOW(Mp2);
-    SHOW(Xb);
-    SHOW(XbMoving);
-
+ 
 
     // if we have 3 protons, randomize protons 2 and 3
     if (Np==3) {
