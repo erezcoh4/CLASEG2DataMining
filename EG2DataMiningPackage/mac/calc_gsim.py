@@ -31,7 +31,7 @@ calc        = TCalcPhysVarsEG2( InTree , OutTree , A , DataType , "q(z) - Pmiss(
 for entry in range(0, (int)(1.*Nentries)):
     
     calc.ComputePhysVars( entry );
-    if (calc.Np >= 3):
+    if (calc.Np >= 13):
         calc.PrintData( entry );
 
 

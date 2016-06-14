@@ -48,6 +48,7 @@ public:
     TString                    Target ( int );
     TString            TargetAsString ( int, float *mA = 0 , float *CoulombDeltaE = 0);
     void           RotVec2_q_Pm_Frame ( TVector3* , float , float , float);
+    void       RotVec_from_q_Pm_Frame ( TVector3* , float , float , float);
     void           RotVec2_Pm_q_Frame ( TVector3* , float , float , float);
 
     Float_t                LCfraction ( TLorentzVector , Float_t );

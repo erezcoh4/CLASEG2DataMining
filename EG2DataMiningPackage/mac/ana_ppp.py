@@ -3,6 +3,7 @@
 
 import ROOT
 import os, sys , math
+import os.path
 from ROOT import TEG2dm , TPlots , TAnalysisEG2 , TSchemeDATA
 from rootpy.interactive import wait
 sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
@@ -11,16 +12,17 @@ init.createnewdir()
 ROOT.gStyle.SetOptStat(0000)
 
 
-# "Draw variable"/ "Show SRC Cuts" / "CTOF subtraction" / "count e,e'p/pp/ppp"  / "combine targets"/ "Mix events" / "Draw" / "elastic x=1" / "DataVsMix" / "generate (e,e'p)+pp for GSIM"
+# "Draw variable"/ "Show SRC Cuts" / "CTOF subtraction" / "count e,e'p/pp/ppp"  / "combine targets"/ "Mix events" / "Draw" / "elastic x=1" / "DataVsMix" / "generate (e,e'p)+pp for GSIM" / "3p events for random forest"
 
-Operation   = "generate (e,e'p)+pp for GSIM"
-DataType    = "Data" # "FSI-3 Simulation" / "Data" / "NoPhysics3p" / "Mixed" / "RandomBkg"
+Operation   = "3p events for random forest"
+DataType    = "NoPhysics3p" # "FSI-3 Simulation" / "Data" / "NoPhysics3p" / "Mixed" / "RandomBkg"
 Var         = sys.argv[1] if len(sys.argv)>1 else "Xb"
 Nbins       = 40
 XbMin       = 1.05
 cut         = ROOT.TCut()
 XbCut       = ROOT.TCut("%f <= Xb"%XbMin)
 dm          = TEG2dm()
+scheme      = TSchemeDATA()
 Path        = "/Users/erezcohen/Desktop/DataMining/AnaFiles"
 
 
@@ -138,7 +140,7 @@ elif Operation == "Draw":
         anaSim = TAnalysisEG2("GSIM_run0088_eep",XbCut)
         anaEG2 = [anaSim , anaSim.Sim3pSRCCut , anaSim.FinalSim3pSRCCut]
     elif DataType == "NoPhysics3p":
-        anaGSM = TAnalysisEG2("GSIM_run0089_eep",XbCut)
+        anaGSM = TAnalysisEG2("GSIM_run0091_eep",XbCut)
         anaEG2 = [anaGSM , anaGSM.Sim3pSRCCut , anaGSM.FinalSim3pSRCCut]
     elif DataType == "Mixed":
         anaMix = TAnalysisEG2("Mixed_C12_Al27_Fe56_Pb28",XbCut)
@@ -328,14 +330,13 @@ elif Operation == "elastic x=1":
 # ------------------------------------------------------------------ #
 elif Operation == "generate (e,e'p)+pp for GSIM":
     ana     = TAnalysisEG2("C12_Al27_Fe56_Pb28",XbCut)
-    scheme  = TSchemeDATA()
-    scheme.SchemeOnTCut( Path, "Ana_C12_Al27_Fe56_Pb28.root", "anaTree", "Ana_C12_Al27_Fe56_Pb28_eep.root", ana.eepFinalCut)
+    scheme.SchemeOnTCut( Path, "Ana_C12_Al27_Fe56_Pb28.root", "anaTree", "Ana_C12_Al27_Fe56_Pb28_eep.root", ana.eepFinalCut) # eepFinalCut = cutXb && cutThetaPQ && cutPoverQ && cutPmiss && cutPmT
     ana     = TAnalysisEG2("C12_Al27_Fe56_Pb28_eep",XbCut)
     outfile = open(Path+"/eep_pp_events.txt", "wb")
     h = ROOT.TH2F("hMmiss","M(miss), recoiling protons momenta 0.3-0.5 GeV/c ; recoiling protons generated momentum [GeV/c] ; M(miss) [GeV/c ^{2}]",100,0.25,0.75,100,0,8)
 
     
-    for i in range(0,int(1.*ana.GetEntries())): # eepFinalCut = cutXb && cutThetaPQ && cutPoverQ && cutPmiss && cutPmT
+    for i in range(0,int(1.*ana.GetEntries())):
         if (i%1000==0):
             print "[%.2f%%]"%(100.*i/ana.GetEntries())
         for j in range (0,10): # for each (e,e'p) event generate 10 (e,e'ppp) events
@@ -362,6 +363,24 @@ elif Operation == "generate (e,e'p)+pp for GSIM":
 
 
 
+# ------------------------------------------------------------------ #
+# write all (e,e'ppp) events to a txt file without applying any kinematical cuts! for Random forest search of special events...
+elif Operation == "3p events for random forest":
+    ana     = TAnalysisEG2("C12_Al27_Fe56_Pb28",XbCut)
+    A = 12
+    if (os.path.isfile(Path+"/Ana_C12_Al27_Fe56_Pb28_pppSRC.root") == False):
+        scheme.SchemeOnTCut( Path, "Ana_C12_Al27_Fe56_Pb28.root", "anaTree", "Ana_C12_Al27_Fe56_Pb28_pppSRC.root",ana.pppSRCCut )
+    ana = TAnalysisEG2("C12_Al27_Fe56_Pb28_pppSRC")
+    outfile = open(Path+"/%s_Full_ppp_events.txt"%dm.Target(A), "wb")
+    for i in range(0,int(ana.GetEntries())):
+        evt = ana.GetFullpppEvent(i,False)
+        outfile.write("%d" % i)
+        for v in range (0,evt.size()):
+            outfile.write("\t%f" % evt.at(v))
+        outfile.write("\n")
+    outfile.close()
+    print "\ndone writing %d events to "%ana.GetEntries() + outfile.name
+# ------------------------------------------------------------------ #
 
 
 

@@ -153,6 +153,44 @@ vector<Float_t> TAnalysisEG2::GetPcmEntry(int entry){
 
 
 
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+vector<Float_t> TAnalysisEG2::GetFullpppEvent(int entry, bool DoPrint){
+    if (entry==0) {
+        Printf("retruning a vector of kinematic variables for (e,e'ppp) events");
+        Printf("Xb / Q2 / p(e)-x / p(e)-y / p(e)-z / p(lead)-x  / p(lead)-y / p(lead)-z / p(2)-x / p(2)-y / p(2)-z / p(3)-x / p(3)-y / p(3)-z");
+    }
+    Float_t Xb , Q2 ;
+    TLorentzVector * e = 0 ;
+    vector <TLorentzVector> * protons = 0;
+    Tree -> SetBranchAddress("Xb"       , &Xb);
+    Tree -> SetBranchAddress("Q2"       , &Q2);
+    Tree -> SetBranchAddress("e"        , &e);
+    Tree -> SetBranchAddress("protons"  , &protons);
+    
+    Tree -> GetEntry(entry);
+    
+    vector<Float_t> res;
+    res.push_back(Xb);
+    res.push_back(Q2);
+    res.push_back(e->Px());
+    res.push_back(e->Py());
+    res.push_back(e->Pz());
+    for (int j = 0; j < 3; j++) {
+        res.push_back(protons->at(j).Px());
+        res.push_back(protons->at(j).Py());
+        res.push_back(protons->at(j).Pz());
+    }
+    
+    if (DoPrint) {
+        for (auto var:res){
+            printf("%.2f\t",var);
+        }
+        cout<<endl;
+    }
+    return res;
+}
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 vector<Float_t> TAnalysisEG2::GetGSIMEvt(int entry, bool DoPrint){
     
@@ -216,26 +254,38 @@ vector<Float_t> TAnalysisEG2::GetGSIMeep_pp_Evt(int entry, bool DoPrint){
     Tree -> SetBranchAddress("e"        , &e);
     Tree -> SetBranchAddress("Pmiss"    , &Pmiss);
     Tree -> SetBranchAddress("protons"  , &p);
+    Tree -> SetBranchAddress("q_phi"    , &q_phi);
+    Tree -> SetBranchAddress("q_theta"  , &q_theta);
+    Tree -> SetBranchAddress("Pmiss_phi", &Pmiss_phi);
     
     Tree -> GetEntry(entry);
     
     TLorentzVector  Beam(0,0,5.009,5.009) , q = Beam - *e , pLead = *Pmiss + q ;
+
+    
+    
+    
     // take the first proton from the data
-    protons.push_back( p->at(0) );
+    p3vec = p->at(0).Vect();
+    RotVec_from_q_Pm_Frame( & p3vec , q_phi, q_theta, Pmiss_phi );
+    protons.push_back( TLorentzVector( p3vec , p->at(0).E()) );
     
     // generate two random (recoiling) protons with uniform momenta 0.3-0.7 and uniform angular distribution
     Pp = rand.Uniform( 0.3 , 0.7 );
     rand.Sphere(Px,Py,Pz,Pp);
-    protons.push_back(TLorentzVector( Px , Py , Pz , sqrt(Pp*Pp + Mp*Mp) ));
+    p3vec = TVector3(Px , Py , Pz);
+    RotVec_from_q_Pm_Frame( & p3vec , q_phi, q_theta, Pmiss_phi );
+    protons.push_back(TLorentzVector( p3vec , sqrt(Pp*Pp + Mp*Mp) ));
     
     Pp = rand.Uniform( 0.3 , 0.7 );
     rand.Sphere(Px,Py,Pz,Pp);
-    protons.emplace_back( Px , Py , Pz , sqrt(Pp*Pp + Mp*Mp) );
+    p3vec = TVector3(Px , Py , Pz);
+    RotVec_from_q_Pm_Frame( & p3vec , q_phi, q_theta, Pmiss_phi );
+    protons.emplace_back( p3vec , sqrt(Pp*Pp + Mp*Mp) );
     
     Mmiss = (*Pmiss + protons[1] + protons[2]).Mag();
 
-    
-    
+ 
     
     vector<Float_t> res;
     res.push_back(4);

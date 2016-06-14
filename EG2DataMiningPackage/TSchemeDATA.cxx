@@ -118,6 +118,42 @@ void TSchemeDATA::SRCPmissXb(int fTargetType , float fXbMin, int fNpMin, int fNp
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void TSchemeDATA::TwoSlowProtons(int fTargetType , float fpMin, float fpMax){
+    TargetType      = fTargetType;
+    SetSchemeType   ("TwoSlowProtons");
+    LoadInTree      ();
+    CreateOutTree   ();
+    int NpGood ;
+    
+    if (DataType == "no ctof") {
+        //         targ_type = 2; // for Al27
+        
+        for (Long64_t i = 0; i < Nentries ; i++) {
+            if (i%(Nentries/20)==0) plot.PrintPercentStr((float)i/Nentries);
+            NpGood = 0;
+            InTree -> GetEntry(i);
+            if( ( Np > 2 ) && (targ_type == TargetType) ){
+                for (int p = 0 ; p < Np ; p++){
+                    if( P_cut[p] == 1 && P_PID[p] == 1 ){    // this is a proton with momentum |p|<2.8 and 'good' CTOF
+                        proton = new TVector3(PpX[p],PpY[p],PpZ[p]);
+                        if (fpMin < proton->Mag() && proton->Mag() < fpMax) {
+                            NpGood++;
+                        }
+                    }
+                }
+                if( NpGood > 2 ){
+                    OutTree -> Fill();
+                }
+            }
+        }
+    }
+    
+    WriteOutFile();
+}
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TSchemeDATA::CreateOutTree(){
     OutFile = new TFile(Form("%s/Schemed_EG2_DATA/Schemed_%s_%s.root",Path.Data(),SchemeType.Data(),InFileName.Data()),"recreate");
     OutTree = InTree -> CloneTree(0);

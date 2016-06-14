@@ -89,7 +89,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
 
     
     // Float_t branches
-    OutTree -> Branch("Xb"           ,&Xb                    , "Xb/F");
+    OutTree -> Branch("Xb"                  ,&Xb                    , "Xb/F");
     OutTree -> Branch("Bjorken x (moving p)",&XbMoving              , "XbMoving/F");
     OutTree -> Branch("Q2"                  ,&Q2                    , "Q2/F");
     OutTree -> Branch("Mmiss"               ,&Mmiss                 , "Mmiss/F");
@@ -105,6 +105,9 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("pEdep"               ,&pEdep                 );// std::vector<Float_t>
     OutTree -> Branch("TpMiss"              ,&TpMiss                , "TpMiss/F");
     OutTree -> Branch("Tp"                  ,&Tp                    );// std::vector<Float_t> - kinetic energies
+    OutTree -> Branch("q_phi"               ,&q_phi                 , "q_phi/F");
+    OutTree -> Branch("q_theta"             ,&q_theta               , "q_theta/F");
+    OutTree -> Branch("Pmiss_phi"           ,&Pmiss_phi             , "Pmiss_phi/F");
 
 
     
@@ -119,6 +122,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("Prec"                ,"TLorentzVector"       ,&Prec);
     OutTree -> Branch("q"                   ,"TLorentzVector"       ,&q);
     OutTree -> Branch("e"                   ,"TLorentzVector"       ,&e);
+    OutTree -> Branch("Wtilde"              ,"TLorentzVector"       ,&Wtilde);
     OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
 
     
@@ -218,8 +222,8 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     pA_Np_1.SetVectM( TVector3() , Mp * (A - Np + 1)  );
     Wtilde      = pA - pA_Np_1 + q ;
     //        XbMoving    = Q2 / ( 2. * (Pmiss * q) ); // = Q2 / 2pq [Q2 / ( 2. * (Pmiss * q) )]
-//    pq = E_p_init * q.E() - Pmiss.Vect().Dot(q.Vect());
-//    XbMoving = Q2 / (2*pq);
+    //    pq = E_p_init * q.E() - Pmiss.Vect().Dot(q.Vect());
+    //    XbMoving = Q2 / (2*pq);
     
     
     

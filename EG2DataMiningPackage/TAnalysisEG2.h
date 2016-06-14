@@ -33,10 +33,12 @@ public:
     TFile * InFile;
     TTree * Tree;
     Double_t Pp , Px , Py , Pz;
+    Float_t  q_phi , q_theta , Pmiss_phi;
+    TVector3 p3vec;
     
     /// Default constructor
     TAnalysisEG2 (){    SetSRCCuts();   }
-    TAnalysisEG2 ( TString fInFileName , TCut XbCut = "1.2 <= Xb" );
+    TAnalysisEG2 ( TString fInFileName , TCut XbCut = "0 <= Xb" );
     
     
     
@@ -83,6 +85,7 @@ public:
     // rooFit
     TMatrix                  RooFitCM (Float_t PmissMin, Float_t PmissMax);
     vector<Float_t>       GetPcmEntry (int);
+    vector<Float_t>   GetFullpppEvent (int, bool DoPrint = false);
     vector<Float_t>        GetGSIMEvt (int, bool DoPrint = false);
     vector<Float_t>     GetGSIMeep_pp_Evt (int, bool DoPrint = false);
     void                    MixEvents (TTree *, bool DoPrint = false);
