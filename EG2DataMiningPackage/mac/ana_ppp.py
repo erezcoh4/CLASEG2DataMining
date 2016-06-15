@@ -14,8 +14,8 @@ ROOT.gStyle.SetOptStat(0000)
 
 # "Draw variable"/ "Show SRC Cuts" / "CTOF subtraction" / "count e,e'p/pp/ppp"  / "combine targets"/ "Mix events" / "Draw" / "elastic x=1" / "DataVsMix" / "generate (e,e'p)+pp for GSIM" / "3p events for random forest"
 
-Operation   = "3p events for random forest"
-DataType    = "NoPhysics3p" # "FSI-3 Simulation" / "Data" / "NoPhysics3p" / "Mixed" / "RandomBkg"
+Operation   = "Draw"
+DataType    = "Data" # "FSI-3 Simulation" / "Data" / "NoPhysics3p" / "Mixed" / "RandomBkg"
 Var         = sys.argv[1] if len(sys.argv)>1 else "Xb"
 Nbins       = 40
 XbMin       = 1.05
@@ -161,17 +161,21 @@ elif Operation == "Draw":
 
 
     elif (Var=="DalitzPlot"):
-        anaEG2[0].Dalitz("protons[1].P()","protons[2].P()","Pmiss.P()",anaEG2[1],1000,-1.7,1.7,1000,-1.1,2,"p_{2}","p_{3}","p_{miss}","",1) # "Modified" Dalitz plot since T is not conserved
-        anaEG2[0].Dalitz("protons[1].P()","protons[2].P()","Pmiss.P()",anaEG2[2],1000,-1.7,1.7,1000,-1.1,2,"p_{2}","p_{3}","p_{miss}","same",4,True)
+#        anaEG2[0].Dalitz("protons[1].P()","protons[2].P()","Pmiss.P()",anaEG2[1],1000,-1.7,1.7,1000,-1.1,2,"p_{2}","p_{3}","p_{miss}","",1) # "Modified" Dalitz plot since T is not conserved
+        anaEG2[0].Dalitz("protons[1].P()","protons[2].P()","Pmiss.P()",anaEG2[2],50,-1.7,1.7,50,-1.1,2,"p_{2}","p_{3}","p_{miss}","col",4,True)
 
 
     else:
         if (Var=="Pcm"):
-            xAxis = ["Pcm.P()" , 0 , 1.4, "| #vec{p} (c.m.) | [GeV/c]"]
+            xAxis = ["Pcm.P()" , 0 , 2, "| #vec{p} (c.m.) | [GeV/c]"]
  
         elif (Var=="theta_Pcm_q"):
             xAxis = [anaEG2[0].Theta("Pcm.Vect()","q.Vect()") , 0 , 360 , "#theta(q,p(c.m.)) [deg.]"]
         
+        
+        elif (Var=="RecoilingProtonsOpeningAngle"):
+            xAxis = [anaEG2[0].CosTheta("protons[1].Vect()","protons[2].Vect()") , -1 , 1 , "cos(#theta_{23})"]
+                
         elif (Var=="Np"):
             xAxis = [Var , 0 , 4 , "numebr of reconstruncted protons"]
             anaEG2[1] = ROOT.TCut("100./%f"%anaEG2[0].GetEntries())
@@ -254,7 +258,7 @@ elif Operation == "Draw":
 
     c.Update()
     wait()
-    c.SaveAs(init.dirname()+"/"+DataType+"C12_Al_27_Fe56_Pb28_"+Var+".pdf")
+    c.SaveAs(init.dirname()+"/"+DataType+Var+".pdf")
 # ------------------------------------------------------------------ #
 
 
