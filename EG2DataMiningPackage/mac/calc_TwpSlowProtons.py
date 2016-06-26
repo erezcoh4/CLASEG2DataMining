@@ -1,7 +1,4 @@
-# run:
-# > python mac/calc_ppp.py <target A>
-
-import ROOT , os , sys 
+import ROOT , os , sys
 from ROOT import TEG2dm , TSchemeDATA , TAnalysisEG2 , TCalcPhysVarsEG2
 
 
@@ -9,7 +6,7 @@ from ROOT import TEG2dm , TSchemeDATA , TAnalysisEG2 , TCalcPhysVarsEG2
 if len(sys.argv)>1:
     A       = int(sys.argv[1])
 else:
-    print '\n run this script with: \n > python mac/calc_ppp.py <target A> \n\n'
+    print '\n run this script with: \n > python mac/calc_TwpSlowProtons.py <target A> \n\n'
     exit(0)
 DataType    = "no ctof"
 
@@ -36,7 +33,7 @@ calc        = TCalcPhysVarsEG2( InTree , OutTree , A , DataType , "q(z) - Pmiss(
 for entry in range(0, (int)(1.*Nentries)):
     
     calc.ComputePhysVars( entry );
-    if (calc.Np >= 10):
+    if (entry>0):
         calc.PrintData( entry );
 
 

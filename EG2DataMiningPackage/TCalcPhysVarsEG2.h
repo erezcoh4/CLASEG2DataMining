@@ -45,7 +45,7 @@ public:
     
     // PARTICLES....
     Int_t   targ_type   , A;
-    Int_t   Np          ;
+    Int_t   Np          , Ntot;
     Int_t   uns_pCut[20], uns_pID[20];
     
     // for GSIM: generated
@@ -81,7 +81,7 @@ public:
     
     
     
-    TLorentzVector          q     , NucleonAtRest     , TargetAtRest  ,   Plead   , Pmiss     , Pcm       , Prec;
+    TLorentzVector          q     , NucleonAtRest     , TargetAtRest  ,   Plead   , Pmiss     , Pcm       , Prec , PcmFinalState;
     vector<TLorentzVector>  protons ;
 
     

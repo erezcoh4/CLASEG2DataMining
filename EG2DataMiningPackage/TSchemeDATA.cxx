@@ -27,6 +27,7 @@ void TSchemeDATA::LoadInTree(){
     SHOW(Nentries);
     
     InTree -> SetBranchAddress("P_nmb"          , &Np);
+    InTree -> SetBranchAddress("N_nmb"          , &Nn);
     InTree -> SetBranchAddress("Xb"             , &Xb);
     InTree -> SetBranchAddress("targ_type"      , &targ_type); // for Al27 remove this
     
@@ -132,7 +133,10 @@ void TSchemeDATA::TwoSlowProtons(int fTargetType , float fpMin, float fpMax){
             if (i%(Nentries/20)==0) plot.PrintPercentStr((float)i/Nentries);
             NpGood = 0;
             InTree -> GetEntry(i);
-            if( ( Np > 2 ) && (targ_type == TargetType) ){
+            
+            // look for events with only one negative particle (electron) and two positive (protons)
+        
+            if( ( Np == 2 ) && ( Nn == 1 ) && (targ_type == TargetType) && (Xb > 0.9)){
                 for (int p = 0 ; p < Np ; p++){
                     if( P_cut[p] == 1 && P_PID[p] == 1 ){    // this is a proton with momentum |p|<2.8 and 'good' CTOF
                         proton = new TVector3(PpX[p],PpY[p],PpZ[p]);
@@ -141,7 +145,7 @@ void TSchemeDATA::TwoSlowProtons(int fTargetType , float fpMin, float fpMax){
                         }
                     }
                 }
-                if( NpGood > 2 ){
+                if( NpGood == 2 ){
                     OutTree -> Fill();
                 }
             }

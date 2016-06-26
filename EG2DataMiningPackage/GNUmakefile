@@ -24,7 +24,8 @@ OSNAMEMODE      = $(OSNAME)
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
 # set linker flags
-LDFLAGS += -L$(shell root-config --libdir) -lEG -lRooFit -lRooFitCore -lRooStats -lSpectrum -lHist 
+#LDFLAGS += -L$(shell root-config --libdir) -lEG -lRooFit -lRooFitCore -lRooStats -lSpectrum -lHist 
+LDFLAGS += -L$(shell root-config --libdir) -lEG -lSpectrum -lHist 
 LDFLAGS += -L$(LARLITE_LIBDIR) -lMySoftware_MySoftwarePackage
 
 

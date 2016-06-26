@@ -46,7 +46,7 @@ public:
     
     // PARTICLES....
     Int_t   TargetType  , targ_type;
-    Int_t   Np ;
+    Int_t   Np          , Nn;
     Int_t   P_cut[20]   , P_PID[20]  ;          //positive particles
     
     Float_t Xb          , XbMin;

@@ -40,6 +40,7 @@ void TCalcPhysVarsEG2::InitInputTree(){
         InTree -> SetBranchAddress("Y"              , &Yp);
         InTree -> SetBranchAddress("Z"              , &Zp);
         InTree -> SetBranchAddress("CTOF"           , &uns_pCTOF);
+        InTree -> SetBranchAddress("T_nmb"      	, &Ntot);
     }
     
     else if(DataType == "no ctof") {
@@ -85,6 +86,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     // Integer branches
     OutTree -> Branch("target atomic mass"  ,&A                     ,"A/I");
     OutTree -> Branch("Np"                  ,&Np                    ,"Np/I");
+    OutTree -> Branch("total particle num." ,&Ntot                  ,"Ntot/I");
     OutTree -> Branch("pCTOFCut"            ,&pCTOFCut              );// std::vector<Int_t>
 
     
@@ -118,6 +120,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     // TLorentzVector branches
     OutTree -> Branch("Pmiss"               ,"TLorentzVector"       ,&Pmiss);
     OutTree -> Branch("Pcm"                 ,"TLorentzVector"       ,&Pcm);
+    OutTree -> Branch("PcmFinalState"       ,"TLorentzVector"       ,&PcmFinalState);
     OutTree -> Branch("Plead"               ,"TLorentzVector"       ,&Plead);
     OutTree -> Branch("Prec"                ,"TLorentzVector"       ,&Prec);
     OutTree -> Branch("q"                   ,"TLorentzVector"       ,&q);
@@ -238,6 +241,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
     // c.m. momentum
     Pcm         = -q;
+    PcmFinalState = TLorentzVector();
     
 
     
@@ -341,6 +345,7 @@ void TCalcPhysVarsEG2::loop_protons(){
         
         protons .push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
         Pcm     += protons.back();
+        PcmFinalState += protons.back();
         
         
         // proton vertex

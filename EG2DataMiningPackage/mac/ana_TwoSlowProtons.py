@@ -1,113 +1,55 @@
-# run:
-# > python mac/ana_ppp.py <target A>
-
 import ROOT
 import os, sys , math
 from ROOT import TEG2dm , TPlots , TAnalysisEG2 , TSchemeDATA
 from rootpy.interactive import wait
 sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
+import GeneralPlot as gen_plot
 import Initiation as init
-init.createnewdir()
-ROOT.gStyle.SetOptStat(0000)
+#init.createnewdir()
+#ROOT.gStyle.SetOptStat(0000)
 
 
 
 Operation   = "Draw C12"
 Var         = sys.argv[1] if len(sys.argv)>1 else "Xb"
 p           = int(sys.argv[2]) if len(sys.argv)>2 else 0
-cut         = ROOT.TCut("Np >= 0")
-Nbins       = 100
+cut         = ROOT.TCut("Xb>1.05")
+Nbins       = 40
 dm          = TEG2dm()
 Path        = "/Users/erezcohen/Desktop/DataMining/AnaFiles"
 
 
+
+print "Operation = " +Operation + ", Var = " + Var
+
 # ------------------------------------------------------------------ #
 if Operation == "Draw C12":
-
-
     ana = TAnalysisEG2("C12_TwoSlowProtons")
-
-    c = ana.CreateCanvas(Var)
-
     if (Var=="Pcm"):
-        xAxis = ["Pcm.P()" , 0 , 1.4, "|#vec{p} (c.m.)| [GeV/c]"]
- 
-    elif (Var=="proton_3momentum"):
-        xAxis = ["protons[%d].P()"%p , 0 , 3 , "|#vec{p}(%d)| [GeV/c]"%p  ]
-    
-    
-    
-    elif (Var=="Wtilde"):
-        xAxis = ["Wtilde.Mag()" , -5 , 5 , "#sqrt{ W'^{#mu} W'_{#mu} } [GeV/c ^{2}]"]
-    
-    
-    
-
-
-    elif (Var=="Np"):
-        xAxis = [Var , 0 , 10 , "numebr of reconstruncted protons"]
-
-
-    elif (Var=="Pmiss"):
-        xAxis = ["Pmiss.P()" , 0.2 , 1.1 , "|#vec{p} (miss)| [GeV/c]"]
-
-    elif (Var=="PmT"):
-        xAxis = ["Pmiss.Pt()" , 0.2 , 1.1 , "#vec{p} (miss) - T [GeV/c]"]
-
-
-    elif (Var=="PtSquared"):
-        xAxis = ["Pmiss.Pt()*Pmiss.Pt()" , 0.0 , 3. , "(#vec{p} (miss) _{#perp})^{2} [GeV/c]"]
-        
+        plot_args = ["PcmFinalState.P()" , cut , Nbins , 0 , 1.5 , "|#vec{p} (c.m.)| [GeV/c]"]
     elif (Var=="Xb"):
-        xAxis = [Var , 0 , 2, "Bjorken x"]
-
-
-    elif (Var=="Q2"):
-        xAxis = [Var , 0 , 5, "Q^{2} (GeV/c) ^{2}"]
-    
-
-    elif (Var=="Mmiss"):
-        xAxis = ["Pcm.Mag()" , 0 , 6, "#sqrt{|p^{#mu}_{lead}+p^{#mu}_{2}+p^{#mu}_{3}-q^{#mu}|^{2}} [GeV/c ^{2}]"]
-
-        
-    elif (Var=="opening_angle"):
-        xAxis = [ana.CosTheta("Pmiss.Vect()","Prec.Vect()") , -1 , 1, "cos (#theta)"]
-
-
-    elif (Var=="cmEvsP"):
-        xyAxes = ["Pcm.E()" , "Pcm.P()" , 2 , 5.8 , 0 , 2.7 , "p^{0}_{lead}+p^{0}_{2}+p^{0}_{3}-q^{0} [GeV]" , "|p^{i}_{lead}+p^{i}_{2}+p^{i}_{3}-q^{i}| [GeV/c]" ]
-        
-    elif (Var=="MmissVsXb"):
-        xyAxes = ["Pcm.Mag()" , "Xb" , -2 , 5 , 0 , 2 , "#sqrt{|p^{#mu}_{lead}+p^{#mu}_{2}+p^{#mu}_{3}-q^{#mu}|^{2}} [GeV/c ^{2}]" , "Bjorken x" ]
-
-
-    elif (Var=="PmissTransversalLongitudinal"):
-        xyAxes = ["Pmiss.Pt()" , "Pmiss.Pz()" , 0 , 1 , -1 , 1 , "|#vec{p} (miss)|-T [GeV/c]" , "|#vec{p} (miss)|-L [GeV/c]" ]
-
-    elif (Var=="proton_xy"):
-        xyAxes = ["protons[%d].Px()"%p , "protons[%d].Py()"%p , -2 , 2 , -2 , 2 , "#vec{p}(%d)-x [GeV/c]"%p , "#vec{p}(%d)|-y [GeV/c]"%p ]
-
-    elif (Var=="proton_xz"):
-        xyAxes = ["protons[%d].Px()"%p , "protons[%d].Pz()"%p , -2 , 2 , -2 , 2 , "#vec{p}(%d)-x [GeV/c]"%p , "#vec{p}(%d)|-z [GeV/c]"%p ]
-
-    elif (Var=="proton_yz"):
-        xyAxes = ["protons[%d].Py()"%p , "protons[%d].Pz()"%p , -2 , 2 , -2 , 2 , "#vec{p}(%d)-y [GeV/c]"%p , "#vec{p}(%d)|-z [GeV/c]"%p ]
-
+        plot_args = [Var , cut , Nbins , 1 , 4 , "Bjorken x"]
     elif (Var=="q"):
-        xyAxes = ["q.P()" , "q.E()"  , 1 , 5 , 1 , 5 , "|#vec{q}| [GeV/c]" , "#omega [GeV]" ]
-
-
+        plot_args = ["q.P()" , "q.E()"  , cut , Nbins , 1.1 , 4 , Nbins , 0 , 3.1 ,"|#vec{q}| [GeV/c]" , "#omega [GeV]"]
+    elif (Var=="Q2"):
+        plot_args = [Var , cut , Nbins , 1 , 5 , "Q^{2} (GeV/c) ^{2}"]
+    elif (Var=="Wtilde"):
+        plot_args = ["Wtilde.Mag()" , cut , Nbins , -5 , 5 , "#sqrt{ W'^{#mu} W'_{#mu} } [GeV/c ^{2}]"]
     elif (Var=="Wtilde_vs_Q2"):
-        xyAxes = ["Wtilde.Mag()" ,"Q2" , -5 , 5 , 0 , 5 , "#sqrt{ W'^{#mu} W'_{#mu} } [GeV/c ^{2}]" , "Q^{2} (GeV/c) ^{2}"]
+        plot_args = ["Wtilde.Mag()" ,"Q2" , cut , Nbins , -5 , 0 , Nbins , 1 , 5 ,"#sqrt{ W'^{#mu} W'_{#mu} } [GeV/c ^{2}]" , "Q^{2} (GeV/c) ^{2}"]
+    elif (Var=="proton_3momentum"):
+        p = int(input("which proton ? [ 1 / 2 ]"))
+        plot_args = ["protons[%d].P()"%(p-1) , cut , Nbins , 0.27 , 0.73 ,"|#vec{p}(%d)| [GeV/c]"%p]
+    elif (Var=="cos_opening_angle"):
+        plot_args = [ str(ana.CosTheta("protons[0].Vect()","protons[1].Vect()")) , cut , Nbins , -1 , 1 , "cos (#theta_{12})"]
+    elif (Var=="opening_angle"):
+        plot_args = [ str(ana.Theta("protons[0].Vect()","protons[1].Vect()")) , cut , Nbins , -180 , 360 , "#theta_{12} [de.]"]
+    elif (Var=="Mmiss"):
+        plot_args = ["Pcm.Mag()", cut , Nbins , -3.5 , 2.1  , "#sqrt{|p^{#mu}_{1}+p^{#mu}_{2}-q^{#mu}|^{2}} [GeV/c ^{2}]"  ]
+#        plot_args = ["PcmFinalState.Mag()", cut , Nbins , -2 , 5  , "#sqrt{|p^{#mu}_{1}+p^{#mu}_{2}|^{2}} [GeV/c ^{2}]"  ]
+
+	print "ploting " + Var
+	gen_plot.plot(ana,"TwoSlowProtons_"+Var,plot_args)
 
 
-    if 'xAxis' in locals():
-        ana.H1(xAxis[0] , cut , "hist" , Nbins , xAxis[1] , xAxis[2] , "" ,xAxis[3] , "" ,38)
-
-    elif 'xyAxes' in locals():
-        ana.H2(xyAxes[0] , xyAxes[1], cut , "colz" , Nbins , xyAxes[2] , xyAxes[3], Nbins , xyAxes[4] , xyAxes[5] , "" ,xyAxes[6] , xyAxes[7] , 1, 20 , 3 )
-
-    c.Update()
-    wait()
-    c.SaveAs(init.dirname()+"/C12_TwoSlowProtons_"+Var+".pdf")
 # ------------------------------------------------------------------ #
