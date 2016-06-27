@@ -75,7 +75,7 @@ public:
     
     TVector3            Pbeam        , Pe;
     vector<TVector3>    p3vec        , pVertex   ;
-    TLorentzVector      Beam         , e        ,  p;
+    TLorentzVector      Beam         , e        ,  p                , Wmiss;
     TLorentzVector      Wtilde       , pA       ,  pA_Np_1;
 
     
@@ -126,6 +126,7 @@ public:
     void   Pmiss_q_frame ();
     
     void    p23Randomize ();
+    void    p12Randomize ();
     
     
     void       PrintData (int);

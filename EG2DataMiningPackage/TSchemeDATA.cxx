@@ -156,6 +156,48 @@ void TSchemeDATA::TwoSlowProtons(int fTargetType , float fpMin, float fpMax){
 }
 
 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void TSchemeDATA::TwoSlowProtons_ppp(int fTargetType , float fpMin, float fpMax){
+    TargetType      = fTargetType;
+    SetSchemeType   ("TwoSlowProtons_ppp");
+    LoadInTree      ();
+    CreateOutTree   ();
+    int NpSlow , NpFast ;
+    
+    if (DataType == "no ctof") {
+        //         targ_type = 2; // for Al27
+        
+        for (Long64_t i = 0; i < Nentries ; i++) {
+            if (i%(Nentries/20)==0) plot.PrintPercentStr((float)i/Nentries);
+            NpFast = 0;
+            NpSlow = 0;
+            InTree -> GetEntry(i);
+            
+            // look for events with only one negative particle (electron) and two positive (protons) of intermediate momenta, plus one aditional proton with large momentum > 1. GeV/c
+            
+            if( ( Np == 3 ) && ( Nn == 1 ) && (targ_type == TargetType) && (Xb > 0.9)){
+                for (int p = 0 ; p < Np ; p++){
+                    if( P_cut[p] == 1 && P_PID[p] == 1 ){    // this is a proton with momentum |p|<2.8 and 'good' CTOF
+                        proton = new TVector3(PpX[p],PpY[p],PpZ[p]);
+                        if (1. < proton->Mag() ){
+                            NpFast++;
+                        }
+                        if (fpMin < proton->Mag() && proton->Mag() < fpMax) {
+                            NpSlow++;
+                        }
+                    }
+                }
+                if( NpFast == 1 && NpSlow == 2 ){
+                    OutTree -> Fill();
+                }
+            }
+        }
+    }
+    
+    WriteOutFile();
+}
+
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TSchemeDATA::CreateOutTree(){

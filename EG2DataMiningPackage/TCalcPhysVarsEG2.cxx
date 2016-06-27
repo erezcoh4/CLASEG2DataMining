@@ -126,6 +126,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("q"                   ,"TLorentzVector"       ,&q);
     OutTree -> Branch("e"                   ,"TLorentzVector"       ,&e);
     OutTree -> Branch("Wtilde"              ,"TLorentzVector"       ,&Wtilde);
+    OutTree -> Branch("Wmiss"               ,"TLorentzVector"       ,&Wmiss);
     OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
 
     
@@ -173,6 +174,7 @@ void TCalcPhysVarsEG2::InitEvent(){
     if (!pEdep.empty())     pEdep.clear();
     if (!Tp.empty())        Tp.clear();
     Plead = TLorentzVector();
+    Wmiss.SetVectM( TVector3() , 3. * Mp  );
 }
 
 
@@ -224,10 +226,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     // Invariant mass of the system produced in the interaction of balancing nucleon with a virtual photon
     pA_Np_1.SetVectM( TVector3() , Mp * (A - Np + 1)  );
     Wtilde      = pA - pA_Np_1 + q ;
-    //        XbMoving    = Q2 / ( 2. * (Pmiss * q) ); // = Q2 / 2pq [Q2 / ( 2. * (Pmiss * q) )]
-    //    pq = E_p_init * q.E() - Pmiss.Vect().Dot(q.Vect());
-    //    XbMoving = Q2 / (2*pq);
-    
+
     
     
     // move to prefered axes frame
@@ -240,6 +239,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
 
     // c.m. momentum
+    Wmiss      += q;
     Pcm         = -q;
     PcmFinalState = TLorentzVector();
     
@@ -269,10 +269,14 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
  
 
     // if we have 3 protons, randomize protons 2 and 3
-    if (Np==3) {
+    if (Np==2) {
+        p12Randomize();
+    }
+    else if (Np==3) {
         p23Randomize();
         thetaMiss23 = r2d*Pmiss.Vect().Angle(Prec.Vect());
         phiMiss23   = 90 - r2d*( Pmiss.Vect().Angle(protons.at(1).Vect().Cross(protons.at(2).Vect()).Unit()) );
+        Wmiss += protons.at(0);
     }
 
 
@@ -377,6 +381,7 @@ void TCalcPhysVarsEG2::loop_protons(){
         
         // Invariant mass of the system produced in the interaction of balancing nucleon with a virtual photon
         Wtilde     -= protons.back();
+        Wmiss      -= protons.back();
     }
     
     
@@ -395,19 +400,37 @@ vector<size_t> TCalcPhysVarsEG2::sort_pMag(const vector<TVector3> &v) {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::p23Randomize(){
-        // If we have 3 protons, randomly choose which is p₂ and which is p₃ with a probablity of 50%
-        if( rand.Uniform() > 0.5 ){
-            
-            std::iter_swap(protons.begin()+1    ,protons.begin()+2);
-            std::iter_swap(pVertex.begin()+1    ,pVertex.begin()+2);
-            std::iter_swap(alpha.begin()+1      ,alpha.begin()+2);
-            
-            if (DataType == "no ctof") {
-                std::iter_swap(pCTOFCut.begin()+1   ,pCTOFCut.begin()+2);
-                std::iter_swap(pCTOF.begin()+1      ,pCTOF.begin()+2);
-                std::iter_swap(pEdep.begin()+1      ,pEdep.begin()+2);
-            }
+    // If we have 3 protons, randomly choose which is p₂ and which is p₃ with a probablity of 50%
+    if( rand.Uniform() > 0.5 ){
+        
+        std::iter_swap(protons.begin()+1    ,protons.begin()+2);
+        std::iter_swap(pVertex.begin()+1    ,pVertex.begin()+2);
+        std::iter_swap(alpha.begin()+1      ,alpha.begin()+2);
+        
+        if (DataType == "no ctof") {
+            std::iter_swap(pCTOFCut.begin()+1   ,pCTOFCut.begin()+2);
+            std::iter_swap(pCTOF.begin()+1      ,pCTOF.begin()+2);
+            std::iter_swap(pEdep.begin()+1      ,pEdep.begin()+2);
         }
+    }
+}
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void TCalcPhysVarsEG2::p12Randomize(){
+    // If we have 2 protons, randomly choose which is p₂ with a probablity of 50%
+    if( rand.Uniform() > 0.5 ){
+        
+        std::iter_swap(protons.begin()    ,protons.begin()+1);
+        std::iter_swap(pVertex.begin()    ,pVertex.begin()+1);
+        std::iter_swap(alpha.begin()      ,alpha.begin()+1);
+        
+        if (DataType == "no ctof") {
+            std::iter_swap(pCTOFCut.begin()   ,pCTOFCut.begin()+1);
+            std::iter_swap(pCTOF.begin()      ,pCTOF.begin()+1);
+            std::iter_swap(pEdep.begin()      ,pEdep.begin()+1);
+        }
+    }
 }
 
 
@@ -434,6 +457,7 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOWTLorentzVector(Plead);
     SHOW(sum_alpha);
     SHOWTLorentzVector(Pmiss);
+    SHOWTLorentzVector(Wmiss);
     SHOW(TpMiss);
     SHOWTLorentzVector(Prec);
     SHOWTLorentzVector(Pcm);

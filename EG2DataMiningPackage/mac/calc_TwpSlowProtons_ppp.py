@@ -12,7 +12,7 @@ DataType    = "no ctof"
 
 
 Path        = "/Users/erezcohen/Desktop/DataMining"
-SchemeType  = "TwoSlowProtons"
+SchemeType  = "TwoSlowProtons_ppp"
 dm          = TEG2dm()
 if DataType == "data":
     FileName    = "DATA_%s"% dm.Target(A)
@@ -24,7 +24,7 @@ InTree      = InFile.Get("T")
 Nentries    = InTree.GetEntries()
 
 OutFile     = ROOT.TFile(Path + "/AnaFiles/Ana_%s"%dm.Target(A)+"_" + SchemeType + ".root","recreate")
-OutTree     = ROOT.TTree("anaTree","physical variables two slow protons SRC")
+OutTree     = ROOT.TTree("anaTree","physical variables two slow protons + 1 fast proron")
 
 calc        = TCalcPhysVarsEG2( InTree , OutTree , A , DataType , "q(z) - Pmiss(x-z) frame" )
 

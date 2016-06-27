@@ -14,7 +14,7 @@ ROOT.gStyle.SetOptStat(0000)
 
 # "Draw variable"/ "Show SRC Cuts" / "CTOF subtraction" / "count e,e'p/pp/ppp"  / "combine targets"/ "Mix events" / "Draw" / "elastic x=1" / "DataVsMix" / "generate (e,e'p)+pp for GSIM" / "3p events for random forest"
 
-Operation   = "Draw"
+Operation   = "combine targets"
 DataType    = "Data" # "FSI-3 Simulation" / "Data" / "NoPhysics3p" / "Mixed" / "RandomBkg"
 Var         = sys.argv[1] if len(sys.argv)>1 else "Xb"
 Nbins       = 40
