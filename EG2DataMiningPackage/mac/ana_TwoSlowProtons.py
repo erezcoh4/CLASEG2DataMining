@@ -61,7 +61,7 @@ if Operation == "?pp":
 # ------------------------------------------------------------------ #
 elif Operation == "?pp vs rec. protons from ppp":
  
-    Data = "C12_TwoSlowProtons_ppp"
+    Data = "no_physics"
     
     if (Data == "C12_Al27_Fe56_Pb28"):
         ana = TAnalysisEG2("C12_Al27_Fe56_Pb28",ROOT.TCut("Xb>1.05"))
@@ -69,6 +69,11 @@ elif Operation == "?pp vs rec. protons from ppp":
     elif (Data == "C12_TwoSlowProtons_ppp"):
         ana = TAnalysisEG2("C12_TwoSlowProtons_ppp",ROOT.TCut("Xb>1.05"))
         cut = ROOT.TCut("Xb > 1.05")
+    elif (Data == "no_physics"):
+        ana = TAnalysisEG2("GSIM_run0091_eep",ROOT.TCut("Xb>1.05"))
+        cut = ana.Sim3pSRCCut
+
+
 
     if (Var=="Pcm"):
         plot_args = ["Prec.P()" , cut , Nbins , 0 , 1.5 , "|#vec{p} (c.m.)| [GeV/c]"]
@@ -87,11 +92,11 @@ elif Operation == "?pp vs rec. protons from ppp":
     elif (Var=="opening_angle"):
         plot_args = [ str(ana.Theta("protons[1].Vect()","protons[2].Vect()")) , cut , Nbins , 0 , 180 , "#theta_{12} [deg.]"]
     elif (Var=="Wmiss"):
-        plot_args = ["Wmiss.Mag()" , cut , Nbins , -2.1 , 3 , "#sqrt{ |3M_{N} + q - p_{1} - p_{2}|^{2} } [GeV/c ^{2}]"]
+        plot_args = ["Wmiss.Mag()" , cut , Nbins , -3 , 3 , "#sqrt{ |3M_{N} + q - p_{1} - p_{2}|^{2} } [GeV/c ^{2}]"]
 
 
     print "ploting " + Var
-    gen_plot.plot(ana,"recProtons_ppp_"+Data+"_"+Var,plot_args)
+    gen_plot.plot(ana,"recProtons_"+Data+"_"+Var,plot_args)
 
 
 # ------------------------------------------------------------------ #
