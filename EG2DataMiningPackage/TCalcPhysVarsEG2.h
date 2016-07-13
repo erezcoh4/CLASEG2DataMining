@@ -66,22 +66,26 @@ public:
     Float_t uns_pCTOF[20], uns_pEdep[20]     ;
     Float_t N_Px[20]    , N_Py[20]  , N_Pz[20];                 // for raw data
     Float_t thetaMiss23 , phiMiss23;
+    Double_t k0         , kCMmag    , Px    , Py    ,Pz;
     
     Double_t            pcmX        , pcmY          , pcmZ          ;
-    Float_t             TpMiss      , m_A_1         , E_p_init      , M_p_init , pq;
+    Float_t             TpMiss      , m_A_1         , E_p_init      , M_p_init  , pq;
     vector<Float_t>     alpha       , pEdep         , pCTOF         , Tp;
     vector<Int_t>       pCTOFCut    ;
     
     
     TVector3            Pbeam        , Pe;
-    vector<TVector3>    p3vec        , pVertex   ;
-    TLorentzVector      Beam         , e        ,  p                , Wmiss;
+    TVector3            * NMom       , * P1Mom  , * P2Mom           , * e3Vector;
+    vector<TVector3>    p3vec        , pVertex  ;
+    TLorentzVector      Beam         , e        ,  p                , Wmiss     , kCM   , WmissWithCm , WmissCmEps;
     TLorentzVector      Wtilde       , pA       ,  pA_Np_1;
 
     
     
     
-    TLorentzVector          q     , NucleonAtRest     , TargetAtRest  ,   Plead   , Pmiss     , Pcm       , Prec , PcmFinalState;
+    TLorentzVector          q       , NucleonAtRest     , TargetAtRest  ;
+    TLorentzVector          Plead   , Pmiss     , Pcm   , Prec , PcmFinalState;
+    TLorentzVector          Nlead   , Nmiss     ;
     vector<TLorentzVector>  protons ;
 
     
@@ -108,6 +112,7 @@ public:
     void        SetInTree (TTree * tree){InTree = tree;};
     void       SetOutTree (TTree * tree){OutTree = tree;};
     void     SetFrameName (TString name){FrameName = name;};
+    void            Setk0 (Float_t  fk0){k0 = fk0;};
     
     // initializations
     void    InitInputTree ();

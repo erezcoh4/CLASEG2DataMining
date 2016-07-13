@@ -49,6 +49,12 @@ void TSchemeDATA::LoadInTree(){
         InTree -> SetBranchAddress("N_Py"           , &N_Py);    // negative particles momenta (electron is the first)
         InTree -> SetBranchAddress("N_Pz"           , &N_Pz);    // negative particles momenta (electron is the first)
     }
+    else if(DataType == "(e,e'npp)") {
+        NMom = P1Mom = P2Mom = 0;
+        InTree -> SetBranchAddress("NMom"           , &NMom);
+        InTree -> SetBranchAddress("P1Mom"          , &P1Mom);
+        InTree -> SetBranchAddress("P2Mom"          , &P2Mom);
+    }
     
 }
 
@@ -197,7 +203,26 @@ void TSchemeDATA::TwoSlowProtons_ppp(int fTargetType , float fpMin, float fpMax)
     WriteOutFile();
 }
 
-
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void TSchemeDATA::TwoSlowProtons_npp(float fn_pMin , float fpMin, float fpMax){
+    SetSchemeType   ("TwoSlowProtons_npp");
+    LoadInTree      ();
+    CreateOutTree   ();
+    
+    if (DataType == "(e,e'npp)") {
+        for (Long64_t i = 0; i < Nentries ; i++) {
+            if (i%(Nentries/20)==0) plot.PrintPercentStr((float)i/Nentries);
+            InTree -> GetEntry(i);
+            
+            // look for events with only one negative particle (electron) and two positive (protons) of intermediate momenta, plus one aditional neutron with large momentum > 1.1 GeV/c
+            
+            if ( (Xb > 1.05) && (NMom->Mag() > fn_pMin) && (fpMin < P1Mom->Mag() && ( P1Mom->Mag() < fpMax ) && (fpMin < P2Mom->Mag() && ( P2Mom->Mag() < fpMax )) ) ) {
+                OutTree -> Fill();
+            }
+        }
+    }
+    WriteOutFile();
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TSchemeDATA::CreateOutTree(){

@@ -12,6 +12,7 @@ TCalcPhysVarsEG2::TCalcPhysVarsEG2( TTree * fInTree, TTree * fOutTree, int fA , 
     SetInTree       (fInTree);
     SetOutTree      (fOutTree);
     SetFrameName    (fFrameName);
+    Setk0           (0.15);
     A = fA;
     InitGlobals     ();
     InitInputTree   ();
@@ -72,13 +73,19 @@ void TCalcPhysVarsEG2::InitInputTree(){
         InTree -> SetBranchAddress("Py_g"           , &PpY_g);
         InTree -> SetBranchAddress("Pz_g"           , &PpZ_g);
     }
+    else if(DataType == "(e,e'npp)") {
+        NMom = P1Mom = P2Mom = e3Vector = 0;
+        
+        InTree -> SetBranchAddress("e3Vector"       , &e3Vector);
+        InTree -> SetBranchAddress("NMom"           , &NMom);
+        InTree -> SetBranchAddress("P1Mom"          , &P1Mom);
+        InTree -> SetBranchAddress("P2Mom"          , &P2Mom);
+    }
+    
     
     Nentries    = InTree -> GetEntries();
     std::cout << "Initialized Input InTree TCalcPhysVarsEG2 for " << InTree -> GetName() <<", Nentries = " <<  Nentries << std::endl;
 }
-
-
-
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::InitOutputTree(){
@@ -127,6 +134,8 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("e"                   ,"TLorentzVector"       ,&e);
     OutTree -> Branch("Wtilde"              ,"TLorentzVector"       ,&Wtilde);
     OutTree -> Branch("Wmiss"               ,"TLorentzVector"       ,&Wmiss);
+    OutTree -> Branch("WmissWithCm"         ,"TLorentzVector"       ,&WmissWithCm);
+    OutTree -> Branch("WmissCmEps"          ,"TLorentzVector"       ,&WmissCmEps);
     OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
 
     
@@ -142,13 +151,13 @@ void TCalcPhysVarsEG2::InitOutputTree(){
         OutTree -> Branch("generated Bjorken x"     ,&Xb_g          , "Xb_g/F");
 
     }
+    if(DataType == "(e,e'npp)"){
+        OutTree -> Branch("Nlead"               ,"TLorentzVector"       ,&Plead);
+        OutTree -> Branch("Nmiss"               ,"TLorentzVector"       ,&Nmiss);
+    }
     
     std::cout << "Initialized Output Tree TCalcPhysVarsEG2 on " << OutTree -> GetTitle() << std::endl;
-
-
-
 }
-
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::InitGlobals(){
@@ -162,7 +171,6 @@ void TCalcPhysVarsEG2::InitGlobals(){
 
 }
 
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::InitEvent(){
     if (!p3vec.empty())     p3vec.clear();   // unsorted protons
@@ -173,11 +181,21 @@ void TCalcPhysVarsEG2::InitEvent(){
     if (!pCTOFCut.empty())  pCTOFCut.clear();
     if (!pEdep.empty())     pEdep.clear();
     if (!Tp.empty())        Tp.clear();
+    Np = 0;
     Plead = TLorentzVector();
     Wmiss.SetVectM( TVector3() , 3. * Mp  );
+
+
+    // see how much the W2 peak is broadened because of motion of three nucleons as a whole
+    // add 3-momentum for the nucleons and, put with exp(-(k/k0)^2, k0 ~ 150-200 MeV/c
+    kCMmag = rand.Gaus( 0 , k0 );
+    rand.Sphere( Px , Py , Pz , kCMmag );
+    WmissWithCm.SetVectM( TVector3(Px , Py , Pz) , 3. * Mp  );
+
+    // maybe interesting to see how much answer changes if 3m_N is changed to 3m_N - epsilon where epsilon ~ 40 MeV
+    WmissCmEps.SetVectM( TVector3(Px , Py , Pz) , 3. * Mp - 0.040 );
+
 }
-
-
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::ComputePhysVars(int entry){
@@ -188,16 +206,16 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     // electron
     if(DataType == "data" || DataType == "GSIM" ) {
         Pe      = TVector3( Px_e , Py_e , Pz_e );
-        //        q.SetPxPyPzE( - Px_e , - Py_e , 5.009 - Pz_e , Nu); delete may 27
     }
     else if (DataType == "no ctof"){
         Pe = TVector3( N_Px[0] , N_Py[0] , N_Pz[0] );
-        //        q.SetPxPyPzE( - N_Px[0] , - N_Py[0] , 5.009 - N_Pz[0], Nu); delete may 27
+    }
+    else if (DataType == "(e,e'npp)"){
+        Pe = *e3Vector;
     }
     e.SetVectM( Pe , Me );
     q = Beam - e;
     Q2 = -q.Mag2();
-    
     
     // get protons - energy loss correction and Coulomb corrections
     for (int i = 0 ; i < Np ; i++ ){
@@ -209,6 +227,15 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
             Plead.SetVectM( p3vec.back() , Mp ) ;           // Plead is first calculated in Lab-Frame
         
     }
+    
+    if (DataType == "(e,e'npp)"){
+        // momenta corrections have already performed
+        p3vec.push_back(*NMom);
+        Plead.SetVectM( p3vec.back() , Mn ) ;           
+        p3vec.push_back(*P1Mom);
+        p3vec.push_back(*P2Mom);
+    }
+   
 
     // Pmiss , p/q , 𝜃(p,q)
     Pmiss       = Plead - q;
@@ -240,6 +267,9 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
     // c.m. momentum
     Wmiss      += q;
+    WmissWithCm+= q;
+    WmissCmEps += q;
+    
     Pcm         = -q;
     PcmFinalState = TLorentzVector();
     
@@ -269,6 +299,11 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
  
 
     // if we have 3 protons, randomize protons 2 and 3
+    if(DataType == "(e,e'npp)"){
+        Nlead = Plead; // the leader is a n
+        Nmiss = Nlead - q;
+        Np = 3;
+    }
     if (Np==2) {
         p12Randomize();
     }
@@ -276,10 +311,11 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         p23Randomize();
         thetaMiss23 = r2d*Pmiss.Vect().Angle(Prec.Vect());
         phiMiss23   = 90 - r2d*( Pmiss.Vect().Angle(protons.at(1).Vect().Cross(protons.at(2).Vect()).Unit()) );
-        Wmiss += protons.at(0);
+        Wmiss       += protons.at(0);
+        WmissWithCm += protons.at(0);
+        WmissCmEps  += protons.at(0);
     }
-
-
+    
     pcmX = Pcm.Px();
     pcmY = Pcm.Py();
     pcmZ = Pcm.Pz();
@@ -289,7 +325,6 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
 }
 
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::ChangeAxesFrame(){
     if (FrameName == "q(z) - Pmiss(x-z) frame")
@@ -297,9 +332,6 @@ void TCalcPhysVarsEG2::ChangeAxesFrame(){
     else if(FrameName == "Pmiss(z) - q(x-z) frame")
         Pmiss_q_frame();
 }
-
-
-
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::q_Pmiss_frame(){
@@ -316,7 +348,6 @@ void TCalcPhysVarsEG2::q_Pmiss_frame(){
     q.RotateY(-q_theta);
 }
 
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::Pmiss_q_frame(){
     //     Pmiss is the z axis, q is in x-z plane: q=(q[x],0,q[Pmiss])
@@ -331,9 +362,6 @@ void TCalcPhysVarsEG2::Pmiss_q_frame(){
     Pmiss.RotateZ(-Pmiss_phi);
     Pmiss.RotateY(-Pmiss_theta);
 }
-
-
-
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::loop_protons(){
@@ -382,12 +410,12 @@ void TCalcPhysVarsEG2::loop_protons(){
         // Invariant mass of the system produced in the interaction of balancing nucleon with a virtual photon
         Wtilde     -= protons.back();
         Wmiss      -= protons.back();
+        WmissWithCm-= protons.back();
+        WmissCmEps -= protons.back();
     }
     
     
 }
-
-
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OåOooo........oooOO0OOooo......
 vector<size_t> TCalcPhysVarsEG2::sort_pMag(const vector<TVector3> &v) {
@@ -396,7 +424,6 @@ vector<size_t> TCalcPhysVarsEG2::sort_pMag(const vector<TVector3> &v) {
     std::sort(idx.begin(), idx.end(), [&v](size_t i1, size_t i2) {return v[i1].Mag() > v[i2].Mag();});
     return idx;
 }
-
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::p23Randomize(){
@@ -415,7 +442,6 @@ void TCalcPhysVarsEG2::p23Randomize(){
     }
 }
 
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::p12Randomize(){
     // If we have 2 protons, randomly choose which is p₂ with a probablity of 50%
@@ -432,8 +458,6 @@ void TCalcPhysVarsEG2::p12Randomize(){
         }
     }
 }
-
-
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::PrintData(int entry){
@@ -458,6 +482,8 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOW(sum_alpha);
     SHOWTLorentzVector(Pmiss);
     SHOWTLorentzVector(Wmiss);
+    SHOWTLorentzVector(WmissWithCm);
+    SHOWTLorentzVector(WmissCmEps);
     SHOW(TpMiss);
     SHOWTLorentzVector(Prec);
     SHOWTLorentzVector(Pcm);

@@ -56,7 +56,7 @@ public:
 
     
     TVector3    * q     , * Plead   , * proton, Pmiss;
-
+    TVector3    *NMom   , * P1Mom   , * P2Mom;
     
     
     /// Default constructor
@@ -94,6 +94,7 @@ public:
     void       SRCPmissXb (int fTargetType = 2 , float fXbMin = 1.05, int fNpMin = 1, int fNpMax= 5, TString name="");
     void   TwoSlowProtons (int fTargetType = 2 , float fpMin = 0.2 , float fpMax = 3. );
     void   TwoSlowProtons_ppp (int fTargetType = 2 , float fpMin = 0.2 , float fpMax = 3. );
+    void   TwoSlowProtons_npp (float fn_pMin = 1.1 , float fpMin = 0.2 , float fpMax = 3. );
     
     
     void     SchemeOnTCut (TString , TString , TString , TString , TCut);
