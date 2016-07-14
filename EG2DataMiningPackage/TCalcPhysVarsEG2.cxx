@@ -121,11 +121,13 @@ void TCalcPhysVarsEG2::InitOutputTree(){
 
     
     // TVector3 branches
+    OutTree -> Branch("PmRctLab3"           ,"TVector3"             ,&PmRctLab3);
     OutTree -> Branch("pVertex"             ,&pVertex);             // std::vector<TVector3>
  
     
     // TLorentzVector branches
     OutTree -> Branch("Pmiss"               ,"TLorentzVector"       ,&Pmiss);
+    OutTree -> Branch("PmissRct"            ,"TLorentzVector"       ,&PmissRct);
     OutTree -> Branch("Pcm"                 ,"TLorentzVector"       ,&Pcm);
     OutTree -> Branch("PcmFinalState"       ,"TLorentzVector"       ,&PcmFinalState);
     OutTree -> Branch("Plead"               ,"TLorentzVector"       ,&Plead);
@@ -235,8 +237,9 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         p3vec.push_back(*P1Mom);
         p3vec.push_back(*P2Mom);
     }
-   
-
+    if(p3vec.size()==3)
+        PmRctLab3   = q.Vect() - p3vec.at(1) - p3vec.at(2);
+    
     // Pmiss , p/q , 𝜃(p,q)
     Pmiss       = Plead - q;
     // p(A-1) = -p(init) , and E(A-1) + E(p(init)) = m(A) => E(p(init)) = m(A) - E(A-1)
@@ -309,6 +312,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     }
     else if (Np==3) {
         p23Randomize();
+        PmissRct    = q - protons.at(1) - protons.at(2);
         thetaMiss23 = r2d*Pmiss.Vect().Angle(Prec.Vect());
         phiMiss23   = 90 - r2d*( Pmiss.Vect().Angle(protons.at(1).Vect().Cross(protons.at(2).Vect()).Unit()) );
         Wmiss       += protons.at(0);

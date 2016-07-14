@@ -74,18 +74,18 @@ public:
     vector<Int_t>       pCTOFCut    ;
     
     
-    TVector3            Pbeam        , Pe;
-    TVector3            * NMom       , * P1Mom  , * P2Mom           , * e3Vector;
-    vector<TVector3>    p3vec        , pVertex  ;
-    TLorentzVector      Beam         , e        ,  p                , Wmiss     , kCM   , WmissWithCm , WmissCmEps;
-    TLorentzVector      Wtilde       , pA       ,  pA_Np_1;
-
+    TVector3            Pbeam       , Pe;
+    TVector3            * NMom      , * P1Mom  , * P2Mom           , * e3Vector;
+    TVector3            PmRctLab3   ;
+    vector<TVector3>    p3vec       , pVertex  ;
     
     
     
-    TLorentzVector          q       , NucleonAtRest     , TargetAtRest  ;
-    TLorentzVector          Plead   , Pmiss     , Pcm   , Prec , PcmFinalState;
-    TLorentzVector          Nlead   , Nmiss     ;
+    TLorentzVector      Beam        , e        ,  p                , Wmiss     , kCM   , WmissWithCm , WmissCmEps;
+    TLorentzVector      Wtilde      , pA       ,  pA_Np_1;
+    TLorentzVector      q           , NucleonAtRest     , TargetAtRest  ;
+    TLorentzVector      Plead       , Pmiss     , Pcm   , Prec , PcmFinalState;
+    TLorentzVector      PmissRct    , Nlead     , Nmiss     ;
     vector<TLorentzVector>  protons ;
 
     
