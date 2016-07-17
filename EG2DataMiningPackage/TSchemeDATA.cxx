@@ -142,7 +142,7 @@ void TSchemeDATA::TwoSlowProtons(int fTargetType , float fpMin, float fpMax){
             
             // look for events with only one negative particle (electron) and two positive (protons)
         
-            if( ( Np == 2 ) && ( Nn == 1 ) && (targ_type == TargetType) && (Xb > 0.9)){
+            if( ( Np == 2 ) && ( Nn == 1 ) && (targ_type == TargetType) ) { //&& (Xb > 0.9)){
                 for (int p = 0 ; p < Np ; p++){
                     if( P_cut[p] == 1 && P_PID[p] == 1 ){    // this is a proton with momentum |p|<2.8 and 'good' CTOF
                         proton = new TVector3(PpX[p],PpY[p],PpZ[p]);

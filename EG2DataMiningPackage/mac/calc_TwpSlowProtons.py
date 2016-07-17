@@ -33,7 +33,8 @@ calc        = TCalcPhysVarsEG2( InTree , OutTree , A , DataType , "q(z) - Pmiss(
 for entry in range(0, (int)(1.*Nentries)):
     
     calc.ComputePhysVars( entry );
-    if (entry>0):
+    if (entry%1000==0):
+        print "entry %d"%entry
         calc.PrintData( entry );
 
 

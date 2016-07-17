@@ -108,6 +108,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("q LC fraction"       ,&alpha_q               , "alpha_q/F");
     OutTree -> Branch("sum of LC fractions" ,&sum_alpha             , "sum_alpha/F");
     OutTree -> Branch("theta p(miss)-p2 p3" ,&thetaMiss23           , "thetaMiss23/F");
+    OutTree -> Branch("theta p(lead)-p(rec)",&thetaLeadRec          , "thetaLeadRec/F");
     OutTree -> Branch("phi p(miss)-p2 p3"   ,&phiMiss23             , "phiMiss23/F");
     OutTree -> Branch("alpha"               ,&alpha                 );// std::vector<Float_t>
     OutTree -> Branch("pCTOF"               ,&pCTOF                 );// std::vector<Float_t>
@@ -319,6 +320,9 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         WmissWithCm += protons.at(0);
         WmissCmEps  += protons.at(0);
     }
+    thetaLeadRec = Plead.Vect().Angle(Prec.Vect());
+    
+    
     
     pcmX = Pcm.Px();
     pcmY = Pcm.Py();

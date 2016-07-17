@@ -60,8 +60,11 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     cutP2       = "0.3 < protons[1].P() && (-27 < pVertex[1].Z() && pVertex[1].Z() < -20)";
     cutP3       = "0.3 < protons[2].P() && (-27 < pVertex[2].Z() && pVertex[2].Z() < -20)";
     cutMmiss    = "Pcm.Mag() < 3*0.938";
+    cutWmiss    = "Wmiss.Mag() > 0";
     cutAngles2p = Form("%s > 150", TPlots::Theta("Pmiss.Vect()","Prec.Vect()").Data());
     cutAngles3p = "thetaMiss23 > 155 && fabs(phiMiss23) < 15";
+    
+    
     
     
     // pID from ∆E (dep.) in TOF scintillators
@@ -70,12 +73,15 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     pppCutPmT   = pppCut && cutPmT;
     pppCutPmTMm = pppCutPmT && cutMmiss;
     pppSRCCut   = cutSRC && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut && cutPmT && cutMmiss;
-//    pppSRCMmiss = pppSRCCut && cutMmiss;
+    //    pppSRCMmiss = pppSRCCut && cutMmiss;
     Final3pCut  = pppSRCMmiss && cutAngles3p;
     
     
-    // For 3p simulation...
+    
+    
+    // For 3p simulation
     Sim3pSRCCut = cutSRC && " 3 <= Np" && "0.3 < protons[1].P() && 0.3 < protons[2].P()" && cutPmT && cutMmiss ;
+    Sim3pWmissCut = Sim3pSRCCut && cutWmiss ;
     FinalSim3pSRCCut = Sim3pSRCCut && cutAngles3p;
     
     
