@@ -9,7 +9,7 @@ import Initiation as init
 
 
 
-Operation   = "Xb"
+Operation   = "diff.samples"
 Var         = sys.argv[1] if len(sys.argv)>1 else "Xb"
 Nbins       = 50
 dm          = TEG2dm()
@@ -18,7 +18,7 @@ Path        = "/Users/erezcohen/Desktop/DataMining/AnaFiles"
 
 
 print "looking at sample of ?pp events, operation = " +Operation + ", Var = " + Var
-XbCut = ROOT.TCut("")
+XbCut = ROOT.TCut("Xb>0 && Wmiss.Mag()<1.2 && (0.938*0.938 + 0.938*q.E() - Q2)<2.")
 
 
 
@@ -38,7 +38,7 @@ elif (DataType == 2):
 elif (DataType == 3):
     DataName = "C12_TwoSlowProtons_ppp"
     ana = TAnalysisEG2(DataName,XbCut) # two slow protons + additional fast proton (>1. GeV/c)
-    cut = ROOT.TCut("Xb>1.05 ")#&& TMath::RadToDeg()*PmRctLab3.Theta()<45")
+    cut = XbCut #&& TMath::RadToDeg()*PmRctLab3.Theta()<45")
 elif (DataType == 4):
     DataName = "C12_TwoSlowProtons_npp"
     ana = TAnalysisEG2(DataName,XbCut) # two slow protons + additional fast proton (>1. GeV/c)
@@ -46,8 +46,8 @@ elif (DataType == 4):
 elif (DataType == 5):
     DataName = "GSIM_run0091_eep"
     ana = TAnalysisEG2(DataName,XbCut) # two slow protons from synthetic data of candidates + 2 random protons
-#    cut = ana.Sim3pSRCCut
-    cut = ana.Sim3pWmissCut
+    cut = ana.Sim3pWmissCut #    cut = ana.Sim3pSRCCut
+
 
 
 
@@ -101,23 +101,23 @@ if Operation == "diff.samples":
         plot_args = ["Prec.Pz()","Pmiss.Pz()",cut,Nbins,-2,2,Nbins,-2,2,gp.PmqTit,gp.PrecqTit]
 
     elif (Var=="XbVsWmiss"):
-        plot_args = ["Xb","Wmiss.Mag()",ROOT.TCut(""),200,0,3,200,-2,4,gp.XbTit,gp.WmissTit]
+        plot_args = ["Xb","Wmiss.Mag()",cut,200,0,3,200,-2,4,gp.XbTit,gp.WmissTit]
 
     elif (Var=="XbVsPrec_q"):
-        plot_args = ["Xb","Prec.Pz()",cut,Nbins,1,2,Nbins,-0.5,0.8,gp.XbTit,gp.PrecqTit]
+        plot_args = ["Xb","Prec.Pz()",cut,Nbins,0,2,Nbins,-0.5,0.8,gp.XbTit,gp.PrecqTit]
 
     elif (Var=="XbVsPcm"):
-        plot_args = ["Xb","PcmFinalState.P()",ROOT.TCut(""),100,0,3,100,0,2,gp.XbTit,"(recoling protons)  " + gp.PcmTit]
+        plot_args = ["Xb","PcmFinalState.P()",cut,100,0,3,100,0,2,gp.XbTit,"(recoling protons)  " + gp.PcmTit]
 
     elif (Var=="XbVsProtonsAngle"):
-        plot_args = ["Xb","(TMath::RadToDeg()*PcmFinalState.Theta())",ROOT.TCut(""),100,0,3,100,0,180,gp.XbTit,gp.ThetaPrecTit]
+        plot_args = ["Xb","(TMath::RadToDeg()*PcmFinalState.Theta())",cut,100,0,3,100,0,180,gp.XbTit,gp.ThetaPrecTit]
     
     elif (Var=="XbVsMcm"):
-        plot_args = ["Xb","-Pcm.Mag()",ROOT.TCut(""),200,0,2.8,200,-2,4.8,gp.XbTit,gp.qp1p2Tit]
+        plot_args = ["Xb","-Pcm.Mag()",cut,200,0,2.8,200,-2,4.8,gp.XbTit,gp.qp1p2Tit]
 
 
     elif (Var=="XbVsWe"):
-        plot_args = ["Xb","0.938*0.938 + 0.938*q.E() - Q2",ROOT.TCut(""),200,0,2.8,200,-4,5,gp.XbTit,gp.We2Tit]
+        plot_args = ["Xb","0.938*0.938 + 0.938*q.E() - Q2",cut,200,0,2.8,200,-4,5,gp.XbTit,gp.We2Tit]
     
     
     elif (Var=="XbVs_op_angle"):
