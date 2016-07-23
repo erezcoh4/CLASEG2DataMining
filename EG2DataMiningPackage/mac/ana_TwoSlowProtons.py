@@ -18,7 +18,7 @@ Path        = "/Users/erezcohen/Desktop/DataMining/AnaFiles"
 
 
 print "looking at sample of ?pp events, operation = " +Operation + ", Var = " + Var
-XbCut = ROOT.TCut("Xb>0 && Wmiss.Mag()<1.2 && (0.938*0.938 + 0.938*q.E() - Q2)<2.")
+XbCut = ROOT.TCut("Xb>0 && (0.938*0.938 + 2*0.938*q.E() - Q2)<1.5")
 
 
 
@@ -117,7 +117,12 @@ if Operation == "diff.samples":
 
 
     elif (Var=="XbVsWe"):
-        plot_args = ["Xb","0.938*0.938 + 0.938*q.E() - Q2",cut,200,0,2.8,200,-4,5,gp.XbTit,gp.We2Tit]
+        plot_args = ["Xb","0.938*0.938 + 2*0.938*q.E() - Q2",cut,200,0,2.8,200,-2,9,gp.XbTit,gp.We2Tit]
+
+
+
+    elif (Var=="XbVsWseely"):
+        plot_args = ["Xb","((q.E()+0.938)**2 - q.P()**2)",cut,200,0,2.8,200,-2,9,gp.XbTit,gp.Wseely2Tit]
     
     
     elif (Var=="XbVs_op_angle"):
