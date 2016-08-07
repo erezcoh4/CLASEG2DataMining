@@ -45,7 +45,7 @@ public:
     
     // PARTICLES....
     Int_t   targ_type   , A;
-    Int_t   Np          , Ntot;
+    Int_t   Np          , Ntot          , NpBack       , NpCumulative   , NpCumulativeSRC;
     Int_t   uns_pCut[20], uns_pID[20];
     
     // for GSIM: generated
@@ -70,7 +70,7 @@ public:
     
     Double_t            pcmX        , pcmY          , pcmZ          ;
     Float_t             TpMiss      , m_A_1         , E_p_init      , M_p_init  , pq;
-    vector<Float_t>     alpha       , pEdep         , pCTOF         , Tp;
+    vector<Float_t>     alpha       , pEdep         , pCTOF         , Tp        , proton_angle;
     vector<Int_t>       pCTOFCut    ;
     
     

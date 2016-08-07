@@ -62,7 +62,7 @@ namespace ROOT {
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::TEG2dm));
       static ::ROOT::TGenericClassInfo 
          instance("TEG2dm", "TEG2dm.h", 32,
-                  typeid(::TEG2dm), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  typeid(::TEG2dm), DefineBehavior(ptr, ptr),
                   &TEG2dm_Dictionary, isa_proxy, 4,
                   sizeof(::TEG2dm) );
       instance.SetNew(&new_TEG2dm);
@@ -107,7 +107,7 @@ namespace ROOT {
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::TSchemeDATA));
       static ::ROOT::TGenericClassInfo 
          instance("TSchemeDATA", "TSchemeDATA.h", 26,
-                  typeid(::TSchemeDATA), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  typeid(::TSchemeDATA), DefineBehavior(ptr, ptr),
                   &TSchemeDATA_Dictionary, isa_proxy, 4,
                   sizeof(::TSchemeDATA) );
       instance.SetNew(&new_TSchemeDATA);
@@ -152,7 +152,7 @@ namespace ROOT {
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::TCalcPhysVarsEG2));
       static ::ROOT::TGenericClassInfo 
          instance("TCalcPhysVarsEG2", "TCalcPhysVarsEG2.h", 28,
-                  typeid(::TCalcPhysVarsEG2), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  typeid(::TCalcPhysVarsEG2), DefineBehavior(ptr, ptr),
                   &TCalcPhysVarsEG2_Dictionary, isa_proxy, 4,
                   sizeof(::TCalcPhysVarsEG2) );
       instance.SetNew(&new_TCalcPhysVarsEG2);
@@ -197,7 +197,7 @@ namespace ROOT {
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::TAnalysisEG2));
       static ::ROOT::TGenericClassInfo 
          instance("TAnalysisEG2", "TAnalysisEG2.h", 26,
-                  typeid(::TAnalysisEG2), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  typeid(::TAnalysisEG2), DefineBehavior(ptr, ptr),
                   &TAnalysisEG2_Dictionary, isa_proxy, 4,
                   sizeof(::TAnalysisEG2) );
       instance.SetNew(&new_TAnalysisEG2);
@@ -242,7 +242,7 @@ namespace ROOT {
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::T3pSimulation));
       static ::ROOT::TGenericClassInfo 
          instance("T3pSimulation", "T3pSimulation.h", 27,
-                  typeid(::T3pSimulation), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  typeid(::T3pSimulation), DefineBehavior(ptr, ptr),
                   &T3pSimulation_Dictionary, isa_proxy, 4,
                   sizeof(::T3pSimulation) );
       instance.SetNew(&new_T3pSimulation);
@@ -391,8 +391,8 @@ namespace ROOT {
       vector<int> *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<int>));
       static ::ROOT::TGenericClassInfo 
-         instance("vector<int>", -2, "vector", 477,
-                  typeid(vector<int>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+         instance("vector<int>", -2, "vector", 457,
+                  typeid(vector<int>), DefineBehavior(ptr, ptr),
                   &vectorlEintgR_Dictionary, isa_proxy, 0,
                   sizeof(vector<int>) );
       instance.SetNew(&new_vectorlEintgR);
@@ -421,10 +421,10 @@ namespace ROOT {
 namespace ROOT {
    // Wrappers around operator new
    static void *new_vectorlEintgR(void *p) {
-      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<int> : new vector<int>;
+      return  p ? ::new((::ROOT::TOperatorNewHelper*)p) vector<int> : new vector<int>;
    }
    static void *newArray_vectorlEintgR(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<int>[nElements] : new vector<int>[nElements];
+      return p ? ::new((::ROOT::TOperatorNewHelper*)p) vector<int>[nElements] : new vector<int>[nElements];
    }
    // Wrapper around operator delete
    static void delete_vectorlEintgR(void *p) {
@@ -454,8 +454,8 @@ namespace ROOT {
       vector<float> *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<float>));
       static ::ROOT::TGenericClassInfo 
-         instance("vector<float>", -2, "vector", 477,
-                  typeid(vector<float>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+         instance("vector<float>", -2, "vector", 457,
+                  typeid(vector<float>), DefineBehavior(ptr, ptr),
                   &vectorlEfloatgR_Dictionary, isa_proxy, 0,
                   sizeof(vector<float>) );
       instance.SetNew(&new_vectorlEfloatgR);
@@ -484,10 +484,10 @@ namespace ROOT {
 namespace ROOT {
    // Wrappers around operator new
    static void *new_vectorlEfloatgR(void *p) {
-      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<float> : new vector<float>;
+      return  p ? ::new((::ROOT::TOperatorNewHelper*)p) vector<float> : new vector<float>;
    }
    static void *newArray_vectorlEfloatgR(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<float>[nElements] : new vector<float>[nElements];
+      return p ? ::new((::ROOT::TOperatorNewHelper*)p) vector<float>[nElements] : new vector<float>[nElements];
    }
    // Wrapper around operator delete
    static void delete_vectorlEfloatgR(void *p) {
@@ -517,8 +517,8 @@ namespace ROOT {
       vector<TVector3> *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<TVector3>));
       static ::ROOT::TGenericClassInfo 
-         instance("vector<TVector3>", -2, "vector", 477,
-                  typeid(vector<TVector3>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+         instance("vector<TVector3>", -2, "vector", 457,
+                  typeid(vector<TVector3>), DefineBehavior(ptr, ptr),
                   &vectorlETVector3gR_Dictionary, isa_proxy, 4,
                   sizeof(vector<TVector3>) );
       instance.SetNew(&new_vectorlETVector3gR);
@@ -547,10 +547,10 @@ namespace ROOT {
 namespace ROOT {
    // Wrappers around operator new
    static void *new_vectorlETVector3gR(void *p) {
-      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<TVector3> : new vector<TVector3>;
+      return  p ? ::new((::ROOT::TOperatorNewHelper*)p) vector<TVector3> : new vector<TVector3>;
    }
    static void *newArray_vectorlETVector3gR(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<TVector3>[nElements] : new vector<TVector3>[nElements];
+      return p ? ::new((::ROOT::TOperatorNewHelper*)p) vector<TVector3>[nElements] : new vector<TVector3>[nElements];
    }
    // Wrapper around operator delete
    static void delete_vectorlETVector3gR(void *p) {
@@ -580,8 +580,8 @@ namespace ROOT {
       vector<TLorentzVector> *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<TLorentzVector>));
       static ::ROOT::TGenericClassInfo 
-         instance("vector<TLorentzVector>", -2, "vector", 477,
-                  typeid(vector<TLorentzVector>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+         instance("vector<TLorentzVector>", -2, "vector", 457,
+                  typeid(vector<TLorentzVector>), DefineBehavior(ptr, ptr),
                   &vectorlETLorentzVectorgR_Dictionary, isa_proxy, 4,
                   sizeof(vector<TLorentzVector>) );
       instance.SetNew(&new_vectorlETLorentzVectorgR);
@@ -610,10 +610,10 @@ namespace ROOT {
 namespace ROOT {
    // Wrappers around operator new
    static void *new_vectorlETLorentzVectorgR(void *p) {
-      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<TLorentzVector> : new vector<TLorentzVector>;
+      return  p ? ::new((::ROOT::TOperatorNewHelper*)p) vector<TLorentzVector> : new vector<TLorentzVector>;
    }
    static void *newArray_vectorlETLorentzVectorgR(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<TLorentzVector>[nElements] : new vector<TLorentzVector>[nElements];
+      return p ? ::new((::ROOT::TOperatorNewHelper*)p) vector<TLorentzVector>[nElements] : new vector<TLorentzVector>[nElements];
    }
    // Wrapper around operator delete
    static void delete_vectorlETLorentzVectorgR(void *p) {
@@ -640,12 +640,12 @@ namespace {
     };
     static const char* includePaths[] = {
 "/Users/erezcohen/larlite/UserDev/mySoftware",
-"/usr/local/Cellar/root6/6.06.02/include/root",
+"/Users/erezcohen/root6/root-6.04.10/include",
 "/Users/erezcohen/larlite/UserDev/CLASEG2DataMining/EG2DataMiningPackage/",
 0
     };
-    static const char* fwdDeclCode = R"DICTFWDDCLS(
-#line 1 "libEG2DataMining_EG2DataMiningPackage dictionary forward declarations' payload"
+    static const char* fwdDeclCode = 
+R"DICTFWDDCLS(
 #pragma clang diagnostic ignored "-Wkeyword-compat"
 #pragma clang diagnostic ignored "-Wignored-attributes"
 #pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
@@ -661,7 +661,6 @@ class __attribute__((annotate("$clingAutoload$TAnalysisEG2.h")))  TAnalysisEG2;
 class __attribute__((annotate("$clingAutoload$T3pSimulation.h")))  T3pSimulation;
 )DICTFWDDCLS";
     static const char* payloadCode = R"DICTPAYLOAD(
-#line 1 "libEG2DataMining_EG2DataMiningPackage dictionary payload"
 
 #ifndef G__VECTOR_HAS_CLASS_ITERATOR
   #define G__VECTOR_HAS_CLASS_ITERATOR 1

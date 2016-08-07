@@ -45,7 +45,7 @@ public:
     
     
     // PARTICLES....
-    Int_t   TargetType  , targ_type;
+    Int_t   TargetType  , targ_type  , NpGood;
     Int_t   Np          , Nn;
     Int_t   P_cut[20]   , P_PID[20]  ;          //positive particles
     
@@ -90,7 +90,7 @@ public:
     void     WriteOutFile ();
 
     
-    
+    void protons_from_nuclei ();
     void       SRCPmissXb (int fTargetType = 2 , float fXbMin = 1.05, int fNpMin = 1, int fNpMax= 5, TString name="");
     void   TwoSlowProtons (int fTargetType = 2 , float fpMin = 0.2 , float fpMax = 3. );
     void   TwoSlowProtons_ppp (int fTargetType = 2 , float fpMin = 0.2 , float fpMax = 3. );

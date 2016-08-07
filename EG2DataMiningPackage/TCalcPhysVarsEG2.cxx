@@ -93,6 +93,9 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     // Integer branches
     OutTree -> Branch("target atomic mass"  ,&A                     ,"A/I");
     OutTree -> Branch("Np"                  ,&Np                    ,"Np/I");
+    OutTree -> Branch("NpBack"              ,&NpBack                ,"NpBack/I"); // number of backward going protons
+    OutTree -> Branch("NpCumulative"        ,&NpCumulative          ,"NpCumulative/I"); // number of backward going protons with 0.3<p
+    OutTree -> Branch("NpCumulativeSRC"     ,&NpCumulativeSRC       ,"NpCumulativeSRC/I"); // number of backward going protons with 0.3<p<0.7
     OutTree -> Branch("total particle num." ,&Ntot                  ,"Ntot/I");
     OutTree -> Branch("pCTOFCut"            ,&pCTOFCut              );// std::vector<Int_t>
 
@@ -111,6 +114,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("theta p(lead)-p(rec)",&thetaLeadRec          , "thetaLeadRec/F");
     OutTree -> Branch("phi p(miss)-p2 p3"   ,&phiMiss23             , "phiMiss23/F");
     OutTree -> Branch("alpha"               ,&alpha                 );// std::vector<Float_t>
+    OutTree -> Branch("proton_angle"        ,&proton_angle          );// std::vector<Float_t>
     OutTree -> Branch("pCTOF"               ,&pCTOF                 );// std::vector<Float_t>
     OutTree -> Branch("pEdep"               ,&pEdep                 );// std::vector<Float_t>
     OutTree -> Branch("TpMiss"              ,&TpMiss                , "TpMiss/F");
@@ -184,7 +188,8 @@ void TCalcPhysVarsEG2::InitEvent(){
     if (!pCTOFCut.empty())  pCTOFCut.clear();
     if (!pEdep.empty())     pEdep.clear();
     if (!Tp.empty())        Tp.clear();
-    Np = 0;
+    if (!proton_angle.empty()) proton_angle.clear();
+    Np = NpBack = NpCumulative = NpCumulativeSRC = 0;
     Plead = TLorentzVector();
     Wmiss.SetVectM( TVector3() , 3. * Mp  );
 
@@ -383,9 +388,10 @@ void TCalcPhysVarsEG2::loop_protons(){
         else if(FrameName == "Pmiss(z) - q(x-z) frame")
             RotVec2_Pm_q_Frame( & p3vec.at(i) , Pmiss_phi, Pmiss_theta, q_phi );
         
-        protons .push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
+        protons.push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
         Pcm     += protons.back();
         PcmFinalState += protons.back();
+        
         
         
         // proton vertex
@@ -402,7 +408,19 @@ void TCalcPhysVarsEG2::loop_protons(){
             pEdep   .push_back( uns_pEdep[i]  );
 
         }
+        
 
+        // cumulative protons
+        proton_angle.push_back(r2d * p3vec.at(i).Angle(q.Vect()));
+        if ( pCTOFCut.back()==1 && proton_angle.back() > 90. ){
+            NpBack ++ ;
+            if (p3vec.at(i).Mag()>0.3){
+                NpCumulative++;
+                if (p3vec.at(i).Mag()<0.7){
+                    NpCumulativeSRC++;
+                }
+            }
+        }
  
         
         // α-s
@@ -471,6 +489,8 @@ void TCalcPhysVarsEG2::p12Randomize(){
 void TCalcPhysVarsEG2::PrintData(int entry){
     
     SHOW(entry);
+    cout << "\033[35m"<< "\t [" << 100*(float)entry/Nentries  << "%]" << "\033[0m"<< endl;
+    PrintLine();
     SHOW(Xb);
     SHOW(Q2);
     SHOW(M_p_init);
@@ -486,6 +506,7 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOWvectorInt_t(pCTOFCut);
     SHOWvectorFloat_t(pEdep);
     SHOWvectorFloat_t(Tp);
+    SHOWvectorFloat_t(proton_angle);
     SHOWTLorentzVector(Plead);
     SHOW(sum_alpha);
     SHOWTLorentzVector(Pmiss);
@@ -497,7 +518,11 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOWTLorentzVector(Pcm);
     SHOW(theta_pq);
     SHOW(p_over_q);
-    PrintLine();
+    SHOW(NpBack);
+    SHOW(NpCumulative);
+    SHOW(NpCumulativeSRC);
+    
+    EndEventBlock();
 }
 
 

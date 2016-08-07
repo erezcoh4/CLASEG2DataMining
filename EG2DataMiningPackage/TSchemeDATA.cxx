@@ -60,6 +60,40 @@ void TSchemeDATA::LoadInTree(){
 
 
 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void TSchemeDATA::protons_from_nuclei(){
+    TargetType      = 2;
+    XbMin           = 0.0;
+    SetSchemeType   ("protons_from_solids");
+    LoadInTree      ();
+    CreateOutTree   ();
+    
+    if (DataType == "no ctof") {
+        //         targ_type = 2; // for Al27
+        
+        for (Long64_t i = 0; i < Nentries ; i++) {
+            NpGood = 0;
+            if (i%(Nentries/20)==0) plot.PrintPercentStr((float)i/Nentries);
+            InTree -> GetEntry(i);
+            if( (targ_type == TargetType) && (Xb > XbMin) ){
+                for (int p = 0 ; p < Np ; p++){
+                    if( P_cut[p] == 1 && P_PID[p] == 1 ){    // this is a proton with momentum |p|<2.8 and 'good' CTOF
+                        NpGood++;
+                    }
+                }
+                if( 0 < NpGood ){
+                    OutTree -> Fill();
+                }
+            }
+        }
+    }
+    
+    WriteOutFile();
+}
+
+
+
+
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
