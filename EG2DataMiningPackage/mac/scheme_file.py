@@ -1,7 +1,5 @@
 import ROOT,os, sys , math , os.path , math
-from ROOT import TEG2dm , TPlots , TAnalysisEG2 , TSchemeDATA
-from rootpy.interactive import wait
-import matplotlib.pyplot as plt
+from ROOT import TEG2dm , TSchemeDATA
 sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
 sys.path.insert(0, '/home/erez/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
 import input_flags
