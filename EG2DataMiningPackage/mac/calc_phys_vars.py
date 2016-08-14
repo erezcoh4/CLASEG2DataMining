@@ -8,7 +8,7 @@ flags = input_flags.get_args()
 '''
     usage:
     --------
-    > python calc_phys_vars.py -A12 -werez --option='A(e,e'p)X' -data='data' -evf=1
+    > python calc_phys_vars.py -A12 -werez --option='A(e,e'p)X' -data='data' -evf=1 -p100
 '''
 
 if flags.worker == "erez":
@@ -32,11 +32,11 @@ elif DataType == "no ctof":
 
 
 
-InFile      = ROOT.TFile(Path + "/Schemed_EG2_DATA/"+"Schemed_"+SchemeType+"_"+FileName+".root")
+InFile      = ROOT.TFile(path + "/Schemed_EG2_DATA/"+"Schemed_"+SchemeType+"_"+FileName+".root")
 InTree      = InFile.Get("T")
 Nentries    = InTree.GetEntries()
 
-OutFile     = ROOT.TFile(Path + "/AnaFiles/"+"Ana_"+FileName+".root","recreate")
+OutFile     = ROOT.TFile(path + "/AnaFiles/"+"Ana_"+FileName+".root","recreate")
 OutTree     = ROOT.TTree("anaTree","physical variables")
 
 
