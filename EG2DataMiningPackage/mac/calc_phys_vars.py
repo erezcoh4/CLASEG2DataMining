@@ -43,7 +43,7 @@ OutTree     = ROOT.TTree("anaTree","physical variables")
 
 
 
-if option=="A(e,e'p)X":
+if flags.option=="A(e,e'p)X":
     calc    = TCalcPhysVarsEG2( InTree , OutTree , A , DataType , "q(z) - Pmiss(x-z) frame" )
 
     for entry in range(0, (int)(flags.evf*Nentries)):
