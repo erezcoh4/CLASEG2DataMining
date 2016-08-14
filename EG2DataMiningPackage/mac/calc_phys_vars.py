@@ -46,7 +46,7 @@ OutTree     = ROOT.TTree("anaTree","physical variables")
 if flags.option=="A(e,e'p)X":
     calc    = TCalcPhysVarsEG2( InTree , OutTree , A , DataType , "q(z) - Pmiss(x-z) frame" )
 
-    for entry in range(0, (int)(flags.evf*Nentries)):
+    for entry in range(0, (int)(flags.evnts_frac*Nentries)):
     
         calc.ComputePhysVars( entry );
         if (entry%flags.print_mod == 0):
