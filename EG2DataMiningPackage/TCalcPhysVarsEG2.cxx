@@ -25,6 +25,8 @@ void TCalcPhysVarsEG2::InitInputTree(){
     InTree -> SetBranchAddress("Xb"                 , &Xb);
     InTree -> SetBranchAddress("Q2"                 , &Q2);
     InTree -> SetBranchAddress("P_nmb"              , &Np);
+    InTree -> SetBranchAddress("T_nmb"              , &Ntotal);
+    InTree -> SetBranchAddress("N_nmb"              , &Nnegative);
   
     if(DataType == "data" || DataType == "GSIM") {
         InTree -> SetBranchAddress("Nu"             , &Nu);
@@ -41,7 +43,6 @@ void TCalcPhysVarsEG2::InitInputTree(){
         InTree -> SetBranchAddress("Y"              , &Yp);
         InTree -> SetBranchAddress("Z"              , &Zp);
         InTree -> SetBranchAddress("CTOF"           , &uns_pCTOF);
-        InTree -> SetBranchAddress("T_nmb"      	, &Ntot);
     }
     
     else if(DataType == "no ctof") {
@@ -96,7 +97,8 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("NpBack"              ,&NpBack                ,"NpBack/I"); // number of backward going protons
     OutTree -> Branch("NpCumulative"        ,&NpCumulative          ,"NpCumulative/I"); // number of backward going protons with 0.3<p
     OutTree -> Branch("NpCumulativeSRC"     ,&NpCumulativeSRC       ,"NpCumulativeSRC/I"); // number of backward going protons with 0.3<p<0.7
-    OutTree -> Branch("total particle num." ,&Ntot                  ,"Ntot/I");
+    OutTree -> Branch("total particle num." ,&Ntotal                ,"Ntotal/I");
+    OutTree -> Branch("neg. particles num." ,&Nnegative             ,"Nnegative/I");
     OutTree -> Branch("pCTOFCut"            ,&pCTOFCut              );// std::vector<Int_t>
 
     

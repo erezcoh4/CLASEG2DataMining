@@ -27,6 +27,7 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     cutPmT      = "Pmiss.Pt() < 0.4";
     cutThetaPQ  = "theta_pq < 25";
     cutPoverQ   = "0.62 < p_over_q && p_over_q < 0.96";
+    cutMmiss2   = "Mmiss < 1.1";
     
     cutSRCNoPm  = cutXb && cutThetaPQ && cutPoverQ ;
     cutSRC      = cutXb && cutThetaPQ && cutPoverQ && cutPmiss;
@@ -35,6 +36,8 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     for (int i = 0; i < 3; i++ ) {
                 pEdepCut[i] = TEG2dm::pEdepCut(i);
     }
+    p1EdepCut   = Form("%s",pEdepCut[0]->GetName());
+    p1CTOFCut   = pCTOFCut[0] ;
     ppEdepCut   = Form("%s && %s",pEdepCut[0]->GetName(),pEdepCut[1]->GetName());
     ppCTOFCut   = pCTOFCut[0] && pCTOFCut[1] ;
     pppEdepCut  = Form("%s && %s && %s",pEdepCut[0]->GetName(),pEdepCut[1]->GetName(),pEdepCut[2]->GetName());
@@ -44,14 +47,18 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     
     // (e,e'p) in our cuts
     eepFinalCut = cutXb && cutThetaPQ && cutPoverQ && cutPmiss && cutPmT;
-    
+    eepInSRCCut = cutSRC && cutMmiss2 && "1 <= Np" && cutPlead && p1CTOFCut;
+
     
     
     // 2p-SRC following Or Hen' cuts
     cutPlead    = "-24.5 < pVertex[0].Z() && pVertex[0].Z() < -20";
     cutPrec     = "0.35 < Prec.P()  &&  (-24.5 < pVertex[1].Z() && pVertex[1].Z() < -20)";
-    ppSRCCut    = cutSRC && " 2 <= Np" && cutPlead && cutPrec;
+    ppSRCCut    = cutSRC && "2 <= Np" && cutPlead && cutPrec && ppCTOFCut;
     
+    
+    // (e,e'p) in our cuts
+    eepInSRCCut = cutSRC && cutMmiss2 && "1 <= Np" && cutPlead && p1CTOFCut;
     
     
     

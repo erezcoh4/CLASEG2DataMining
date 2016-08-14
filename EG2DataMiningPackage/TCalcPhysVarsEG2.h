@@ -45,7 +45,8 @@ public:
     
     // PARTICLES....
     Int_t   targ_type   , A;
-    Int_t   Np          , Ntot          , NpBack       , NpCumulative   , NpCumulativeSRC;
+    Int_t   Np          , Ntotal        , Nnegative;
+    Int_t   NpBack      , NpCumulative  , NpCumulativeSRC;
     Int_t   uns_pCut[20], uns_pID[20];
     
     // for GSIM: generated

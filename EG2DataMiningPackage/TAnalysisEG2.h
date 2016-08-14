@@ -67,17 +67,17 @@ public:
     
     // cuts
     TCutG   * pEdepCut[3];
-    TCut    cutXb       , cutPmiss          , cutPmT        , cutThetaPQ    , cutPoverQ     ;
+    TCut    cutXb       , cutPmiss          , cutPmT        , cutThetaPQ    , cutPoverQ     , cutMmiss2;
     TCut    cutMmiss    , cutPlead          , cutPrec       , cutP1         , cutP2         , cutP3 ;
     TCut    cutWmiss    ;
     TCut    cutAngles2p , cutAngles3p       , cutSRCNoPm;
-    TCut    pCTOFCut[3] , ppEdepCut         , ppCTOFCut     , pppEdepCut    , pppCTOFCut    ;
+    TCut    pCTOFCut[3] , p1EdepCut         , p1CTOFCut     , ppEdepCut     , ppCTOFCut     , pppEdepCut    , pppCTOFCut    ;
     TCut    cutSRC      , eepFinalCut       , cut1pSRC      , ppSRCCut      ;
     TCut    pppSRCCut   , pppSRCMmiss       , Final3pCut    ;
     TCut    pppRandomBkg, pppCut            , pppCutPmT     , pppCutPmTMm   ;
     TCut    Sim3pSRCCut , FinalSim3pSRCCut  , Sim3pWmissCut ;
     TCut    Mix3pSRCCut , FinalMix3pSRCCut  , Mix3pPmT      , Mix3pPmTMm    ;
-
+    TCut    eepInSRCCut ;
     
     void         SetSRCCuts ( TCut XbCut = "1.05 <= Xb");
     void        PrintInCuts ();

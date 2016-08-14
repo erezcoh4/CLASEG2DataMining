@@ -1,27 +1,34 @@
-from ROOT import TSchemeDATA
+import ROOT,os, sys , math , os.path , math
+from ROOT import TEG2dm , TPlots , TAnalysisEG2 , TSchemeDATA
+from rootpy.interactive import wait
+import matplotlib.pyplot as plt
+sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
+sys.path.insert(0, '/home/erez/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
+import input_flags
+flags = input_flags.get_args()
 
-scheme = TSchemeDATA("data","/Users/erezcohen/Desktop/DataMining","DATA_C12","T")
+'''
+    usage:
+    --------
+    > python scheme_file.py -A12 -werez --operation='scheme SRCPmissXb'
+'''
+
+if flags.worker == "erez":
+    path = "/Users/erezcohen/Desktop/DataMining"
+
+elif flags.worker == "helion":
+    path = "/home/erez/DataMining"
+
+scheme = TSchemeDATA("data",path,"DATA_C12","T")
 
 
 
-DoSchemeSRC     = False
-DoScheme2pSRC   = True
 
-
-
-
-
-
-
-if DoSchemeSRC:
+if (flags.operation=="SRCPmissXb")
     
     scheme.SRCPmissXb( 2 , 1.1 ) # target-type = 2, Bjorken x > 1.1
     print 'schemed for SRC in nuclear target (1 > p(miss) > 0.3 GeV/c) and Xb > 1.1'
 
-if DoScheme2pSRC:
-    
-    scheme.SRCPmissXb( 2 , 1.1 , 2 , 2) # target-type = 2, Bjorken x > 1.1
-    print 'schemed for ppSRC in nuclear target (1 > p(miss) > 0.3 GeV/c) and Xb > 1.1'
 
 else:
     

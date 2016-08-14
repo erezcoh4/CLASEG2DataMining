@@ -28,6 +28,7 @@ void TSchemeDATA::LoadInTree(){
     
     InTree -> SetBranchAddress("P_nmb"          , &Np);
     InTree -> SetBranchAddress("N_nmb"          , &Nn);
+    InTree -> SetBranchAddress("T_nmb"          , &Ntotal);
     InTree -> SetBranchAddress("Xb"             , &Xb);
     InTree -> SetBranchAddress("targ_type"      , &targ_type); // for Al27 remove this
     
@@ -160,26 +161,32 @@ void TSchemeDATA::SRCPmissXb(int fTargetType , float fXbMin, int fNpMin, int fNp
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TSchemeDATA::TwoSlowProtons(int fTargetType , float fpMin, float fpMax){
+    
     TargetType      = fTargetType;
     SetSchemeType   ("TwoSlowProtons");
     LoadInTree      ();
     CreateOutTree   ();
-    int NpGood ;
     
     if (DataType == "no ctof") {
-        //         targ_type = 2; // for Al27
+
+        targ_type = 2; // for 27Al or the new 12C Meytal cooked Aug-2016
         
         for (Long64_t i = 0; i < Nentries ; i++) {
+            
             if (i%(Nentries/20)==0) plot.PrintPercentStr((float)i/Nentries);
             NpGood = 0;
             InTree -> GetEntry(i);
             
             // look for events with only one negative particle (electron) and two positive (protons)
         
-            if( ( Np == 2 ) && ( Nn == 1 ) && (targ_type == TargetType) ) { //&& (Xb > 0.9)){
+            if( ( Np == 2 ) && ( Nn == 1 ) && ( Ntotal == 3 ) && (targ_type == TargetType) ) {
+                
+                // make sure these two positive particles are actually protons
                 for (int p = 0 ; p < Np ; p++){
                     if( P_cut[p] == 1 && P_PID[p] == 1 ){    // this is a proton with momentum |p|<2.8 and 'good' CTOF
                         proton = new TVector3(PpX[p],PpY[p],PpZ[p]);
+                        
+                        // and that their momenta are in the desired range
                         if (fpMin < proton->Mag() && proton->Mag() < fpMax) {
                             NpGood++;
                         }
