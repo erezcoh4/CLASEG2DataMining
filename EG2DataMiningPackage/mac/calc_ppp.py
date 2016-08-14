@@ -1,6 +1,3 @@
-# run:
-# > python mac/calc_ppp.py <target A>
-
 import ROOT , os , sys 
 from ROOT import TEG2dm , TSchemeDATA , TAnalysisEG2 , TCalcPhysVarsEG2
 
