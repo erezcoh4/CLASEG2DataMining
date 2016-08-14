@@ -12,7 +12,7 @@ ROOT.gStyle.SetOptStat(0000)
 '''
     usage:
     --------
-    > python ana_SRC.py -A12 -var='Prec' --operation='pp-events'
+    > python ana_SRC.py -A12 -var='Prec' --option='pp-events'
 '''
 
 Nbins       = 35
@@ -21,7 +21,7 @@ var         = flags.variable
 cut         = flags.cut
 
 if flags.operation == 12:
-    flags.operation = 'short-tracks'
+    flags.option = 'short-tracks'
 if var == 12:
     var = 'Prec'
 
@@ -40,7 +40,7 @@ def addPreliminaryText(h):
 
 
 # ------------------------------------------------------------------ #
-if flags.operation == "ppSRC":
+if flags.option == "ppSRC":
     
     ana = TAnalysisEG2("NoCTofDATA_%s"% dm.Target(A), XbCut ) #
 
@@ -73,7 +73,7 @@ if flags.operation == "ppSRC":
 
 
 
-elif flags.operation == "(e,e'pp)/(e,e'p)":
+elif flags.option == "(e,e'pp)/(e,e'p)":
     
     ana = TAnalysisEG2("NoCTofDATA_%s"% dm.Target(A), XbCut )
     heep = ana.H1( "Pmiss.P()", ana.eepInSRCCut, "goff", Nbins , 0.3 ,0.9 )
@@ -113,7 +113,7 @@ elif flags.operation == "(e,e'pp)/(e,e'p)":
 
 
 # ------------------------------------------------------------------ #
-elif flags.Operation == "SRC signature of cumulative kinematics in Q2":
+elif flags.option == "SRC signature of cumulative kinematics in Q2":
     
     ana = TAnalysisEG2("everything_NoCTofDATA_%s"% dm.Target(A), XbCut ) #
     
