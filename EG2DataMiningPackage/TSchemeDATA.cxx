@@ -30,17 +30,17 @@ void TSchemeDATA::LoadInTree(){
     InTree -> SetBranchAddress("N_nmb"          , &Nn);
     InTree -> SetBranchAddress("T_nmb"          , &Ntotal);
     InTree -> SetBranchAddress("Xb"             , &Xb);
-    InTree -> SetBranchAddress("targ_type"      , &targ_type); // for Al27 remove this
     
-    if (DataType == "data") {
+    if (DataType == "DATA") {
         InTree -> SetBranchAddress("Px"             , &PpX);
         InTree -> SetBranchAddress("Py"             , &PpY);
         InTree -> SetBranchAddress("Pz"             , &PpZ);
         InTree -> SetBranchAddress("Px_e"           , &Px_e);
         InTree -> SetBranchAddress("Py_e"           , &Py_e);
         InTree -> SetBranchAddress("Pz_e"           , &Pz_e);
+        InTree -> SetBranchAddress("targ_type"      , &targ_type); // for Al27 remove this
     }
-    else if(DataType == "no ctof") {
+    else if(DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
         InTree -> SetBranchAddress("P_Px"           , &PpX);    // protons momenta
         InTree -> SetBranchAddress("P_Py"           , &PpY);
         InTree -> SetBranchAddress("P_Pz"           , &PpZ);
@@ -49,6 +49,7 @@ void TSchemeDATA::LoadInTree(){
         InTree -> SetBranchAddress("N_Px"           , &N_Px);    // negative particles momenta (electron is the first)
         InTree -> SetBranchAddress("N_Py"           , &N_Py);    // negative particles momenta (electron is the first)
         InTree -> SetBranchAddress("N_Pz"           , &N_Pz);    // negative particles momenta (electron is the first)
+        Printf("set adresses for %s",DataType.Data());
     }
     else if(DataType == "(e,e'npp)") {
         NMom = P1Mom = P2Mom = 0;
@@ -69,7 +70,7 @@ void TSchemeDATA::protons_from_nuclei(){
     LoadInTree      ();
     CreateOutTree   ();
     
-    if (DataType == "no ctof") {
+    if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
         //         targ_type = 2; // for Al27
         
         for (Long64_t i = 0; i < Nentries ; i++) {
@@ -126,7 +127,7 @@ void TSchemeDATA::SRCPmissXb(int fTargetType , float fXbMin, int fNpMin, int fNp
             }
         }
     }
-    else if (DataType == "no ctof") {
+    else if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
 //         targ_type = 2; // for Al27
 
         for (Long64_t i = 0; i < Nentries ; i++) {
@@ -166,21 +167,26 @@ void TSchemeDATA::TwoSlowProtons(int fTargetType , float fpMin, float fpMax){
     SetSchemeType   ("TwoSlowProtons");
     LoadInTree      ();
     CreateOutTree   ();
-    
-    if (DataType == "no ctof") {
 
-        targ_type = 2; // for 27Al or the new 12C Meytal cooked Aug-2016
+    if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
+
+        if (DataType == "New_NoCTofDATA") {
+            targ_type = 2; // for 27Al or the new 12C Meytal cooked Aug-2016
+        }
+
         
         for (Long64_t i = 0; i < Nentries ; i++) {
             
-            if (i%(Nentries/20)==0) plot.PrintPercentStr((float)i/Nentries);
+            if (i%(Nentries/20)==0) {
+                printf("schemed %d events so far, out of ", (int)OutTree -> GetEntries());
+                plot.PrintPercentStr((float)i/Nentries);
+            }
             NpGood = 0;
             InTree -> GetEntry(i);
-            
+
             // look for events with only one negative particle (electron) and two positive (protons)
-        
             if( ( Np == 2 ) && ( Nn == 1 ) && ( Ntotal == 3 ) && (targ_type == TargetType) ) {
-                
+
                 // make sure these two positive particles are actually protons
                 for (int p = 0 ; p < Np ; p++){
                     if( P_cut[p] == 1 && P_PID[p] == 1 ){    // this is a proton with momentum |p|<2.8 and 'good' CTOF
@@ -211,7 +217,7 @@ void TSchemeDATA::TwoSlowProtons_ppp(int fTargetType , float fpMin, float fpMax)
     CreateOutTree   ();
     int NpSlow , NpFast ;
     
-    if (DataType == "no ctof") {
+    if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
         //         targ_type = 2; // for Al27
         
         for (Long64_t i = 0; i < Nentries ; i++) {

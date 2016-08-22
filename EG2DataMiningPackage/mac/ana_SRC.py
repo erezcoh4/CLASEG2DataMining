@@ -1,5 +1,5 @@
 import ROOT,os, sys , math , os.path , math
-from ROOT import TEG2dm , TPlots , TAnalysisEG2 , TSchemeDATA
+from ROOT import TEG2dm , TPlots , TAnalysisEG2 , TSchemeDATA , TPaveLabel
 from rootpy.interactive import wait
 import matplotlib.pyplot as plt
 sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
@@ -15,12 +15,12 @@ ROOT.gStyle.SetOptStat(0000)
     > python ana_SRC.py -A12 -var='Prec' --option='pp-events'
 '''
 
-Nbins       = 35
+Nbins       = 12
 A           = flags.atomic_mass
 var         = flags.variable
 cut         = flags.cut
 
-if flags.operation == 12:
+if flags.option == 12:
     flags.option = 'short-tracks'
 if var == 12:
     var = 'Prec'
@@ -42,9 +42,12 @@ def addPreliminaryText(h):
 # ------------------------------------------------------------------ #
 if flags.option == "ppSRC":
     
-    ana = TAnalysisEG2("NoCTofDATA_%s"% dm.Target(A), XbCut ) #
+    ana = TAnalysisEG2("DATA_%s"% dm.Target(A), XbCut ) #
 
     c = ana.CreateCanvas("SRC signature of cumulative kinematics in Q2" )
+    pl = TPaveLabel( 3, 22, 17, 23.7, 'My first PyROOT interactive session', 'br' )
+    pl.SetFillColor( 18 )
+    pl.Draw()
 
     if var == "Prec":
         h = ana.H1( "Prec.P()" ,  ana.ppSRCCut , "hist" , Nbins , 0.3 , 1. , "" , gp.PrecTit )
@@ -60,10 +63,11 @@ if flags.option == "ppSRC":
         ana.Text( 0.5 , 0.8*heep.GetMaximum() , "^{12}C(e,e'p)" , 1, 0.1 )
 
         c.cd(2)
-        h = ana.H1( "Pmiss.P()", ana.ppSRCCut, "hist", Nbins , 0.3 , 1 , "" , gp.PmissTit )
+        h = ana.H1( "Pmiss.P()", ana.eeppInSRCCut, "hist", Nbins , 0.3 , 1 , "" , gp.PmissTit )
         addPreliminaryText(h)
         ana.Text( 0.5 , 0.8*h.GetMaximum() , "^{12}C(e,e'pp)" , 1 , 0.1 )
 
+    c.cd()
 
     c.Update()
     wait()
@@ -75,9 +79,11 @@ if flags.option == "ppSRC":
 
 elif flags.option == "(e,e'pp)/(e,e'p)":
     
-    ana = TAnalysisEG2("NoCTofDATA_%s"% dm.Target(A), XbCut )
+    
+    
+    ana = TAnalysisEG2("DATA_%s"% dm.Target(A), XbCut )
     heep = ana.H1( "Pmiss.P()", ana.eepInSRCCut, "goff", Nbins , 0.3 ,0.9 )
-    heepp = ana.H1( "Pmiss.P()", ana.ppSRCCut, "goff", Nbins , 0.3 , 0.9 )
+    heepp = ana.H1( "Pmiss.P()", ana.eeppInSRCCut, "goff", Nbins , 0.3 , 0.9 )
         
     Pmiss = []
     PmissErr = []
@@ -105,7 +111,7 @@ elif flags.option == "(e,e'pp)/(e,e'p)":
     plt.xlabel(r'$|\vec{p}_{miss}|$ [GeV/c]',fontsize=22)
     plt.ylabel(r'${\frac{^{12}C(e,e\'pp)}{^{12}C(e,e\'p)}}$ [%]',fontsize=25)
     ax = fig.add_subplot(111)
-    ax.text( 0.4, 10, "preliminary - not corrected for CLAS acceptance" , fontsize=22 , color='red' , alpha = 0.15 , rotation=30)
+    ax.text( 0.4, 5, "preliminary - not corrected for CLAS acceptance" , fontsize=22 , color='red' , alpha = 0.15 )#, rotation=30)
     plt.savefig(init.dirname()+"/ppSRC_12C_eepp_eep_ratio.pdf")
     plt.show()
 

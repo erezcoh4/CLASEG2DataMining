@@ -7,7 +7,8 @@
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-TCalcPhysVarsEG2::TCalcPhysVarsEG2( TTree * fInTree, TTree * fOutTree, int fA , TString fDataType, TString fFrameName){
+TCalcPhysVarsEG2::TCalcPhysVarsEG2( TTree * fInTree, TTree * fOutTree, int fA , TString fDataType, TString fFrameName, int fdebug){
+    SetDebug        (fdebug);
     SetDataType     (fDataType);
     SetInTree       (fInTree);
     SetOutTree      (fOutTree);
@@ -22,13 +23,14 @@ TCalcPhysVarsEG2::TCalcPhysVarsEG2( TTree * fInTree, TTree * fOutTree, int fA , 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::InitInputTree(){
+    
     InTree -> SetBranchAddress("Xb"                 , &Xb);
     InTree -> SetBranchAddress("Q2"                 , &Q2);
     InTree -> SetBranchAddress("P_nmb"              , &Np);
     InTree -> SetBranchAddress("T_nmb"              , &Ntotal);
     InTree -> SetBranchAddress("N_nmb"              , &Nnegative);
   
-    if(DataType == "data" || DataType == "GSIM") {
+    if (DataType == "DATA" || DataType == "GSIM") {
         InTree -> SetBranchAddress("Nu"             , &Nu);
         InTree -> SetBranchAddress("Px_e"           , &Px_e);
         InTree -> SetBranchAddress("Py_e"           , &Py_e);
@@ -45,7 +47,7 @@ void TCalcPhysVarsEG2::InitInputTree(){
         InTree -> SetBranchAddress("CTOF"           , &uns_pCTOF);
     }
     
-    else if(DataType == "no ctof") {
+    else if(DataType == "NoCTof_DATA" || DataType == "New_NoCTofDATA") {
         InTree -> SetBranchAddress("N_Px"           , &N_Px);    // negative particles momenta (electron is the first)
         InTree -> SetBranchAddress("N_Py"           , &N_Py);    // negative particles momenta (electron is the first)
         InTree -> SetBranchAddress("N_Pz"           , &N_Pz);    // negative particles momenta (electron is the first)
@@ -59,6 +61,15 @@ void TCalcPhysVarsEG2::InitInputTree(){
         InTree -> SetBranchAddress("P_PID"          , &uns_pID);        // positive particles momenta
         InTree -> SetBranchAddress("P_cut"          , &uns_pCut);       // positive particles momenta
         InTree -> SetBranchAddress("P_Edep"         , &uns_pEdep);
+    }
+
+    else if(DataType == "(e,e'npp)") {
+        NMom = P1Mom = P2Mom = e3Vector = 0;
+        
+        InTree -> SetBranchAddress("e3Vector"       , &e3Vector);
+        InTree -> SetBranchAddress("NMom"           , &NMom);
+        InTree -> SetBranchAddress("P1Mom"          , &P1Mom);
+        InTree -> SetBranchAddress("P2Mom"          , &P2Mom);
     }
     
     if(DataType == "GSIM") {
@@ -74,18 +85,10 @@ void TCalcPhysVarsEG2::InitInputTree(){
         InTree -> SetBranchAddress("Py_g"           , &PpY_g);
         InTree -> SetBranchAddress("Pz_g"           , &PpZ_g);
     }
-    else if(DataType == "(e,e'npp)") {
-        NMom = P1Mom = P2Mom = e3Vector = 0;
-        
-        InTree -> SetBranchAddress("e3Vector"       , &e3Vector);
-        InTree -> SetBranchAddress("NMom"           , &NMom);
-        InTree -> SetBranchAddress("P1Mom"          , &P1Mom);
-        InTree -> SetBranchAddress("P2Mom"          , &P2Mom);
-    }
     
     
     Nentries    = InTree -> GetEntries();
-    std::cout << "Initialized Input InTree TCalcPhysVarsEG2 for " << InTree -> GetName() <<", Nentries = " <<  Nentries << std::endl;
+    if (debug>0) std::cout << "Initialized Input InTree TCalcPhysVarsEG2 for " << InTree -> GetName() <<", Nentries = " <<  Nentries << std::endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -129,6 +132,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     
     // TVector3 branches
     OutTree -> Branch("PmRctLab3"           ,"TVector3"             ,&PmRctLab3);
+    OutTree -> Branch("eVertex"             ,"TVector3"             ,&eVertex);
     OutTree -> Branch("pVertex"             ,&pVertex);             // std::vector<TVector3>
  
     
@@ -165,7 +169,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
         OutTree -> Branch("Nmiss"               ,"TLorentzVector"       ,&Nmiss);
     }
     
-    std::cout << "Initialized Output Tree TCalcPhysVarsEG2 on " << OutTree -> GetTitle() << std::endl;
+    if (debug>0) std::cout << "Initialized Output Tree TCalcPhysVarsEG2 on " << OutTree -> GetTitle() << std::endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -177,6 +181,8 @@ void TCalcPhysVarsEG2::InitGlobals(){
     A_over_mA  = (float)A/mA;
     pA.SetVectM( TVector3() , Mp * A  );
     Beam = TLorentzVector( 0 , 0 , 5.009 , 5.009 );
+    
+    if (debug > 2) Printf("intialized globals");
 
 }
 
@@ -205,6 +211,7 @@ void TCalcPhysVarsEG2::InitEvent(){
     // maybe interesting to see how much answer changes if 3m_N is changed to 3m_N - epsilon where epsilon ~ 40 MeV
     WmissCmEps.SetVectM( TVector3(Px , Py , Pz) , 3. * Mp - 0.040 );
 
+    if (debug > 2) Printf("initialized event");
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -212,12 +219,14 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
     InitEvent();
     InTree -> GetEntry(entry);
+    if (debug > 2) Printf("got entry");
 
     // electron
     if(DataType == "data" || DataType == "GSIM" ) {
         Pe      = TVector3( Px_e , Py_e , Pz_e );
+        eVertex = TVector3( X_e , Y_e , Z_e );
     }
-    else if (DataType == "no ctof"){
+    else if (DataType == "NoCTOF_DATA" || DataType == "New_NoCTofDATA"){
         Pe = TVector3( N_Px[0] , N_Py[0] , N_Pz[0] );
     }
     else if (DataType == "(e,e'npp)"){
@@ -226,6 +235,9 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     e.SetVectM( Pe , Me );
     q = Beam - e;
     Q2 = -q.Mag2();
+    if (debug > 2) Printf("extracted electron' kinematics");
+
+    
     
     // get protons - energy loss correction and Coulomb corrections
     for (int i = 0 ; i < Np ; i++ ){
@@ -247,6 +259,10 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     }
     if(p3vec.size()==3)
         PmRctLab3   = q.Vect() - p3vec.at(1) - p3vec.at(2);
+    if (debug > 2) Printf("extracted protons' kinematics");
+
+    
+    
     
     // Pmiss , p/q , 𝜃(p,q)
     Pmiss       = Plead - q;
@@ -257,6 +273,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
     theta_pq    = r2d * Plead.Vect().Angle(q.Vect());
     p_over_q    = Plead.P() / q.P();
+    if (debug > 2) Printf("computed Pmiss , p/q , 𝜃(p,q) , p(A-1)");
 
 
     
@@ -269,6 +286,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     // move to prefered axes frame
     ChangeAxesFrame();
+    if (debug > 2) Printf("Changed Axes Frame");
 
     
     // α-s
@@ -293,8 +311,10 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
 
     
+    if (debug > 2) Printf("starting to sort the protons and loop over them");
     // sort the protons and loop on them for variables calculations only once more!
     loop_protons();
+    if (debug > 2) Printf("finished sorting the protons and looping over them");
 
     // all recoil protons together (just without the leading proton)
     Plead       = protons.at(0);            // now Plead is calculated in q-Pmiss frame
@@ -389,6 +409,7 @@ void TCalcPhysVarsEG2::loop_protons(){
             RotVec2_q_Pm_Frame( & p3vec.at(i) , q_phi, q_theta, Pmiss_phi );
         else if(FrameName == "Pmiss(z) - q(x-z) frame")
             RotVec2_Pm_q_Frame( & p3vec.at(i) , Pmiss_phi, Pmiss_theta, q_phi );
+        if (debug > 3) Printf("rotated proton to %s",FrameName.Data());
         
         protons.push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
         Pcm     += protons.back();
@@ -398,19 +419,22 @@ void TCalcPhysVarsEG2::loop_protons(){
         
         // proton vertex
         pVertex .push_back( TVector3( Xp[i] , Yp[i] , Zp[i] ) );
-        
+
         // kinetic energies
         Tp      .push_back( protons.back().E() - protons.back().M() );
-        
+
         // proton identification
-        if (DataType == "no ctof") {
+        if (DataType == "NoCTOF_DATA" || DataType == "New_NoCTofDATA") {
             
             pCTOFCut.push_back( uns_pCut[i] * uns_pID[i] );
             pCTOF   .push_back( uns_pCTOF[i]  );
             pEdep   .push_back( uns_pEdep[i]  );
-
+            if (debug > 2) Printf("extracted proton identification information");
         }
-        
+        else {
+            pCTOFCut.push_back( 1 );
+        }
+
 
         // cumulative protons
         proton_angle.push_back(r2d * p3vec.at(i).Angle(q.Vect()));
@@ -423,7 +447,7 @@ void TCalcPhysVarsEG2::loop_protons(){
                 }
             }
         }
- 
+
         
         // α-s
         alpha.push_back( LCfraction(protons.back() , A_over_mA ) );
@@ -440,6 +464,7 @@ void TCalcPhysVarsEG2::loop_protons(){
         Wmiss      -= protons.back();
         WmissWithCm-= protons.back();
         WmissCmEps -= protons.back();
+        if (debug > 3) Printf("finished going over this proton...");
     }
     
     
@@ -462,7 +487,7 @@ void TCalcPhysVarsEG2::p23Randomize(){
         std::iter_swap(pVertex.begin()+1    ,pVertex.begin()+2);
         std::iter_swap(alpha.begin()+1      ,alpha.begin()+2);
         
-        if (DataType == "no ctof") {
+        if (DataType == "NoCTOF_DATA" || DataType == "New_NoCTofDATA") {
             std::iter_swap(pCTOFCut.begin()+1   ,pCTOFCut.begin()+2);
             std::iter_swap(pCTOF.begin()+1      ,pCTOF.begin()+2);
             std::iter_swap(pEdep.begin()+1      ,pEdep.begin()+2);
@@ -479,7 +504,7 @@ void TCalcPhysVarsEG2::p12Randomize(){
         std::iter_swap(pVertex.begin()    ,pVertex.begin()+1);
         std::iter_swap(alpha.begin()      ,alpha.begin()+1);
         
-        if (DataType == "no ctof") {
+        if (DataType == "NoCTOF_DATA" || DataType == "New_NoCTofDATA") {
             std::iter_swap(pCTOFCut.begin()   ,pCTOFCut.begin()+1);
             std::iter_swap(pCTOF.begin()      ,pCTOF.begin()+1);
             std::iter_swap(pEdep.begin()      ,pEdep.begin()+1);
@@ -503,12 +528,19 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOW(alpha_q);
     SHOWvectorTLorentzVector(protons);
     SHOWstdTVector3(pVertex);
-    SHOWvectorFloat_t(alpha);
+//    SHOWstdVector(protons);
+//    SHOWstdVector(pVertex);
+    SHOWstdVector(alpha);
+//    SHOWvectorFloat_t(alpha);
     SHOW(alpha_q);
-    SHOWvectorInt_t(pCTOFCut);
-    SHOWvectorFloat_t(pEdep);
-    SHOWvectorFloat_t(Tp);
-    SHOWvectorFloat_t(proton_angle);
+//    SHOWvectorInt_t(pCTOFCut);
+//    SHOWvectorFloat_t(pEdep);
+//    SHOWvectorFloat_t(Tp);
+//    SHOWvectorFloat_t(proton_angle);
+    SHOWstdVector(pCTOFCut);
+    SHOWstdVector(pEdep);
+    SHOWstdVector(Tp);
+    SHOWstdVector(proton_angle);
     SHOWTLorentzVector(Plead);
     SHOW(sum_alpha);
     SHOWTLorentzVector(Pmiss);

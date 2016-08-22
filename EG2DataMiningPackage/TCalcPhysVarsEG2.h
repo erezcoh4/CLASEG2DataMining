@@ -38,13 +38,13 @@ public:
     TPlots  plot;
     TRandom3  rand;
     
-    int     Nentries    , Entry;
+    int     Nentries    , Entry         , debug;
     TString FrameName   ;          // prefered frame of axes to work in....
     
     
     
     // PARTICLES....
-    Int_t   targ_type   , A;
+    Int_t   targ_type   , A             ;
     Int_t   Np          , Ntotal        , Nnegative;
     Int_t   NpBack      , NpCumulative  , NpCumulativeSRC;
     Int_t   uns_pCut[20], uns_pID[20];
@@ -76,9 +76,9 @@ public:
     
     
     TVector3            Pbeam       , Pe;
-    TVector3            * NMom      , * P1Mom  , * P2Mom           , * e3Vector;
-    TVector3            PmRctLab3   ;
-    vector<TVector3>    p3vec       , pVertex  ;
+    TVector3            * NMom      , * P1Mom   , * P2Mom           , * e3Vector;
+    TVector3            PmRctLab3   , eVertex   ;
+    vector<TVector3>    p3vec       , pVertex   ;
     
     
     
@@ -96,7 +96,7 @@ public:
     
     /// Default constructor
     TCalcPhysVarsEG2    (){}
-    TCalcPhysVarsEG2    (TTree * fInTree, TTree * fOutTree, int fA = 12, TString fDataType = "data" , TString fFrameName = "q(z) - Pmiss(x-z) frame");
+    TCalcPhysVarsEG2    (TTree * fInTree, TTree * fOutTree, int fA = 12, TString fDataType = "data" , TString fFrameName = "q(z) - Pmiss(x-z) frame", int fdebug = 1);
 
  
     /// Default destructor
@@ -114,7 +114,7 @@ public:
     void       SetOutTree (TTree * tree){OutTree = tree;};
     void     SetFrameName (TString name){FrameName = name;};
     void            Setk0 (Float_t  fk0){k0 = fk0;};
-    
+    void         SetDebug (int d)       {debug = d;};
     // initializations
     void    InitInputTree ();
     void   InitOutputTree ();

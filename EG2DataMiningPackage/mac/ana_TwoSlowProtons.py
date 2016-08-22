@@ -1,11 +1,8 @@
 import ROOT ,os, sys , math
 from ROOT import TEG2dm , TPlots , TAnalysisEG2 , TSchemeDATA
 from rootpy.interactive import wait
-sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
-import GeneralPlot as gp
-import Initiation as init
-#init.createnewdir()
-#ROOT.gStyle.SetOptStat(0000)
+sys.path.insert(0, '../../mySoftware/MySoftwarePackage/mac')
+import GeneralPlot as gp , Initiation as init
 
 
 

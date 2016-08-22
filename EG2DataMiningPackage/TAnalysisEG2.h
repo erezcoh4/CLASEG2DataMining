@@ -77,7 +77,7 @@ public:
     TCut    pppRandomBkg, pppCut            , pppCutPmT     , pppCutPmTMm   ;
     TCut    Sim3pSRCCut , FinalSim3pSRCCut  , Sim3pWmissCut ;
     TCut    Mix3pSRCCut , FinalMix3pSRCCut  , Mix3pPmT      , Mix3pPmTMm    ;
-    TCut    eepInSRCCut ;
+    TCut    eepInSRCCut , eeppInSRCCut  ;
     
     void         SetSRCCuts ( TCut XbCut = "1.05 <= Xb");
     void        PrintInCuts ();

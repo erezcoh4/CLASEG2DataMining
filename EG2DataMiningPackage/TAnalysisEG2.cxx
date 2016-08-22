@@ -47,7 +47,6 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     
     // (e,e'p) in our cuts
     eepFinalCut = cutXb && cutThetaPQ && cutPoverQ && cutPmiss && cutPmT;
-    eepInSRCCut = cutSRC && cutMmiss2 && "1 <= Np" && cutPlead && p1CTOFCut;
 
     
     
@@ -59,11 +58,12 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     
     // (e,e'p) in our cuts
     eepInSRCCut = cutSRC && cutMmiss2 && "1 <= Np" && cutPlead && p1CTOFCut;
+    eeppInSRCCut = cutSRC && cutMmiss2 && "2 <= Np" && cutPlead && cutPrec && ppCTOFCut;
     
     
     
     // 3p-SRC
-    cutP1       = "(-27 < pVertex[1].Z() && pVertex[1].Z() < -20)";
+    cutP1       = "(-27 < pVertex[0].Z() && pVertex[0].Z() < -20)";
     cutP2       = "0.3 < protons[1].P() && (-27 < pVertex[1].Z() && pVertex[1].Z() < -20)";
     cutP3       = "0.3 < protons[2].P() && (-27 < pVertex[2].Z() && pVertex[2].Z() < -20)";
     cutMmiss    = "Pcm.Mag() < 3*0.938";
