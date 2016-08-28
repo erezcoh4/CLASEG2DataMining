@@ -46,16 +46,16 @@ public:
     
     // PARTICLES....
     Int_t   TargetType  , targ_type  , NpGood;
-    Int_t   Np          , Nn         , Ntotal;
+    Int_t   Np          , Nn         , Ntotal   , Npiminus;
     Int_t   P_cut[20]   , P_PID[20]  ;          //positive particles
     
     Float_t Xb          , XbMin;
     Float_t PpX[20]     , PpY[20]   , PpZ[20];  //proton momentum
     Float_t Px_e        , Py_e      , Pz_e   ;
     Float_t N_Px[20]    , N_Py[20]  , N_Pz[20]; // for raw data
-
+    Float_t N_PathSC[20], N_TimeSC[20];
     
-    TVector3    * q     , * Plead   , * proton, Pmiss;
+    TVector3    * q     , * Plead   , * proton, Pmiss , *negative_particle_momentum;
     TVector3    *NMom   , * P1Mom   , * P2Mom;
     
     
@@ -91,10 +91,11 @@ public:
 
     
     void protons_from_nuclei ();
-    void       SRCPmissXb (int fTargetType = 2 , float fXbMin = 1.05, int fNpMin = 1, int fNpMax= 5, TString name="");
-    void   TwoSlowProtons (int fTargetType = 2 , float fpMin = 0.2 , float fpMax = 3. );
-    void   TwoSlowProtons_ppp (int fTargetType = 2 , float fpMin = 0.2 , float fpMax = 3. );
-    void   TwoSlowProtons_npp (float fn_pMin = 1.1 , float fpMin = 0.2 , float fpMax = 3. );
+    void               SRCPmissXb (int fTargetType = 2 , float fXbMin = 1.05, int fNpMin = 1, int fNpMax= 5, TString name="");
+    void           TwoSlowProtons (int fTargetType = 2 , float fpMin = 0.2 , float fpMax = 3. );
+    void       TwoSlowProtons_ppp (int fTargetType = 2 , float fpMin = 0.2 , float fpMax = 3. );
+    void       TwoSlowProtons_npp (float fn_pMin = 1.1 , float fpMin = 0.2 , float fpMax = 3. );
+    void TwoSlowProtons_piminus_p (int fTargetType = 2 , float fpMin = 0.2 , float fpMax = 3. );
     
     
     void     SchemeOnTCut (TString , TString , TString , TString , TCut);

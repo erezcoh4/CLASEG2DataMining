@@ -1,7 +1,7 @@
 '''
     usage:
     --------
-    > python scheme_file.py -A12 -werez --option="(e,e'pp?)" --DataType="New_NoCTofDATA"
+    python mac/scheme_file.py -A12  --option="(e,e'pp?)" --DataType="New_NoCTofDATA"
 '''
 
 import ROOT,os, sys , math , os.path , math
@@ -39,6 +39,13 @@ elif (flags.option == "(e,e'pp?)"):
     scheme.TwoSlowProtons( 2 , pMin , pMax ) # target-type = 2, momentum minimum and maximum
     print "schemed in nuclear target, for 2 protons with momentum %.1f < p < %.1f..."%(pMin,pMax)
 # ------------------------------------------------------------------ #
+
+# ------------------------------------------------------------------ #
+elif (flags.option == "(e,e'pp[pi-,p])"):
+    scheme.TwoSlowProtons_piminus_p( 2 , pMin , pMax ) # target-type = 2, momentum minimum and maximum
+    print "schemed in nuclear target, for 2 protons with momentum %.1f < p < %.1f and additional pi- and p..."%(pMin,pMax)
+# ------------------------------------------------------------------ #
+
 
 
 # ------------------------------------------------------------------ #

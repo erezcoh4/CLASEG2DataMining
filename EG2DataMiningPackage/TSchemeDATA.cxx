@@ -49,6 +49,8 @@ void TSchemeDATA::LoadInTree(){
         InTree -> SetBranchAddress("N_Px"           , &N_Px);    // negative particles momenta (electron is the first)
         InTree -> SetBranchAddress("N_Py"           , &N_Py);    // negative particles momenta (electron is the first)
         InTree -> SetBranchAddress("N_Pz"           , &N_Pz);    // negative particles momenta (electron is the first)
+        InTree -> SetBranchAddress("N_PathSC"       , &N_PathSC);    // negative particles path length (electron is the first)
+        InTree -> SetBranchAddress("N_TimeSC"       , &N_TimeSC);    // negative particles time (electron is the first)
         Printf("set adresses for %s",DataType.Data());
     }
     else if(DataType == "(e,e'npp)") {
@@ -199,6 +201,76 @@ void TSchemeDATA::TwoSlowProtons(int fTargetType , float fpMin, float fpMax){
                     }
                 }
                 if( NpGood == 2 ){
+                    OutTree -> Fill();
+                }
+            }
+        }
+    }
+    
+    WriteOutFile();
+}
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void TSchemeDATA::TwoSlowProtons_piminus_p (int fTargetType , float fpMin, float fpMax ){
+    
+    TargetType      = fTargetType;
+    SetSchemeType   ("TwoSlowProtons_piminus_p");
+    LoadInTree      ();
+    CreateOutTree   ();
+    
+    if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
+        
+        if (DataType == "New_NoCTofDATA") {
+            targ_type = 2; // for 27Al or the new 12C Meytal cooked Aug-2016
+        }
+        
+        
+        for (Long64_t i = 0; i < Nentries ; i++) {
+            
+            if (i%(Nentries/20)==0) {
+                printf("schemed %d events so far, out of ", (int)OutTree -> GetEntries());
+                plot.PrintPercentStr((float)i/Nentries);
+            }
+            NpGood = Npiminus = 0;
+            InTree -> GetEntry(i);
+            
+        
+            
+            // look for events with only one negative particle (electron) and two positive (protons)
+            if( ( Np == 3 ) && ( Nn > 1 ) && (targ_type == TargetType) ) {
+                
+                // ask if we have a π-
+                for (int n = 0 ; n < Nn ; n++){
+                    
+                    negative_particle_momentum = new TVector3(N_Px[n],N_Py[n],N_Pz[n]);
+                    Float_t Momentum = negative_particle_momentum->Mag();
+                    Float_t Betta = ( N_PathSC[n] / N_TimeSC[n] ) / 30.0 ; // c = 30 cm/ns,  the units for N_PathSC are [cm] and for N_TimeSC are [ns]
+                    
+//                    SHOW3(Momentum , Betta , TMath::Abs(Betta-Momentum/sqrt(Momentum*Momentum+0.14*0.14)));
+
+                    if (TMath::Abs(Betta-Momentum/sqrt(Momentum*Momentum+0.14*0.14))<0.03){ // this is the CTOF of π- according to meytal p.31
+//                        Printf("π-!!!");
+                        Npiminus++;
+                    }
+                }
+
+                
+                // make sure these two positive particles are actually protons
+                for (int p = 0 ; p < Np ; p++){
+                    if( P_cut[p] == 1 && P_PID[p] == 1 ){    // this is a proton with momentum |p|<2.8 and 'good' CTOF
+                        proton = new TVector3(PpX[p],PpY[p],PpZ[p]);
+                        
+                        // and that their momenta are in the desired range
+                        if (fpMin < proton->Mag() && proton->Mag() < fpMax) {
+                            NpGood++;
+                        }
+                    }
+                }
+//                SHOW3(NpGood , Npiminus , targ_type)
+                
+                if (( NpGood > 1 ) && (Npiminus >= 1) ){
                     OutTree -> Fill();
                 }
             }
