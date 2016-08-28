@@ -518,25 +518,14 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOW(entry);
     cout << "\033[35m"<< "\t [" << 100*(float)entry/Nentries  << "%]" << "\033[0m"<< endl;
     PrintLine();
-    SHOW(Xb);
-    SHOW(Q2);
+    SHOW3(Xb , Q2 , alpha_q);
     SHOW(M_p_init);
     SHOW(E_p_init);
-    SHOW(XbMoving);
     SHOWTLorentzVector(e);
     SHOWTLorentzVector(q);
-    SHOW(alpha_q);
     SHOWvectorTLorentzVector(protons);
     SHOWstdTVector3(pVertex);
-//    SHOWstdVector(protons);
-//    SHOWstdVector(pVertex);
     SHOWstdVector(alpha);
-//    SHOWvectorFloat_t(alpha);
-    SHOW(alpha_q);
-//    SHOWvectorInt_t(pCTOFCut);
-//    SHOWvectorFloat_t(pEdep);
-//    SHOWvectorFloat_t(Tp);
-//    SHOWvectorFloat_t(proton_angle);
     SHOWstdVector(pCTOFCut);
     SHOWstdVector(pEdep);
     SHOWstdVector(Tp);
@@ -547,14 +536,10 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOWTLorentzVector(Wmiss);
     SHOWTLorentzVector(WmissWithCm);
     SHOWTLorentzVector(WmissCmEps);
-    SHOW(TpMiss);
     SHOWTLorentzVector(Prec);
     SHOWTLorentzVector(Pcm);
-    SHOW(theta_pq);
-    SHOW(p_over_q);
-    SHOW(NpBack);
-    SHOW(NpCumulative);
-    SHOW(NpCumulativeSRC);
+    SHOW3(TpMiss , theta_pq , p_over_q);
+    SHOW3(NpBack , NpCumulative , NpCumulativeSRC );
     
     EndEventBlock();
 }
