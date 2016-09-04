@@ -55,6 +55,7 @@ public:
 
     
     TCutG                  * pEdepCut (int);
+    TCutG          * alpha12_vs_XbCut ();
 
 };
 

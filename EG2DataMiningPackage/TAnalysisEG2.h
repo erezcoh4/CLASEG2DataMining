@@ -38,7 +38,7 @@ public:
     
     /// Default constructor
     TAnalysisEG2 (){    SetSRCCuts();   }
-    TAnalysisEG2 ( TString fInFileName , TCut XbCut = "0 <= Xb" );
+    TAnalysisEG2 ( TString fInFileName , TCut MainCut = "0 <= Xb" );
     
     
     
@@ -66,7 +66,8 @@ public:
     
     
     // cuts
-    TCutG   * pEdepCut[3];
+    TCutG   * pEdepCut[3], * ppNothing_alpha12_vs_XbCut;
+    TCut    alpha12_vs_XbCutDIS , alpha12_vs_XbCutCorrelation;
     TCut    cutXb       , cutPmiss          , cutPmT        , cutThetaPQ    , cutPoverQ     , cutMmiss2;
     TCut    cutMmiss    , cutPlead          , cutPrec       , cutP1         , cutP2         , cutP3 ;
     TCut    cutWmiss    ;
@@ -79,7 +80,7 @@ public:
     TCut    Mix3pSRCCut , FinalMix3pSRCCut  , Mix3pPmT      , Mix3pPmTMm    ;
     TCut    eepInSRCCut , eeppInSRCCut  ;
     
-    void         SetSRCCuts ( TCut XbCut = "1.05 <= Xb");
+    void         SetSRCCuts ( TCut MainCut = "1.05 <= Xb");
     void        PrintInCuts ();
     
     

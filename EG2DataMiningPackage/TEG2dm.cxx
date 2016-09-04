@@ -132,6 +132,24 @@ TCutG * TEG2dm::pEdepCut(int p){
     return cutg;
 }
 
+
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+TCutG * TEG2dm::alpha12_vs_XbCut(){
+    TCutG *cutg = new TCutG("alpha12_vs_XbCut",4);
+    cutg->SetVarX("Xb");
+    cutg->SetVarY("alpha[0]+alpha[1]");
+    cutg->SetPoint(0,0.8,1.75);
+    cutg->SetPoint(1,1.2,1.75);
+    cutg->SetPoint(2,1.9,1.0);
+    cutg->SetPoint(3,0.8,1.0);
+    cutg->SetPoint(4,0.8,1.75);
+    return cutg;
+}
+
+
 #endif
 
 

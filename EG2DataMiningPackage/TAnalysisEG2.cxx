@@ -7,22 +7,22 @@
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-TAnalysisEG2::TAnalysisEG2(TString fInFileName, TCut XbCut):
+TAnalysisEG2::TAnalysisEG2(TString fInFileName, TCut MainCut):
 TPlots("$DataMiningAnaFiles/Ana_" + fInFileName + ".root","anaTree",fInFileName, false){
     SetPath("$DataMiningAnaFiles");
     SetInFileName( "Ana_" + fInFileName + ".root");
     
-    SetSRCCuts(XbCut);
+    SetSRCCuts(MainCut);
     SetInFile( new TFile( "$DataMiningAnaFiles/" + InFileName ));
     SetTree ((TTree*) InFile->Get( "anaTree" ));
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC cuts
+void TAnalysisEG2::SetSRCCuts(TCut MainCut){ // last editted March-22 for pppSRC cuts
 
     // important (constant) cuts
     
-    cutXb       = XbCut;
+    cutXb       = MainCut;
     cutPmiss    = "0.3 < Pmiss.P() && Pmiss.P() < 1.0";
     cutPmT      = "Pmiss.Pt() < 0.4";
     cutThetaPQ  = "theta_pq < 25";
@@ -56,6 +56,7 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     ppSRCCut    = cutSRC && "2 <= Np" && cutPlead && cutPrec && ppCTOFCut;
     
     
+    
     // (e,e'p) in our cuts
     eepInSRCCut = cutSRC && cutMmiss2 && "1 <= Np" && cutPlead && p1CTOFCut;
     eeppInSRCCut = cutSRC && cutMmiss2 && "2 <= Np" && cutPlead && cutPrec && ppCTOFCut;
@@ -72,7 +73,10 @@ void TAnalysisEG2::SetSRCCuts(TCut XbCut){ // last editted March-22 for pppSRC c
     cutAngles3p = "thetaMiss23 > 155 && fabs(phiMiss23) < 15";
     
     
-    
+    ppNothing_alpha12_vs_XbCut = TEG2dm::alpha12_vs_XbCut();
+    alpha12_vs_XbCutDIS = ppNothing_alpha12_vs_XbCut->GetName();
+    alpha12_vs_XbCutCorrelation = Form("!%s",ppNothing_alpha12_vs_XbCut->GetName());
+
     
     // pID from ∆E (dep.) in TOF scintillators
     pppRandomBkg= cutSRC && cutPmT && " 3 <= Np" && cutP1 && cutP2 && cutP3 && !pppEdepCut && !pppCTOFCut;
