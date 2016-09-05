@@ -39,7 +39,7 @@ EGgui::~EGgui(){
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void EGgui::AddEmbeddedCanvas(){
-    fEcanvas    = new TRootEmbeddedCanvas("Ecanvas",fMain,600,600);        // Create canvas widget
+    fEcanvas    = new TRootEmbeddedCanvas("Ecanvas",fMain,300,300);        // Create canvas widget
     fMain       -> AddFrame(fEcanvas, new TGLayoutHints(kLHintsExpandX| kLHintsExpandY, 10,10,10,10));
 }
 
@@ -70,14 +70,20 @@ void EGgui::SetGlobals(){
     CutString   = "";
     OptionString= "";
     
-    Pmin        = 0.1;          Pmax        = 1.1;
-    Thetamin    = 0;            Thetamax    = 120;
+    Pmin        = 0.2;          Pmax        = 1.;
+    Thetamin    = 0;            Thetamax    = 180;
     
     MagHistName   = "h_P";
     ThetaHistName = "h_Theta";
     
     eeNTreeName   = "Tree";
     Path = "/Users/erezcohen/Desktop/DataMining/GSIM";
+    runsFilename  = Form("%s/eg_txtfiles/RunNumbers.dat",Path.Data());
+
+
+    // current date/time based on current system
+    now = time(0);
+    dt = localtime(&now);
 
 }
 
@@ -113,10 +119,11 @@ void EGgui::AddMainButtonsFrame(){
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void EGgui::AddRunNumberFrame(TGHorizontalFrame *frame ){
-    InRunNumberFile.open("./TextFiles/RunNumbers.dat");
+    InRunNumberFile.open(runsFilename);
     InRunNumberFile >> RunNumber;
     InRunNumberFile.close();
     RunNumber++;
+    SHOW(RunNumber);
     RunNumberFrame  = new TGGroupFrame(frame, Form("Run Number (%d)",RunNumber),kVerticalFrame);
     fRun            = new TGNumberEntry(RunNumberFrame,RunNumber,4,999, TGNumberFormat::kNESInteger, TGNumberFormat::kNEANonNegative);
     fRun            -> Connect("ValueSet(Long_t)", "EGgui", this, "DoSetRun()");
@@ -256,7 +263,7 @@ void EGgui::DoSetSigmaT(){
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void EGgui::AddSigmaLFrame(TGHorizontalFrame *frame ){
-    SigmaLFrame         = new TGGroupFrame(frame, Form("sigma(L)=%.3f+%.3f(p(miss)-0.5)",SigmaL_a1,SigmaL_a2),kHorizontalFrame);
+    SigmaLFrame         = new TGGroupFrame(frame, Form("sigma(L)=%.2f+%.2f(p(miss)-0.5)",SigmaL_a1,SigmaL_a2),kHorizontalFrame);
     fSigmaL_a1          = new TGNumberEntry(SigmaLFrame,SigmaL_a1,5,999, TGNumberFormat::kNESRealThree, TGNumberFormat::kNEANonNegative);
     fSigmaL_a1          -> Connect("ValueSet(Long_t)", "EGgui", this, "DoSetSigmaL()");
     SigmaLFrame         -> AddFrame(fSigmaL_a1, new TGLayoutHints(kMainFrame));
@@ -268,16 +275,16 @@ void EGgui::AddSigmaLFrame(TGHorizontalFrame *frame ){
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void EGgui::DoSetSigmaL(){
-    SigmaL_a1           = SigmaT;
-    SigmaL_a2           = 0;
-    //    SigmaL_a1           = fSigmaL_a1 -> GetNumberEntry() -> GetNumber();
-    //    SigmaL_a2           = fSigmaL_a2 -> GetNumberEntry() -> GetNumber();
-    SigmaLFrame         ->  SetTitle(Form("sigma(L)=%.3f+%.3f(p(miss)-0.5)",SigmaL_a1,SigmaL_a2));
+//    SigmaL_a1           = SigmaT;
+//    SigmaL_a2           = 0;
+    SigmaL_a1           = fSigmaL_a1 -> GetNumberEntry() -> GetNumber();
+    SigmaL_a2           = fSigmaL_a2 -> GetNumberEntry() -> GetNumber();
+    SigmaLFrame         ->  SetTitle(Form("sigma(L)=%.2f+%.2f(p(miss)-0.5)",SigmaL_a1,SigmaL_a2));
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void EGgui::AddShiftLFrame(TGHorizontalFrame *frame ){
-    ShiftLFrame         = new TGGroupFrame(frame,Form("Shift(L)=%.3f+%.3f(p(miss)-0.3)",ShiftL_a1,ShiftL_a2),kHorizontalFrame);
+    ShiftLFrame         = new TGGroupFrame(frame,Form("Shift(L)=%.2f+%.2f(p(miss)-0.3)",ShiftL_a1,ShiftL_a2),kHorizontalFrame);
     fShiftL_a1          = new TGNumberEntry(ShiftLFrame,ShiftL_a1,5,999, TGNumberFormat::kNESRealThree, TGNumberFormat::kNEANonNegative);
     fShiftL_a1          -> Connect("ValueSet(Long_t)", "EGgui", this, "DoSetShiftL()");
     ShiftLFrame         -> AddFrame(fShiftL_a1, new TGLayoutHints(kMainFrame));
@@ -291,7 +298,7 @@ void EGgui::AddShiftLFrame(TGHorizontalFrame *frame ){
 void EGgui::DoSetShiftL(){
     ShiftL_a1           = fShiftL_a1 -> GetNumberEntry() -> GetNumber();
     ShiftL_a2           = fShiftL_a2 -> GetNumberEntry() -> GetNumber();
-    ShiftLFrame         ->  SetTitle(Form("Shift(L)=%.3f+%.3f(p(miss)-0.3)",ShiftL_a1,ShiftL_a2));
+    ShiftLFrame         ->  SetTitle(Form("Shift(L)=%.2f+%.2f(p(miss)-0.3)",ShiftL_a1,ShiftL_a2));
 }
 
 
@@ -464,9 +471,6 @@ void EGgui::DoSetThetaminThetamax(){
 }
 
 
-
-
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void EGgui::AddeeNFromDistributions(){
     eeNFromDistributionsFrame   = new TGHorizontalFrame(fMain,900,40);
@@ -500,12 +504,6 @@ void EGgui::OpenInFileDialog(){
 }
 
 
-
-
-
-
-
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void EGgui::AddeeNFromTree(){
     eeNFromTreeFrame            = new TGHorizontalFrame(fMain,900,40);
@@ -516,9 +514,6 @@ void EGgui::AddeeNFromTree(){
     AddTextButton(eeNFromTreeFrame , "&Choose File" , "OpeneeNTreeInFileDialog()");
     fMain                       -> AddFrame(eeNFromTreeFrame, new TGLayoutHints(kLHintsCenterX,2,2,2,2));
 }
-
-
-
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -545,25 +540,22 @@ void EGgui::DoGenMCFiles(){
 }
 
 
-
 // main generation processes....
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void EGgui::DoGenerate(){
     InputT   = new TChain("T");
     txtFilename     = Form("%s/eg_txtfiles/run%04d.txt",Path.Data(),RunNumber);
-    runsFilename    = Form("%s/eg_txtfiles/RunNumbers.dat",Path.Data());
     rootFilename    = Form("%s/eg_rootfiles/run%04d.root",Path.Data(),RunNumber);
     cout << "Generating " << txtFilename << " and " <<  rootFilename << endl;
     TextFile.open(txtFilename);
     RootFile = new TFile( rootFilename ,"recreate" );
     RootTree = new TTree("anaTree","generated events");
     SetRootTreeAddresses();
-    
     if (fReepp -> IsOn() ){
         Printf("(e,e'pp)");
         // Take 12C(e,e'p) SRC tree data
-        InputT          -> Add("SRC_e1_C.root");
-        InputT          -> Add("SRC_e2_C.root");
+        InputT          -> Add("/Users/erezcohen/Desktop/DataMining/GSIM/GUIEG/SRC_e1_C.root");
+        InputT          -> Add("/Users/erezcohen/Desktop/DataMining/GSIM/GUIEG/SRC_e2_C.root");
         Float_t Pe[3]   , Pe_size;                                              // electron
         Float_t Ep[2]   , Rproton[2][3] , Pproton[2][3] ,   Pproton_size[2];    // Proton
         Float_t Pm[2][3], Pm_size[2];                                           // Proton missing momentum magnitude
@@ -670,8 +662,6 @@ void EGgui::DoGenerate(){
             }
         }
     }
-    
-
     else if (fReeN -> IsOn()){
         Printf("(e,e'B)");
         TVector3 e , N;     // N is a baryon: p/n/𝚫
@@ -739,13 +729,10 @@ void EGgui::DoGenerate(){
     OutRunNumberFile.open(runsFilename);
     OutRunNumberFile << RunNumber << "\n" ;
     OutRunNumberFile.close();
-    Printf("\nDont forget:\nDocument run %d in README file! ... ", RunNumber);
+    //Printf("\nDont forget:\nDocument run %d in README file! ... ", RunNumber);
+    OutputInfo2File();
     DoDrawGenerated();
 }
-
-
-
-
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void EGgui::SetRootTreeAddresses(){
@@ -788,7 +775,22 @@ void EGgui::DoDrawGenerated(){
 }
 
 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void EGgui::OutputInfo2File(){
+    
+    RunsInfoFileName = Form("%s/eg_txtfiles/RunsInfo.txt",Path.Data());
+    RunsInfoFile.open(RunsInfoFileName,std::ofstream::out | std::ofstream::app);
 
+    RunsInfoFile
+    << RunNumber
+    << "\t" << 1900+dt->tm_year << "/" << dt->tm_mon
+    << "\t\t"  << SigmaT
+    << "\t\t"  << SigmaL_a1 << "\t"  << SigmaL_a2
+    << "\t\t"  << ShiftL_a1 << "\t"  << ShiftL_a2
+    << "\n" ;
+    
+    RunsInfoFile.close();
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void EGgui::OutPutToTextFile(const int N , TVector3 momentum[] , int charge[N] , float mass[N], int pid[N]){

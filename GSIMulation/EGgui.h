@@ -58,6 +58,7 @@
 
 #include <unistd.h>
 #include <TRandom3.h>
+#include <ctime>
 
 /**
    \class EGgui
@@ -99,16 +100,22 @@ public:
     ifstream            InRunNumberFile;
     ofstream            OutRunNumberFile;
     ofstream            TextFile;
+    ofstream            RunsInfoFile;
+
     TFile             * RootFile;
     TTree             * RootTree;
     TChain            * InputT;
     TTree             * eeNTree;
     TPlots              plot;
     int                 Nentries;
-    TString             BaryonName;
+    
+    
+    
+    TString             BaryonName , RunsInfoFileName;
     TString             Path , rootFilename , txtFilename , runsFilename;
     
-    
+    time_t  now ;
+    tm      * dt;
     
     // Main funcionality
     TGHorizontalFrame * fMainButtonsFrame;
@@ -270,7 +277,8 @@ public:
     void DoSetInHistNames           ();
     void DoSeteeNTreeName           ();
     void AddTextButton              ( TGHorizontalFrame *, TString , TString );
-    void OutPutToTextFile           ( const int, TVector3*, int*, float*, int*);
+    void            OutputInfo2File ();
+    void           OutPutToTextFile ( const int, TVector3*, int*, float*, int*);
 
 };
 

@@ -1,6 +1,6 @@
 
 void EvntGen(){
     
-    EGgui * gui = new EGgui( gClient->GetRoot() , 700 , 700 );
+    EGgui * gui = new EGgui( gClient->GetRoot() , 600 , 400 );
     
 }
