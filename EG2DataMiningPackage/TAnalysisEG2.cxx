@@ -53,7 +53,7 @@ void TAnalysisEG2::SetSRCCuts(TCut MainCut){ // last editted March-22 for pppSRC
     // 2p-SRC following Or Hen' cuts
     cutPlead    = "-24.5 < pVertex[0].Z() && pVertex[0].Z() < -20";
     cutPrec     = "0.35 < Prec.P()  &&  (-24.5 < pVertex[1].Z() && pVertex[1].Z() < -20)";
-    ppSRCCut    = cutSRC && "2 <= Np" && cutPlead && cutPrec && ppCTOFCut;
+    ppSRCCut    = cutSRC && cutMmiss2 && "2 <= Np" && cutPlead && cutPrec && ppCTOFCut;
     
     
     
@@ -124,34 +124,34 @@ void TAnalysisEG2::PrintInCuts(){
            , GetEntries( cutSRC && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut && cutAngles3p) );
 }
 
-////....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//TMatrix  TAnalysisEG2::RooFitCM(Float_t PmissMin, Float_t PmissMax){
-//    // returns a parameter matrix: (μ-x,𝜎-x,μ-y,𝜎-y,μ-z,𝜎-z) and their uncertainties (𝚫μ-x,𝚫𝜎-x,𝚫μ-y,𝚫𝜎-y,𝚫μ-z,𝚫𝜎-z)
-//    TMatrix     res(6,2);
-//    Double_t    PcmPars[2] = { 0 , 0.14 } ,   PcmParsErr[2] = { 0 , 0 };
-//    
-//    TCut cut = Form("%f < Pmiss.P() && Pmiss.P() < %f" , PmissMin , PmissMax);
-//    RooFit1D( Tree , "pcmX", cut , PcmPars , PcmParsErr , false );
-//    res(0,0)   = PcmPars[0];
-//    res(1,0)   = PcmPars[1];
-//    res(0,1)   = PcmParsErr[0];
-//    res(1,1)   = PcmParsErr[1];
-//    
-//    RooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , false );
-//    res(2,0)   = PcmPars[0];
-//    res(3,0)   = PcmPars[1];
-//    res(2,1)   = PcmParsErr[0];
-//    res(3,1)   = PcmParsErr[1];
-//    
-//    RooFit1D( Tree , "pcmZ", cut , PcmPars , PcmParsErr , false );
-//    res(4,0)   = PcmPars[0];
-//    res(5,0)   = PcmPars[1];
-//    res(4,1)   = PcmParsErr[0];
-//    res(5,1)   = PcmParsErr[1];
-//    
-//    
-//    return res;
-//}
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+TMatrix  TAnalysisEG2::RooFitCM(Float_t PmissMin, Float_t PmissMax){
+    // returns a parameter matrix: (μ-x,𝜎-x,μ-y,𝜎-y,μ-z,𝜎-z) and their uncertainties (𝚫μ-x,𝚫𝜎-x,𝚫μ-y,𝚫𝜎-y,𝚫μ-z,𝚫𝜎-z)
+    TMatrix     res(6,2);
+    Double_t    PcmPars[2] = { 0 , 0.14 } ,   PcmParsErr[2] = { 0 , 0 };
+    
+    TCut cut = Form("%f < Pmiss.P() && Pmiss.P() < %f" , PmissMin , PmissMax);
+    RooFit1D( Tree , "pcmX", cut , PcmPars , PcmParsErr , true );
+    res(0,0)   = PcmPars[0];
+    res(1,0)   = PcmPars[1];
+    res(0,1)   = PcmParsErr[0];
+    res(1,1)   = PcmParsErr[1];
+    
+    RooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , true );
+    res(2,0)   = PcmPars[0];
+    res(3,0)   = PcmPars[1];
+    res(2,1)   = PcmParsErr[0];
+    res(3,1)   = PcmParsErr[1];
+    
+    RooFit1D( Tree , "pcmZ", cut , PcmPars , PcmParsErr , true );
+    res(4,0)   = PcmPars[0];
+    res(5,0)   = PcmPars[1];
+    res(4,1)   = PcmParsErr[0];
+    res(5,1)   = PcmParsErr[1];
+    
+    
+    return res;
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 vector<Float_t> TAnalysisEG2::GetPcmEntry(int entry){

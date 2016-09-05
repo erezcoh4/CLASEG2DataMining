@@ -1,25 +1,41 @@
-import ROOT
-from ROOT import TPlots
-from ROOT import TAnalysisEG2
+'''
+    usage:
+    ------
+    python mac/ana_pp_cm.py --option=roofit_cm_parameters
+    
+'''
+
+import ROOT , time , sys
+from ROOT import TPlots, TAnalysisEG2 , TEG2dm , TSchemeDATA
 from rootpy.interactive import wait
-import time
-ROOT.gStyle.SetOptStat(0000)
+sys.path.insert(0, '../../mySoftware/MySoftwarePackage/mac')
+import GeneralPlot as gp, Initiation as init , input_flags
+from matplotlib import pyplot as plt
+
+init.createnewdir()
+flags = input_flags.get_args()
 
 
-DoDrawCM3D              = False
-DoPrintParameterVectors = False
-DoPrintPcm              = True
 
 PmissMin    = [0.3  , 0.45 , 0.55 , 0.65 , 0.75]
 PmissMax    = [0.45 , 0.55 , 0.65 , 0.75 , 1.0 ]
-ana         = TAnalysisEG2("ppSRC_DATA_C12_FullCuts")
-Nbins       = 50
+dm          = TEG2dm()
+DataName    = "DATA_%s"% dm.Target(flags.atomic_mass)
+SchemedName = "ppSRCCut_%s"% DataName
 
 
+if flags.option=='scheme':
+    print 'scheming from %s'% DataName
+    ana     = TAnalysisEG2( DataName , flags.cut )
+    scheme  = TSchemeDATA()
+    scheme.SchemeOnTCut( "/Users/erezcohen/Desktop/DataMining/AnaFiles" , "Ana_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ana.ppSRCCut )
+    print 'schemed to %s'%SchemedName
 
+ana         = TAnalysisEG2( SchemedName , flags.cut )
 
-if DoDrawCM3D :
+if flags.option=="DrawCM3D" :
     c = ana.CreateCanvas("c.m. momentum","DivideSquare",9)
+    Nbins       = 50
 
     c.cd(1)
     ana.H1("Pcm.Px()",ROOT.TCut(),"HIST",Nbins,-1,1,"","p(c.m.) ^{x} [GeV/c]","",1,46)
@@ -80,14 +96,15 @@ if DoDrawCM3D :
 
 
 
-
-if DoPrintParameterVectors:
+elif flags.option=="roofit_cm_parameters":
     outfile = open("/Users/erezcohen/Desktop/CMparametes.dat", "wb")
-    outfile.write("mean(x) \t sigma(x) \t mean(y) \t sigma(y) \t mean(z) \t sigma(z) \t p(miss) min \t p(miss) max\n")
+    outfile.write('\n\n')
+    outfile.write("p(miss): min \t max \t mean(x) \t sigma(x) \t mean(y) \t sigma(y) \t mean(z) \t sigma(z) \n")
     outfile.write("-------------------------------------------------------------------------------------------------------------------------\n")
-    for i in range(0,5):
+    for i in range(len(PmissMin)):
         x = ana.RooFitCM(PmissMin[i],PmissMax[i]) # RooFitCM return a parameter vector
-        outfile.write("%f \t %f \t %f \t %f \t %f \t %f \t %f \t %f\n" % (x(0,0) , x(1,0) , x(2,0) , x(3,0) , x(4,0) , x(5,0) , PmissMin[i] , PmissMax[i] ))
+        outfile.write("%.2f \t %.2f \t %f \t %f \t %f \t %f \t %f \t %f\n" % ( PmissMin[i] , PmissMax[i] , x(0,0) , x(1,0) , x(2,0) , x(3,0) , x(4,0) , x(5,0)))
+    outfile.write('\n\n')
     outfile.close()
     print "done calculating parameters, output can be found in the file: ", outfile.name
     print '\n\n'
@@ -95,7 +112,7 @@ if DoPrintParameterVectors:
 
 
 
-if DoPrintPcm:
+elif flags.option=="PrintPcm":
     outfile = open("/Users/erezcohen/Desktop/CMdata.dat", "wb")
     outfile.write("c.m. momentum vectors - %d large sample from C12, \t Units:GeV/c, \t" % ana.GetEntries(ROOT.TCut()) )
     outfile.write( time.strftime('%l:%M%p %Z on %b %d, %Y \n') )
