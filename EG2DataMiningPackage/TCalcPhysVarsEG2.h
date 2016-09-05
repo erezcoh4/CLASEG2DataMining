@@ -61,6 +61,7 @@ public:
     Float_t alpha_q     , sum_alpha;
     Float_t p_over_q    , theta_pq  ;
     Float_t q_phi       , q_theta   , Pmiss_phi , Pmiss_theta;
+    Float_t q_phi_g     , q_theta_g , Pmiss_phi_g, Pmiss_theta_g;
     Float_t Emiss       , Mmiss;
     Float_t mA          , CoulombDeltaE         , A_over_mA ;
     Float_t Mrec        , Trec      ;                           // protons kinetic energy, recoil mass & kinetic energy
@@ -69,25 +70,25 @@ public:
     Float_t thetaMiss23 , phiMiss23 , thetaLeadRec;
     Double_t k0         , kCMmag    , Px    , Py    ,Pz;
     
-    Double_t            pcmX        , pcmY          , pcmZ          ;
+    Float_t             pcmX        , pcmY          , pcmZ          ;
     Float_t             TpMiss      , m_A_1         , E_p_init      , M_p_init  , pq;
     vector<Float_t>     alpha       , pEdep         , pCTOF         , Tp        , proton_angle;
     vector<Int_t>       pCTOFCut    ;
     
     
-    TVector3            Pbeam       , Pe;
+    TVector3            Pbeam       , Pe        , Pe_g;
     TVector3            * NMom      , * P1Mom   , * P2Mom           , * e3Vector;
     TVector3            PmRctLab3   , eVertex   ;
-    vector<TVector3>    p3vec       , pVertex   ;
+    vector<TVector3>    p3vec       , p3vec_g   , pVertex   ;
     
     
     
-    TLorentzVector      Beam        , e        ,  p                , Wmiss     , kCM   , WmissWithCm , WmissCmEps;
+    TLorentzVector      Beam        , e         , e_g       ,  p                , Wmiss     , kCM   , WmissWithCm , WmissCmEps;
     TLorentzVector      Wtilde      , pA       ,  pA_Np_1;
-    TLorentzVector      q           , NucleonAtRest     , TargetAtRest  ;
-    TLorentzVector      Plead       , Pmiss     , Pcm   , Prec , PcmFinalState;
+    TLorentzVector      q           , q_g       , NucleonAtRest     , TargetAtRest  ;
+    TLorentzVector      Plead       , Plead_g   , Pmiss     , Pmiss_g , Pcm   , Prec , PcmFinalState;
     TLorentzVector      PmissRct    , Nlead     , Nmiss     ;
-    vector<TLorentzVector>  protons ;
+    vector<TLorentzVector>  protons , protons_g ;
 
     
     

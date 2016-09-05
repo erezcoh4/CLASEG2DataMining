@@ -1,7 +1,7 @@
 '''
     usage:
     ------
-    python mac/ana_pp_cm.py --option=roofit_cm_parameters
+    python mac/ana_pp_cm.py --option=calc_roofit_cm_parameters
     
 '''
 
@@ -11,6 +11,7 @@ from rootpy.interactive import wait
 sys.path.insert(0, '../../mySoftware/MySoftwarePackage/mac')
 import GeneralPlot as gp, Initiation as init , input_flags
 from matplotlib import pyplot as plt
+import matplotlib , pandas as pd , numpy as np
 
 init.createnewdir()
 flags = input_flags.get_args()
@@ -20,18 +21,27 @@ flags = input_flags.get_args()
 PmissMin    = [0.3  , 0.45 , 0.55 , 0.65 , 0.75]
 PmissMax    = [0.45 , 0.55 , 0.65 , 0.75 , 1.0 ]
 dm          = TEG2dm()
-DataName    = "DATA_%s"% dm.Target(flags.atomic_mass)
+DataName    = "DATA_%s_ppSRC"% dm.Target(flags.atomic_mass)
 SchemedName = "ppSRCCut_%s"% DataName
 
 
-if flags.option=='scheme':
+if flags.option=="scheme":
     print 'scheming from %s'% DataName
     ana     = TAnalysisEG2( DataName , flags.cut )
     scheme  = TSchemeDATA()
     scheme.SchemeOnTCut( "/Users/erezcohen/Desktop/DataMining/AnaFiles" , "Ana_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ana.ppSRCCut )
     print 'schemed to %s'%SchemedName
 
-ana         = TAnalysisEG2( SchemedName , flags.cut )
+ana = TAnalysisEG2( SchemedName , flags.cut )
+
+def  plot_errorbar_and_fit( ax , x , y , xerr , yerr , color , marker , lstyle , label , offset):
+    
+    plt.errorbar(x, y, xerr=xerr, yerr=yerr, color=color, marker=marker , linestyle=lstyle , label=None)
+    p = np.polyfit( x , y , 1)
+    ax.plot(x, p[0] * (x-offset) + p[0]*offset + p[1], color=color , label=label + "=%.2f($p_{miss}$-%.1f)+%.2f"%(p[0],offset,p[0]*offset + p[1]))
+
+
+
 
 if flags.option=="DrawCM3D" :
     c = ana.CreateCanvas("c.m. momentum","DivideSquare",9)
@@ -96,19 +106,60 @@ if flags.option=="DrawCM3D" :
 
 
 
-elif flags.option=="roofit_cm_parameters":
-    outfile = open("/Users/erezcohen/Desktop/CMparametes.dat", "wb")
+elif flags.option=="calc_roofit_cm_parameters":
+    outfile = open("/Users/erezcohen/Desktop/CMparametes.csv", "wb")
     outfile.write('\n\n')
-    outfile.write("p(miss): min \t max \t mean(x) \t sigma(x) \t mean(y) \t sigma(y) \t mean(z) \t sigma(z) \n")
-    outfile.write("-------------------------------------------------------------------------------------------------------------------------\n")
+    outfile.write("pMiss_min,pMiss_max,mean_x,mean_xErr,sigma_x,sigma_xErr,mean_y,mean_yErr,sigma_y,sigma_yErr,mean_z,mean_zErr,sigma_z,sigma_zErr\n")
     for i in range(len(PmissMin)):
         x = ana.RooFitCM(PmissMin[i],PmissMax[i]) # RooFitCM return a parameter vector
-        outfile.write("%.2f \t %.2f \t %f \t %f \t %f \t %f \t %f \t %f\n" % ( PmissMin[i] , PmissMax[i] , x(0,0) , x(1,0) , x(2,0) , x(3,0) , x(4,0) , x(5,0)))
+        outfile.write("%.2f,%.2f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n" % ( PmissMin[i] , PmissMax[i] ,x(0,0) ,x(0,1) ,x(1,0) ,x(1,1) , x(2,0) ,x(2,1) ,x(3,0), x(3,1) , x(4,0), x(4,1) , x(5,0), x(5,1)))
     outfile.write('\n\n')
     outfile.close()
+    print "from \n/Users/erezcohen/Desktop/DataMining/AnaFiles/Ana_"+SchemedName+".root"
     print "done calculating parameters, output can be found in the file: ", outfile.name
     print '\n\n'
 
+
+
+
+elif flags.option=="plot_roofit_cm_parameters":
+    data = pd.read_csv("/Users/erezcohen/Desktop/CMparametes.csv")
+    Pmiss = (data.pMiss_max + data.pMiss_min)/2.
+    pMissUpErr , pMissLowErr = data.pMiss_max - Pmiss , Pmiss - data.pMiss_min
+    sigma_x = data.sigma_x
+    print "data: ",data
+    print "Pmiss: ",Pmiss
+
+    fig = plt.figure(figsize=(15,10))
+    ax = fig.add_subplot(111)
+    ax.text( 0.5 , 0.2 , "no acc. corr." , fontsize=60 , color='red' , alpha = 0.15 )
+    ax.grid(True,linestyle='-',color='0.75')
+
+    plot_errorbar_and_fit( ax , Pmiss, data.sigma_x , [pMissLowErr,pMissUpErr] , [data.sigma_xErr,data.sigma_xErr],'black'  ,'v','none',r'$\sigma_{x}$' , 0.5)
+    plot_errorbar_and_fit( ax , Pmiss, data.sigma_y , [pMissLowErr,pMissUpErr] , [data.sigma_yErr,data.sigma_yErr],'red'    ,'o','none',r'$\sigma_{y}$' , 0.5)
+    plot_errorbar_and_fit( ax , Pmiss, data.sigma_z , [pMissLowErr,pMissUpErr] , [data.sigma_zErr,data.sigma_zErr],'blue'   ,'s','none',r'$\sigma_{\vec{p}_{miss}}$', 0.5)
+    
+    plt.xlabel(gp.pmiss_label,fontsize=25)
+    plt.ylabel( r'c.m. momentum width [Gev/c]',fontsize=25)
+    ax.legend(loc="upper left",scatterpoints=1)
+#    plt.show()
+    plt.savefig("/Users/erezcohen/Desktop/cm_width.pdf")
+    
+    
+    fig = plt.figure(figsize=(15,10))
+    ax = fig.add_subplot(111)
+    ax.text( 0.5 , 0.1 , "no acc. corr." , fontsize=60 , color='red' , alpha = 0.15 )
+    ax.grid(True,linestyle='-',color='0.75')
+    
+    plot_errorbar_and_fit( ax , Pmiss, data.mean_x , [pMissLowErr,pMissUpErr] , [data.mean_xErr,data.mean_xErr],'black' ,'v','none',r'$mean_{x}$' , 0.3)
+    plot_errorbar_and_fit( ax , Pmiss, data.mean_y , [pMissLowErr,pMissUpErr] , [data.mean_yErr,data.mean_yErr],'red'   ,'v','none',r'$mean_{y}$' , 0.3)
+    plot_errorbar_and_fit( ax , Pmiss, data.mean_z , [pMissLowErr,pMissUpErr] , [data.mean_zErr,data.mean_zErr],'blue'  ,'v','none',r'$mean_{\vec{p}_{miss}}$' , 0.3)
+
+    plt.xlabel(gp.pmiss_label,fontsize=25)
+    plt.ylabel( r'c.m. momentum mean [Gev/c]',fontsize=25)
+    ax.legend(loc="upper left",scatterpoints=1)
+#    plt.show()
+    plt.savefig("/Users/erezcohen/Desktop/cm_mean.pdf")
 
 
 

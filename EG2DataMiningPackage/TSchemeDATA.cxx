@@ -95,11 +95,6 @@ void TSchemeDATA::protons_from_nuclei(){
     WriteOutFile();
 }
 
-
-
-
-
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TSchemeDATA::SRCPmissXb(int fTargetType , float fXbMin, int fNpMin, int fNpMax, TString name){
     TargetType      = fTargetType;
@@ -108,9 +103,12 @@ void TSchemeDATA::SRCPmissXb(int fTargetType , float fXbMin, int fNpMin, int fNp
     LoadInTree      ();
     CreateOutTree   ();
 
-    if (DataType == "data") {
+    if (DataType == "DATA") {
         for (Long64_t i = 0; i < Nentries ; i++) {
-            if (i%(Nentries/20)==0) plot.PrintPercentStr((float)i/Nentries);
+            if (i%(Nentries/20)==0) {
+                printf("schemed %d events so far, out of ", (int)OutTree -> GetEntries());
+                plot.PrintPercentStr((float)i/Nentries);
+            }
             InTree -> GetEntry(i);
             if( (fNpMin <= Np &&  Np <= fNpMax) && (targ_type == TargetType) && (Xb > XbMin) ){
                 q       = new TVector3( - Px_e , - Py_e , 5.009 - Pz_e );
@@ -156,10 +154,6 @@ void TSchemeDATA::SRCPmissXb(int fTargetType , float fXbMin, int fNpMin, int fNp
 
     WriteOutFile();
 }
-
-
-
-
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

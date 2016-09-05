@@ -1,5 +1,5 @@
 # run:
-# > python mac/calc_gsim.py <run-number>
+# python mac/calc_gsim.py <run-number>
 
 import ROOT , os , sys 
 from ROOT import TEG2dm , TSchemeDATA , TAnalysisEG2 , TCalcPhysVarsEG2
@@ -31,7 +31,7 @@ calc        = TCalcPhysVarsEG2( InTree , OutTree , A , DataType , "q(z) - Pmiss(
 for entry in range(0, (int)(1.*Nentries)):
     
     calc.ComputePhysVars( entry );
-    if (calc.Np >= 13):
+    if (entry%10000==0):
         calc.PrintData( entry );
 
 

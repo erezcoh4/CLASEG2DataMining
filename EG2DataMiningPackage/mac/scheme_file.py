@@ -29,8 +29,8 @@ pMin , pMax = 0.3 , 0.7
 
 # ------------------------------------------------------------------ #
 if (flags.option=="SRCPmissXb"):
-    scheme.SRCPmissXb( 2 , 1.1 ) # target-type = 2, Bjorken x > 1.1
-    print "schemed for SRC in nuclear target (1 > p(miss) > 0.3 GeV/c) and Xb > 1.1"
+    scheme.SRCPmissXb( 2 , 0.8 , 1 , 4) # target-type = 2, Bjorken x > 0.8
+    print "schemed for SRC in nuclear target (1 > p(miss) > 0.3 GeV/c) and Xb > 0.8, 1-4 protons"
 # ------------------------------------------------------------------ #
 
 

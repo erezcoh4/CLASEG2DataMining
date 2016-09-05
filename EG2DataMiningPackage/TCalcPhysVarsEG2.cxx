@@ -110,6 +110,11 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("Bjorken x (moving p)",&XbMoving              , "XbMoving/F");
     OutTree -> Branch("Q2"                  ,&Q2                    , "Q2/F");
     OutTree -> Branch("Mmiss"               ,&Mmiss                 , "Mmiss/F");
+    // p(cm) for RooFit
+    OutTree -> Branch("pcmX"                ,&pcmX                  , "pcmX/F");
+    OutTree -> Branch("pcmY"                ,&pcmY                  , "pcmY/F");
+    OutTree -> Branch("pcmZ"                ,&pcmZ                  , "pcmZ/F");
+
     OutTree -> Branch("missing energy"      ,&Emiss                 , "Emiss/F");
     OutTree -> Branch("theta (pq)"          ,&theta_pq              , "theta_pq/F");
     OutTree -> Branch("p/q"                 ,&p_over_q              , "p_over_q/F");
@@ -153,15 +158,12 @@ void TCalcPhysVarsEG2::InitOutputTree(){
 
     
     
-    // p(cm) for rooFit
-    OutTree -> Branch("p(c.m.) x direction" ,&pcmX                  , "pcmX/D");
-    OutTree -> Branch("p(c.m.) y direction" ,&pcmY                  , "pcmY/D");
-    OutTree -> Branch("p(c.m.) z direction" ,&pcmZ                  , "pcmZ/D");
 
     
     if(DataType == "GSIM") {
         OutTree -> Branch("generated Q2"            ,&Q2_g          , "Q2_g/F");
         OutTree -> Branch("generated Bjorken x"     ,&Xb_g          , "Xb_g/F");
+        OutTree -> Branch("protons_g"               ,&protons_g);             // std::vector<TLorentzVector>
 
     }
     if(DataType == "(e,e'npp)"){
@@ -189,7 +191,9 @@ void TCalcPhysVarsEG2::InitGlobals(){
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::InitEvent(){
     if (!p3vec.empty())     p3vec.clear();   // unsorted protons
+    if (!p3vec_g.empty())   p3vec_g.clear();   // unsorted protons
     if (!protons.empty())   protons.clear();
+    if (!protons_g.empty()) protons_g.clear();
     if (!pVertex.empty())   pVertex.clear();
     if (!alpha.empty())     alpha.clear();
     if (!pCTOF.empty())     pCTOF.clear();
@@ -198,7 +202,7 @@ void TCalcPhysVarsEG2::InitEvent(){
     if (!Tp.empty())        Tp.clear();
     if (!proton_angle.empty()) proton_angle.clear();
     Np = NpBack = NpCumulative = NpCumulativeSRC = 0;
-    Plead = TLorentzVector();
+    Plead = Plead_g = TLorentzVector();
     Wmiss.SetVectM( TVector3() , 3. * Mp  );
 
 
@@ -222,7 +226,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     if (debug > 2) Printf("got entry");
 
     // electron
-    if(DataType == "data" || DataType == "GSIM" ) {
+    if(DataType == "DATA" || DataType == "GSIM" ) {
         Pe      = TVector3( Px_e , Py_e , Pz_e );
         eVertex = TVector3( X_e , Y_e , Z_e );
     }
@@ -235,6 +239,12 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     e.SetVectM( Pe , Me );
     q = Beam - e;
     Q2 = -q.Mag2();
+    if (DataType == "GSIM") {
+        Pe = TVector3( Px_e_g , Py_e_g , Pz_e_g );
+        e_g.SetVectM( Pe_g , Me );
+        q_g = Beam - e_g;
+        Q2_g=-q_g.Mag2();
+    }
     if (debug > 2) Printf("extracted electron' kinematics");
 
     
@@ -248,6 +258,13 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         if ( p3vec.back().Mag() > Plead.P() )
             Plead.SetVectM( p3vec.back() , Mp ) ;           // Plead is first calculated in Lab-Frame
         
+        if (DataType == "GSIM") {
+            p3vec_g.push_back( TVector3 (PpX_g[i],PpY_g[i],PpZ_g[i] ) );
+            EnergyLossCorrrection( p3vec_g.back() );
+            CoulombCorrection( p3vec_g.back() , CoulombDeltaE );
+            if ( p3vec_g.back().Mag() > Plead_g.P() )
+            Plead_g.SetVectM( p3vec_g.back() , Mp ) ;           // Plead is first calculated in Lab-Frame
+        }
     }
     
     if (DataType == "(e,e'npp)"){
@@ -266,6 +283,9 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     // Pmiss , p/q , 𝜃(p,q)
     Pmiss       = Plead - q;
+    if (DataType == "GSIM") {
+        Pmiss_g = Plead_g - q_g;
+    }
     // p(A-1) = -p(init) , and E(A-1) + E(p(init)) = m(A) => E(p(init)) = m(A) - E(A-1)
     E_p_init    = mA - sqrt( pow( m_A_1 , 2 ) + pow( Pmiss.P() , 2 ) );
     M_p_init    = Mp;
@@ -381,6 +401,19 @@ void TCalcPhysVarsEG2::q_Pmiss_frame(){
     
     q.RotateZ(-q_phi);
     q.RotateY(-q_theta);
+    
+    if (DataType=="GSIM"){
+        q_phi_g   = q_g.Phi();
+        q_theta_g = q_g.Theta();
+        
+        Pmiss_g.RotateZ(-q_phi_g);
+        Pmiss_g.RotateY(-q_theta_g);
+        Pmiss_phi_g = Pmiss_g.Phi();
+        Pmiss_g.RotateZ(-Pmiss_phi_g);
+        
+        q_g.RotateZ(-q_phi_g);
+        q_g.RotateY(-q_theta_g);
+    }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -396,6 +429,19 @@ void TCalcPhysVarsEG2::Pmiss_q_frame(){
     
     Pmiss.RotateZ(-Pmiss_phi);
     Pmiss.RotateY(-Pmiss_theta);
+    
+    if (DataType=="GSIM"){
+        Pmiss_phi_g   = Pmiss_g.Phi();
+        Pmiss_theta_g = Pmiss_g.Theta();
+        
+        q_g.RotateZ(-Pmiss_phi_g);
+        q_g.RotateY(-Pmiss_theta_g);
+        q_phi_g = q_g.Phi();
+        q_g.RotateZ(-q_phi_g);
+        
+        Pmiss_g.RotateZ(-Pmiss_phi_g);
+        Pmiss_g.RotateY(-Pmiss_theta_g);
+    }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -405,13 +451,24 @@ void TCalcPhysVarsEG2::loop_protons(){
     for (auto i: sort_pMag( p3vec )){
         
         // protons
-        if (FrameName == "q(z) - Pmiss(x-z) frame")
+        if (FrameName == "q(z) - Pmiss(x-z) frame"){
             RotVec2_q_Pm_Frame( & p3vec.at(i) , q_phi, q_theta, Pmiss_phi );
-        else if(FrameName == "Pmiss(z) - q(x-z) frame")
+            if (DataType == "GSIM"){
+                RotVec2_q_Pm_Frame( & p3vec_g.at(i) , q_phi_g, q_theta_g, Pmiss_phi_g );
+            }
+        }
+        else if(FrameName == "Pmiss(z) - q(x-z) frame"){
             RotVec2_Pm_q_Frame( & p3vec.at(i) , Pmiss_phi, Pmiss_theta, q_phi );
+            if (DataType == "GSIM"){
+                RotVec2_Pm_q_Frame( & p3vec_g.at(i) , Pmiss_phi_g, Pmiss_theta_g, q_phi_g );
+            }
+        }
         if (debug > 3) Printf("rotated proton to %s",FrameName.Data());
         
         protons.push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
+        if (DataType == "GSIM"){
+            protons_g.push_back( TLorentzVector( p3vec_g.at(i) , sqrt( p3vec_g.at(i).Mag2() + Mp2 ) ) );
+        }
         Pcm     += protons.back();
         PcmFinalState += protons.back();
         
@@ -421,7 +478,7 @@ void TCalcPhysVarsEG2::loop_protons(){
         pVertex .push_back( TVector3( Xp[i] , Yp[i] , Zp[i] ) );
 
         // kinetic energies
-        Tp      .push_back( protons.back().E() - protons.back().M() );
+        Tp.push_back( protons.back().E() - protons.back().M() );
 
         // proton identification
         if (DataType == "NoCTOF_DATA" || DataType == "New_NoCTofDATA") {
