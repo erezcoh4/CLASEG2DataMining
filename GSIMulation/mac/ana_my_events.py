@@ -15,7 +15,7 @@ init.createnewdir()
 flags = input_flags.get_args()
 
 
-runs     = np.arange(100,170)
+runs     = np.arange(100,505)
 PrecMin  = 0.35
 
 PmissLow = [ 0.3  , 0.45 , 0.55 , 0.65 , 0.75]
@@ -38,6 +38,8 @@ if flags.option=="missing evts vs. p(miss)":
     fig, ax = plt.subplots(1,1,figsize=(20,10))
 
     for run in runs:
+        if (run%flags.print_mod==0):
+            print "\trun=%d,[%.1f%%]"%(run,100*float(run)/len(runs))
     
         ana = TPlots("/Users/erezcohen/Desktop/DataMining/GSIM/eg_rootfiles/run0%d.root"%run,"anaTree")
         fracGoodPrec = []
@@ -51,7 +53,10 @@ if flags.option=="missing evts vs. p(miss)":
             CutPrec  = ROOT.TCut("%f<Precoil.Mag()"%PrecMin)
             NentriesPmissBin = ana.GetEntries( CutPmBin )
             NentriesPrecCut = ana.GetEntries( CutPmBin + CutPrec )
-            fracGoodPrec.append(100*(1-float(NentriesPrecCut)/NentriesPmissBin))
+            if (NentriesPmissBin > 0):
+                fracGoodPrec.append(100*(1-float(NentriesPrecCut)/NentriesPmissBin))
+            else:
+                fracGoodPrec.append(100)
 
 
         l, = plt.plot( Pmiss , fracGoodPrec , label='run %d'%run )
@@ -62,6 +67,7 @@ if flags.option=="missing evts vs. p(miss)":
         rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::1])))
         ltex = plt.text(pos[0], pos[1], '%d'%run , size=9, rotation=rot, color = l.get_color(),
                         ha="center", va="center",bbox = dict(ec='1',fc='1'))
+        ana.Close()
 
     plt.xlabel(gp.pmiss_label)
     plt.ylabel('loss for $p_{rec}>0.35$ GeV/c cut [%]')

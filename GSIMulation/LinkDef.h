@@ -11,6 +11,8 @@
 
 
 #pragma link C++ class EGgui+;
+#pragma link C++ class GenerateEvents+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 

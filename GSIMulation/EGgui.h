@@ -14,51 +14,53 @@
 #ifndef EGGUI_H
 #define EGGUI_H
 
-#include <iostream>
-#include "MySoftwarePackage/myIncludes.h"
-#include "MySoftwarePackage/TPlots.h"
+//#include <iostream>
+//#include "MySoftwarePackage/myIncludes.h"
+//#include "MySoftwarePackage/TPlots.h"
+//
+//
+//#include <TSystem.h>
+//#include <TFile.h>
+//#include <TTree.h>
+//#include <TBranchElement.h>
+//#include <TROOT.h>
+//#include <TCanvas.h>
+//#include <TH1F.h>
+//#include <TH2F.h>
+//#include <TProfile.h>
+//#include <TPad.h>
+//#include <TStyle.h>
+//#include <TMultiGraph.h>
+//#include <TGraphErrors.h>
+//#include <TLegend.h>
+//#include <TPaveStats.h>
+//#include <TChain.h>
+//#include <TBranch.h>
+//#include <TLeaf.h>
+//#include <TMath.h>
+//#include <TCut.h>
+//
+//#include <TGClient.h>
+//#include <TCanvas.h>
+//#include <TF1.h>
+//#include <TRandom.h>
+//#include <TGButton.h>
+//#include <TGFrame.h>
+//#include <TRootEmbeddedCanvas.h>
+//#include <RQ_OBJECT.h>
+//#include "TApplication.h"
+//#include "TGButtonGroup.h"
+//#include "TGFileDialog.h"
+//#include "TGNumberEntry.h"
+//#include "TGTextEntry.h"
+//#include "TGLabel.h"
+//#include "TText.h"
+//
+//#include <unistd.h>
+//#include <TRandom3.h>
+//#include <ctime>
 
-
-#include <TSystem.h>
-#include <TFile.h>
-#include <TTree.h>
-#include <TBranchElement.h>
-#include <TROOT.h>
-#include <TCanvas.h>
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TProfile.h>
-#include <TPad.h>
-#include <TStyle.h>
-#include <TMultiGraph.h>
-#include <TGraphErrors.h>
-#include <TLegend.h>
-#include <TPaveStats.h>
-#include <TChain.h>
-#include <TBranch.h>
-#include <TLeaf.h>
-#include <TMath.h>
-#include <TCut.h>
-
-#include <TGClient.h>
-#include <TCanvas.h>
-#include <TF1.h>
-#include <TRandom.h>
-#include <TGButton.h>
-#include <TGFrame.h>
-#include <TRootEmbeddedCanvas.h>
-#include <RQ_OBJECT.h>
-#include "TApplication.h"
-#include "TGButtonGroup.h"
-#include "TGFileDialog.h"
-#include "TGNumberEntry.h"
-#include "TGTextEntry.h"
-#include "TGLabel.h"
-#include "TText.h"
-
-#include <unistd.h>
-#include <TRandom3.h>
-#include <ctime>
+#include "GenerateEvents.h"
 
 /**
    \class EGgui
@@ -93,7 +95,8 @@ public:
     TVector3 q3Vector_in_Pmiss_q_system ,       Pmiss_in_Pmiss_q_system ,   Pcm_in_Pmiss_q_system;
     TVector3 q_q_sys                    ,       Pmiss_q_sys             ,   Pcm_q_sys;
     TRandom3 * gRandom;
-    
+    GenerateEvents * gen_events;
+
     // Globals
     TString             FileName;
     TString             eeNTreeName;
@@ -260,7 +263,7 @@ public:
     
     void DoGenMCFiles               ();
     void DoGenerate                 ();
-    void SetRootTreeAddresses       ();
+//    void SetRootTreeAddresses       ();
     void DoDrawGenerated            ();
     void DoSetDrawString            ();
     
@@ -277,8 +280,8 @@ public:
     void DoSetInHistNames           ();
     void DoSeteeNTreeName           ();
     void AddTextButton              ( TGHorizontalFrame *, TString , TString );
-    void            OutputInfo2File ();
-    void           OutPutToTextFile ( const int, TVector3*, int*, float*, int*);
+//    void            OutputInfo2File ();
+//    void           OutPutToTextFile ( const int, TVector3*, int*, float*, int*);
 
 };
 

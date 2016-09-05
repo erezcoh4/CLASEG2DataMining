@@ -279,7 +279,7 @@ void EGgui::DoSetSigmaL(){
 //    SigmaL_a2           = 0;
     SigmaL_a1           = fSigmaL_a1 -> GetNumberEntry() -> GetNumber();
     SigmaL_a2           = fSigmaL_a2 -> GetNumberEntry() -> GetNumber();
-    SigmaLFrame         ->  SetTitle(Form("sigma(L)=%.2f+%.2f(p(miss)-0.5)",SigmaL_a1,SigmaL_a2));
+    SigmaLFrame         ->  SetTitle(Form("sigma(L)=%.2f(p(miss)-0.5)+%.2f",SigmaL_a1,SigmaL_a2));
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -298,7 +298,7 @@ void EGgui::AddShiftLFrame(TGHorizontalFrame *frame ){
 void EGgui::DoSetShiftL(){
     ShiftL_a1           = fShiftL_a1 -> GetNumberEntry() -> GetNumber();
     ShiftL_a2           = fShiftL_a2 -> GetNumberEntry() -> GetNumber();
-    ShiftLFrame         ->  SetTitle(Form("Shift(L)=%.2f+%.2f(p(miss)-0.3)",ShiftL_a1,ShiftL_a2));
+    ShiftLFrame         ->  SetTitle(Form("Shift(L)=%.2f(p(miss)-0.3)+%.2f",ShiftL_a1,ShiftL_a2));
 }
 
 
@@ -543,222 +543,238 @@ void EGgui::DoGenMCFiles(){
 // main generation processes....
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void EGgui::DoGenerate(){
-    InputT   = new TChain("T");
-    txtFilename     = Form("%s/eg_txtfiles/run%04d.txt",Path.Data(),RunNumber);
-    rootFilename    = Form("%s/eg_rootfiles/run%04d.root",Path.Data(),RunNumber);
-    cout << "Generating " << txtFilename << " and " <<  rootFilename << endl;
-    TextFile.open(txtFilename);
-    RootFile = new TFile( rootFilename ,"recreate" );
-    RootTree = new TTree("anaTree","generated events");
-    SetRootTreeAddresses();
-    if (fReepp -> IsOn() ){
-        Printf("(e,e'pp)");
-        // Take 12C(e,e'p) SRC tree data
-        InputT          -> Add("/Users/erezcohen/Desktop/DataMining/GSIM/GUIEG/SRC_e1_C.root");
-        InputT          -> Add("/Users/erezcohen/Desktop/DataMining/GSIM/GUIEG/SRC_e2_C.root");
-        Float_t Pe[3]   , Pe_size;                                              // electron
-        Float_t Ep[2]   , Rproton[2][3] , Pproton[2][3] ,   Pproton_size[2];    // Proton
-        Float_t Pm[2][3], Pm_size[2];                                           // Proton missing momentum magnitude
-        Float_t q[3]    , q_size;                                               // q momentum transfer
-        
-        InputT -> SetBranchAddress("Q2"      ,           &Q2);
-        InputT -> SetBranchAddress("Xb"      ,           &Xb);
-        InputT -> SetBranchAddress("Pe"      ,           &Pe);
-        InputT -> SetBranchAddress("theta_e" ,           &theta_e);
-        InputT -> SetBranchAddress("Pe_size" ,           &Pe_size);
-        InputT -> SetBranchAddress("Ep"      ,           &Ep);
-        InputT -> SetBranchAddress("Pp"      ,           &Pproton);
-        InputT -> SetBranchAddress("Rp"      ,           &Rproton);           // proton vertex
-        InputT -> SetBranchAddress("Pp_size" ,           &Pproton_size);
-        InputT -> SetBranchAddress("Pmiss"   ,           &Pm);
-        InputT -> SetBranchAddress("Pmiss_size",         &Pm_size);
-        InputT -> SetBranchAddress("q"       ,           &q);
-        InputT -> SetBranchAddress("q_size"  ,           &q_size);
-        int InputNentries = InputT -> GetEntries();
-        
-        TVector3 * momentum = new TVector3[3];
-        int charge[3]           = { -1          , 1         , 1     };
-        float mass[3]           = { 0.000511    , 0.938     , 0.938 };
-        int pid[3]              = { 11          , 2212      , 2212  };
-        
-        for (int entry = 0 ; entry < InputNentries ; entry++ ) {
-            if ( entry%(InputNentries/10) == 0 ) std::cout  <<  (int)(100*(double)entry/InputNentries)+1 << "%\n";
-            
-            InputT -> GetEntry(entry);
-            double PmissMag = Pm_size[0];
-            
-            e.SetXYZ            ( Pe[0]         , Pe[1]         , Pe[2]);
-            q3Vector.SetXYZ     ( q[0]          , q[1]          , q[2] );
-            Pmiss.SetXYZ        ( Pm[0][0]      , Pm[0][1]      , Pm[0][2]);
-            Pp1.SetXYZ          ( Pproton[0][0] , Pproton[0][1] , Pproton[0][2]);
-            
-            
-            // rotate to Pmiss-q frame: Pmiss is the z axis, q is in x-z plane: q=(q[x],0,q[Pmiss])
-            double Pmiss_phi = Pmiss.Phi() , Pmiss_theta = Pmiss.Theta() ;
-            q3Vector_in_Pmiss_q_system = q3Vector;
-            q3Vector_in_Pmiss_q_system.RotateZ(-Pmiss_phi);
-            q3Vector_in_Pmiss_q_system.RotateY(-Pmiss_theta);
-            double q_Phi = q3Vector_in_Pmiss_q_system.Phi();
-            q3Vector_in_Pmiss_q_system.RotateZ(-q_Phi);
-            
-            Pmiss_in_Pmiss_q_system = Pmiss;
-            Pmiss_in_Pmiss_q_system.RotateZ(-Pmiss_phi);
-            Pmiss_in_Pmiss_q_system.RotateY(-Pmiss_theta);
-            Pmiss_in_Pmiss_q_system.RotateZ(-q_Phi);
-            
-            
-            // rotate to q-Pmiss frame: q is the z axis, Pmiss is in x-z plane: Pmiss=(Pmiss[x],0,Pmiss[q])
-            double q_q_phi = q3Vector.Phi() , q_q_theta = q3Vector.Theta() ;
-            Pmiss_q_sys = q3Vector;
-            Pmiss_q_sys.RotateZ(-q_q_phi);
-            Pmiss_q_sys.RotateY(-q_q_theta);
-            double Pmiss_Phi = Pmiss_q_sys.Phi();
-            Pmiss_q_sys.RotateZ(-Pmiss_Phi);
-            
-            q_q_sys = q3Vector;
-            q_q_sys.RotateZ(-q_q_phi);
-            q_q_sys.RotateY(-q_q_theta);
-            q_q_sys.RotateZ(-Pmiss_Phi);
-            
-            
-            double  omega   = 5.009 - sqrt( 0.000511*0.000511 + e.Mag()*e.Mag() );
-            ThetaPQ         = (180/TMath::Pi())*(Pp1.Angle(q3Vector));
-            ThetaPmissQ     = (180/TMath::Pi())*(Pmiss.Angle(q3Vector));
-            PoverQ          = Pp1.Mag()/q3Vector.Mag();
-            Proton          .SetVectM   ( Pp1 , 0.938 ); // struck proton
-            q4Vector        .SetXYZT    ( q3Vector.x() , q3Vector.y() , q3Vector.z() , omega );
-            m2N             .SetVectM   ( TVector3(0,0,0) , 2.*0.938 );
-            miss            = q4Vector + m2N - Proton;
-            Mmiss           = miss.Mag();
-            Rp1             .SetXYZ(Rproton[0][0],Rproton[0][1],Rproton[0][2]); // since there is no actual Rp2....
-            Rp2 = Rp1;// since there is no actual Rp2....
-            
-            
-            for( int j = 0 ; j < NRand  ;  j++ ){    //MC event generation
-                
-                float Px = gRandom -> Gaus( 0  , SigmaT );
-                float Py = gRandom -> Gaus( 0  , SigmaT );
-                float Pz = gRandom -> Gaus( ShiftL_a1 + ShiftL_a2*(PmissMag-0.3)  , SigmaL_a1 + SigmaL_a2*(PmissMag-0.5) );
-                Pcm_in_Pmiss_q_system.SetXYZ   ( Px , Py , Pz );
-                
-                // rotate back to lab frame
-                Pcm = Pcm_in_Pmiss_q_system;
-                Pcm.RotateZ  ( q_Phi );
-                Pcm.RotateY  ( Pmiss_theta );
-                Pcm.RotateZ  ( Pmiss_phi );
-                Precoil =   Pp2     = Pcm - Pmiss;
-                ThetaPmissPrecoil   = (180/TMath::Pi())*(Pmiss.Angle(Precoil));
-                
-                momentum[0] = e ; momentum[1] = Pp1; momentum[2] = Pp2;
-                OutPutToTextFile(3, momentum , charge , mass , pid );
-                // rotate also to q-Pmiss frame: q is the z axis, Pmiss is in x-z plane: Pmiss=(Pmiss[x],0,Pmiss[q])
-                Pcm_q_sys = Pcm;
-                Pcm_q_sys.RotateZ(-q_q_phi);
-                Pcm_q_sys.RotateY(-q_q_theta);
-                Pcm_q_sys.RotateZ(-Pmiss_Phi);
-                
-                Nevents++ ;
-                RootTree -> Fill();
-            }
-        }
+//    InputT   = new TChain("T");
+//    txtFilename     = Form("%s/eg_txtfiles/run%04d.txt",Path.Data(),RunNumber);
+//    rootFilename    = Form("%s/eg_rootfiles/run%04d.root",Path.Data(),RunNumber);
+//    cout << "Generating " << txtFilename << " and " <<  rootFilename << endl;
+//    TextFile.open(txtFilename);
+//    RootFile = new TFile( rootFilename ,"recreate" );
+//    RootTree = new TTree("anaTree","generated events");
+//    SetRootTreeAddresses();
+//    if (fReepp -> IsOn() ){
+//        Printf("(e,e'pp)");
+//        // Take 12C(e,e'p) SRC tree data
+//        InputT          -> Add("/Users/erezcohen/Desktop/DataMining/GSIM/GUIEG/SRC_e1_C.root");
+//        InputT          -> Add("/Users/erezcohen/Desktop/DataMining/GSIM/GUIEG/SRC_e2_C.root");
+//        Float_t Pe[3]   , Pe_size;                                              // electron
+//        Float_t Ep[2]   , Rproton[2][3] , Pproton[2][3] ,   Pproton_size[2];    // Proton
+//        Float_t Pm[2][3], Pm_size[2];                                           // Proton missing momentum magnitude
+//        Float_t q[3]    , q_size;                                               // q momentum transfer
+//        
+//        InputT -> SetBranchAddress("Q2"      ,           &Q2);
+//        InputT -> SetBranchAddress("Xb"      ,           &Xb);
+//        InputT -> SetBranchAddress("Pe"      ,           &Pe);
+//        InputT -> SetBranchAddress("theta_e" ,           &theta_e);
+//        InputT -> SetBranchAddress("Pe_size" ,           &Pe_size);
+//        InputT -> SetBranchAddress("Ep"      ,           &Ep);
+//        InputT -> SetBranchAddress("Pp"      ,           &Pproton);
+//        InputT -> SetBranchAddress("Rp"      ,           &Rproton);           // proton vertex
+//        InputT -> SetBranchAddress("Pp_size" ,           &Pproton_size);
+//        InputT -> SetBranchAddress("Pmiss"   ,           &Pm);
+//        InputT -> SetBranchAddress("Pmiss_size",         &Pm_size);
+//        InputT -> SetBranchAddress("q"       ,           &q);
+//        InputT -> SetBranchAddress("q_size"  ,           &q_size);
+//        int InputNentries = InputT -> GetEntries();
+//        
+//        TVector3 * momentum = new TVector3[3];
+//        int charge[3]           = { -1          , 1         , 1     };
+//        float mass[3]           = { 0.000511    , 0.938     , 0.938 };
+//        int pid[3]              = { 11          , 2212      , 2212  };
+//        
+//        for (int entry = 0 ; entry < InputNentries ; entry++ ) {
+//            if ( entry%(InputNentries/10) == 0 ) std::cout  <<  (int)(100*(double)entry/InputNentries)+1 << "%\n";
+//            
+//            InputT -> GetEntry(entry);
+//            double PmissMag = Pm_size[0];
+//            
+//            e.SetXYZ            ( Pe[0]         , Pe[1]         , Pe[2]);
+//            q3Vector.SetXYZ     ( q[0]          , q[1]          , q[2] );
+//            Pmiss.SetXYZ        ( Pm[0][0]      , Pm[0][1]      , Pm[0][2]);
+//            Pp1.SetXYZ          ( Pproton[0][0] , Pproton[0][1] , Pproton[0][2]);
+//            
+//            
+//            // rotate to Pmiss-q frame: Pmiss is the z axis, q is in x-z plane: q=(q[x],0,q[Pmiss])
+//            double Pmiss_phi = Pmiss.Phi() , Pmiss_theta = Pmiss.Theta() ;
+//            q3Vector_in_Pmiss_q_system = q3Vector;
+//            q3Vector_in_Pmiss_q_system.RotateZ(-Pmiss_phi);
+//            q3Vector_in_Pmiss_q_system.RotateY(-Pmiss_theta);
+//            double q_Phi = q3Vector_in_Pmiss_q_system.Phi();
+//            q3Vector_in_Pmiss_q_system.RotateZ(-q_Phi);
+//            
+//            Pmiss_in_Pmiss_q_system = Pmiss;
+//            Pmiss_in_Pmiss_q_system.RotateZ(-Pmiss_phi);
+//            Pmiss_in_Pmiss_q_system.RotateY(-Pmiss_theta);
+//            Pmiss_in_Pmiss_q_system.RotateZ(-q_Phi);
+//            
+//            
+//            // rotate to q-Pmiss frame: q is the z axis, Pmiss is in x-z plane: Pmiss=(Pmiss[x],0,Pmiss[q])
+//            double q_q_phi = q3Vector.Phi() , q_q_theta = q3Vector.Theta() ;
+//            Pmiss_q_sys = q3Vector;
+//            Pmiss_q_sys.RotateZ(-q_q_phi);
+//            Pmiss_q_sys.RotateY(-q_q_theta);
+//            double Pmiss_Phi = Pmiss_q_sys.Phi();
+//            Pmiss_q_sys.RotateZ(-Pmiss_Phi);
+//            
+//            q_q_sys = q3Vector;
+//            q_q_sys.RotateZ(-q_q_phi);
+//            q_q_sys.RotateY(-q_q_theta);
+//            q_q_sys.RotateZ(-Pmiss_Phi);
+//            
+//            
+//            double  omega   = 5.009 - sqrt( 0.000511*0.000511 + e.Mag()*e.Mag() );
+//            ThetaPQ         = (180/TMath::Pi())*(Pp1.Angle(q3Vector));
+//            ThetaPmissQ     = (180/TMath::Pi())*(Pmiss.Angle(q3Vector));
+//            PoverQ          = Pp1.Mag()/q3Vector.Mag();
+//            Proton          .SetVectM   ( Pp1 , 0.938 ); // struck proton
+//            q4Vector        .SetXYZT    ( q3Vector.x() , q3Vector.y() , q3Vector.z() , omega );
+//            m2N             .SetVectM   ( TVector3(0,0,0) , 2.*0.938 );
+//            miss            = q4Vector + m2N - Proton;
+//            Mmiss           = miss.Mag();
+//            Rp1             .SetXYZ(Rproton[0][0],Rproton[0][1],Rproton[0][2]); // since there is no actual Rp2....
+//            Rp2 = Rp1;// since there is no actual Rp2....
+//            
+//            
+//            for( int j = 0 ; j < NRand  ;  j++ ){    //MC event generation
+//                
+//                float Px = gRandom -> Gaus( 0  , SigmaT );
+//                float Py = gRandom -> Gaus( 0  , SigmaT );
+//                float Pz = gRandom -> Gaus( ShiftL_a1 + ShiftL_a2*(PmissMag-0.3)  , SigmaL_a1 + SigmaL_a2*(PmissMag-0.5) );
+//                Pcm_in_Pmiss_q_system.SetXYZ   ( Px , Py , Pz );
+//                
+//                // rotate back to lab frame
+//                Pcm = Pcm_in_Pmiss_q_system;
+//                Pcm.RotateZ  ( q_Phi );
+//                Pcm.RotateY  ( Pmiss_theta );
+//                Pcm.RotateZ  ( Pmiss_phi );
+//                Precoil =   Pp2     = Pcm - Pmiss;
+//                ThetaPmissPrecoil   = (180/TMath::Pi())*(Pmiss.Angle(Precoil));
+//                
+//                momentum[0] = e ; momentum[1] = Pp1; momentum[2] = Pp2;
+//                OutPutToTextFile(3, momentum , charge , mass , pid );
+//                // rotate also to q-Pmiss frame: q is the z axis, Pmiss is in x-z plane: Pmiss=(Pmiss[x],0,Pmiss[q])
+//                Pcm_q_sys = Pcm;
+//                Pcm_q_sys.RotateZ(-q_q_phi);
+//                Pcm_q_sys.RotateY(-q_q_theta);
+//                Pcm_q_sys.RotateZ(-Pmiss_Phi);
+//                
+//                Nevents++ ;
+//                RootTree -> Fill();
+//            }
+//        }
+//    }
+//    else if (fReeN -> IsOn()){
+//        Printf("(e,e'B)");
+//        TVector3 e , N;     // N is a baryon: p/n/𝚫
+//        RootTree -> Branch( BaryonName ,"TVector3"     ,&N);
+//        RootTree -> Branch( "e" ,"TVector3" ,&e);
+//        Float_t mag , theta;
+//        TVector3 * momentum     = new TVector3[2];
+//        
+//        int charge[2]           = { -1          , (BaryonName == "p") ? 1       : ((BaryonName == "n") ? 0      : 2)        };
+//        float mass[2]           = { 0.000511    ,  static_cast<float>((BaryonName == "p") ? 0.938   : ((BaryonName == "n") ? 0.939  : 1.232))    };
+//        int pid[2]              = { 11          , (BaryonName == "p") ? 2212    : ((BaryonName == "n") ? 2112   : 2214)     };
+//        
+//        
+//        //------- TAKE DATA FROM TREE --------------//
+//        if (fReeNFromTree -> IsOn()){
+//            
+//            Float_t PeMag   , Theta_e , Phi_e   , PpMag , Theta_p;
+//            eeNTree -> SetBranchAddress("P_e"       ,   &PeMag);
+//            eeNTree -> SetBranchAddress("theta_e"   ,   &Theta_e);
+//            eeNTree -> SetBranchAddress("phi_e"     ,   &Phi_e);
+//            eeNTree -> SetBranchAddress("P_N"       ,   &mag);
+//            eeNTree -> SetBranchAddress("theta_N"   ,   &theta);
+//            
+//            for (int entry = 0 ; entry < eeNTree->GetEntries() ; entry++ ) {
+//                eeNTree -> GetEntry(entry);
+//                e.SetMagThetaPhi(PeMag,(TMath::Pi()/180.)*Theta_e,(TMath::Pi()/180.)*Phi_e);
+//                momentum[0] = e;
+//                for ( int rand = 0 ; rand < NRand ; rand++ ) {
+//                    Double_t phi    = 360.*gRandom->Uniform();         // uniform angle between 0 and 360 degrees
+//                    N.SetMagThetaPhi ( mag , (TMath::Pi()/180.)*theta , (TMath::Pi()/180.)*phi);
+//                    momentum[1] = N;
+//                    OutPutToTextFile(2, momentum , charge ,mass , pid );
+//                    RootTree -> Fill();
+//                }
+//            }
+//        }
+//        
+//        //------- CREATE NEW DATA --------------//
+//        else {
+//            TVector3 e(-0.137*4.306 , -0.339*4.306 , 0.956*4.306 ); // a single electron that passes RECSIS cuts...
+//            momentum[0] = e;
+//            for (int entry = 0 ; entry < NPTheta ; entry++ ) {
+//                if ( entry%(NPTheta/10) == 0 ) std::cout  << (int)(100*(double)entry/NPTheta) << "%\n";
+//                if (fFlateeN->IsOn()){ // flat distributions
+//                    theta  = Thetamin + (Thetamax-Thetamin)*gRandom->Uniform();
+//                    mag    = Pmin + (Pmax-Pmin)*gRandom->Uniform();
+//                } else if (fReeNFromDist->IsOn()){  // take from file histograms
+//                    theta  = histTheta ->GetRandom();
+//                    mag    = histMag   ->GetRandom();
+//                }
+//                for ( int rand = 0 ; rand < NRand ; rand++ ) {
+//                    Double_t phi    = 360.*gRandom->Uniform();         // uniform angle between 0 and 360 degrees
+//                    N.SetMagThetaPhi ( mag , (TMath::Pi()/180.)*theta , (TMath::Pi()/180.)*phi);
+//                    momentum[1] = N;
+//                    OutPutToTextFile(2, momentum , charge ,mass , pid );
+//                    RootTree -> Fill();
+//                }
+//            }
+//            
+//        }
+//    }
+//    RootFile -> Write();
+//    RootFile -> Close();
+//    TextFile.close();
+//    OutRunNumberFile.open(runsFilename);
+//    OutRunNumberFile << RunNumber << "\n" ;
+//    OutRunNumberFile.close();
+//    //Printf("\nDont forget:\nDocument run %d in README file! ... ", RunNumber);
+//    OutputInfo2File();
+    gen_events = new GenerateEvents( Path , RunNumber , 2 );
+    TString Type = (fReepp -> IsOn()) ? "(e,e'pp)" : "(e,e'B)";
+    bool fDoReeNFromTree = (fReeNFromTree -> IsOn()) ? true : false;
+    bool fDoReeNFromDist = (fReeNFromDist->IsOn()) ? true : false;
+    bool fDoFlateeN  = (fFlateeN->IsOn()) ? true : false;
+    gen_events -> SetLimits( Pmin , Pmax , Thetamin , Thetamax );
+    if (Type == "(e,e'pp)") {
+        gen_events -> Set_eep_Parameters( SigmaT , SigmaL_a1 , SigmaL_a2 , ShiftL_a1 , ShiftL_a2 );
     }
-    else if (fReeN -> IsOn()){
-        Printf("(e,e'B)");
-        TVector3 e , N;     // N is a baryon: p/n/𝚫
-        RootTree -> Branch( BaryonName ,"TVector3"     ,&N);
-        RootTree -> Branch( "e" ,"TVector3" ,&e);
-        Float_t mag , theta;
-        TVector3 * momentum     = new TVector3[2];
-        
-        int charge[2]           = { -1          , (BaryonName == "p") ? 1       : ((BaryonName == "n") ? 0      : 2)        };
-        float mass[2]           = { 0.000511    ,  static_cast<float>((BaryonName == "p") ? 0.938   : ((BaryonName == "n") ? 0.939  : 1.232))    };
-        int pid[2]              = { 11          , (BaryonName == "p") ? 2212    : ((BaryonName == "n") ? 2112   : 2214)     };
-        
-        
-        //------- TAKE DATA FROM TREE --------------//
-        if (fReeNFromTree -> IsOn()){
-            
-            Float_t PeMag   , Theta_e , Phi_e   , PpMag , Theta_p;
-            eeNTree -> SetBranchAddress("P_e"       ,   &PeMag);
-            eeNTree -> SetBranchAddress("theta_e"   ,   &Theta_e);
-            eeNTree -> SetBranchAddress("phi_e"     ,   &Phi_e);
-            eeNTree -> SetBranchAddress("P_N"       ,   &mag);
-            eeNTree -> SetBranchAddress("theta_N"   ,   &theta);
-            
-            for (int entry = 0 ; entry < eeNTree->GetEntries() ; entry++ ) {
-                eeNTree -> GetEntry(entry);
-                e.SetMagThetaPhi(PeMag,(TMath::Pi()/180.)*Theta_e,(TMath::Pi()/180.)*Phi_e);
-                momentum[0] = e;
-                for ( int rand = 0 ; rand < NRand ; rand++ ) {
-                    Double_t phi    = 360.*gRandom->Uniform();         // uniform angle between 0 and 360 degrees
-                    N.SetMagThetaPhi ( mag , (TMath::Pi()/180.)*theta , (TMath::Pi()/180.)*phi);
-                    momentum[1] = N;
-                    OutPutToTextFile(2, momentum , charge ,mass , pid );
-                    RootTree -> Fill();
-                }
-            }
-        }
-        
-        //------- CREATE NEW DATA --------------//
-        else {
-            TVector3 e(-0.137*4.306 , -0.339*4.306 , 0.956*4.306 ); // a single electron that passes RECSIS cuts...
-            momentum[0] = e;
-            for (int entry = 0 ; entry < NPTheta ; entry++ ) {
-                if ( entry%(NPTheta/10) == 0 ) std::cout  << (int)(100*(double)entry/NPTheta) << "%\n";
-                if (fFlateeN->IsOn()){ // flat distributions
-                    theta  = Thetamin + (Thetamax-Thetamin)*gRandom->Uniform();
-                    mag    = Pmin + (Pmax-Pmin)*gRandom->Uniform();
-                } else if (fReeNFromDist->IsOn()){  // take from file histograms
-                    theta  = histTheta ->GetRandom();
-                    mag    = histMag   ->GetRandom();
-                }
-                for ( int rand = 0 ; rand < NRand ; rand++ ) {
-                    Double_t phi    = 360.*gRandom->Uniform();         // uniform angle between 0 and 360 degrees
-                    N.SetMagThetaPhi ( mag , (TMath::Pi()/180.)*theta , (TMath::Pi()/180.)*phi);
-                    momentum[1] = N;
-                    OutPutToTextFile(2, momentum , charge ,mass , pid );
-                    RootTree -> Fill();
-                }
-            }
-            
-        }
+    else{
+        gen_events -> Set_eeN_tree(eeNTree);
+        if (fDoReeNFromDist) gen_events -> SetHistThetaHistMag ( histMag , histTheta );
     }
-    RootFile -> Write();
-    RootFile -> Close();
-    TextFile.close();
-    OutRunNumberFile.open(runsFilename);
-    OutRunNumberFile << RunNumber << "\n" ;
-    OutRunNumberFile.close();
-    //Printf("\nDont forget:\nDocument run %d in README file! ... ", RunNumber);
-    OutputInfo2File();
+    gen_events -> SetNRand(NRand);
+    gen_events -> SetNPTheta(NPTheta);
+    gen_events -> DoGenerate( Type , BaryonName , fDoReeNFromTree , fDoReeNFromDist , fDoFlateeN );
     DoDrawGenerated();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-void EGgui::SetRootTreeAddresses(){
-    RootTree -> Branch("q3Vector"                    ,"TVector3"     ,&q3Vector);
-    RootTree -> Branch("Pcm"                         ,"TVector3"     ,&Pcm);
-    RootTree -> Branch("Pp1"                         ,"TVector3"     ,&Pp1);
-    RootTree -> Branch("Pp2"                         ,"TVector3"     ,&Pp2);
-    RootTree -> Branch("Pmiss"                       ,"TVector3"     ,&Pmiss);
-    RootTree -> Branch("Precoil"                     ,"TVector3"     ,&Pp2);
-    RootTree -> Branch("q_in_Pmiss_q_system"         ,"TVector3"     ,&q3Vector_in_Pmiss_q_system);
-    RootTree -> Branch("Pmiss_in_Pmiss_q_system"     ,"TVector3"     ,&Pmiss_in_Pmiss_q_system);
-    RootTree -> Branch("Pcm_in_Pmiss_q_system"       ,"TVector3"     ,&Pcm_in_Pmiss_q_system);
-    RootTree -> Branch("q_q_sys"                     ,"TVector3"     ,&q_q_sys);
-    RootTree -> Branch("Pmiss_q_sys"                 ,"TVector3"     ,&Pmiss_q_sys);
-    RootTree -> Branch("Pcm_q_sys"                   ,"TVector3"     ,&Pcm_q_sys);
-    RootTree -> Branch("Rp1"                         ,"TVector3"     ,&Rp1);                      // proton vertex
-    RootTree -> Branch("Rp2"                         ,"TVector3"     ,&Rp2);                      // proton vertex
-    RootTree -> Branch("Q2"                  ,&Q2                    ,"Q2/F");
-    RootTree -> Branch("theta_e"             ,&theta_e               ,"theta_e/F");
-    RootTree -> Branch("Xb"                  ,&Xb                    ,"Xb/F");
-    RootTree -> Branch("ThetaPQ"             ,&ThetaPQ               ,"ThetaPQ/F");              // angle between the leading proton and q
-    RootTree -> Branch("ThetaPmissQ"         ,&ThetaPmissQ           ,"ThetaPmissQ/F");          // angle between the missing momentum and q
-    RootTree -> Branch("ThetaPmissPrecoil"   ,&ThetaPmissPrecoil     ,"ThetaPmissPrecoil/F");    // angle between the missing and recoil momenta
-    RootTree -> Branch("PoverQ"              ,&PoverQ                ,"PoverQ/F");               // ratio |p|/|q| for leading proton
-    RootTree -> Branch("Mmiss"               ,&Mmiss                 ,"Mmiss/F");
-}
+//void EGgui::SetRootTreeAddresses(){
+//    RootTree -> Branch("q3Vector"                    ,"TVector3"     ,&q3Vector);
+//    RootTree -> Branch("Pcm"                         ,"TVector3"     ,&Pcm);
+//    RootTree -> Branch("Pp1"                         ,"TVector3"     ,&Pp1);
+//    RootTree -> Branch("Pp2"                         ,"TVector3"     ,&Pp2);
+//    RootTree -> Branch("Pmiss"                       ,"TVector3"     ,&Pmiss);
+//    RootTree -> Branch("Precoil"                     ,"TVector3"     ,&Pp2);
+//    RootTree -> Branch("q_in_Pmiss_q_system"         ,"TVector3"     ,&q3Vector_in_Pmiss_q_system);
+//    RootTree -> Branch("Pmiss_in_Pmiss_q_system"     ,"TVector3"     ,&Pmiss_in_Pmiss_q_system);
+//    RootTree -> Branch("Pcm_in_Pmiss_q_system"       ,"TVector3"     ,&Pcm_in_Pmiss_q_system);
+//    RootTree -> Branch("q_q_sys"                     ,"TVector3"     ,&q_q_sys);
+//    RootTree -> Branch("Pmiss_q_sys"                 ,"TVector3"     ,&Pmiss_q_sys);
+//    RootTree -> Branch("Pcm_q_sys"                   ,"TVector3"     ,&Pcm_q_sys);
+//    RootTree -> Branch("Rp1"                         ,"TVector3"     ,&Rp1);                      // proton vertex
+//    RootTree -> Branch("Rp2"                         ,"TVector3"     ,&Rp2);                      // proton vertex
+//    RootTree -> Branch("Q2"                  ,&Q2                    ,"Q2/F");
+//    RootTree -> Branch("theta_e"             ,&theta_e               ,"theta_e/F");
+//    RootTree -> Branch("Xb"                  ,&Xb                    ,"Xb/F");
+//    RootTree -> Branch("ThetaPQ"             ,&ThetaPQ               ,"ThetaPQ/F");              // angle between the leading proton and q
+//    RootTree -> Branch("ThetaPmissQ"         ,&ThetaPmissQ           ,"ThetaPmissQ/F");          // angle between the missing momentum and q
+//    RootTree -> Branch("ThetaPmissPrecoil"   ,&ThetaPmissPrecoil     ,"ThetaPmissPrecoil/F");    // angle between the missing and recoil momenta
+//    RootTree -> Branch("PoverQ"              ,&PoverQ                ,"PoverQ/F");               // ratio |p|/|q| for leading proton
+//    RootTree -> Branch("Mmiss"               ,&Mmiss                 ,"Mmiss/F");
+//}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void EGgui::DoDrawGenerated(){
@@ -776,35 +792,35 @@ void EGgui::DoDrawGenerated(){
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-void EGgui::OutputInfo2File(){
-    
-    RunsInfoFileName = Form("%s/eg_txtfiles/RunsInfo.txt",Path.Data());
-    RunsInfoFile.open(RunsInfoFileName,std::ofstream::out | std::ofstream::app);
-
-    RunsInfoFile
-    << RunNumber
-    << "\t" << 1900+dt->tm_year << "/" << dt->tm_mon
-    << "\t\t"  << SigmaT
-    << "\t\t"  << SigmaL_a1 << "\t"  << SigmaL_a2
-    << "\t\t"  << ShiftL_a1 << "\t"  << ShiftL_a2
-    << "\n" ;
-    
-    RunsInfoFile.close();
-}
+//void EGgui::OutputInfo2File(){
+//    
+//    RunsInfoFileName = Form("%s/eg_txtfiles/RunsInfo.txt",Path.Data());
+//    RunsInfoFile.open(RunsInfoFileName,std::ofstream::out | std::ofstream::app);
+//
+//    RunsInfoFile
+//    << RunNumber
+//    << "\t" << 1900+dt->tm_year << "/" << dt->tm_mon
+//    << "\t\t"  << SigmaT
+//    << "\t\t"  << SigmaL_a1 << "\t"  << SigmaL_a2
+//    << "\t\t"  << ShiftL_a1 << "\t"  << ShiftL_a2
+//    << "\n" ;
+//    
+//    RunsInfoFile.close();
+//}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-void EGgui::OutPutToTextFile(const int N , TVector3 momentum[] , int charge[N] , float mass[N], int pid[N]){
-    float x = 0 , y  = 0 , z  = 0 , t_off = 0 ;
-    int flag = 0;
-    TextFile << N << std::endl;
-    for (int j = 0 ; j < N ; j++ ){
-        float   p_mag = momentum[j].Mag();
-        float   cx  = momentum[j].x()/p_mag, cy = momentum[j].y()/p_mag  , cz = momentum[j].z()/p_mag ;
-        TextFile << pid[j]  <<" "<< cx      <<" "<< cy  <<" "<< cz      <<" "<< p_mag     <<std::endl;
-        TextFile << mass[j] <<" "<< charge[j]  << std::endl;
-        TextFile << x       <<" "<< y       <<" "<< z   <<" "<< t_off   <<" "<< flag    <<std::endl;
-    }
-}
+//void EGgui::OutPutToTextFile(const int N , TVector3 momentum[] , int charge[N] , float mass[N], int pid[N]){
+//    float x = 0 , y  = 0 , z  = 0 , t_off = 0 ;
+//    int flag = 0;
+//    TextFile << N << std::endl;
+//    for (int j = 0 ; j < N ; j++ ){
+//        float   p_mag = momentum[j].Mag();
+//        float   cx  = momentum[j].x()/p_mag, cy = momentum[j].y()/p_mag  , cz = momentum[j].z()/p_mag ;
+//        TextFile << pid[j]  <<" "<< cx      <<" "<< cy  <<" "<< cz      <<" "<< p_mag     <<std::endl;
+//        TextFile << mass[j] <<" "<< charge[j]  << std::endl;
+//        TextFile << x       <<" "<< y       <<" "<< z   <<" "<< t_off   <<" "<< flag    <<std::endl;
+//    }
+//}
 
 
 
