@@ -15,7 +15,7 @@ init.createnewdir()
 flags = input_flags.get_args()
 
 
-runs     = np.arange(100,505)
+runs     = np.arange(801,935)
 PrecMin  = 0.35
 
 PmissLow = [ 0.3  , 0.45 , 0.55 , 0.65 , 0.75]

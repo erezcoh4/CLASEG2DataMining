@@ -96,6 +96,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
 
     // Integer branches
     OutTree -> Branch("target atomic mass"  ,&A                     ,"A/I");
+    OutTree -> Branch("Np_g"                ,&Np_g                  ,"Np_g/I");
     OutTree -> Branch("Np"                  ,&Np                    ,"Np/I");
     OutTree -> Branch("NpBack"              ,&NpBack                ,"NpBack/I"); // number of backward going protons
     OutTree -> Branch("NpCumulative"        ,&NpCumulative          ,"NpCumulative/I"); // number of backward going protons with 0.3<p
@@ -257,15 +258,18 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         CoulombCorrection( p3vec.back() , CoulombDeltaE );
         if ( p3vec.back().Mag() > Plead.P() )
             Plead.SetVectM( p3vec.back() , Mp ) ;           // Plead is first calculated in Lab-Frame
-        
-        if (DataType == "GSIM") {
+    }
+    
+    if (DataType == "GSIM") {
+        for (int i = 0 ; i < Np_g ; i++ ){
             p3vec_g.push_back( TVector3 (PpX_g[i],PpY_g[i],PpZ_g[i] ) );
             EnergyLossCorrrection( p3vec_g.back() );
             CoulombCorrection( p3vec_g.back() , CoulombDeltaE );
             if ( p3vec_g.back().Mag() > Plead_g.P() )
-            Plead_g.SetVectM( p3vec_g.back() , Mp ) ;           // Plead is first calculated in Lab-Frame
+                Plead_g.SetVectM( p3vec_g.back() , Mp ) ;           // Plead is first calculated in Lab-Frame
         }
     }
+
     
     if (DataType == "(e,e'npp)"){
         // momenta corrections have already performed
@@ -334,10 +338,13 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     if (debug > 2) Printf("starting to sort the protons and loop over them");
     // sort the protons and loop on them for variables calculations only once more!
     loop_protons();
+    
     if (debug > 2) Printf("finished sorting the protons and looping over them");
 
     // all recoil protons together (just without the leading proton)
-    Plead       = protons.at(0);            // now Plead is calculated in q-Pmiss frame
+    if (protons.size()>0) {
+        Plead       = protons.at(0);            // now Plead is calculated in q-Pmiss frame
+    }
     Prec        = Pcm - (Plead - q);        // Prec is the 4-vector sum of all recoiling protons
 
     
@@ -386,6 +393,8 @@ void TCalcPhysVarsEG2::ChangeAxesFrame(){
         q_Pmiss_frame();
     else if(FrameName == "Pmiss(z) - q(x-z) frame")
         Pmiss_q_frame();
+    else if(FrameName == "lab frame")
+        return;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -446,40 +455,55 @@ void TCalcPhysVarsEG2::Pmiss_q_frame(){
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::loop_protons(){
-
-
+    
+    if (DataType == "GSIM"){
+        for (auto i: sort_pMag( p3vec_g )){
+            
+            // protons
+            if (FrameName == "q(z) - Pmiss(x-z) frame"){
+                RotVec2_q_Pm_Frame( & p3vec_g.at(i) , q_phi_g, q_theta_g, Pmiss_phi_g );
+            }
+            else if(FrameName == "Pmiss(z) - q(x-z) frame"){
+                RotVec2_Pm_q_Frame( & p3vec_g.at(i) , Pmiss_phi_g, Pmiss_theta_g, q_phi_g );
+            }
+            else if (FrameName == "lab frame"){
+                if (debug>2) cout << "staying in lab frame..." << endl;
+            }
+            if (debug > 3) Printf("rotated proton to %s",FrameName.Data());
+            
+            protons_g.push_back( TLorentzVector( p3vec_g.at(i) , sqrt( p3vec_g.at(i).Mag2() + Mp2 ) ) );
+        }
+    }
+    
+    
+    
+    
     for (auto i: sort_pMag( p3vec )){
         
         // protons
         if (FrameName == "q(z) - Pmiss(x-z) frame"){
             RotVec2_q_Pm_Frame( & p3vec.at(i) , q_phi, q_theta, Pmiss_phi );
-            if (DataType == "GSIM"){
-                RotVec2_q_Pm_Frame( & p3vec_g.at(i) , q_phi_g, q_theta_g, Pmiss_phi_g );
-            }
         }
         else if(FrameName == "Pmiss(z) - q(x-z) frame"){
             RotVec2_Pm_q_Frame( & p3vec.at(i) , Pmiss_phi, Pmiss_theta, q_phi );
-            if (DataType == "GSIM"){
-                RotVec2_Pm_q_Frame( & p3vec_g.at(i) , Pmiss_phi_g, Pmiss_theta_g, q_phi_g );
-            }
+        }
+        else if (FrameName == "lab frame"){
+            if (debug>2) cout << "staying in lab frame..." << endl;
         }
         if (debug > 3) Printf("rotated proton to %s",FrameName.Data());
         
         protons.push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
-        if (DataType == "GSIM"){
-            protons_g.push_back( TLorentzVector( p3vec_g.at(i) , sqrt( p3vec_g.at(i).Mag2() + Mp2 ) ) );
-        }
-        Pcm     += protons.back();
+        Pcm += protons.back();
         PcmFinalState += protons.back();
         
         
         
         // proton vertex
         pVertex .push_back( TVector3( Xp[i] , Yp[i] , Zp[i] ) );
-
+        
         // kinetic energies
         Tp.push_back( protons.back().E() - protons.back().M() );
-
+        
         // proton identification
         if (DataType == "NoCTOF_DATA" || DataType == "New_NoCTofDATA") {
             
@@ -491,8 +515,8 @@ void TCalcPhysVarsEG2::loop_protons(){
         else {
             pCTOFCut.push_back( 1 );
         }
-
-
+        
+        
         // cumulative protons
         proton_angle.push_back(r2d * p3vec.at(i).Angle(q.Vect()));
         if ( pCTOFCut.back()==1 && proton_angle.back() > 90. ){
@@ -504,17 +528,17 @@ void TCalcPhysVarsEG2::loop_protons(){
                 }
             }
         }
-
+        
         
         // α-s
         alpha.push_back( LCfraction(protons.back() , A_over_mA ) );
         sum_alpha += alpha.back();
         
         
-       
+        
         // A(e,e'p)X missing energy
         Emiss      -= protons.back().E() - Mp;
-     
+        
         
         // Invariant mass of the system produced in the interaction of balancing nucleon with a virtual photon
         Wtilde     -= protons.back();
@@ -524,7 +548,7 @@ void TCalcPhysVarsEG2::loop_protons(){
         if (debug > 3) Printf("finished going over this proton...");
     }
     
-    
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OåOooo........oooOO0OOooo......
@@ -580,6 +604,7 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOW(E_p_init);
     SHOWTLorentzVector(e);
     SHOWTLorentzVector(q);
+    if(DataType=="GSIM") SHOWvectorTLorentzVector(protons_g);
     SHOWvectorTLorentzVector(protons);
     SHOWstdTVector3(pVertex);
     SHOWstdVector(alpha);

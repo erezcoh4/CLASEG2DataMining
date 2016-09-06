@@ -44,7 +44,7 @@ public:
     
     
     // PARTICLES....
-    Int_t   targ_type   , A             ;
+    Int_t   targ_type   , A             , Np_g;
     Int_t   Np          , Ntotal        , Nnegative;
     Int_t   NpBack      , NpCumulative  , NpCumulativeSRC;
     Int_t   uns_pCut[20], uns_pID[20];
@@ -83,7 +83,7 @@ public:
     
     
     
-    TLorentzVector      Beam        , e         , e_g       ,  p                , Wmiss     , kCM   , WmissWithCm , WmissCmEps;
+    TLorentzVector      Beam        , e         , e_g       ,  p    , Wmiss     , kCM   , WmissWithCm , WmissCmEps;
     TLorentzVector      Wtilde      , pA       ,  pA_Np_1;
     TLorentzVector      q           , q_g       , NucleonAtRest     , TargetAtRest  ;
     TLorentzVector      Plead       , Plead_g   , Pmiss     , Pmiss_g , Pcm   , Prec , PcmFinalState;
@@ -116,6 +116,8 @@ public:
     void     SetFrameName (TString name){FrameName = name;};
     void            Setk0 (Float_t  fk0){k0 = fk0;};
     void         SetDebug (int d)       {debug = d;};
+    void          SetNp_g (int fNp_g)   {Np_g = fNp_g;};
+    
     // initializations
     void    InitInputTree ();
     void   InitOutputTree ();

@@ -65,15 +65,15 @@ elif (flags.option=="two slow protons-npp"):
 
 
 # ------------------------------------------------------------------ #
-elif (flags.option=="gsim"):
+elif (flags.option=="gsim" or flags.option=="GSIM"):
 
-    run = int(input("which run number? > "))
+    run         = flags.run
     DataType    = "GSIM"
     Path        = path + "/GSIM_DATA"
     FileName    = "GSIM_run%04d"%run
 
     scheme = TSchemeDATA()
-    scheme.SchemeOnTCut( Path, FileName+".root", "proton_data", FileName + "_eep.root", ROOT.TCut("P_nmb>0"))
+    scheme.SchemeOnTCut( Path, FileName+".root", "proton_data", FileName + "_eep.root", flags.cut )
     
     print "schemed gsim file "+FileName
 # ------------------------------------------------------------------ #

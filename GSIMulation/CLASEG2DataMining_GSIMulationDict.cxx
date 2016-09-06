@@ -57,7 +57,7 @@ namespace ROOT {
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::EGgui));
       static ::ROOT::TGenericClassInfo 
          instance("EGgui", "EGgui.h", 70,
-                  typeid(::EGgui), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  typeid(::EGgui), DefineBehavior(ptr, ptr),
                   &EGgui_Dictionary, isa_proxy, 4,
                   sizeof(::EGgui) );
       instance.SetDelete(&delete_EGgui);
@@ -100,7 +100,7 @@ namespace ROOT {
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::GenerateEvents));
       static ::ROOT::TGenericClassInfo 
          instance("GenerateEvents", "GenerateEvents.h", 68,
-                  typeid(::GenerateEvents), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  typeid(::GenerateEvents), DefineBehavior(ptr, ptr),
                   &GenerateEvents_Dictionary, isa_proxy, 4,
                   sizeof(::GenerateEvents) );
       instance.SetNew(&new_GenerateEvents);
@@ -173,12 +173,12 @@ namespace {
     };
     static const char* includePaths[] = {
 "/Users/erezcohen/larlite/UserDev/mySoftware",
-"/usr/local/Cellar/root6/6.06.02/include/root",
+"/Users/erezcohen/root6/root-6.04.10/include",
 "/Users/erezcohen/larlite/UserDev/CLASEG2DataMining/GSIMulation/",
 0
     };
-    static const char* fwdDeclCode = R"DICTFWDDCLS(
-#line 1 "libCLASEG2DataMining_GSIMulation dictionary forward declarations' payload"
+    static const char* fwdDeclCode = 
+R"DICTFWDDCLS(
 #pragma clang diagnostic ignored "-Wkeyword-compat"
 #pragma clang diagnostic ignored "-Wignored-attributes"
 #pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
@@ -187,7 +187,6 @@ class __attribute__((annotate("$clingAutoload$EGgui.h")))  EGgui;
 class __attribute__((annotate("$clingAutoload$EGgui.h")))  GenerateEvents;
 )DICTFWDDCLS";
     static const char* payloadCode = R"DICTPAYLOAD(
-#line 1 "libCLASEG2DataMining_GSIMulation dictionary payload"
 
 #ifndef G__VECTOR_HAS_CLASS_ITERATOR
   #define G__VECTOR_HAS_CLASS_ITERATOR 1
