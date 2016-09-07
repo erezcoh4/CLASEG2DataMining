@@ -47,16 +47,23 @@ void GenerateEvents::SetHistThetaHistMag( TH1F * fhistMag , TH1F * fhistTheta ){
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-Int_t GenerateEvents::DoGenerate( TString Type, TString BaryonName,
+Int_t GenerateEvents::DoGenerate( TString Type,
+                                 bool DoGetRootFile, bool DoGenTextFile,
+                                 TString BaryonName,
                                  bool DoReeNFromTree, bool DoReeNFromDist, bool DoFlateeN){
     // return the number of events
     Nevents         = 0;
     InputT          = new TChain("T");
-    txtFilename     = Form("%s/eg_txtfiles/run%04d.txt",Path.Data(),RunNumber);
-    rootFilename    = Form("%s/eg_rootfiles/run%04d.root",Path.Data(),RunNumber);
-    cout << "Generating " << txtFilename << " and " <<  rootFilename << endl;
-    TextFile.open(txtFilename);
-    RootFile = new TFile( rootFilename ,"recreate" );
+    txtFilename     = Form("%s/eg_txtfiles/run%d.txt",Path.Data(),RunNumber);
+    rootFilename    = Form("%s/eg_rootfiles/run%d.root",Path.Data(),RunNumber);
+    if (DoGenTextFile){
+        cout << "Generating " << txtFilename << endl;
+        TextFile.open(txtFilename);
+    }
+    if (DoGetRootFile){
+        cout << "Generating " <<  rootFilename << endl;
+        RootFile = new TFile( rootFilename ,"recreate" );
+    }
     RootTree = new TTree("anaTree","generated events");
     SetRootTreeAddresses();
     if (Type == "(e,e'pp)" ){
@@ -168,7 +175,7 @@ Int_t GenerateEvents::DoGenerate( TString Type, TString BaryonName,
                 ThetaPmissPrecoil   = (180/TMath::Pi())*(Pmiss.Angle(Precoil));
                 
                 momentum[0] = e ; momentum[1] = Pp1; momentum[2] = Pp2;
-                OutPutToTextFile(3, momentum , charge , mass , pid );
+                if (DoGenTextFile) OutPutToTextFile(3, momentum , charge , mass , pid );
 
                 if(debug > 3) cout << "rotate also to q-Pmiss frame: q is the z axis" << endl;
                 // rotate also to q-Pmiss frame: q is the z axis, Pmiss is in x-z plane: Pmiss=(Pmiss[x],0,Pmiss[q])
@@ -214,7 +221,7 @@ Int_t GenerateEvents::DoGenerate( TString Type, TString BaryonName,
                     Double_t phi    = 360.*gRandom->Uniform();         // uniform angle between 0 and 360 degrees
                     N.SetMagThetaPhi ( mag , (TMath::Pi()/180.)*theta , (TMath::Pi()/180.)*phi);
                     momentum[1] = N;
-                    OutPutToTextFile(2, momentum , charge ,mass , pid );
+                    if (DoGenTextFile) OutPutToTextFile(2, momentum , charge ,mass , pid );
                     RootTree -> Fill();
                 }
             }
@@ -237,16 +244,21 @@ Int_t GenerateEvents::DoGenerate( TString Type, TString BaryonName,
                     Double_t phi    = 360.*gRandom->Uniform();         // uniform angle between 0 and 360 degrees
                     N.SetMagThetaPhi ( mag , (TMath::Pi()/180.)*theta , (TMath::Pi()/180.)*phi);
                     momentum[1] = N;
-                    OutPutToTextFile(2, momentum , charge ,mass , pid );
+                    if (DoGenTextFile) OutPutToTextFile(2, momentum , charge ,mass , pid );
                     RootTree -> Fill();
                 }
             }
             
         }
     }
-    RootFile -> Write();
-    RootFile -> Close();
-    TextFile.close();
+    if (DoGetRootFile){
+
+        RootFile -> Write();
+        RootFile -> Close();
+    }
+    if (DoGenTextFile){
+        TextFile.close();
+    }
     
     if (debug > 2) cout << "Out to Run Number File..." << endl;
     OutRunNumberFile.open(runsFilename);

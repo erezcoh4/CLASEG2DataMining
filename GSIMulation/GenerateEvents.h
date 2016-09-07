@@ -75,6 +75,8 @@ public:
     GenerateEvents( TString fPath = "" , Int_t fRunNumber = 1 , Int_t fdebug = 1 );
 
     Int_t DoGenerate( TString Type = "(e,e'pp)"
+                     , bool DoGetRootFile = true
+                     , bool DoGenTextFile = false
                      , TString BaryonName = "p"
                      , bool DoReeNFromTree = false
                      , bool DoReeNFromDist = false

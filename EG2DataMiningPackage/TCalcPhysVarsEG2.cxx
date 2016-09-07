@@ -538,7 +538,6 @@ void TCalcPhysVarsEG2::loop_protons(){
     if (DataType == "GSIM"){
         for (auto i: sort_pMag( p3vec_g )){
             
-
             // proton fiducial cut is calculated in the lab frame, so it must come first...
             pFiducCut_g.push_back( protonFiducial( p3vec_g.at(i) ) );
             
