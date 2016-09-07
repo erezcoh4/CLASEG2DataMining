@@ -15,7 +15,7 @@ init.createnewdir()
 flags = input_flags.get_args()
 
 
-runs     = np.arange(801,935)
+runs     = np.arange(1001,1045)
 PrecMin  = 0.35
 
 PmissLow = [ 0.3  , 0.45 , 0.55 , 0.65 , 0.75]
@@ -41,7 +41,7 @@ if flags.option=="missing evts vs. p(miss)":
         if (run%flags.print_mod==0):
             print "\trun=%d,[%.1f%%]"%(run,100*float(run)/len(runs))
     
-        ana = TPlots("/Users/erezcohen/Desktop/DataMining/GSIM/eg_rootfiles/run0%d.root"%run,"anaTree")
+        ana = TPlots("/Users/erezcohen/Desktop/DataMining/GSIM/eg_rootfiles/run%d.root"%run,"anaTree")
         fracGoodPrec = []
         '''
             find how many events were 'lost' due to the cut on p(rec) > 0.35

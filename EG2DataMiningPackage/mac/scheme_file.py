@@ -1,7 +1,7 @@
 '''
     usage:
     --------
-    python mac/scheme_file.py -A12  --option="(e,e'pp?)" --DataType="New_NoCTofDATA"
+    python mac/scheme_file.py -A12  --option="(e,e'pp?)" --DataType=New_NoCTofDATA
 '''
 
 import ROOT,os, sys , math , os.path , math

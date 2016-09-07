@@ -174,12 +174,12 @@ void TSchemeDATA::TwoSlowProtons(int fTargetType , float fpMin, float fpMax){
         for (Long64_t i = 0; i < Nentries ; i++) {
             
             if (i%(Nentries/20)==0) {
-                printf("schemed %d events so far, out of ", (int)OutTree -> GetEntries());
+                printf("%d events so far, out of ", (int)OutTree -> GetEntries());
                 plot.PrintPercentStr((float)i/Nentries);
             }
             NpGood = 0;
             InTree -> GetEntry(i);
-
+            SHOW3(Ntotal , Nn , Np);
             // look for events with only one negative particle (electron) and two positive (protons)
             if( ( Np == 2 ) && ( Nn == 1 ) && ( Ntotal == 3 ) && (targ_type == TargetType) ) {
 
