@@ -104,6 +104,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("total particle num." ,&Ntotal                ,"Ntotal/I");
     OutTree -> Branch("neg. particles num." ,&Nnegative             ,"Nnegative/I");
     OutTree -> Branch("pCTOFCut"            ,&pCTOFCut              );// std::vector<Int_t>
+    OutTree -> Branch("pFiducCut"           ,&pFiducCut             );// std::vector<Int_t>
 
     
     // Float_t branches
@@ -165,6 +166,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
         OutTree -> Branch("generated Q2"            ,&Q2_g          , "Q2_g/F");
         OutTree -> Branch("generated Bjorken x"     ,&Xb_g          , "Xb_g/F");
         OutTree -> Branch("protons_g"               ,&protons_g);             // std::vector<TLorentzVector>
+        OutTree -> Branch("pFiducCut_g"             ,&pFiducCut_g);// std::vector<Int_t>
 
     }
     if(DataType == "(e,e'npp)"){
@@ -192,16 +194,18 @@ void TCalcPhysVarsEG2::InitGlobals(){
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::InitEvent(){
     if (!p3vec.empty())     p3vec.clear();   // unsorted protons
-    if (!p3vec_g.empty())   p3vec_g.clear();   // unsorted protons
     if (!protons.empty())   protons.clear();
-    if (!protons_g.empty()) protons_g.clear();
     if (!pVertex.empty())   pVertex.clear();
     if (!alpha.empty())     alpha.clear();
     if (!pCTOF.empty())     pCTOF.clear();
     if (!pCTOFCut.empty())  pCTOFCut.clear();
+    if (!pFiducCut.empty()) pFiducCut.clear();
     if (!pEdep.empty())     pEdep.clear();
     if (!Tp.empty())        Tp.clear();
     if (!proton_angle.empty()) proton_angle.clear();
+    if (!p3vec_g.empty())   p3vec_g.clear();   // unsorted protons
+    if (!protons_g.empty()) protons_g.clear();
+    if (!pFiducCut_g.empty()) pFiducCut_g.clear();
     Np = NpBack = NpCumulative = NpCumulativeSRC = 0;
     Plead = Plead_g = TLorentzVector();
     Wmiss.SetVectM( TVector3() , 3. * Mp  );
@@ -456,29 +460,11 @@ void TCalcPhysVarsEG2::Pmiss_q_frame(){
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::loop_protons(){
     
-    if (DataType == "GSIM"){
-        for (auto i: sort_pMag( p3vec_g )){
-            
-            // protons
-            if (FrameName == "q(z) - Pmiss(x-z) frame"){
-                RotVec2_q_Pm_Frame( & p3vec_g.at(i) , q_phi_g, q_theta_g, Pmiss_phi_g );
-            }
-            else if(FrameName == "Pmiss(z) - q(x-z) frame"){
-                RotVec2_Pm_q_Frame( & p3vec_g.at(i) , Pmiss_phi_g, Pmiss_theta_g, q_phi_g );
-            }
-            else if (FrameName == "lab frame"){
-                if (debug>2) cout << "staying in lab frame..." << endl;
-            }
-            if (debug > 3) Printf("rotated proton to %s",FrameName.Data());
-            
-            protons_g.push_back( TLorentzVector( p3vec_g.at(i) , sqrt( p3vec_g.at(i).Mag2() + Mp2 ) ) );
-        }
-    }
-    
-    
-    
     
     for (auto i: sort_pMag( p3vec )){
+        
+        // proton fiducial cut is calculated in the lab frame, so it must come first...
+        pFiducCut.push_back( protonFiducial( p3vec.at(i) ) );
         
         // protons
         if (FrameName == "q(z) - Pmiss(x-z) frame"){
@@ -504,8 +490,9 @@ void TCalcPhysVarsEG2::loop_protons(){
         // kinetic energies
         Tp.push_back( protons.back().E() - protons.back().M() );
         
+        
         // proton identification
-        if (DataType == "NoCTOF_DATA" || DataType == "New_NoCTofDATA") {
+       if (DataType == "NoCTOF_DATA" || DataType == "New_NoCTofDATA") {
             
             pCTOFCut.push_back( uns_pCut[i] * uns_pID[i] );
             pCTOF   .push_back( uns_pCTOF[i]  );
@@ -548,6 +535,28 @@ void TCalcPhysVarsEG2::loop_protons(){
         if (debug > 3) Printf("finished going over this proton...");
     }
     
+    if (DataType == "GSIM"){
+        for (auto i: sort_pMag( p3vec_g )){
+            
+
+            // proton fiducial cut is calculated in the lab frame, so it must come first...
+            pFiducCut_g.push_back( protonFiducial( p3vec_g.at(i) ) );
+            
+            // protons
+            if (FrameName == "q(z) - Pmiss(x-z) frame"){
+                RotVec2_q_Pm_Frame( & p3vec_g.at(i) , q_phi_g, q_theta_g, Pmiss_phi_g );
+            }
+            else if(FrameName == "Pmiss(z) - q(x-z) frame"){
+                RotVec2_Pm_q_Frame( & p3vec_g.at(i) , Pmiss_phi_g, Pmiss_theta_g, q_phi_g );
+            }
+            else if (FrameName == "lab frame"){
+                if (debug>2) cout << "staying in lab frame..." << endl;
+            }
+            if (debug > 3) Printf("rotated proton to %s",FrameName.Data());
+            
+            protons_g.push_back( TLorentzVector( p3vec_g.at(i) , sqrt( p3vec_g.at(i).Mag2() + Mp2 ) ) );
+        }
+    }
 
 }
 
@@ -568,6 +577,7 @@ void TCalcPhysVarsEG2::p23Randomize(){
         std::iter_swap(pVertex.begin()+1    ,pVertex.begin()+2);
         std::iter_swap(alpha.begin()+1      ,alpha.begin()+2);
         
+        std::iter_swap(pFiducCut.begin()+1  ,pFiducCut.begin()+2);
         if (DataType == "NoCTOF_DATA" || DataType == "New_NoCTofDATA") {
             std::iter_swap(pCTOFCut.begin()+1   ,pCTOFCut.begin()+2);
             std::iter_swap(pCTOF.begin()+1      ,pCTOF.begin()+2);
@@ -585,12 +595,49 @@ void TCalcPhysVarsEG2::p12Randomize(){
         std::iter_swap(pVertex.begin()    ,pVertex.begin()+1);
         std::iter_swap(alpha.begin()      ,alpha.begin()+1);
         
+        std::iter_swap(pFiducCut.begin()  ,pFiducCut.begin()+1);
         if (DataType == "NoCTOF_DATA" || DataType == "New_NoCTofDATA") {
             std::iter_swap(pCTOFCut.begin()   ,pCTOFCut.begin()+1);
             std::iter_swap(pCTOF.begin()      ,pCTOF.begin()+1);
             std::iter_swap(pEdep.begin()      ,pEdep.begin()+1);
         }
     }
+}
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+Int_t TCalcPhysVarsEG2::protonFiducial( TVector3 pMomentum ){
+    
+    // return 1 if proton inside fiducial region, and 0 if it is outside fiducial region
+    //--------------------------------------------------------------------
+    // Fiducial cuts from Zana' thesis (by Or)
+    //--------------------------------------------------------------------
+    Double_t mag    = pMomentum.Mag();
+    Double_t theta  = r2d * pMomentum.Theta();
+    Double_t phi    = r2d * pMomentum.Phi();
+    
+    // Check if within fiducials
+    int sector = (int)(phi/60);
+    if (sector<0 || sector>5)
+        return 0;
+    
+    Double_t theta_min = P0_theta[sector] + P1_theta[sector]/(pow(mag,2)) + P2_theta[sector]*mag + P3_theta[sector]/mag + P4_theta[sector]*exp(P5_theta[sector]*mag);
+    Double_t theta_max = 120;
+    
+    if(theta_min < theta && theta < theta_max){
+        Double_t Delta_phi[2];
+        for(int k=0; k<2; k++){
+            Double_t a = P0_a[sector][k] + P1_a[sector][k]*exp(P2_a[sector][k]*(mag-P3_a[sector][k])   )    ;
+            Double_t b = P0_b[sector][k] + P1_b[sector][k]*exp( pow( P2_b[sector][k]*(mag-P3_b[sector][k]) , 2 ) )*mag;
+            Delta_phi[k] = a*(1 - 1./((theta - theta_min)/b+1) );
+        }
+        if(phi > sector*60-Delta_phi[0] && phi < sector*60+Delta_phi[1]){
+            if (debug > 3) cout << "in fiducial region!" << endl;
+            return 1;
+        }
+    }
+    if (debug > 3) cout << "not in fiducial region...." << endl;
+    return 0;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -609,6 +656,7 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOWstdTVector3(pVertex);
     SHOWstdVector(alpha);
     SHOWstdVector(pCTOFCut);
+    SHOWstdVector(pFiducCut);
     SHOWstdVector(pEdep);
     SHOWstdVector(Tp);
     SHOWstdVector(proton_angle);

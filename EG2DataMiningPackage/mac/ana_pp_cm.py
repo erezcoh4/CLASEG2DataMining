@@ -1,7 +1,7 @@
 '''
     usage:
     ------
-    python mac/ana_pp_cm.py --option=calc_roofit_cm_parameters
+    python mac/ana_pp_cm.py --option=scheme
     
 '''
 
