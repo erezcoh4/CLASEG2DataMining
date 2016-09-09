@@ -20,7 +20,7 @@ flags = input_flags.get_args()
 Nbins       = flags.Nbins
 Var         = flags.variable
 dm          = TEG2dm()
-XbMin       = 0.0
+XbMin       = 0.8
 cut         = flags.cut + ROOT.TCut("((0.938*0.938 + 2*0.938*q.E() - Q2)<2 && Xb>%f && PcmFinalState.Pt() < 2.4)"%XbMin)
 ana         = TAnalysisEG2( flags.SchemedType + "_" + flags.DataType , cut )
 pppCandidats= TAnalysisEG2( "C12_Al27_Fe56_Pb28" , cut )
@@ -178,7 +178,8 @@ elif flags.option == "Xb vs. recoil LC":
     c = ana.CreateCanvas(flags.option)
     
     ana.H2("Xb","alpha[0] + alpha[1]",cut,"colz",Nbins,0.9*XbMin,2.5,Nbins,1.,2.6,"",gp.XbTit, gp.alphaTit("p_{1}") + " + " + gp.alphaTit("p_{2}")  )
-#    pppCandidats.H2("Xb","alpha[1] + alpha[2]",pppCandidats.pppSRCCut,"same",Nbins,0.9*XbMin,2.5,Nbins,1.,2.6,"",gp.XbTit, gp.alphaTit("p_{1}") + " + " + gp.alphaTit("p_{2}") , 1 , 21 , 1  )
+    pppCandidats.H2("Xb","alpha[1] + alpha[2]",pppCandidats.pppSRCCut,"same",Nbins,0.9*XbMin,2.5,Nbins,1.,2.6,"",gp.XbTit, gp.alphaTit("p_{1}") + " + " + gp.alphaTit("p_{2}") , 1 , 21 , 1  )
+    ana.Line(0.9*XbMin,3-0.9*XbMin,3-1.,1.,1,2)
     c.Update()
     wait()
     c.SaveAs(init.dirname()+"/"+flags.DataType+"_Prec_q_vs_Xb.pdf")
