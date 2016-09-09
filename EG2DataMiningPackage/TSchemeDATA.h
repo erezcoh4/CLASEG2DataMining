@@ -53,7 +53,7 @@ public:
     Float_t PpX[20]     , PpY[20]   , PpZ[20];  //proton momentum
     Float_t Px_e        , Py_e      , Pz_e   ;
     Float_t N_Px[20]    , N_Py[20]  , N_Pz[20]; // for raw data
-    Float_t N_PathSC[20], N_TimeSC[20];
+    Float_t N_PathSC[20], N_TimeSC[20] , STT[20];
     
     TVector3    * q     , * Plead   , * proton, Pmiss , *negative_particle_momentum;
     TVector3    *NMom   , * P1Mom   , * P2Mom;

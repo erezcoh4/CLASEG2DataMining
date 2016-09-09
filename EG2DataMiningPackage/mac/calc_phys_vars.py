@@ -4,6 +4,7 @@
     --------
     python mac/calc_phys_vars.py -A12 -werez --option=ppSRC --DataType=DATA -evf=1 -p1000 -v2
     python mac/calc_phys_vars.py --DataType=GSIM -r80 -evf=0.01 -p1000
+    python mac/calc_phys_vars.py -A12 --DataType=New_NoCTofDATA --SchemedType=TwoSlowProtons_piminus_p -evf=1 -p100
 '''
 
 import ROOT , os , sys
@@ -22,7 +23,7 @@ elif flags.worker == "helion":
 
 dm  = TEG2dm()
 A   = flags.atomic_mass
-SchemeType  = "SRCPmissXb"
+SchemeType  = flags.SchemedType
 DataType    = flags.DataType
 
 
@@ -40,10 +41,10 @@ if (DataType == "GSIM"):
     axes_frame  = "lab frame"
 
 else:
-    FileName    = "%s_%s"% (DataType,dm.Target(A))
-    InFile      = ROOT.TFile(path + "/Schemed_EG2_DATA/"+"Schemed_"+SchemeType+"_"+FileName+".root")
+    FileName    = "%s_%s_%s"% (SchemeType,DataType,dm.Target(A))
+    InFile      = ROOT.TFile(path + "/Schemed_EG2_DATA/"+"Schemed_"+FileName+".root")
     InTree      = InFile.Get("T")
-    OutFile     = ROOT.TFile(path + "/AnaFiles/"+"Ana_"+FileName+"_"+flags.option+".root","recreate")
+    OutFile     = ROOT.TFile(path + "/AnaFiles/"+"Ana_"+FileName+".root","recreate")
 
 
 Nentries    = InTree.GetEntries()

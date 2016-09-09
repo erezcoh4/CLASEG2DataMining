@@ -1,7 +1,7 @@
 '''
     usage:
     --------
-    python mac/ana_two_slow_protons.py -A12 --DataType=New_NoCTofDATA_C12_TwoSlowProtons --option="DIS/correlation in alpha12:Xb" -var=DIS_and_correlation
+    python mac/ana_two_slow_protons.py -A12 --DataType=New_NoCTofDATA_C12 --SchemedType=TwoSlowProtons_piminus_p --option="DIS/correlation in alpha12:Xb" -var=DIS_and_correlation
 '''
 
 import ROOT ,os, sys , math
@@ -17,117 +17,19 @@ flags = input_flags.get_args()
 
 
 
-
 Nbins       = flags.Nbins
 Var         = flags.variable
 dm          = TEG2dm()
-XbMin       = 0.8
+XbMin       = 0.0
 cut         = flags.cut + ROOT.TCut("((0.938*0.938 + 2*0.938*q.E() - Q2)<2 && Xb>%f && PcmFinalState.Pt() < 2.4)"%XbMin)
-ana         = TAnalysisEG2( flags.DataType , cut )
+ana         = TAnalysisEG2( flags.SchemedType + "_" + flags.DataType , cut )
 pppCandidats= TAnalysisEG2( "C12_Al27_Fe56_Pb28" , cut )
 
 
 
-# ------------------------------------------------------------------ #
-if flags.option == "diff. samples":
- 
- 
-    if (Var=="PmissQ"):
-        plot_args = ["Xb","fabs(Plead.Pz()-q.Pz())",cut,Nbins,1,2,Nbins,-.5,1,gp.XbTit,gp.PmqTit]
-
-
-    elif (Var=="PrecQ"):
-        plot_args = ["Xb","fabs(Prec.Pz())",cut,Nbins,1,2,Nbins,0,1,gp.XbTit,gp.PrecqTit]
-
-
-    elif (Var=="PrecPmiss"):
-        plot_args = ["Prec.Pz()","Pmiss.Pz()",cut,Nbins,-2,2,Nbins,-2,2,gp.PmqTit,gp.PrecqTit]
-
-
-    elif (Var=="XbVsWmiss"):
-        plot_args = ["Xb","Wmiss.Mag()",cut,200,0,3,200,-2,4,gp.XbTit,gp.WmissTit]
-
-
-
-    elif (Var=="XbVsPcm"):
-        plot_args = ["Xb","PcmFinalState.P()",cut,100,0,3,100,0,2,gp.XbTit,"(recoling protons)  " + gp.PcmTit]
-
-
-    elif (Var=="XbVsProtonsAngle"):
-        plot_args = ["Xb","(TMath::RadToDeg()*PcmFinalState.Theta())",cut,100,0,3,100,0,180,gp.XbTit,gp.ThetaPrecTit]
-
-
-    elif (Var=="XbVsMcm"):
-        plot_args = ["Xb","-Pcm.Mag()",cut,200,0,2.8,200,-2,4.8,gp.XbTit,gp.qp1p2Tit]
-
-
-    elif (Var=="XbVsWe"):
-        plot_args = ["Xb","(0.938*0.938 + 2*0.938*q.E() - Q2)",cut,200,0,2.8,200,-2,9,gp.XbTit,gp.We2Tit]
-
-
-    elif (Var=="XbVsWseely"):
-        plot_args = ["Xb","((q.E()+0.938)**2 - q.P()**2)",cut,200,0,2.8,200,-2,9,gp.XbTit,gp.Wseely2Tit]
-    
-    
-
-
-
-    c = gp.plot(ana,"slow2p_"+flags.DataType+"_"+Var,plot_args)
-    wait()
-    c.SaveAs(init.dirname()+"/"+flags.DataType+"_"+Var+".pdf")
 
 # ------------------------------------------------------------------ #
-
-
-
-
-# ------------------------------------------------------------------ #
-elif flags.option == "Xb vs. Preq q":
-    
-    
-    
-    c = ana.CreateCanvas(flags.option)
-    ana.H2("Xb","protons[0].Pz() + protons[1].Pz()",cut,"colz",Nbins,0.9*XbMin,2.5,Nbins,-0.2,1.4,"",gp.XbTit,"#vec{p}_{1}#hat{q} + #vec{p}_{2}#hat{q}")
-    ana.Line(1,0,2,1,1,2)
-    ana.Text(1.8,0.5,"#vec{p}_{rec}#hat{q} = -#vec{p}_{miss}#hat{q} = x_{B}+1")
-    ana.Text(1.8,0.3,"#pm 0.2GeV/c c.m.")
-    ana.Line(1,0-0.2,2,1-0.2,1,2,2)
-    ana.Line(1,0+0.2,2,1+0.2,1,2,2)
-
-    
-    c.Update()
-    wait()
-    c.SaveAs(init.dirname()+"/"+flags.DataType+"_Prec_q_vs_Xb.pdf")
-
-
-# ------------------------------------------------------------------ #
-
-
-
-# ------------------------------------------------------------------ #
-elif flags.option == "Xb vs. recoil LC":
-    
-    c = ana.CreateCanvas(flags.option)
-
-    ana.H2("Xb","alpha[0] + alpha[1]",cut,"colz",Nbins,0.9*XbMin,2.5,Nbins,1.,2.6,"",gp.XbTit, gp.alphaTit("p_{1}") + " + " + gp.alphaTit("p_{2}")  )
-    pppCandidats.H2("Xb","alpha[1] + alpha[2]",pppCandidats.pppSRCCut,"same",Nbins,0.9*XbMin,2.5,Nbins,1.,2.6,"",gp.XbTit, gp.alphaTit("p_{1}") + " + " + gp.alphaTit("p_{2}") , 1 , 21 , 1  )
-    c.Update()
-    wait()
-    c.SaveAs(init.dirname()+"/"+flags.DataType+"_Prec_q_vs_Xb.pdf")
-
-#    T  = tree2array(ana.GetTree(),branches=['Xb','alpha[0]+alpha[1]'])
-#    X , Y , labels = T['Xb'],T['alpha[0]+alpha[1]'],[ '$x_{B}$' , '$\\alpha(p_{1}) + \\alpha(p_{2})$']
-#    fig = gp.sns2d_with_projections( X , Y , labels , "hex")
-#    plt.savefig(init.dirname()+"/"+flags.DataType+"_Prec_q_vs_Xb.pdf")
-
-
-
-
-# ------------------------------------------------------------------ #
-
-
-# ------------------------------------------------------------------ #
-elif flags.option == "DIS/correlation in alpha12:Xb":
+if flags.option == "DIS/correlation in alpha12:Xb":
 
 
     cut_ppNothinalpha12_vs_XbCutDIS = cut + ana.alpha12_vs_XbCutDIS;
@@ -191,3 +93,103 @@ elif flags.option == "protons angles":
 
 
 # ------------------------------------------------------------------ #
+
+
+
+
+# ------------------------------------------------------------------ #
+if flags.option == "diff. samples":
+    
+    
+    if (Var=="PmissQ"):
+        plot_args = ["Xb","fabs(Plead.Pz()-q.Pz())",cut,Nbins,1,2,Nbins,-.5,1,gp.XbTit,gp.PmqTit]
+    
+    
+    elif (Var=="PrecQ"):
+        plot_args = ["Xb","fabs(Prec.Pz())",cut,Nbins,1,2,Nbins,0,1,gp.XbTit,gp.PrecqTit]
+    
+    
+    elif (Var=="PrecPmiss"):
+        plot_args = ["Prec.Pz()","Pmiss.Pz()",cut,Nbins,-2,2,Nbins,-2,2,gp.PmqTit,gp.PrecqTit]
+    
+    
+    elif (Var=="XbVsWmiss"):
+        plot_args = ["Xb","Wmiss.Mag()",cut,200,0,3,200,-2,4,gp.XbTit,gp.WmissTit]
+    
+    
+    
+    elif (Var=="XbVsPcm"):
+        plot_args = ["Xb","PcmFinalState.P()",cut,100,0,3,100,0,2,gp.XbTit,"(recoling protons)  " + gp.PcmTit]
+    
+    
+    elif (Var=="XbVsProtonsAngle"):
+        plot_args = ["Xb","(TMath::RadToDeg()*PcmFinalState.Theta())",cut,100,0,3,100,0,180,gp.XbTit,gp.ThetaPrecTit]
+    
+    
+    elif (Var=="XbVsMcm"):
+        plot_args = ["Xb","-Pcm.Mag()",cut,200,0,2.8,200,-2,4.8,gp.XbTit,gp.qp1p2Tit]
+    
+    
+    elif (Var=="XbVsWe"):
+        plot_args = ["Xb","(0.938*0.938 + 2*0.938*q.E() - Q2)",cut,200,0,2.8,200,-2,9,gp.XbTit,gp.We2Tit]
+    
+    
+    elif (Var=="XbVsWseely"):
+        plot_args = ["Xb","((q.E()+0.938)**2 - q.P()**2)",cut,200,0,2.8,200,-2,9,gp.XbTit,gp.Wseely2Tit]
+    
+    
+    
+    
+    
+    c = gp.plot(ana,"slow2p_"+flags.DataType+"_"+Var,plot_args)
+    wait()
+    c.SaveAs(init.dirname()+"/"+flags.DataType+"_"+Var+".pdf")
+# ------------------------------------------------------------------ #
+
+
+
+
+# ------------------------------------------------------------------ #
+elif flags.option == "Xb vs. Preq q":
+    
+    
+    
+    c = ana.CreateCanvas(flags.option)
+    ana.H2("Xb","protons[0].Pz() + protons[1].Pz()",cut,"colz",Nbins,0.9*XbMin,2.5,Nbins,-0.2,1.4,"",gp.XbTit,"#vec{p}_{1}#hat{q} + #vec{p}_{2}#hat{q}")
+    ana.Line(1,0,2,1,1,2)
+    ana.Text(1.8,0.5,"#vec{p}_{rec}#hat{q} = -#vec{p}_{miss}#hat{q} = x_{B}+1")
+    ana.Text(1.8,0.3,"#pm 0.2GeV/c c.m.")
+    ana.Line(1,0-0.2,2,1-0.2,1,2,2)
+    ana.Line(1,0+0.2,2,1+0.2,1,2,2)
+    
+    
+    c.Update()
+    wait()
+    c.SaveAs(init.dirname()+"/"+flags.DataType+"_Prec_q_vs_Xb.pdf")
+
+
+# ------------------------------------------------------------------ #
+
+
+
+# ------------------------------------------------------------------ #
+elif flags.option == "Xb vs. recoil LC":
+    
+    c = ana.CreateCanvas(flags.option)
+    
+    ana.H2("Xb","alpha[0] + alpha[1]",cut,"colz",Nbins,0.9*XbMin,2.5,Nbins,1.,2.6,"",gp.XbTit, gp.alphaTit("p_{1}") + " + " + gp.alphaTit("p_{2}")  )
+#    pppCandidats.H2("Xb","alpha[1] + alpha[2]",pppCandidats.pppSRCCut,"same",Nbins,0.9*XbMin,2.5,Nbins,1.,2.6,"",gp.XbTit, gp.alphaTit("p_{1}") + " + " + gp.alphaTit("p_{2}") , 1 , 21 , 1  )
+    c.Update()
+    wait()
+    c.SaveAs(init.dirname()+"/"+flags.DataType+"_Prec_q_vs_Xb.pdf")
+
+#    T  = tree2array(ana.GetTree(),branches=['Xb','alpha[0]+alpha[1]'])
+#    X , Y , labels = T['Xb'],T['alpha[0]+alpha[1]'],[ '$x_{B}$' , '$\\alpha(p_{1}) + \\alpha(p_{2})$']
+#    fig = gp.sns2d_with_projections( X , Y , labels , "hex")
+#    plt.savefig(init.dirname()+"/"+flags.DataType+"_Prec_q_vs_Xb.pdf")
+
+
+
+
+# ------------------------------------------------------------------ #
+
