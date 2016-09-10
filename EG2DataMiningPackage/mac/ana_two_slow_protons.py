@@ -21,7 +21,7 @@ Nbins       = flags.Nbins
 Var         = flags.variable
 dm          = TEG2dm()
 XbMin       = 0.8
-cut         = flags.cut + ROOT.TCut("((0.938*0.938 + 2*0.938*q.E() - Q2)<2 && Xb>%f && PcmFinalState.Pt() < 2.4)"%XbMin)
+cut         = flags.cut + ROOT.TCut("((0.938*0.938 + 2*0.938*q.E() - Q2)<2 && Xb>%f && PcmFinalState.Pt() < 0.4)"%XbMin)
 ana         = TAnalysisEG2( flags.SchemedType + "_" + flags.DataType , cut )
 pppCandidats= TAnalysisEG2( "C12_Al27_Fe56_Pb28" , cut )
 
@@ -58,6 +58,9 @@ if flags.option == "DIS/correlation in alpha12:Xb":
 #        args = ["Xb","PcmFinalState.Pt()",0.9*XbMin,2.5,0.,1.5,gp.XbTit, "(#vec{p}_{1}+#vec{p}_{2})_{perp} [GeV/c]"]
         args = ["q.P()","PcmFinalState.Pt()",1.1,4,0.,1.5,"|#vec{q}| [GeV/c]", "(#vec{p}_{1}+#vec{p}_{2})_{perp} [GeV/c]"]
         Nbins = Nbins/2
+
+    elif (flags.variable == "coplanarity_with_q"):
+        args = ["q.P()","PcmFinalState.Pt()",1.1,4,0.,1.5,"|#vec{q}| [GeV/c]", "(#vec{p}_{1}+#vec{p}_{2})_{perp} [GeV/c]"]
 
 
     c = ana.CreateCanvas(flags.option)
