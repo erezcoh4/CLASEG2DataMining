@@ -137,13 +137,13 @@ TMatrix  TAnalysisEG2::RooFitCM( Float_t PmissMin, Float_t PmissMax ){
     res(1,0)   = PcmPars[1];
     res(0,1)   = PcmParsErr[0];
     res(1,1)   = PcmParsErr[1];
-    
+
     RooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , false );
     res(2,0)   = PcmPars[0];
     res(3,0)   = PcmPars[1];
     res(2,1)   = PcmParsErr[0];
     res(3,1)   = PcmParsErr[1];
-    
+
     RooFit1D( Tree , "pcmZ", cut , PcmPars , PcmParsErr , false );
     res(4,0)   = PcmPars[0];
     res(5,0)   = PcmPars[1];
