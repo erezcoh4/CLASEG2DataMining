@@ -255,13 +255,14 @@ def generate_runs_with_different_parameters( cm_pars_bands , start_run , RunsInf
                         
                         # (1) generate the simulated data (the 'run')
                         gen_events = GenerateEvents( path , run , debug )
-                        gen_events.SetNRand( 10 )
+                        gen_events.SetNRand( 100 )
                         gen_events.Set_eep_Parameters( sT , sLa1 , sLa2 , mLa1 , mLa2 )
                         pAcceptacneFile = ROOT.TFile("/Users/erezcohen/Desktop/DataMining/GSIM_DATA/PrecoilAcceptance.root")
                         h = pAcceptacneFile.Get("hRescaled")
                         gen_events.Set_protonAcceptacne( h )
                         # ToDo: add proton fiducial cuts acceptance
                         gen_events.DoGenerate( "(e,e'pp)" , True , False )
+                        # ToDo: problem with acceptance? i am getting a double-peaked distribution instead of a gaussian localized around 0
                         
                         # (2) analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
                         path = "/Users/erezcohen/Desktop/DataMining/Analysis_DATA/ppSRCcm"
