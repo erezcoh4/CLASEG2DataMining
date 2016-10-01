@@ -173,7 +173,7 @@ Int_t GenerateEvents::DoGenerate( TString Type,
                 // rotate back to lab frame
                 Pcm = Pcm_in_Pmiss_q_system;
                 // and for RooFit
-                PmissMag = Pmiss.Mag();
+                Pmiss3Mag = Pmiss.Mag();
                 pcmX = Pcm_in_Pmiss_q_system.x() ;
                 pcmY = Pcm_in_Pmiss_q_system.y() ;
                 pcmZ = Pcm_in_Pmiss_q_system.z() ;
