@@ -38,6 +38,7 @@ public:
     
     /// Default constructor
     TAnalysisEG2 (){    SetSRCCuts();   }
+    TAnalysisEG2 ( TString fPath , TString fInFileName , TCut MainCut = "0 <= Xb" );
     TAnalysisEG2 ( TString fInFileName , TCut MainCut = "0 <= Xb" );
     
     
@@ -86,7 +87,7 @@ public:
     
     
     // rooFit
-    TMatrix                  RooFitCM (Float_t PmissMin, Float_t PmissMax);
+    TMatrix                  RooFitCM (Float_t PmissMin, Float_t PmissMax, bool PlotFits = false, TCanvas * c = nullptr, Int_t start_cd = 1);
     vector<Float_t>       GetPcmEntry (int);
     vector<Float_t>   GetFullpppEvent (int, bool DoPrint = false);
     vector<Float_t>        GetGSIMEvt (int, bool DoPrint = false);

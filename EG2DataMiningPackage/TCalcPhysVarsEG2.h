@@ -70,7 +70,7 @@ public:
     Float_t thetaMiss23 , phiMiss23 , thetaLeadRec;
     Double_t k0         , kCMmag    , Px    , Py    ,Pz;
     
-    Float_t             pcmX        , pcmY          , pcmZ          ;
+    Float_t             Pmiss3Mag   , pcmX        , pcmY          , pcmZ          ;
     Float_t             TpMiss      , m_A_1         , E_p_init      , M_p_init  , pq;
     vector<Float_t>     alpha       , pEdep         , pCTOF         , Tp        , proton_angle;
     vector<Int_t>       pCTOFCut    , pFiducCut     , pFiducCut_g;

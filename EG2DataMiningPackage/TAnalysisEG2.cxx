@@ -3,6 +3,15 @@
 
 #include "TAnalysisEG2.h"
 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+TAnalysisEG2::TAnalysisEG2(TString fPath , TString fInFileName, TCut MainCut):
+TPlots( fPath + "/" + fInFileName + ".root","anaTree",fInFileName, false){
+    SetPath(fPath);
+    SetInFileName( fInFileName + ".root");
+    SetSRCCuts(MainCut);
+    SetInFile( new TFile( fPath + "/" + fInFileName + ".root" ));
+    SetTree ((TTree*) InFile->Get( "anaTree" ));
+}
 
 
 
@@ -53,8 +62,9 @@ void TAnalysisEG2::SetSRCCuts(TCut MainCut){ // last editted March-22 for pppSRC
     // 2p-SRC following Or Hen' cuts
     PrecFiducial= "pFiducCut[1] == 1";
     cutPlead    = "-24.5 < pVertex[0].Z() && pVertex[0].Z() < -20";
-    cutPrec     = "0.35 < Prec.P()  &&  (-24.5 < pVertex[1].Z() && pVertex[1].Z() < -20)" && PrecFiducial;
-    ppSRCCut    = cutSRC && cutMmiss2 && "2 <= Np" && cutPlead && cutPrec && ppCTOFCut;
+    // ToDo: add Precoil fiducials!
+    cutPrec     = "0.35 < Prec.P()  &&  (-24.5 < pVertex[1].Z() && pVertex[1].Z() < -20)" ;//&& PrecFiducial;
+    ppSRCCut    = cutSRC && "1.2 <= Xb" && cutMmiss2 && "2 <= Np" && cutPlead && cutPrec && ppCTOFCut;
     
     
     
@@ -126,25 +136,27 @@ void TAnalysisEG2::PrintInCuts(){
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-TMatrix  TAnalysisEG2::RooFitCM( Float_t PmissMin, Float_t PmissMax ){
+TMatrix  TAnalysisEG2::RooFitCM( Float_t PmissMin, Float_t PmissMax, bool PlotFits, TCanvas * c, Int_t start_cd){
     // returns a parameter matrix: (μ-x,𝜎-x,μ-y,𝜎-y,μ-z,𝜎-z) and their uncertainties (𝚫μ-x,𝚫𝜎-x,𝚫μ-y,𝚫𝜎-y,𝚫μ-z,𝚫𝜎-z)
+    // if PlotFits=true, it also plots the RooFits into three pads: start_cd, start_cd+1 , start_cd+2
     TMatrix     res(6,2);
     Double_t    PcmPars[2] = { 0 , 0.14 } ,   PcmParsErr[2] = { 0 , 0 };
     
-    TCut cut = Form("%f < Pmiss.P() && Pmiss.P() < %f" , PmissMin , PmissMax);
-    RooFit1D( Tree , "pcmX", cut , PcmPars , PcmParsErr , false );
+    TCut cut = Form("%f < Pmiss3Mag && Pmiss3Mag < %f" , PmissMin , PmissMax);
+    
+    RooFit1D( Tree , "pcmX", cut , PcmPars , PcmParsErr , PlotFits , c->cd(start_cd) , Form("p(c.m.)-#bf{X} {%.2f<p(miss)<%.2f GeV/c}" , PmissMin , PmissMax) );
     res(0,0)   = PcmPars[0];
     res(1,0)   = PcmPars[1];
     res(0,1)   = PcmParsErr[0];
     res(1,1)   = PcmParsErr[1];
 
-    RooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , false );
+    RooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , PlotFits , c->cd(start_cd+1) , Form("p(c.m.)-#bf{Y} {%.2f<p(miss)<%.2f GeV/c}" , PmissMin , PmissMax)  );
     res(2,0)   = PcmPars[0];
     res(3,0)   = PcmPars[1];
     res(2,1)   = PcmParsErr[0];
     res(3,1)   = PcmParsErr[1];
 
-    RooFit1D( Tree , "pcmZ", cut , PcmPars , PcmParsErr , false );
+    RooFit1D( Tree , "pcmZ", cut , PcmPars , PcmParsErr , PlotFits , c->cd(start_cd+2)  , Form("p(c.m.)-#bf{Z} {%.2f<p(miss)<%.2f GeV/c}" , PmissMin , PmissMax)  );
     res(4,0)   = PcmPars[0];
     res(5,0)   = PcmPars[1];
     res(4,1)   = PcmParsErr[0];

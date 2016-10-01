@@ -112,7 +112,9 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("Bjorken x (moving p)",&XbMoving              , "XbMoving/F");
     OutTree -> Branch("Q2"                  ,&Q2                    , "Q2/F");
     OutTree -> Branch("Mmiss"               ,&Mmiss                 , "Mmiss/F");
+    
     // p(cm) for RooFit
+    OutTree -> Branch("Pmiss3Mag"           ,&Pmiss3Mag             , "Pmiss3Mag/F");
     OutTree -> Branch("pcmX"                ,&pcmX                  , "pcmX/F");
     OutTree -> Branch("pcmY"                ,&pcmY                  , "pcmY/F");
     OutTree -> Branch("pcmZ"                ,&pcmZ                  , "pcmZ/F");
@@ -291,6 +293,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     // Pmiss , p/q , 𝜃(p,q)
     Pmiss       = Plead - q;
+    Pmiss3Mag   = Pmiss.P();
     if (DataType == "GSIM") {
         Pmiss_g = Plead_g - q_g;
     }
