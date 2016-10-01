@@ -263,13 +263,9 @@ def generate_runs_with_different_parameters( cm_pars_bands , start_run , RunsInf
                         # ToDo: add proton fiducial cuts acceptance
                         gen_events.DoGenerate( "(e,e'pp)" , True , False )
                         
-                        # analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
+                        # (2) analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
                         path = "/Users/erezcohen/Desktop/DataMining/Analysis_DATA/ppSRCcm"
-                        ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run )
-#                        sim_cm_parameters_name  = CMParsFname( path + '/eg_cm_parameters/run%d_'%run )#path + '/eg_cm_parameters/run%d_cm_parameters.csv'%run
-#                        sim_cm_roofit_name      = CMRooFitsName( path + '/eg_cm_roofits/run%d_'%run )#path + '/eg_cm_roofits/run%d_cm_roofits.pdf'%run
-#                        sim_cm_fits_name        = CMFitsFname( path + '/eg_cm_fits/run%d_'%run )#path + '/eg_cm_fits/run%d_cm_fits.csv'%run
-#                        sim_cm_figures_name     = FigureFName( path + '/eg_cm_figures/run%d_'%run )#path + '/eg_cm_figures/run%d_cm_width_and_mean.pdf'%run
+                        ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
                         calc_cm_parameters( ana_sim  , PmissBins , CMParsFname( path + '/eg_cm_parameters/run%d_'%run ) , CMRooFitsName( path + '/eg_cm_roofits/run%d_'%run ) )
                         cm_parameters = pd.read_csv( CMParsFname( path + '/eg_cm_parameters/run%d_'%run ) )
                         plot_cm_parameters( cm_parameters , CMFitsFname( path + '/eg_cm_fits/run%d_'%run ) , FigureFName( path + '/eg_cm_figures/run%d_'%run ) )
