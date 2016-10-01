@@ -29,6 +29,9 @@ void GenerateEvents::Set_eep_Parameters(Float_t fSigmaT , Float_t fSigmaL_a1 , F
 }
 
 
+
+
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void GenerateEvents::SetLimits(Float_t fPmin , Float_t fPmax , Float_t fThetamin , Float_t fThetamax ){
     
@@ -52,7 +55,7 @@ Int_t GenerateEvents::DoGenerate( TString Type,
                                  TString BaryonName,
                                  bool DoReeNFromTree, bool DoReeNFromDist, bool DoFlateeN){
     // return the number of events
-    Nevents         = 0;
+    NAcceptedEvents = Nevents = 0;
     InputT          = new TChain("T");
     txtFilename     = Form("%s/eg_txtfiles/run%d.txt",Path.Data(),RunNumber);
     rootFilename    = Form("%s/eg_rootfiles/run%d.root",Path.Data(),RunNumber);
@@ -123,7 +126,7 @@ Int_t GenerateEvents::DoGenerate( TString Type,
             Pmiss_in_Pmiss_q_system = Pmiss;
             Pmiss_in_Pmiss_q_system.RotateZ(-Pmiss_phi);
             Pmiss_in_Pmiss_q_system.RotateY(-Pmiss_theta);
-            Pmiss_in_Pmiss_q_system.RotateZ(-q_Phi);
+//            Pmiss_in_Pmiss_q_system.RotateZ(-q_Phi);
             
             
             // rotate to q-Pmiss frame: q is the z axis, Pmiss is in x-z plane: Pmiss=(Pmiss[x],0,Pmiss[q])
@@ -138,7 +141,7 @@ Int_t GenerateEvents::DoGenerate( TString Type,
             q_q_sys = q3Vector;
             q_q_sys.RotateZ(-q_q_phi);
             q_q_sys.RotateY(-q_q_theta);
-            q_q_sys.RotateZ(-Pmiss_Phi);
+//            q_q_sys.RotateZ(-Pmiss_Phi);
             
             
             if(debug > 2) cout << "define omega and other variables" << endl;
@@ -164,10 +167,17 @@ Int_t GenerateEvents::DoGenerate( TString Type,
                 float Py = gRandom -> Gaus( 0  , SigmaT );
                 float Pz = gRandom -> Gaus( ShiftL_a1*(PmissMag-0.3) + ShiftL_a2  , SigmaL_a1*(PmissMag-0.5) + SigmaL_a2 );
                 Pcm_in_Pmiss_q_system.SetXYZ ( Px , Py , Pz );
-                if(debug > 3) cout << "Pcm_in_Pmiss_q_system.SetXYZ " ;
+                Precoil_in_Pmiss_q_system = Pcm_in_Pmiss_q_system - Pmiss_in_Pmiss_q_system;
+                if(debug > 3) cout << "set Pcm_in_Pmiss_q_system and Precoil_in_Pmiss_q_system " ;
 
                 // rotate back to lab frame
                 Pcm = Pcm_in_Pmiss_q_system;
+                // and for RooFit
+                PmissMag = Pmiss.Mag();
+                pcmX = Pcm_in_Pmiss_q_system.x() ;
+                pcmY = Pcm_in_Pmiss_q_system.y() ;
+                pcmZ = Pcm_in_Pmiss_q_system.z() ;
+            
                 Pcm.RotateZ  ( q_Phi );
                 Pcm.RotateY  ( Pmiss_theta );
                 Pcm.RotateZ  ( Pmiss_phi );
@@ -186,7 +196,32 @@ Int_t GenerateEvents::DoGenerate( TString Type,
                 
                 Nevents++ ;
                 if(debug > 3) SHOW( Nevents );
-                RootTree -> Fill();
+                
+                // decide if this event is accepted as a legitimate (e,e'pp) event based on the recoiling proton acceptance
+                AcceptEvent = false;
+                Double_t PrecoilMag = Precoil_in_Pmiss_q_system.Mag() , PrecoilTheta = r2d*Precoil_in_Pmiss_q_system.Theta() , PrecoilPhi = r2d*Precoil_in_Pmiss_q_system.Phi();
+                // rescale phi angle to the range [-30,330]
+                PrecoilPhi =  (PrecoilPhi < -30.) ? (PrecoilPhi + 360.) : ( (PrecoilPhi > 330.) ? (PrecoilPhi - 360.) : PrecoilPhi ) ;
+                
+                if(debug > 3) SHOW3( PrecoilMag , PrecoilTheta , PrecoilPhi );
+                if (    h_protonAcceptance->GetXaxis()->GetBinCenter(1) < PrecoilMag   && PrecoilMag   < h_protonAcceptance->GetXaxis()->GetBinCenter(h_protonAcceptance->GetNbinsX())
+                     && h_protonAcceptance->GetYaxis()->GetBinCenter(1) < PrecoilTheta && PrecoilTheta < h_protonAcceptance->GetYaxis()->GetBinCenter(h_protonAcceptance->GetNbinsY())
+                     && h_protonAcceptance->GetZaxis()->GetBinCenter(1) < PrecoilPhi   && PrecoilPhi   < h_protonAcceptance->GetZaxis()->GetBinCenter(h_protonAcceptance->GetNbinsZ())    ) {
+                    Double_t PrecoilAcceptance = h_protonAcceptance -> Interpolate( PrecoilMag , PrecoilTheta , PrecoilPhi ) / 100.;
+                    if(debug > 3) SHOW( PrecoilAcceptance );
+                    if( gRandom->Uniform() < PrecoilAcceptance ){ // event is accepted in PrecoilAcceptance %
+                        AcceptEvent = true;
+                    }
+                }
+                if (AcceptEvent){
+                    if(debug > 3) Printf( "event was accepted" );
+                    RootTree -> Fill();
+                    NAcceptedEvents++ ;
+                } else {
+                    if(debug > 3) Printf( "event was not accepted" );
+                }
+                if(debug > 3) SHOW( NAcceptedEvents );
+                
             }
         }
     }
@@ -295,6 +330,13 @@ void GenerateEvents::SetRootTreeAddresses(){
     RootTree -> Branch("ThetaPmissPrecoil"   ,&ThetaPmissPrecoil     ,"ThetaPmissPrecoil/F");    // angle between the missing and recoil momenta
     RootTree -> Branch("PoverQ"              ,&PoverQ                ,"PoverQ/F");               // ratio |p|/|q| for leading proton
     RootTree -> Branch("Mmiss"               ,&Mmiss                 ,"Mmiss/F");
+    
+    // p(cm) for RooFit
+    RootTree -> Branch("Pmiss3Mag"           ,&Pmiss3Mag             , "Pmiss3Mag/F");
+    RootTree -> Branch("pcmX"                ,&pcmX                  , "pcmX/F");
+    RootTree -> Branch("pcmY"                ,&pcmY                  , "pcmY/F");
+    RootTree -> Branch("pcmZ"                ,&pcmZ                  , "pcmZ/F");
+
 }
 
 

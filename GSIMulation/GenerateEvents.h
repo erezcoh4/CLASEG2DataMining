@@ -59,6 +59,7 @@
 #include <unistd.h>
 #include <TRandom3.h>
 #include <ctime>
+#include "TEG2dm.h"
 
 /**
    \class GenerateEvents
@@ -89,8 +90,11 @@ public:
     void               Set_eeN_tree ( TTree * feeNTree) { eeNTree = feeNTree;};
     void            OutputInfo2File ();
     void           OutPutToTextFile ( const int, TVector3*, int*, float*, int*);
+    
+    // simple setters
     void                   SetNRand ( Int_t fNRand = 1 )    { NRand = fNRand; };
     void                 SetNPTheta ( Int_t fNPTheta = 10 ) { NPTheta = fNPTheta; };
+    void       Set_protonAcceptacne ( TH3F * h)             { h_protonAcceptance = h; };
     
     
 
@@ -102,14 +106,19 @@ public:
     TTree   * RootTree , * eeNTree;
 
     TRandom3 * gRandom;
+ 
+    bool        AcceptEvent;
     
-    // Physical variables
+    Int_t       RunNumber   , Nevents   , NAcceptedEvents;
+    Int_t       NRand       , NPTheta   , debug;
+   
     Float_t     Q2      , Xb            , PoverQ    , Mmiss;
     Float_t     ThetaPQ , ThetaPmissQ   , ThetaPmissPrecoil;
     Float_t     Mott    , DipoleFF      , Weight;
     Float_t     theta_e ;
-    Float_t     SigmaT  , SigmaL_a1 , SigmaL_a2 , ShiftL_a1 , ShiftL_a2;
-    Float_t     Pmin , Pmax , Thetamin , Thetamax;
+    Float_t     SigmaT  , SigmaL_a1     , SigmaL_a2 , ShiftL_a1 , ShiftL_a2;
+    Float_t     Pmin    , Pmax  , Thetamin  , Thetamax;
+    Float_t     Pmiss3Mag   , pcmX      , pcmY      , pcmZ  ;
 
     
     
@@ -117,22 +126,16 @@ public:
     TVector3 e                          ,       Pp1                     ,   Pp2             , Precoil;
     TVector3 Rp1                        ,       Rp2;                                                    // proton vertex
     TVector3 q3Vector                   ,       Pcm                     ,   Pmiss;
-    TVector3 q3Vector_in_Pmiss_q_system ,       Pmiss_in_Pmiss_q_system ,   Pcm_in_Pmiss_q_system;
+    TVector3 q3Vector_in_Pmiss_q_system ,       Pmiss_in_Pmiss_q_system ,   Pcm_in_Pmiss_q_system   , Precoil_in_Pmiss_q_system;
     TVector3 q_q_sys                    ,       Pmiss_q_sys             ,   Pcm_q_sys;
 
     TLorentzVector  Proton                  ,   q4Vector        , m2N       , miss;
 
-    
-    
-    Int_t       RunNumber   , Nevents;
-    Int_t       NRand       , NPTheta   , debug;
-
     TString     Path , RunsInfoFileName , txtFilename , rootFilename , runsFilename;
     
     
-    
-    
     TH1F        * histMag , * histTheta;
+    TH3F        * h_protonAcceptance;
     
     time_t  now ;
     tm      * dt;
