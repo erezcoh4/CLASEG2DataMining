@@ -62,8 +62,7 @@ void TAnalysisEG2::SetSRCCuts(TCut MainCut){ // last editted March-22 for pppSRC
     // 2p-SRC following Or Hen' cuts
     PrecFiducial= "pFiducCut[1] == 1";
     cutPlead    = "-24.5 < pVertex[0].Z() && pVertex[0].Z() < -20";
-    // ToDo: add Precoil fiducials!
-    cutPrec     = "0.35 < Prec.P()  &&  (-24.5 < pVertex[1].Z() && pVertex[1].Z() < -20)" ;//&& PrecFiducial;
+    cutPrec     = "0.35 < Prec.P()  &&  (-24.5 < pVertex[1].Z() && pVertex[1].Z() < -20)" ;
     ppSRCCut    = cutSRC && "1.2 <= Xb" && cutMmiss2 && "2 <= Np" && cutPlead && cutPrec && ppCTOFCut;
     
     

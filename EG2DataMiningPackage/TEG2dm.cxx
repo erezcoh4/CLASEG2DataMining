@@ -150,6 +150,77 @@ TCutG * TEG2dm::alpha12_vs_XbCut(){
 }
 
 
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+Int_t TEG2dm::protonFiducial( TVector3 pMomentum , int debug ){
+    
+    // return 1 if proton inside fiducial region, and 0 if it is outside fiducial region
+    //--------------------------------------------------------------------
+    // Fiducial cuts from Zana' thesis (p. 67, 4.4)
+    //--------------------------------------------------------------------
+    Double_t mag    = pMomentum.Mag();
+    Double_t theta  = r2d * pMomentum.Theta();
+    Double_t phi    = r2d * pMomentum.Phi();
+    phi = ChangePhiToPhiLab( phi );
+    
+    // Check if within fiducials
+    int sector = (int)(phi/60);
+    if (sector<0 || sector>5)
+    return 0;
+    
+    // delete (obselete)
+    //    Double_t theta_min = P0_theta[sector] + P1_theta[sector]/(pow(mag,2)) + P2_theta[sector]*mag + P3_theta[sector]/mag + P4_theta[sector]*exp(P5_theta[sector]*mag);
+    P0 = P0_theta[sector];
+    P1 = P1_theta[sector];
+    P2 = P2_theta[sector];
+    P3 = P3_theta[sector];
+    P4 = P4_theta[sector];
+    P5 = P5_theta[sector];
+    mom = mag;
+    
+    Double_t theta_min = P0 + P1/pow(mom,2) + P2*mom + P3/mom + P4 * exp( P5 * mom );
+    Double_t theta_max = 120;
+    
+    if(theta_min < theta && theta < theta_max){
+        Double_t Delta_phi[2];
+        for(int k=0; k<2; k++){
+            
+            // delete (obselete)
+            //            Double_t a = P0_a[sector][k] + P1_a[sector][k]*exp(P2_a[sector][k]*(mag-P3_a[sector][k])   )    ;
+            //            Double_t b = P0_b[sector][k] + P1_b[sector][k]*exp( pow( P2_b[sector][k]*(mag-P3_b[sector][k]) , 2 ) )*mag;
+            //            Double_t b = P0_b[sector][k] + P1_b[sector][k]*exp( pow( P2_b[sector][k]*(mag-P3_b[sector][k]) , 2 ) )*mag;
+            //            Delta_phi[k] = a*(1 - 1./((theta - theta_min)/b+1) );
+
+            
+            P0 = P0_a[sector][k];
+            P1 = P1_a[sector][k];
+            P2 = P2_a[sector][k];
+            P3 = P3_a[sector][k];
+            mom = mag;
+            a = P0 + P1 * exp( P2 *( mom - P3 ) ) ;
+
+ 
+            P0 = P0_b[sector][k];
+            P1 = P1_b[sector][k];
+            P2 = P2_b[sector][k];
+            P3 = P3_b[sector][k];
+            mom = mag;
+            b = P0 + P1 * mom * exp( P2 * pow( mom - P3 , 2 ) ) ;
+
+            
+            Delta_phi[k] = a * (1 - 1./( ((theta - theta_min)/b) + 1 ) );
+        }
+        if(  sector*60-Delta_phi[0] < phi && phi < sector*60+Delta_phi[1]){
+            if (debug > 3) cout << "in fiducial region!" << endl;
+            return 1;
+        }
+    }
+    if (debug > 3) cout << "not in fiducial region...." << endl;
+    return 0;
+}
+
 #endif
 
 

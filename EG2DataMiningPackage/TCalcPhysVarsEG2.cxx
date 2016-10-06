@@ -159,6 +159,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("WmissWithCm"         ,"TLorentzVector"       ,&WmissWithCm);
     OutTree -> Branch("WmissCmEps"          ,"TLorentzVector"       ,&WmissCmEps);
     OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
+    OutTree -> Branch("protonsLab"          ,&protonsLab);          // std::vector<TLorentzVector>
 
     
     
@@ -197,6 +198,7 @@ void TCalcPhysVarsEG2::InitGlobals(){
 void TCalcPhysVarsEG2::InitEvent(){
     if (!p3vec.empty())     p3vec.clear();   // unsorted protons
     if (!protons.empty())   protons.clear();
+    if (!protonsLab.empty())protonsLab.clear();
     if (!pVertex.empty())   pVertex.clear();
     if (!alpha.empty())     alpha.clear();
     if (!pCTOF.empty())     pCTOF.clear();
@@ -466,8 +468,10 @@ void TCalcPhysVarsEG2::loop_protons(){
     
     for (auto i: sort_pMag( p3vec )){
         
-        // proton fiducial cut is calculated in the lab frame, so it must come first...
-        pFiducCut.push_back( protonFiducial( p3vec.at(i) ) );
+        protonsLab.push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
+        
+        // proton fiducial cut is calculated in the lab frame, so it must come before we rotate the protons...
+        pFiducCut.push_back( protonFiducial( p3vec.at(i) , debug ) );
         
         // protons
         if (FrameName == "q(z) - Pmiss(x-z) frame"){
@@ -576,6 +580,7 @@ void TCalcPhysVarsEG2::p23Randomize(){
     if( rand.Uniform() > 0.5 ){
         
         std::iter_swap(protons.begin()+1    ,protons.begin()+2);
+        std::iter_swap(protonsLab.begin()+1 ,protonsLab.begin()+2);
         std::iter_swap(pVertex.begin()+1    ,pVertex.begin()+2);
         std::iter_swap(alpha.begin()+1      ,alpha.begin()+2);
         
@@ -594,6 +599,7 @@ void TCalcPhysVarsEG2::p12Randomize(){
     if( rand.Uniform() > 0.5 ){
         
         std::iter_swap(protons.begin()    ,protons.begin()+1);
+        std::iter_swap(protonsLab.begin()+1 ,protonsLab.begin()+2);
         std::iter_swap(pVertex.begin()    ,pVertex.begin()+1);
         std::iter_swap(alpha.begin()      ,alpha.begin()+1);
         
@@ -607,40 +613,44 @@ void TCalcPhysVarsEG2::p12Randomize(){
 }
 
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-Int_t TCalcPhysVarsEG2::protonFiducial( TVector3 pMomentum ){
-    
-    // return 1 if proton inside fiducial region, and 0 if it is outside fiducial region
-    //--------------------------------------------------------------------
-    // Fiducial cuts from Zana' thesis (by Or)
-    //--------------------------------------------------------------------
-    Double_t mag    = pMomentum.Mag();
-    Double_t theta  = r2d * pMomentum.Theta();
-    Double_t phi    = r2d * pMomentum.Phi();
-    
-    // Check if within fiducials
-    int sector = (int)(phi/60);
-    if (sector<0 || sector>5)
-        return 0;
-    
-    Double_t theta_min = P0_theta[sector] + P1_theta[sector]/(pow(mag,2)) + P2_theta[sector]*mag + P3_theta[sector]/mag + P4_theta[sector]*exp(P5_theta[sector]*mag);
-    Double_t theta_max = 120;
-    
-    if(theta_min < theta && theta < theta_max){
-        Double_t Delta_phi[2];
-        for(int k=0; k<2; k++){
-            Double_t a = P0_a[sector][k] + P1_a[sector][k]*exp(P2_a[sector][k]*(mag-P3_a[sector][k])   )    ;
-            Double_t b = P0_b[sector][k] + P1_b[sector][k]*exp( pow( P2_b[sector][k]*(mag-P3_b[sector][k]) , 2 ) )*mag;
-            Delta_phi[k] = a*(1 - 1./((theta - theta_min)/b+1) );
-        }
-        if(phi > sector*60-Delta_phi[0] && phi < sector*60+Delta_phi[1]){
-            if (debug > 3) cout << "in fiducial region!" << endl;
-            return 1;
-        }
-    }
-    if (debug > 3) cout << "not in fiducial region...." << endl;
-    return 0;
-}
+
+// delete Nov-1  (obselete)
+//
+//
+////....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//Int_t TCalcPhysVarsEG2::protonFiducial( TVector3 pMomentum ){
+//    
+//    // return 1 if proton inside fiducial region, and 0 if it is outside fiducial region
+//    //--------------------------------------------------------------------
+//    // Fiducial cuts from Zana' thesis (by Or)
+//    //--------------------------------------------------------------------
+//    Double_t mag    = pMomentum.Mag();
+//    Double_t theta  = r2d * pMomentum.Theta();
+//    Double_t phi    = r2d * pMomentum.Phi();
+//    
+//    // Check if within fiducials
+//    int sector = (int)(phi/60);
+//    if (sector<0 || sector>5)
+//        return 0;
+//    
+//    Double_t theta_min = P0_theta[sector] + P1_theta[sector]/(pow(mag,2)) + P2_theta[sector]*mag + P3_theta[sector]/mag + P4_theta[sector]*exp(P5_theta[sector]*mag);
+//    Double_t theta_max = 120;
+//    
+//    if(theta_min < theta && theta < theta_max){
+//        Double_t Delta_phi[2];
+//        for(int k=0; k<2; k++){
+//            Double_t a = P0_a[sector][k] + P1_a[sector][k]*exp(P2_a[sector][k]*(mag-P3_a[sector][k])   )    ;
+//            Double_t b = P0_b[sector][k] + P1_b[sector][k]*exp( pow( P2_b[sector][k]*(mag-P3_b[sector][k]) , 2 ) )*mag;
+//            Delta_phi[k] = a*(1 - 1./((theta - theta_min)/b+1) );
+//        }
+//        if(phi > sector*60-Delta_phi[0] && phi < sector*60+Delta_phi[1]){
+//            if (debug > 3) cout << "in fiducial region!" << endl;
+//            return 1;
+//        }
+//    }
+//    if (debug > 3) cout << "not in fiducial region...." << endl;
+//    return 0;
+//}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::PrintData(int entry){

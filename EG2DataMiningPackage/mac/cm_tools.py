@@ -5,6 +5,8 @@ from ROOT import TAnalysisEG2,GenerateEvents
 
 # ------------------------------------------------------------------------------- #
 # file names
+def print_important(string): print '\033[94m' + '\033[1m' + string + '\033[0m'
+def print_line(): print '\033[93m' + '--------------------------------------------------------------' + '\033[0m'
 def CMParsFname( path ):
     return path+"CMparameters.csv"
 def CMRooFitsName( path ):
@@ -38,16 +40,22 @@ def append2RunsInfoFile(RunsInfoFileName):
 
 # ------------------------------------------------------------------------------- #
 def append2SimParametersFile(SimParametersFileName):
+
     print "appending into simulated-parameters File Name:\n"+SimParametersFileName
+    string = "run,time"
+    string += ",genSigmaT,genSigmaT,genSigmaL_a1,genSigmaL_a2,genShiftL_a1,genShiftL_a2"
+    string += ",recSigmaT,recSigmaTErr,recSigmaL_a1,recSigmaL_a1Err,recSigmaL_a2,recSigmaL_a2Err,recShiftL_a1,recShiftL_a1Err,recShiftL_a2,recShiftL_a2Err"
+    string += ",recSigmaT,recSigmaTErr,recSigmaL_a1,recSigmaL_a1Err,recSigmaL_a2,recSigmaL_a2Err,recShiftL_a1,recShiftL_a1Err,recShiftL_a2,recShiftL_a2Err"
+    
     try:
         if os.stat(SimParametersFileName).st_size > 0:
             SimParametersFile = open(SimParametersFileName,'a')
         else:
             SimParametersFile = open(SimParametersFileName,'wb')
-            SimParametersFile.write( "run,time,genSigmaT,genSigmaL_a1,genSigmaL_a2,genShiftL_a1,genShiftL_a2,recSigmaT,recSigmaL_a1,recSigmaL_a2,recShiftL_a1,recShiftL_a2\n" )
+            SimParametersFile.write( string + "\n" )
     except OSError:
         SimParametersFile = open(SimParametersFileName,'wb')
-        SimParametersFile.write( "run,time,genSigmaT,genSigmaL_a1,genSigmaL_a2,genShiftL_a1,genShiftL_a2,recSigmaT,recSigmaL_a1,recSigmaL_a2,recShiftL_a1,recShiftL_a2\n" )
+        SimParametersFile.write( string + "\n" )
     return SimParametersFile
 
 # ------------------------------------------------------------------------------- #
@@ -70,12 +78,11 @@ def plot_errorbar_and_fit( ax , x , y , xerr , yerr , color , marker , lstyle , 
 # calculate the  C.M. parameters
 # ToDo: add cross-section weighting to the fits
 def calc_cm_parameters( fana  , PmissBins , outFileName , plotsFileName):
-    outfile = open( outFileName , "wb")
-    outfile.write('\n\n')
+    outfile = open( outFileName , 'wb' )
     outfile.write("pMiss_min,pMiss_max,mean_x,mean_xErr,sigma_x,sigma_xErr,mean_y,mean_yErr,sigma_y,sigma_yErr,mean_z,mean_zErr,sigma_z,sigma_zErr\n")
     canvas = fana.CreateCanvas( "RooFit plots" , "Divide" , 3 , len(PmissBins) )
     for i in range(len(PmissBins)):
-        print "p(miss) bin %d\n"%i
+        #         print "p(miss) bin %d\n"%i
         x = fana.RooFitCM(PmissBins[i][0],PmissBins[i][1] , True, canvas, 3*i + 1) # RooFitCM return a parameter vector
         outfile.write("%.2f,%.2f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n" % ( PmissBins[i][0],PmissBins[i][1] ,x(0,0) ,x(0,1) ,x(1,0) ,x(1,1) , x(2,0) ,x(2,1) ,x(3,0), x(3,1) , x(4,0), x(4,1) , x(5,0), x(5,1)))
     outfile.write('\n\n')
@@ -84,7 +91,7 @@ def calc_cm_parameters( fana  , PmissBins , outFileName , plotsFileName):
     print "done calculating parameters, output can be found in the file:\n", outfile.name
     canvas.SaveAs(plotsFileName)
     print "see plots at \n"+plotsFileName
-
+    print_line()
 
 
 
@@ -139,6 +146,7 @@ def plot_cm_parameters( data , CMFitsFname , FigureFName ):
     outfile.close()
     print "wrote fit parameters to\n"+CMFitsFname
     print "and plot can be found at\n"+FigureFName
+    print_line()
 
 
 
@@ -221,7 +229,7 @@ def generate_cm_bands( cm_parameters , run , CMFitsFname , CMBandFname , RunsInf
     outfile.close()
     print "wrote fit bands to\n"+CMBandFname
     print "plots to file\n"+FigureBandFName
-
+    print_line()
 
 
 
@@ -255,15 +263,20 @@ def generate_runs_with_different_parameters( cm_pars_bands , start_run , RunsInf
                         
                         # (1) generate the simulated data (the 'run')
                         gen_events = GenerateEvents( path , run , debug )
-                        gen_events.SetNRand( 100 )
+                        gen_events.SetNRand( 1 )
                         gen_events.Set_eep_Parameters( sT , sLa1 , sLa2 , mLa1 , mLa2 )
                         pAcceptacneFile = ROOT.TFile("/Users/erezcohen/Desktop/DataMining/GSIM_DATA/PrecoilAcceptance.root")
+                        '''
+                            recoil proton acceptances:
+                            (a) efficiency and acceptacne from the 'uniform' map i've generated using virtual CLAS
+                            (b) proton fiducial cuts (coded inside the event generator class)
+                        '''
+                        gen_events.Use_protonAcceptacne( True )
                         h = pAcceptacneFile.Get("hRescaled")
                         gen_events.Set_protonAcceptacne( h )
-                        # ToDo: add proton fiducial cuts acceptance
                         gen_events.DoGenerate( "(e,e'pp)" , True , False )
-                        # ToDo: problem with acceptance? i am getting a double-peaked distribution instead of a gaussian localized around 0
-                        
+
+
                         # (2) analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
                         path = "/Users/erezcohen/Desktop/DataMining/Analysis_DATA/ppSRCcm"
                         ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
@@ -282,7 +295,8 @@ def generate_runs_with_different_parameters( cm_pars_bands , start_run , RunsInf
                         sTrec   , sTrecErr      = 0.5*(sXfit+sYfit) , math.sqrt(sXfit*sXfit+sYfit*sYfit)
                         par_str += ",%f"%sTrec+",%f"%sLa1rec+",%f"%sLa2rec+",%f"%mLa1rec+",%f"%mLa2rec
                         SimParametersFile.write( par_str + '\n' )
-                        # ToDo: Add rooFit plots to monitor what the fuck is wrong with these not happening
+                        print_important( "completed run %d"%run )
+                        print_line()
 
 
 
@@ -293,4 +307,5 @@ def generate_runs_with_different_parameters( cm_pars_bands , start_run , RunsInf
     RunsInfoFile.close()
     SimParametersFile.close()
     print "done... see \n"+RunsInfoFileName+"\n"+SimParametersFileName
+    print_line()
     return generated_runs

@@ -28,7 +28,7 @@ if 'scheme pp-SRC' in flags.option: # scheme to pp-SRC
     SchemedName = "ppSRCCut_%s"% DataName
     ana     = TAnalysisEG2( "SRCPmissXb_"+DataName , flags.cut )
     scheme  = TSchemeDATA()
-    scheme.SchemeOnTCut( "/Users/erezcohen/Desktop/DataMining/AnaFiles" , "Ana_SRCPmissXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ana.ppSRCCut )
+    scheme.SchemeOnTCut( "/Users/erezcohen/Desktop/DataMining/AnaFiles" , "Ana_SRCPmissXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ana.ppSRCCut + ana.PrecFiducial)
     print 'schemed to %s'%SchemedName
 
 
@@ -49,7 +49,7 @@ if 'create bands for EG' in flags.option:
     
     # (3) create bands for event generation
     cm_parameters = pd.read_csv( tools.CMParsFname(path+'/DATA/') )
-    tools.generate_cm_bands( parameters , start_run , tools.CMFitsFname( path+'/DATA/' ) , tools.CMBandFname( path+'/DATA/' ) , tools.RunsInfoFileName( path+'/simulation/' ) , tools.FigureBandFName( path+'/simulation/' ))
+    tools.generate_cm_bands( cm_parameters , start_run , tools.CMFitsFname( path+'/DATA/' ) , tools.CMBandFname( path+'/DATA/' ) , tools.RunsInfoFileName( path+'/simulation/' ) , tools.FigureBandFName( path+'/simulation/' ))
 
 
 
