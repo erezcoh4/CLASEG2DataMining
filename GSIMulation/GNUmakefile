@@ -24,6 +24,7 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 # set linker flags
 LDFLAGS += -L$(shell root-config --libdir) -lGui -lEG -lSpectrum -lHist 
 LDFLAGS += -L$(LARLITE_LIBDIR) -lMySoftware_MySoftwarePackage
+LDFLAGS += -L$(LARLITE_LIBDIR) -lEG2DataMining_EG2DataMiningPackage
 
 
 # call the common GNUmakefile

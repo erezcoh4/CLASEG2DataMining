@@ -11,7 +11,7 @@ GenerateEvents::GenerateEvents( TString fPath , Int_t fRunNumber , Int_t fdebug 
     debug = fdebug;
     runsFilename  = Form("%s/eg_txtfiles/RunNumbers.dat",Path.Data());
     gRandom = new TRandom3( fRunNumber );
-
+    eg2dm = new TEG2dm();
 
 }
 
@@ -170,14 +170,14 @@ Int_t GenerateEvents::DoGenerate( TString Type,
                 Precoil_in_Pmiss_q_system = Pcm_in_Pmiss_q_system - Pmiss_in_Pmiss_q_system;
                 if(debug > 3) cout << "set Pcm_in_Pmiss_q_system and Precoil_in_Pmiss_q_system " ;
 
-                // rotate back to lab frame
-                Pcm = Pcm_in_Pmiss_q_system;
-                // and for RooFit
+                // for RooFits
                 Pmiss3Mag = Pmiss.Mag();
                 pcmX = Pcm_in_Pmiss_q_system.x() ;
                 pcmY = Pcm_in_Pmiss_q_system.y() ;
                 pcmZ = Pcm_in_Pmiss_q_system.z() ;
-            
+
+                // now, rotate back to lab frame
+                Pcm = Pcm_in_Pmiss_q_system;
                 Pcm.RotateZ  ( q_Phi );
                 Pcm.RotateY  ( Pmiss_theta );
                 Pcm.RotateZ  ( Pmiss_phi );
@@ -194,25 +194,35 @@ Int_t GenerateEvents::DoGenerate( TString Type,
                 Pcm_q_sys.RotateY(-q_q_theta);
                 Pcm_q_sys.RotateZ(-Pmiss_Phi);
                 
-                Nevents++ ;
+                Nevents++;
                 if(debug > 3) SHOW( Nevents );
                 
+                // recoil proton acceptance
+                // ------------------------------------------------
                 // decide if this event is accepted as a legitimate (e,e'pp) event based on the recoiling proton acceptance
                 AcceptEvent = false;
-                Double_t PrecoilMag = Precoil_in_Pmiss_q_system.Mag() , PrecoilTheta = r2d*Precoil_in_Pmiss_q_system.Theta() , PrecoilPhi = r2d*Precoil_in_Pmiss_q_system.Phi();
-                // rescale phi angle to the range [-30,330]
-                PrecoilPhi =  (PrecoilPhi < -30.) ? (PrecoilPhi + 360.) : ( (PrecoilPhi > 330.) ? (PrecoilPhi - 360.) : PrecoilPhi ) ;
+                if ( !Do_pAcceptance )  AcceptEvent = true; // in case we do not want to use the proton acceptances
                 
-                if(debug > 3) SHOW3( PrecoilMag , PrecoilTheta , PrecoilPhi );
-                if (    h_protonAcceptance->GetXaxis()->GetBinCenter(1) < PrecoilMag   && PrecoilMag   < h_protonAcceptance->GetXaxis()->GetBinCenter(h_protonAcceptance->GetNbinsX())
-                     && h_protonAcceptance->GetYaxis()->GetBinCenter(1) < PrecoilTheta && PrecoilTheta < h_protonAcceptance->GetYaxis()->GetBinCenter(h_protonAcceptance->GetNbinsY())
-                     && h_protonAcceptance->GetZaxis()->GetBinCenter(1) < PrecoilPhi   && PrecoilPhi   < h_protonAcceptance->GetZaxis()->GetBinCenter(h_protonAcceptance->GetNbinsZ())    ) {
-                    Double_t PrecoilAcceptance = h_protonAcceptance -> Interpolate( PrecoilMag , PrecoilTheta , PrecoilPhi ) / 100.;
-                    if(debug > 3) SHOW( PrecoilAcceptance );
-                    if( gRandom->Uniform() < PrecoilAcceptance ){ // event is accepted in PrecoilAcceptance %
-                        AcceptEvent = true;
+                
+                if ( eg2dm->protonFiducial( Precoil , debug ) == 1 ){
+                    
+                    // #IMPORTANT: the acceptance map that i've created i given in the lab frame
+                    Double_t PrecoilMag = Precoil.Mag() , PrecoilTheta = r2d*Precoil.Theta() , PrecoilPhi = r2d*Precoil.Phi();
+                    PrecoilPhi =  eg2dm->ChangePhiToPhiLab( PrecoilPhi ) ; // rescale phi angle to the range [-30,330]
+                    if(debug > 3) SHOW3( PrecoilMag , PrecoilTheta , PrecoilPhi );
+                    
+                    if (    h_protonAcceptance->GetXaxis()->GetBinCenter(1) < PrecoilMag   && PrecoilMag   < h_protonAcceptance->GetXaxis()->GetBinCenter(h_protonAcceptance->GetNbinsX())
+                        && h_protonAcceptance->GetYaxis()->GetBinCenter(1) < PrecoilTheta && PrecoilTheta < h_protonAcceptance->GetYaxis()->GetBinCenter(h_protonAcceptance->GetNbinsY())
+                        && h_protonAcceptance->GetZaxis()->GetBinCenter(1) < PrecoilPhi   && PrecoilPhi   < h_protonAcceptance->GetZaxis()->GetBinCenter(h_protonAcceptance->GetNbinsZ())    ) {
+                        Double_t PrecoilAcceptance = h_protonAcceptance -> Interpolate( PrecoilMag , PrecoilTheta , PrecoilPhi ) / 100.;
+                        if(debug > 3) SHOW( PrecoilAcceptance );
+                        if( gRandom->Uniform() < PrecoilAcceptance ){ // event is accepted in PrecoilAcceptance %
+                            AcceptEvent = true;
+                        }
                     }
                 }
+                // ------------------------------------------------
+                
                 if (AcceptEvent){
                     if(debug > 3) Printf( "event was accepted" );
                     RootTree -> Fill();
@@ -299,7 +309,7 @@ Int_t GenerateEvents::DoGenerate( TString Type,
     OutRunNumberFile.open(runsFilename);
     OutRunNumberFile << RunNumber << "\n" ;
     OutRunNumberFile.close();
-//    OutputInfo2File();
+    Printf("done generating events to %s",rootFilename.Data());
     return Nevents;
 }
 
@@ -339,27 +349,6 @@ void GenerateEvents::SetRootTreeAddresses(){
 
 }
 
-
-
-
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//void GenerateEvents::OutputInfo2File(){
-//    if (debug > 2) cout << "Out to Info-File..." << endl;
-//    
-//    RunsInfoFileName = Form("%s/eg_txtfiles/Info_runs.csv",Path.Data());
-//    RunsInfoFile.open(RunsInfoFileName,std::ofstream::out | std::ofstream::app);
-//    
-//    RunsInfoFile
-//    << RunNumber
-//    << "," << 1900+dt->tm_year << "/" << dt->tm_mon
-//    << ","  << SigmaT
-//    << ","  << SigmaL_a1 << "\t"  << SigmaL_a2
-//    << ","  << ShiftL_a1 << "\t"  << ShiftL_a2
-//    << "," ;
-//    
-//    RunsInfoFile.close();
-//}
 
 
 

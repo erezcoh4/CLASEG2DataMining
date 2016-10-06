@@ -92,10 +92,10 @@ public:
     void           OutPutToTextFile ( const int, TVector3*, int*, float*, int*);
     
     // simple setters
-    void                   SetNRand ( Int_t fNRand = 1 )    { NRand = fNRand; };
-    void                 SetNPTheta ( Int_t fNPTheta = 10 ) { NPTheta = fNPTheta; };
-    void       Set_protonAcceptacne ( TH3F * h)             { h_protonAcceptance = h; };
-    
+    void                   SetNRand ( Int_t fNRand = 1 )                { NRand = fNRand; };
+    void                 SetNPTheta ( Int_t fNPTheta = 10 )             { NPTheta = fNPTheta; };
+    void       Use_protonAcceptacne ( bool fDo_pAcceptance = false )    {Do_pAcceptance = fDo_pAcceptance;};
+    void       Set_protonAcceptacne ( TH3F * h)                         { h_protonAcceptance = h; };
     
 
     ofstream TextFile , OutRunNumberFile , RunsInfoFile;
@@ -107,7 +107,7 @@ public:
 
     TRandom3 * gRandom;
  
-    bool        AcceptEvent;
+    bool        Do_pAcceptance , AcceptEvent;
     
     Int_t       RunNumber   , Nevents   , NAcceptedEvents;
     Int_t       NRand       , NPTheta   , debug;
@@ -137,8 +137,9 @@ public:
     TH1F        * histMag , * histTheta;
     TH3F        * h_protonAcceptance;
     
-    time_t  now ;
-    tm      * dt;
+    TEG2dm      * eg2dm;
+    time_t      now ;
+    tm          * dt;
 
 };
 
