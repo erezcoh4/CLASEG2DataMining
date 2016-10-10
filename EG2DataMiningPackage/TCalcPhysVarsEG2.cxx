@@ -118,6 +118,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("pcmX"                ,&pcmX                  , "pcmX/F");
     OutTree -> Branch("pcmY"                ,&pcmY                  , "pcmY/F");
     OutTree -> Branch("pcmZ"                ,&pcmZ                  , "pcmZ/F");
+    OutTree -> Branch("rooWeight"           ,&rooWeight             , "rooWeight/F");
 
     OutTree -> Branch("missing energy"      ,&Emiss                 , "Emiss/F");
     OutTree -> Branch("theta (pq)"          ,&theta_pq              , "theta_pq/F");
@@ -246,6 +247,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         Pe = *e3Vector;
     }
     e.SetVectM( Pe , Me );
+    
     q = Beam - e;
     Q2 = -q.Mag2();
     if (DataType == "GSIM") {
@@ -386,10 +388,11 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     thetaLeadRec = Plead.Vect().Angle(Prec.Vect());
     
     
-    
+    // roofit
     pcmX = Pcm.Px();
     pcmY = Pcm.Py();
     pcmZ = Pcm.Pz();
+    ComputeWeights();
     
     // finally, fill the TTree output
     OutTree -> Fill();
@@ -612,6 +615,15 @@ void TCalcPhysVarsEG2::p12Randomize(){
     }
 }
 
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void TCalcPhysVarsEG2::ComputeWeights(){
+    Theta           = r2d * e.Theta();
+    Mott            = pow( e2/(2*Ebeam) , 2 ) * pow( cos(Theta/2.) , 2 ) / pow( sin(Theta/2.) , 4 );
+    DipoleFF        = pow( 1/(1 + Q2/0.71) , 2);
+    rooWeight       =  1./ ( Mott * pow( DipoleFF ,2) ) ;
+}
 
 
 // delete Nov-1  (obselete)

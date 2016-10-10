@@ -17,7 +17,7 @@ path = "/Users/erezcohen/Desktop/DataMining/Analysis_DATA/ppSRCcm"
 A = 12
 start_run  = flags.run
 dm = TEG2dm()
-
+DoWeight = True if flags.DoWeight==1 else False
 
 
 
@@ -36,11 +36,11 @@ if 'extract cm-parameters' in flags.option: # DATA
 
     # (1) calc cm parameters of data
     ana_data = TAnalysisEG2( "ppSRCCut_DATA_%s"% dm.Target(A) )
-    tools.calc_cm_parameters( ana_data  , PmissBins , tools.CMParsFname(path+'/DATA/') , tools.CMRooFitsName( path + '/DATA/') )
+    tools.calc_cm_parameters( ana_data  , PmissBins , tools.CMParsFname(path+'/DATA/') , tools.CMfitsFname( path + '/DATA/') , DoWeight )
 
     # (2) plot cm parameters
     cm_parameters = pd.read_csv( tools.CMParsFname(path+'/DATA/') )
-    tools.plot_cm_parameters( cm_parameters , tools.CMFitsFname(path+'/DATA/') , tools.FigureFName(path+'/DATA/') )
+    tools.plot_cm_parameters( cm_parameters , tools.CMfitsFname(path+'/DATA/') , tools.FigureFName(path+'/DATA/') )
 
 
 
@@ -49,7 +49,7 @@ if 'create bands for EG' in flags.option:
     
     # (3) create bands for event generation
     cm_parameters = pd.read_csv( tools.CMParsFname(path+'/DATA/') )
-    tools.generate_cm_bands( cm_parameters , start_run , tools.CMFitsFname( path+'/DATA/' ) , tools.CMBandFname( path+'/DATA/' ) , tools.RunsInfoFileName( path+'/simulation/' ) , tools.FigureBandFName( path+'/simulation/' ))
+    tools.generate_cm_bands( cm_parameters , start_run , tools.CMfitsFname( path+'/DATA/' ) , tools.CMBandFname( path+'/DATA/' ) , tools.RunsInfoFileName( path+'/simulation/' ) , tools.FigureBandFName( path+'/simulation/' ))
 
 
 
@@ -57,7 +57,8 @@ if 'generate runs' in flags.option:
     
     # (4) generate runs with different parameters
     cm_pars_bands = pd.read_csv( tools.CMBandFname(path+'/DATA/') )
-    tools.generate_runs_with_different_parameters( cm_pars_bands , start_run , tools.RunsInfoFileName( path+'/simulation/' ) , path , flags.verbose , PmissBins , tools.SimParametersFileName( path+'/simulation/' ) )
+    tools.generate_runs_with_different_parameters( tools.CMfitsFname( path+'/DATA/' ) , cm_pars_bands , start_run , tools.RunsInfoFileName( path+'/simulation/' ) ,
+                                                  path , flags.verbose , PmissBins , tools.SimParametersFileName( path+'/simulation/' ) , dm.Target(A) , DoWeight )
 
 
 

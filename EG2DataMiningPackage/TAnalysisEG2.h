@@ -87,7 +87,7 @@ public:
     
     
     // rooFit
-    TMatrix                  RooFitCM (Float_t PmissMin, Float_t PmissMax, bool PlotFits = false, TCanvas * c = nullptr, Int_t start_cd = 1);
+    TMatrix                  RooFitCM (Float_t PmissMin, Float_t PmissMax, bool PlotFits = false, TCanvas * c = nullptr, Int_t start_cd = 1, bool DoWeight = true );
     vector<Float_t>       GetPcmEntry (int);
     vector<Float_t>   GetFullpppEvent (int, bool DoPrint = false);
     vector<Float_t>        GetGSIMEvt (int, bool DoPrint = false);

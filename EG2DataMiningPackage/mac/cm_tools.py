@@ -2,6 +2,8 @@ import time , sys , os , math , datetime , ROOT
 import matplotlib , pandas as pd , numpy as np
 from matplotlib import pyplot as plt
 from ROOT import TAnalysisEG2,GenerateEvents
+from root_numpy import hist2array
+from scipy.stats import ks_2samp
 
 # ------------------------------------------------------------------------------- #
 # file names
@@ -11,8 +13,10 @@ def CMParsFname( path ):
     return path+"CMparameters.csv"
 def CMRooFitsName( path ):
     return path+"CMRooFits.pdf"
-def CMFitsFname( path ):
-    return path+"CMparameter_Fits.csv"
+def CMfitsFname( path ):
+    return path+"CMfits.csv"
+#def CMFitsFname( path ):
+#    return path+"CMparameter_Fits.csv"
 def CMBandFname( path ):
     return path+"CMparameter_Bands.csv"
 def FigureFName( path ):
@@ -23,6 +27,10 @@ def RunsInfoFileName( path ):
     return path+"EG_simulated_runs_Info.csv"
 def SimParametersFileName( path ):
     return path+"EG_simulated_runs_results_cm_parameters.csv"
+
+# ------------------------------------------------------------------------------- #
+def Nsigma( v1 , v1Err , v2 , v2Err):
+    return math.fabs( v1 - v2 )/math.sqrt( v1Err*v1Err + v2Err*v2Err )
 
 # ------------------------------------------------------------------------------- #
 def append2RunsInfoFile(RunsInfoFileName):
@@ -45,7 +53,8 @@ def append2SimParametersFile(SimParametersFileName):
     string = "run,time"
     string += ",genSigmaT,genSigmaT,genSigmaL_a1,genSigmaL_a2,genShiftL_a1,genShiftL_a2"
     string += ",recSigmaT,recSigmaTErr,recSigmaL_a1,recSigmaL_a1Err,recSigmaL_a2,recSigmaL_a2Err,recShiftL_a1,recShiftL_a1Err,recShiftL_a2,recShiftL_a2Err"
-    string += ",recSigmaT,recSigmaTErr,recSigmaL_a1,recSigmaL_a1Err,recSigmaL_a2,recSigmaL_a2Err,recShiftL_a1,recShiftL_a1Err,recShiftL_a2,recShiftL_a2Err"
+    string += ",NsigST,NsigSL_a1,NsigSL_a2,NsigML_a1,NsigML_a2,NsigAvg" # Nsig = N(sigma), the distance of the recosntructed parameter from the data-fit parameter
+    string += ",KSpCMx,KSpCMy,KSpCMz,KSavg" # Kolomogorov-Smirnov test results for pCM distributions in x,y,z directions
     
     try:
         if os.stat(SimParametersFileName).st_size > 0:
@@ -57,6 +66,17 @@ def append2SimParametersFile(SimParametersFileName):
         SimParametersFile = open(SimParametersFileName,'wb')
         SimParametersFile.write( string + "\n" )
     return SimParametersFile
+
+
+# ------------------------------------------------------------------------------- #
+def KStest( ana1 , ana2 , var , cut=ROOT.TCut() , Nbins=50, xmin=0 , xmax=2 ):
+    # [http://docs.scipy.org/doc/scipy-0.15.1/reference/generated/scipy.stats.ks_2samp.html]
+    h1 = ana1.H1( var, cut,"goff", Nbins, xmin, xmax)
+    h2 = ana2.H1( var, cut,"goff", Nbins, xmin, xmax)
+    array1 , array2 = hist2array(h1) , hist2array(h2)
+    D , Pvalue = ks_2samp( array1 , array2 )
+    return D
+
 
 # ------------------------------------------------------------------------------- #
 def plot_errorbar_and_fit( ax , x , y , xerr , yerr , color , marker , lstyle , label , fit_type='const',offset=0.3):
@@ -77,13 +97,12 @@ def plot_errorbar_and_fit( ax , x , y , xerr , yerr , color , marker , lstyle , 
 # ------------------------------------------------------------------------------- #
 # calculate the  C.M. parameters
 # ToDo: add cross-section weighting to the fits
-def calc_cm_parameters( fana  , PmissBins , outFileName , plotsFileName):
+def calc_cm_parameters( fana  , PmissBins , outFileName , plotsFileName , DoWeight ):
     outfile = open( outFileName , 'wb' )
     outfile.write("pMiss_min,pMiss_max,mean_x,mean_xErr,sigma_x,sigma_xErr,mean_y,mean_yErr,sigma_y,sigma_yErr,mean_z,mean_zErr,sigma_z,sigma_zErr\n")
     canvas = fana.CreateCanvas( "RooFit plots" , "Divide" , 3 , len(PmissBins) )
     for i in range(len(PmissBins)):
-        #         print "p(miss) bin %d\n"%i
-        x = fana.RooFitCM(PmissBins[i][0],PmissBins[i][1] , True, canvas, 3*i + 1) # RooFitCM return a parameter vector
+        x = fana.RooFitCM(PmissBins[i][0],PmissBins[i][1] , True, canvas, 3*i + 1 , DoWeight ) # RooFitCM return a parameter vector
         outfile.write("%.2f,%.2f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n" % ( PmissBins[i][0],PmissBins[i][1] ,x(0,0) ,x(0,1) ,x(1,0) ,x(1,1) , x(2,0) ,x(2,1) ,x(3,0), x(3,1) , x(4,0), x(4,1) , x(5,0), x(5,1)))
     outfile.write('\n\n')
     outfile.close()
@@ -235,13 +254,28 @@ def generate_cm_bands( cm_parameters , run , CMFitsFname , CMBandFname , RunsInf
 
 
 # ------------------------------------------------------------------------------- #
-def generate_runs_with_different_parameters( cm_pars_bands , start_run , RunsInfoFileName , path , debug , PmissBins , SimParametersFileName ):
+def generate_runs_with_different_parameters( CMFitsFname, cm_pars_bands , start_run , RunsInfoFileName , path , debug , PmissBins , SimParametersFileName , target , DoWeight ):
     # returns the generated run numbers
+    
+    # the data (nominal values)
+    ana_data = TAnalysisEG2( "ppSRCCut_DATA_%s"% target )
+    cm_fits_parameters = pd.read_csv(CMFitsFname)
+    DATAsXfit , DATAsXfiterr = cm_fits_parameters.sXfit , cm_fits_parameters.sXfiterr
+    DATAsYfit , DATAsYfiterr = cm_fits_parameters.sYfit , cm_fits_parameters.sYfiterr
+    DATAsZa1  , DATAsZa1err  = cm_fits_parameters.sZa1  , cm_fits_parameters.sZa1err
+    DATAsZa2  , DATAsZa2err  = cm_fits_parameters.sZa2  , cm_fits_parameters.sZa2err
+    DATAmXfit , DATAmXfiterr = cm_fits_parameters.mXfit , cm_fits_parameters.mXfiterr
+    DATAmYfit , DATAmYfiterr = cm_fits_parameters.mYfit , cm_fits_parameters.mYfiterr
+    DATAmZa1  , DATAmZa1err  = cm_fits_parameters.mZa1  , cm_fits_parameters.mZa1err
+    DATAmZa2  , DATAmZa2err  = cm_fits_parameters.mZa2  , cm_fits_parameters.mZa2err
+    DATA_ST   , DATA_STErr = 0.5*(DATAsXfit+DATAsYfit)  , math.sqrt(DATAsXfiterr*DATAsXfiterr + DATAsYfiterr*DATAsYfiterr)
+
 
     RunsInfoFile = append2RunsInfoFile(RunsInfoFileName)
     SimParametersFile = append2SimParametersFile(SimParametersFileName)
     run = start_run
     generated_runs = []
+    # the bands around data (around nominal values)
     print 'cm_pars_bands:',cm_pars_bands
     sigT = np.linspace(cm_pars_bands.sTBandMin[0]  ,cm_pars_bands.sTBandMax[0]  ,1)
     sigLa1 = np.linspace(cm_pars_bands.sZa1Min[0]  ,cm_pars_bands.sZa1Max[0]    ,1)
@@ -280,10 +314,10 @@ def generate_runs_with_different_parameters( cm_pars_bands , start_run , RunsInf
                         # (2) analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
                         path = "/Users/erezcohen/Desktop/DataMining/Analysis_DATA/ppSRCcm"
                         ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
-                        calc_cm_parameters( ana_sim  , PmissBins , CMParsFname( path + '/eg_cm_parameters/run%d_'%run ) , CMRooFitsName( path + '/eg_cm_roofits/run%d_'%run ) )
+                        calc_cm_parameters( ana_sim  , PmissBins , CMParsFname( path + '/eg_cm_parameters/run%d_'%run ) , CMRooFitsName( path + '/eg_cm_roofits/run%d_'%run ) , DoWeight )
                         cm_parameters = pd.read_csv( CMParsFname( path + '/eg_cm_parameters/run%d_'%run ) )
-                        plot_cm_parameters( cm_parameters , CMFitsFname( path + '/eg_cm_fits/run%d_'%run ) , FigureFName( path + '/eg_cm_figures/run%d_'%run ) )
-                        cm_fits_parameters = pd.read_csv( CMFitsFname( path + '/eg_cm_fits/run%d_'%run ) )
+                        plot_cm_parameters( cm_parameters , CMfitsFname( path + '/eg_cm_fits/run%d_'%run ) , FigureFName( path + '/eg_cm_figures/run%d_'%run ) )
+                        cm_fits_parameters = pd.read_csv( CMfitsFname( path + '/eg_cm_fits/run%d_'%run ) )
                         sXfit   , sXfiterr      = cm_fits_parameters.sXfit , cm_fits_parameters.sXfiterr
                         sYfit   , sYfiterr      = cm_fits_parameters.sYfit , cm_fits_parameters.sYfiterr
                         sLa1rec , sLa1recErr    = cm_fits_parameters.sZa1 , cm_fits_parameters.sZa1err
@@ -293,7 +327,27 @@ def generate_runs_with_different_parameters( cm_pars_bands , start_run , RunsInf
                         mLa1rec , mLa1recErr    = cm_fits_parameters.mZa1 , cm_fits_parameters.mZa1err
                         mLa2rec , mLa2recErr    = cm_fits_parameters.mZa2 , cm_fits_parameters.mZa2err
                         sTrec   , sTrecErr      = 0.5*(sXfit+sYfit) , math.sqrt(sXfit*sXfit+sYfit*sYfit)
+                        
+                        # write the results into file
                         par_str += ",%f"%sTrec+",%f"%sLa1rec+",%f"%sLa2rec+",%f"%mLa1rec+",%f"%mLa2rec
+                        par_str += ",%f"%sTrecErr+",%f"%sLa1recErr+",%f"%sLa2recErr+",%f"%mLa1recErr+",%f"%mLa2recErr
+                        
+                        # compute N(sigma), the distance of the recosntructed parameter from the data-fit parameter
+                        NsigST = Nsigma( sTrec , sTrecErr  , DATA_ST , DATA_STErr )
+                        NsigSL_a1 = Nsigma( sLa1rec , sLa1recErr , DATAsZa1 , DATAsZa1err )
+                        NsigSL_a2 = Nsigma( sLa2rec , sLa2recErr , DATAsZa2 , DATAsZa2err )
+                        NsigML_a1 = Nsigma( mLa1rec , mLa1recErr , DATAmZa1 , DATAmZa1err )
+                        NsigML_a2 = Nsigma( mLa2rec , mLa2recErr , DATAmZa2 , DATAmZa2err )
+                        NsigAvg = (NsigST + NsigSL_a1 + NsigSL_a2 + NsigML_a1 + NsigML_a2)/5.
+                        par_str += ",%f"%NsigST+",%f"%NsigSL_a1+",%f"%NsigSL_a2+",%f"%NsigML_a1+",%f"%NsigML_a2+",%f"%NsigAvg
+                        
+                        # KS test for the c.m. distributions in x,y,z directions
+                        KSpCMx = KStest( ana_sim , ana_data , "pcmX" ) # maybe make it 2D, with adding the pmiss magnitude as a second variable?
+                        KSpCMy = KStest( ana_sim , ana_data , "pcmY" )
+                        KSpCMz = KStest( ana_sim , ana_data , "pcmZ" )
+                        KSavg = (KSpCMx + KSpCMy + KSpCMz)/3.
+                        par_str += ",%f"%KSpCMx+",%f"%KSpCMy+",%f"%KSpCMz+",%f"%KSavg
+                        
                         SimParametersFile.write( par_str + '\n' )
                         print_important( "completed run %d"%run )
                         print_line()
