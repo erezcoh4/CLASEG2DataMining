@@ -277,8 +277,8 @@ def generate_runs_with_different_parameters( CMFitsFname, cm_pars_bands , start_
     generated_runs = []
     # the bands around data (around nominal values)
     print 'cm_pars_bands:',cm_pars_bands
-    sigT = np.linspace(cm_pars_bands.sTBandMin[0]  ,cm_pars_bands.sTBandMax[0]  ,1)
-    sigLa1 = np.linspace(cm_pars_bands.sZa1Min[0]  ,cm_pars_bands.sZa1Max[0]    ,1)
+    sigT = np.linspace(cm_pars_bands.sTBandMin[0]  ,cm_pars_bands.sTBandMax[0]  ,2)
+    sigLa1 = np.linspace(cm_pars_bands.sZa1Min[0]  ,cm_pars_bands.sZa1Max[0]    ,2)
     sigLa2 = np.linspace(cm_pars_bands.sZa2Min[0]  ,cm_pars_bands.sZa2Max[0]    ,1)
     meanLa1 = np.linspace(cm_pars_bands.mZa1Min[0] ,cm_pars_bands.mZa1Max[0]    ,1)
     meanLa2 = np.linspace(cm_pars_bands.mZa2Min[0] ,cm_pars_bands.mZa2Max[0]    ,1)

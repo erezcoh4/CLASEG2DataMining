@@ -23,7 +23,6 @@ DoWeight = True if flags.DoWeight==1 else False
 
 if 'scheme pp-SRC' in flags.option: # scheme to pp-SRC
 
-    # ToDo: add proton fiducial cuts!
     DataName    = "DATA_%s"% dm.Target(flags.atomic_mass)
     SchemedName = "ppSRCCut_%s"% DataName
     ana     = TAnalysisEG2( "SRCPmissXb_"+DataName , flags.cut )
@@ -63,7 +62,11 @@ if 'generate runs' in flags.option:
 
 
 
+if 'find the best paramteres' in flags.option:
 
+    # (5) find the best-correspondance from the generated runs, to estimate nature's parameteres
+    simulation_results = pd.read_csv( tools.SimParametersFileName( path+'/simulation/' ) )
+    tools.find_best_parameters( simulation_results )
 
 
 
