@@ -4,6 +4,9 @@ from matplotlib import pyplot as plt
 from ROOT import TAnalysisEG2,GenerateEvents
 from root_numpy import hist2array
 from scipy.stats import ks_2samp
+sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
+import GeneralPlot as gp
+
 
 # ------------------------------------------------------------------------------- #
 # file names
@@ -500,3 +503,28 @@ def generate_runs_with_different_parameters( cm_fits_parameters , cm_pars_bands 
     print "done... see \n"+RunsInfoFileName+"\n"+SimParametersFileName
     print_line()
     return generated_runs
+
+
+
+# ------------------------------------------------------------------------------- #
+def find_best_parameters( simulation_results ):
+    sr = simulation_results
+    gp.sns2d_with_projections( sr.genSigmaT , sr.recSigmaT_unweighted , axes_labels=[r'generated $\sigma_{T}$ [GeV/c]',r'un-weighted reconstructed $\sigma_{T}$ [GeV/c]'] , kind="hex")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

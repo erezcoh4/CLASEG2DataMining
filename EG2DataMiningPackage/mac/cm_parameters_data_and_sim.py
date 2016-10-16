@@ -8,6 +8,7 @@
             extract data cm-parameters
             create bands for EG
             generate runs
+            find the best paramteres
     
 '''
 
