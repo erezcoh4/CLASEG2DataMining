@@ -5,7 +5,7 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 TAnalysisEG2::TAnalysisEG2(TString fPath , TString fInFileName, TCut MainCut):
-TPlots( fPath + "/" + fInFileName + ".root","anaTree",fInFileName, false){
+TPlots( fPath + "/" + fInFileName + ".root","anaTree",fInFileName, true ){
     SetPath(fPath);
     SetInFileName( fInFileName + ".root");
     SetSRCCuts(MainCut);
@@ -17,7 +17,7 @@ TPlots( fPath + "/" + fInFileName + ".root","anaTree",fInFileName, false){
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 TAnalysisEG2::TAnalysisEG2(TString fInFileName, TCut MainCut):
-TPlots("$DataMiningAnaFiles/Ana_" + fInFileName + ".root","anaTree",fInFileName, false){
+TPlots("$DataMiningAnaFiles/Ana_" + fInFileName + ".root","anaTree",fInFileName, true ){
     SetPath("$DataMiningAnaFiles");
     SetInFileName( "Ana_" + fInFileName + ".root");
     
@@ -135,34 +135,35 @@ void TAnalysisEG2::PrintInCuts(){
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-TMatrix  TAnalysisEG2::RooFitCM( Float_t PmissMin, Float_t PmissMax, bool PlotFits, TCanvas * c, Int_t start_cd , bool DoWeight ){
+std::vector<Double_t> TAnalysisEG2::RooFitCM( Float_t PmissMin, Float_t PmissMax, bool PlotFits, TCanvas * c, Int_t start_cd , bool DoWeight ){
     // returns a parameter matrix: (μ-x,𝜎-x,μ-y,𝜎-y,μ-z,𝜎-z) and their uncertainties (𝚫μ-x,𝚫𝜎-x,𝚫μ-y,𝚫𝜎-y,𝚫μ-z,𝚫𝜎-z)
     // if PlotFits=true, it also plots the RooFits into three pads: start_cd, start_cd+1 , start_cd+2
-    TMatrix     res(6,2);
+    
     Double_t    PcmPars[2] = { 0 , 0.14 } ,   PcmParsErr[2] = { 0 , 0 };
+    
+    std::vector<Double_t> results;
     
     TCut cut = Form("%f < Pmiss3Mag && Pmiss3Mag < %f" , PmissMin , PmissMax);
     
     RooFit1D( Tree , "pcmX", cut , PcmPars , PcmParsErr , PlotFits , c->cd(start_cd) , Form("p(c.m.)-#bf{X} {%.2f<p(miss)<%.2f GeV/c}" , PmissMin , PmissMax) , DoWeight , "rooWeight" );
-    res(0,0)   = PcmPars[0];
-    res(1,0)   = PcmPars[1];
-    res(0,1)   = PcmParsErr[0];
-    res(1,1)   = PcmParsErr[1];
-
+    results.push_back(PcmPars[0]); // mean
+    results.push_back(PcmParsErr[0]); // mean - err
+    results.push_back(PcmPars[1]); // sigma
+    results.push_back(PcmParsErr[1]); // sigma - err
+    
     RooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , PlotFits , c->cd(start_cd+1) , Form("p(c.m.)-#bf{Y} {%.2f<p(miss)<%.2f GeV/c}" , PmissMin , PmissMax) , DoWeight , "rooWeight"  );
-    res(2,0)   = PcmPars[0];
-    res(3,0)   = PcmPars[1];
-    res(2,1)   = PcmParsErr[0];
-    res(3,1)   = PcmParsErr[1];
+    results.push_back(PcmPars[0]); // mean
+    results.push_back(PcmParsErr[0]); // mean - err
+    results.push_back(PcmPars[1]); // sigma
+    results.push_back(PcmParsErr[1]); // sigma - err
 
     RooFit1D( Tree , "pcmZ", cut , PcmPars , PcmParsErr , PlotFits , c->cd(start_cd+2)  , Form("p(c.m.)-#bf{Z} {%.2f<p(miss)<%.2f GeV/c}" , PmissMin , PmissMax) , DoWeight , "rooWeight"  );
-    res(4,0)   = PcmPars[0];
-    res(5,0)   = PcmPars[1];
-    res(4,1)   = PcmParsErr[0];
-    res(5,1)   = PcmParsErr[1];
-    
-    
-    return res;
+    results.push_back(PcmPars[0]); // mean
+    results.push_back(PcmParsErr[0]); // mean - err
+    results.push_back(PcmPars[1]); // sigma
+    results.push_back(PcmParsErr[1]); // sigma - err
+
+    return results;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
