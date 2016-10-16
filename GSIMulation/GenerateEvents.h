@@ -96,6 +96,7 @@ public:
     void                 SetNPTheta ( Int_t fNPTheta = 10 )             { NPTheta = fNPTheta; };
     void       Use_protonAcceptacne ( bool fDo_pAcceptance = false )    {Do_pAcceptance = fDo_pAcceptance;};
     void       Set_protonAcceptacne ( TH3F * h)                         { h_protonAcceptance = h; };
+    void             ComputeWeights ();
     
 
     ofstream TextFile , OutRunNumberFile , RunsInfoFile;
@@ -114,11 +115,12 @@ public:
    
     Float_t     Q2      , Xb            , PoverQ    , Mmiss;
     Float_t     ThetaPQ , ThetaPmissQ   , ThetaPmissPrecoil;
-    Float_t     Mott    , DipoleFF      , Weight;
     Float_t     theta_e ;
     Float_t     SigmaT  , SigmaL_a1     , SigmaL_a2 , ShiftL_a1 , ShiftL_a2;
     Float_t     Pmin    , Pmax  , Thetamin  , Thetamax;
     Float_t     Pmiss3Mag   , pcmX      , pcmY      , pcmZ  ;
+    Float_t     Theta       , Mott      , DipoleFF      , rooWeight;
+    const Float_t Ebeam = 5.009 , e2 = 1; // sqaure of e-charge in e-charge units (for simplcity)
 
     
     

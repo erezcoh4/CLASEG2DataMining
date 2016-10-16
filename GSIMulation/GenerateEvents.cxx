@@ -194,6 +194,10 @@ Int_t GenerateEvents::DoGenerate( TString Type,
                 Pcm_q_sys.RotateY(-q_q_theta);
                 Pcm_q_sys.RotateZ(-Pmiss_Phi);
                 
+                // compute event weight
+                ComputeWeights();
+                
+                // finish
                 Nevents++;
                 if(debug > 3) SHOW( Nevents );
                 
@@ -346,9 +350,19 @@ void GenerateEvents::SetRootTreeAddresses(){
     RootTree -> Branch("pcmX"                ,&pcmX                  , "pcmX/F");
     RootTree -> Branch("pcmY"                ,&pcmY                  , "pcmY/F");
     RootTree -> Branch("pcmZ"                ,&pcmZ                  , "pcmZ/F");
+    RootTree -> Branch("rooWeight"           ,&rooWeight             , "rooWeight/F");
+
 
 }
 
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void GenerateEvents::ComputeWeights(){
+    Theta           = r2d * e.Theta();
+    Mott            = pow( e2/(2*Ebeam) , 2 ) * pow( cos(Theta/2.) , 2 ) / pow( sin(Theta/2.) , 4 );
+    DipoleFF        = pow( 1/(1 + Q2/0.71) , 2);
+    rooWeight       =  1./ ( Mott * pow( DipoleFF ,2) ) ;
+}
 
 
 
