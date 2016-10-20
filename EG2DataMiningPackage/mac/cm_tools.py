@@ -9,9 +9,13 @@ import GeneralPlot as gp
 
 
 # ------------------------------------------------------------------------------- #
-# file names
+
+# prints
 def print_important(string): print '\033[94m' + '\033[1m' + string + '\033[0m'
 def print_line(): print '\033[93m' + '--------------------------------------------------------------' + '\033[0m'
+def print_filename(filename,action_on_file=""): print action_on_file + ' ' + '\033[91m' + filename + '\033[0m'
+
+# file names
 def CMParsFname( path ):
     return path+"CMparameters.csv"
 def CMRooFitsName( path ):
@@ -35,7 +39,7 @@ def Nsigma( v1 , v1Err , v2 , v2Err):
 
 # ------------------------------------------------------------------------------- #
 def append2RunsInfoFile(RunsInfoFileName):
-    print "appending into Runs Info File Name:\n"+RunsInfoFileName
+    print_filename(RunsInfoFileName , "appending Runs info")
     try:
         if os.stat(RunsInfoFileName).st_size > 0:
             RunsInfoFile = open(RunsInfoFileName,'a')
@@ -50,7 +54,7 @@ def append2RunsInfoFile(RunsInfoFileName):
 # ------------------------------------------------------------------------------- #
 def append2SimParametersFile(SimParametersFileName):
 
-    print "appending into simulated-parameters File Name:\n"+SimParametersFileName
+    print_filename(SimParametersFileName,"appending simulated-parameters")
     string = "run,time"
     string += ",genSigmaT,genSigmaL_a1,genSigmaL_a2,genShiftL_a1,genShiftL_a2"
     string += ",recSigmaT_unweighted,recSigmaTErr_unweighted"
@@ -120,10 +124,10 @@ def calc_cm_parameters( fana  , PmissBins , outFileName , plotsFileName ):
             out_string += ",%f" % cmParsWeighted.at(j)
         outfile.write(out_string + "\n")
     outfile.close()
-    print "from \n"+fana.GetFile().GetName()
-    print "done calculating parameters, output can be found in the file:\n", outfile.name
+    print_filename(fana.GetFile().GetName(),"from")
+    print_filename(outfile.name,"done calculating parameters, output can be found in the file:\n")
     canvas.SaveAs(plotsFileName)
-    print "see plots at \n"+plotsFileName
+    print_filename(plotsFileName,"see plots at")
     print_line()
 
 
@@ -159,6 +163,9 @@ def plot_cm_parameters( data , CMFitsFname , FigureFName ):
     [sZa1,sZa1err],[sZa2,sZa2err] = plot_errorbar_and_fit( ax , Pmiss, data.sigma_z_unweighted ,
                                                           [pMissLowErr,pMissUpErr] , [data.sigma_zErr_unweighted,data.sigma_zErr_unweighted],
                                                           'blue'   ,'s','none',r'$\sigma_{\vec{p}_{miss}}$' ,'linear', 0.5)
+    set_frame( r'un-weighted width' , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum width [Gev/c]' , "upper left")
+    def set_frame( title , xlabel , ylabel , "upper left")
+
     plt.title( r'un-weighted width',fontsize=25)
     plt.xlabel( r'$p_{miss}$ [GeV/c]',fontsize=25)
     ax.tick_params(axis='both', which='major', labelsize=25)
@@ -237,8 +244,8 @@ def plot_cm_parameters( data , CMFitsFname , FigureFName ):
     
     outfile.write(out_string + "\n")
     outfile.close()
-    print "wrote fit parameters to\n"+CMFitsFname
-    print "and plot can be found at\n"+FigureFName
+    print_filename( CMFitsFname , "wrote fit parameters to" )
+    print_filename( FigureFName , "and plot can be found at" )
     print_line()
 
 

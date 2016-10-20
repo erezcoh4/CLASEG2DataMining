@@ -1,7 +1,7 @@
 '''
     usage:
     ---------
-    python mac/cm_parameters_data_and_sim.py --option="generate runs " --worker=erez --run=0 -core=0
+    python mac/cm_parameters_data_and_sim.py --option="generate runs" --worker=erez -core=0
     
     options (can be ran simultaneously):
             scheme pp-SRC
