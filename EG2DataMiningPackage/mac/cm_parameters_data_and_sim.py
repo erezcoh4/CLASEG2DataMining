@@ -56,7 +56,7 @@ if 'create bands for EG' in flags.option:
     # (3) create bands for event generation
     cm_parameters = pd.read_csv( tools.CMParsFname(path+'/DATA/') )
     cm_fits_parameters = pd.read_csv( tools.CMfitsFname( path+'/DATA/' ) )
-    tools.generate_cm_bands( cm_parameters , cm_fits_parameters , tools.CMBandFname( path+'/DATA/' ) , tools.RunsInfoFileName( path+'/simulation/' ) , tools.FigureBandFName( path+'/simulation/' ))
+    tools.generate_cm_bands( cm_parameters , cm_fits_parameters , tools.CMBandFname( path+'/DATA/' ) , tools.FigureBandFName( path+'/simulation/' ))
 
 
 
@@ -66,8 +66,8 @@ if 'generate runs' in flags.option:
     cm_pars_bands = pd.read_csv( tools.CMBandFname(path+'/DATA/') )
     cm_fits_parameters = pd.read_csv( tools.CMfitsFname( path+'/DATA/' ) )
     
-    NptsBand = 2
-    Ncores = 4 if flags.worker == "erez" else 50 if flags.worker == "helion" else 1
+    NptsBand = 5
+    Ncores = 1 if flags.worker == "erez" else 50 if flags.worker == "helion" else 1
     if flags.i_core > Ncores:
         print 'error: i_core > Ncores!'
         exit(1)
@@ -81,8 +81,13 @@ if 'generate runs' in flags.option:
 if 'find the best paramteres' in flags.option:
 
     # (5) find the best-correspondance from the generated runs, to estimate nature's parameteres
+    tools.print_filename(tools.SimParametersFileName( path+'/simulation/' ),'reading file ')
     simulation_results = pd.read_csv( tools.SimParametersFileName( path+'/simulation/' ) )
-    tools.find_best_parameters( simulation_results )
+#    tools.plot( simulation_results , 'genSigmaT' , 'recSigmaT_unweighted' )
+#    tools.plot( simulation_results , 'KSpCMx' , 'KSpCMy' )
+#    tools.plot( simulation_results , 'genSigmaT' , 'NsigST_unweighted' , 'generated $\sigma_T$ [GeV/c]' , 'unweighted N$\sigma$ ($\sigma_T$)' )
+    tools.plot( simulation_results , 'genSigmaL_a1' , 'NsigSL_a1_unweighted' , 'generated a$_1$ ($\sigma_z$) [GeV/c]' , 'unweighted N$\sigma$ (a$_1$ ($\sigma_z$))' )
+#    tools.find_best_parameters( simulation_results )
 
 
 

@@ -1,5 +1,6 @@
 import time , sys , os , math , datetime , ROOT
 import matplotlib , pandas as pd , numpy as np
+import matplotlib as mpl , seaborn as sns; sns.set(style="white", color_codes=True , font_scale=3)
 from matplotlib import pyplot as plt
 from ROOT import TAnalysisEG2,GenerateEvents
 from root_numpy import hist2array
@@ -107,7 +108,7 @@ def plot_errorbar_and_fit( ax , x , y , xerr , yerr , color , marker , lstyle , 
 
 # ------------------------------------------------------------------------------- #
 # calculate the  C.M. parameters
-def calc_cm_parameters( fana  , PmissBins , outFileName , plotsFileName ):
+def calc_cm_parameters( fana  , PmissBins , outFileName , plotsFileName , DoSaveCanvas = False ):
     outfile = open( outFileName , 'wb' )
     out_string = "pMiss_min,pMiss_max"
     out_string += ",mean_x_unweighted,mean_xErr_unweighted,sigma_x_unweighted,sigma_xErr_unweighted,mean_y_unweighted,mean_yErr_unweighted,sigma_y_unweighted,sigma_yErr_unweighted,mean_z_unweighted,mean_zErr_unweighted,sigma_z_unweighted,sigma_zErr_unweighted"
@@ -126,14 +127,23 @@ def calc_cm_parameters( fana  , PmissBins , outFileName , plotsFileName ):
     outfile.close()
     print_filename(fana.GetFile().GetName(),"from")
     print_filename(outfile.name,"done calculating parameters, output can be found in the file:\n")
-    canvas.SaveAs(plotsFileName)
-    print_filename(plotsFileName,"see plots at")
+    if DoSaveCanvas:
+        canvas.SaveAs(plotsFileName)
+        print_filename(plotsFileName,"see plots at")
     print_line()
 
 
+# ------------------------------------------------------------------------------- #
+def set_frame( ax , title , xlabel , ylabel , legend_location="upper left" ):
+
+    plt.title( title ,fontsize=25)
+    plt.xlabel( xlabel,fontsize=25)
+    plt.ylabel( ylabel,fontsize=25)
+    ax.tick_params(axis='both', which='major', labelsize=25)
+    ax.legend(loc=legend_location,scatterpoints=1,fontsize=25)
 
 # ------------------------------------------------------------------------------- #
-def plot_cm_parameters( data , CMFitsFname , FigureFName ):
+def plot_cm_parameters( data , CMFitsFname , FigureFName , DoSaveFig = False ):
 
     Pmiss = (data.pMiss_max + data.pMiss_min)/2.
     pMissUpErr , pMissLowErr = data.pMiss_max - Pmiss , Pmiss - data.pMiss_min
@@ -163,14 +173,14 @@ def plot_cm_parameters( data , CMFitsFname , FigureFName ):
     [sZa1,sZa1err],[sZa2,sZa2err] = plot_errorbar_and_fit( ax , Pmiss, data.sigma_z_unweighted ,
                                                           [pMissLowErr,pMissUpErr] , [data.sigma_zErr_unweighted,data.sigma_zErr_unweighted],
                                                           'blue'   ,'s','none',r'$\sigma_{\vec{p}_{miss}}$' ,'linear', 0.5)
-    set_frame( r'un-weighted width' , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum width [Gev/c]' , "upper left")
-    def set_frame( title , xlabel , ylabel , "upper left")
+    set_frame( ax , r'un-weighted width' , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum width [Gev/c]' , "upper left")
+    
 
-    plt.title( r'un-weighted width',fontsize=25)
-    plt.xlabel( r'$p_{miss}$ [GeV/c]',fontsize=25)
-    ax.tick_params(axis='both', which='major', labelsize=25)
-    plt.ylabel( r'c.m. momentum width [Gev/c]',fontsize=25)
-    ax.legend(loc="upper left",scatterpoints=1,fontsize=25)
+#    plt.title( r'un-weighted width',fontsize=25)
+#    plt.xlabel( r'$p_{miss}$ [GeV/c]',fontsize=25)
+#    ax.tick_params(axis='both', which='major', labelsize=25)
+#    plt.ylabel( r'c.m. momentum width [Gev/c]',fontsize=25)
+#    ax.legend(loc="upper left",scatterpoints=1,fontsize=25)
 
     ax = fig.add_subplot(222)
     ax.text( 0.3 , 0.15 , "no acc. corr." , fontsize=80 , color='red' , alpha = 0.15 )
@@ -185,12 +195,12 @@ def plot_cm_parameters( data , CMFitsFname , FigureFName ):
                                                           [pMissLowErr,pMissUpErr] , [data.mean_zErr_unweighted,data.mean_zErr_unweighted],
                                                           'blue'  ,'v','none',r'$mean_{\vec{p}_{miss}}$' ,'linear', 0.3)
 
-    plt.title( r'un-weighted mean',fontsize=25)
-    plt.xlabel( r'$p_{miss}$ [GeV/c]',fontsize=25)
-    plt.ylabel( r'c.m. momentum mean [Gev/c]',fontsize=25)
-    ax.tick_params(axis='both', which='major', labelsize=25)
-
-    ax.legend(loc="upper left",scatterpoints=1,fontsize=25)
+    set_frame( ax , r'un-weighted mean' , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum mean [Gev/c]' , "upper left")
+#    plt.title( r'un-weighted mean',fontsize=25)
+#    plt.xlabel( r'$p_{miss}$ [GeV/c]',fontsize=25)
+#    plt.ylabel( r'c.m. momentum mean [Gev/c]',fontsize=25)
+#    ax.tick_params(axis='both', which='major', labelsize=25)
+#    ax.legend(loc="upper left",scatterpoints=1,fontsize=25)
 
     out_string += "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f"%(sXfit,sXfiterr,sYfit,sYfiterr,
                                                                      sZa1,sZa1err,sZa2,sZa2err,
@@ -209,13 +219,13 @@ def plot_cm_parameters( data , CMFitsFname , FigureFName ):
     [sZa1,sZa1err],[sZa2,sZa2err] = plot_errorbar_and_fit( ax , Pmiss, data.sigma_z_weighted ,
                                                           [pMissLowErr,pMissUpErr] , [data.sigma_zErr_weighted,data.sigma_zErr_weighted],
                                                           'blue'   ,'s','none',r'$\sigma_{\vec{p}_{miss}}$' ,'linear', 0.5)
-    plt.title( r'weighted width',fontsize=25)
-    plt.xlabel( r'$p_{miss}$ [GeV/c]',fontsize=25)
-    plt.ylabel( r'c.m. momentum width [Gev/c]',fontsize=25)
-    ax.tick_params(axis='both', which='major', labelsize=25)
+    set_frame( ax , r'weighted width' , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum width [Gev/c]' , "upper left")
+#    plt.title( r'weighted width',fontsize=25)
+#    plt.xlabel( r'$p_{miss}$ [GeV/c]',fontsize=25)
+#    plt.ylabel( r'c.m. momentum width [Gev/c]',fontsize=25)
+#    ax.tick_params(axis='both', which='major', labelsize=25)
+#    ax.legend(loc="upper left",scatterpoints=1,fontsize=25)
 
-    ax.legend(loc="upper left",scatterpoints=1,fontsize=25)
-                                             
     ax = fig.add_subplot(224)
     ax.text( 0.3 , 0.15 , "no acc. corr." , fontsize=80 , color='red' , alpha = 0.15 )
     ax.grid(True,linestyle='-',color='0.95')
@@ -228,38 +238,37 @@ def plot_cm_parameters( data , CMFitsFname , FigureFName ):
     [mZa1,mZa1err],[mZa2,mZa2err] = plot_errorbar_and_fit( ax , Pmiss, data.mean_z_weighted ,
                                                           [pMissLowErr,pMissUpErr] , [data.mean_zErr_weighted,data.mean_zErr_weighted],
                                                           'blue'  ,'v','none',r'$mean_{\vec{p}_{miss}}$' ,'linear', 0.3)
-    plt.title( r'weighted mean',fontsize=25)
-    plt.xlabel( r'$p_{miss}$ [GeV/c]',fontsize=25)
-    plt.ylabel( r'c.m. momentum mean [Gev/c]',fontsize=25)
-    ax.tick_params(axis='both', which='major', labelsize=25)
-
-    ax.legend(loc="upper left",scatterpoints=1,fontsize=25)
+    set_frame( ax , r'weighted mean' , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum mean [Gev/c]' , "upper left")
+#    plt.title( r'weighted mean',fontsize=25)
+#    plt.xlabel( r'$p_{miss}$ [GeV/c]',fontsize=25)
+#    plt.ylabel( r'c.m. momentum mean [Gev/c]',fontsize=25)
+#    ax.tick_params(axis='both', which='major', labelsize=25)
+#    ax.legend(loc="upper left",scatterpoints=1,fontsize=25)
 
     out_string += ",%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f"%(sXfit,sXfiterr,sYfit,sYfiterr,
                                                                      sZa1,sZa1err,sZa2,sZa2err,
                                                                      mXfit,mXfiterr,mYfit,mYfiterr,
                                                                      mZa1,mZa1err,mZa2,mZa2err)
 
-    plt.savefig(FigureFName)
+    if DoSaveFig:
+        plt.savefig(FigureFName)
+        print_filename( FigureFName , "and plot can be found at" )
     
     outfile.write(out_string + "\n")
     outfile.close()
     print_filename( CMFitsFname , "wrote fit parameters to" )
-    print_filename( FigureFName , "and plot can be found at" )
     print_line()
 
 
 
 
 # ------------------------------------------------------------------------------- #
-def generate_cm_bands( cm_parameters , cm_fits_parameters , CMBandFname , RunsInfoFileName , FigureBandFName ):
+def generate_cm_bands( cm_parameters , cm_fits_parameters , CMBandFname , FigureBandFName , DoSaveFig = False ):
     
     data = cm_parameters
     Pmiss = (data.pMiss_max + data.pMiss_min)/2.
     pMissUpErr , pMissLowErr = data.pMiss_max - Pmiss , Pmiss - data.pMiss_min
     
-    RunsInfoFile = append2RunsInfoFile(RunsInfoFileName)
-
     sXfit , sXfiterr = cm_fits_parameters.sXfit_unweighted , cm_fits_parameters.sXfiterr_unweighted
     sYfit , sYfiterr = cm_fits_parameters.sYfit_unweighted , cm_fits_parameters.sYfiterr_unweighted
     sZa1  , sZa1err  = cm_fits_parameters.sZa1_unweighted , cm_fits_parameters.sZa1err_unweighted
@@ -319,7 +328,9 @@ def generate_cm_bands( cm_parameters , cm_fits_parameters , CMBandFname , RunsIn
     plt.xlabel( r'$p_{miss}$ [GeV/c]' ,fontsize=25)
     plt.ylabel( r'c.m. momentum mean [Gev/c]',fontsize=25)
 
-    plt.savefig(FigureBandFName)
+    if DoSaveFig:
+        plt.savefig(FigureBandFName)
+        print "plots to file\n"+FigureBandFName
 
     outfile = open(CMBandFname, "wb")
     outfile.write("sTBandMin,sTBandMax,sZa1Min,sZa1Max,sZa2Min,sZa2Max,mZa1Min,mZa1Max,mZa2Min,mZa2Max\n")
@@ -329,7 +340,6 @@ def generate_cm_bands( cm_parameters , cm_fits_parameters , CMBandFname , RunsIn
     outfile.write(outfile_str)
     outfile.close()
     print "wrote fit bands to\n"+CMBandFname
-    print "plots to file\n"+FigureBandFName
     print_line()
 
 
@@ -338,9 +348,10 @@ def linspace_single_core( band_min  , band_max  , NptsBand , Ncores , i_core ):
     tmp_min = np.min( [band_min , band_max] )
     band_max = np.max( [band_min , band_max] )
     band_min = tmp_min
-    step = math.fabs(band_max - band_min)/Ncores
+    step = math.fabs(band_max - band_min)/NptsBand#Ncores
     min = band_min + (float(i_core)/Ncores)*(band_max - band_min)
     max = min + float(band_max - band_min)/Ncores
+    print min , max , step
     res = np.arange( min , max , step )
     return res
 
@@ -384,15 +395,18 @@ def generate_runs_with_different_parameters( cm_fits_parameters , cm_pars_bands 
     # the bands around data (around nominal values)
     sigT = linspace_single_core( cm_pars_bands.sTBandMin[0]  ,cm_pars_bands.sTBandMax[0]    , NptsBand , Ncores , i_core )
     sigLa1 = linspace_single_core( cm_pars_bands.sZa1Min[0]  ,cm_pars_bands.sZa1Max[0]      , NptsBand , Ncores , i_core )
-    sigLa2 = linspace_single_core( cm_pars_bands.sZa2Min[0]  ,cm_pars_bands.sZa2Max[0]      , NptsBand , 1 , 0 ) # ToDo: change this to Ncores , i_core
-    meanLa1 = linspace_single_core( cm_pars_bands.mZa1Min[0]  ,cm_pars_bands.mZa1Max[0]     , NptsBand , 1 , 0 ) # ToDo: change this to Ncores , i_core
-    meanLa2 = linspace_single_core( cm_pars_bands.mZa2Min[0]  ,cm_pars_bands.mZa2Max[0]     , NptsBand , 1 , 0 ) # ToDo: change this to Ncores , i_core
+    sigLa2 = linspace_single_core( cm_pars_bands.sZa2Min[0]  ,cm_pars_bands.sZa2Max[0]      , NptsBand , Ncores , i_core )
+    meanLa1 = linspace_single_core( cm_pars_bands.mZa1Min[0]  ,cm_pars_bands.mZa1Max[0]     , NptsBand , Ncores , i_core )
+    meanLa2 = linspace_single_core( cm_pars_bands.mZa2Min[0]  ,cm_pars_bands.mZa2Max[0]     , NptsBand , Ncores , i_core ) # ToDo: change this to Ncores , i_core ?
     
-    NrunsThisCore , NrunsTotal = len(sigT)*len(sigLa1)*len(sigLa2)*len(meanLa1)*len(meanLa2) , NptsBand*NptsBand*1*1*1
+    NrunsThisCore , NrunsTotal = len(sigT)*len(sigLa1)*len(sigLa2)*len(meanLa1)*len(meanLa2) , NptsBand*NptsBand*NptsBand*NptsBand*NptsBand
     if (debug>0): print '\033[95m' + 'Core %d (out of %d) will procees %d runs (total %d runs)'%(i_core,Ncores,NrunsThisCore,NrunsTotal) + '\033[0m'
     print_line
     run = start_run + (i_core+1)*1000
 
+    print "sigT: ",sigT,", sigLa1: ",sigLa1
+    pAcceptacneFile = ROOT.TFile("/Users/erezcohen/Desktop/DataMining/GSIM_DATA/PrecoilAcceptance.root")
+    h = pAcceptacneFile.Get("hRescaled")
 
     # event generation (and analysis) loop
     for sT in sigT:
@@ -410,14 +424,12 @@ def generate_runs_with_different_parameters( cm_fits_parameters , cm_pars_bands 
                         gen_events = GenerateEvents( path , run , debug )
                         gen_events.SetNRand( 1 )
                         gen_events.Set_eep_Parameters( sT , sLa1 , sLa2 , mLa1 , mLa2 )
-                        pAcceptacneFile = ROOT.TFile("/Users/erezcohen/Desktop/DataMining/GSIM_DATA/PrecoilAcceptance.root")
                         '''
                             recoil proton acceptances:
                             (a) efficiency and acceptacne from the 'uniform' map i've generated using virtual CLAS
                             (b) proton fiducial cuts (coded inside the event generator class)
                         '''
                         gen_events.Use_protonAcceptacne( True )
-                        h = pAcceptacneFile.Get("hRescaled")
                         gen_events.Set_protonAcceptacne( h )
                         gen_events.DoGenerate( "(e,e'pp)" , True , False )
 
@@ -511,6 +523,18 @@ def generate_runs_with_different_parameters( cm_fits_parameters , cm_pars_bands 
     print_line()
     return generated_runs
 
+
+# ------------------------------------------------------------------------------- #
+def plot( simulation_results , x , y , xlabel = '' , ylabel = '' ):
+    sr = simulation_results
+    cmap = mpl.cm.hot
+    my_hot_cmap = gp.reverse_colourmap(cmap)
+    
+    with sns.axes_style("white"):
+        g = sns.jointplot(x=sr[x], y=sr[y] , cmap=my_hot_cmap, kind="hex", stat_func=None, marginal_kws={'color': 'green'})
+    g.set_axis_labels(xlabel,ylabel)
+    plt.colorbar()
+    plt.show()
 
 
 # ------------------------------------------------------------------------------- #
