@@ -70,7 +70,6 @@ class GenerateEvents{
 
 public:
 
-//    GenerateEvents(){}
     ~GenerateEvents(){}
 
     GenerateEvents( TString fPath = "" , Int_t fRunNumber = 1 , Int_t fdebug = 1 );
@@ -83,6 +82,10 @@ public:
                      , bool DoReeNFromDist = false
                      , bool DoFlateeN = false);
     
+    Int_t DoGenerateRun_eep( Int_t run = 1
+                            , bool DoGetRootFile = true
+                            , bool DoGenTextFile = false);
+
     void       SetRootTreeAddresses ();
     void                  SetLimits ( Float_t , Float_t , Float_t , Float_t );
     void        SetHistThetaHistMag ( TH1F * , TH1F * );
@@ -90,6 +93,10 @@ public:
     void               Set_eeN_tree ( TTree * feeNTree) { eeNTree = feeNTree;};
     void            OutputInfo2File ();
     void           OutPutToTextFile ( const int, TVector3*, int*, float*, int*);
+    void          SetInputChain_eep ();
+    void      ReleaseInputChain_eep ();
+    
+    
     
     // simple setters
     void                   SetNRand ( Int_t fNRand = 1 )                { NRand = fNRand; };
@@ -122,7 +129,11 @@ public:
     Float_t     Theta       , Mott      , DipoleFF      , rooWeight;
     const Float_t Ebeam = 5.009 , e2 = 1; // sqaure of e-charge in e-charge units (for simplcity)
 
-    
+    Float_t Pe[3]   , Pe_size;                                              // electron
+    Float_t Ep[2]   , Rproton[2][3] , Pproton[2][3] ,   Pproton_size[2];    // Proton
+    Float_t Pm[2][3], Pm_size[2];                                           // Proton missing momentum magnitude
+    Float_t q[3]    , q_size;                                               // q momentum transfer
+  
     
     
     TVector3 e                          ,       Pp1                     ,   Pp2             , Precoil;

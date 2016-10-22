@@ -47,6 +47,208 @@ void GenerateEvents::SetHistThetaHistMag( TH1F * fhistMag , TH1F * fhistTheta ){
     histTheta = fhistTheta;
 }
 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void GenerateEvents::SetInputChain_eep(){
+    InputT  = new TChain("T");
+    // Take 12C(e,e'p) SRC tree data
+    InputT -> Add("/Users/erezcohen/Desktop/DataMining/GSIM/GUIEG/SRC_e1_C.root");
+    InputT -> Add("/Users/erezcohen/Desktop/DataMining/GSIM/GUIEG/SRC_e2_C.root");
+    
+    InputT -> SetBranchAddress("Q2"      ,           &Q2);
+    InputT -> SetBranchAddress("Xb"      ,           &Xb);
+    InputT -> SetBranchAddress("Pe"      ,           &Pe);
+    InputT -> SetBranchAddress("theta_e" ,           &theta_e);
+    InputT -> SetBranchAddress("Pe_size" ,           &Pe_size);
+    InputT -> SetBranchAddress("Ep"      ,           &Ep);
+    InputT -> SetBranchAddress("Pp"      ,           &Pproton);
+    InputT -> SetBranchAddress("Rp"      ,           &Rproton);           // proton vertex
+    InputT -> SetBranchAddress("Pp_size" ,           &Pproton_size);
+    InputT -> SetBranchAddress("Pmiss"   ,           &Pm);
+    InputT -> SetBranchAddress("Pmiss_size",         &Pm_size);
+    InputT -> SetBranchAddress("q"       ,           &q);
+    InputT -> SetBranchAddress("q_size"  ,           &q_size);
+    
+}
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void GenerateEvents::ReleaseInputChain_eep(){delete InputT;}
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+Int_t GenerateEvents::DoGenerateRun_eep( Int_t fRunNumber, bool DoGetRootFile, bool DoGenTextFile){
+    
+    RunNumber = fRunNumber ;
+    NAcceptedEvents = Nevents = 0;
+    txtFilename     = Form("%s/eg_txtfiles/run%d.txt",Path.Data(),RunNumber);
+    rootFilename    = Form("%s/eg_rootfiles/run%d.root",Path.Data(),RunNumber);
+    if (DoGenTextFile){
+        cout << "Generating " << txtFilename << endl;
+        TextFile.open(txtFilename);
+    }
+    if (DoGetRootFile){
+        cout << "Generating " <<  rootFilename << endl;
+        RootFile = new TFile( rootFilename ,"recreate" );
+    }
+    RootTree = new TTree("anaTree","generated events");
+    SetRootTreeAddresses();
+    
+    int InputNentries = InputT -> GetEntries();
+    
+    TVector3 * momentum = new TVector3[3];
+    int charge[3]           = { -1          , 1         , 1     };
+    float mass[3]           = { 0.000511    , 0.938     , 0.938 };
+    int pid[3]              = { 11          , 2212      , 2212  };
+    
+    for (int entry = 0 ; entry < InputNentries ; entry++ ) {
+        if ( debug > 2 && entry%(InputNentries/4) == 0 ) std::cout  <<  (int)(100*(double)entry/InputNentries)+1 << "%\n";
+        
+        InputT -> GetEntry(entry);
+        if(debug > 2) cout << "got entry " << entry << endl;
+        
+        double PmissMag = Pm_size[0];
+        
+        e.SetXYZ            ( Pe[0]         , Pe[1]         , Pe[2]);
+        q3Vector.SetXYZ     ( q[0]          , q[1]          , q[2] );
+        Pmiss.SetXYZ        ( Pm[0][0]      , Pm[0][1]      , Pm[0][2]);
+        Pp1.SetXYZ          ( Pproton[0][0] , Pproton[0][1] , Pproton[0][2]);
+        
+        
+        if(debug > 2) cout << "rotate to Pmiss-q frame" << endl;
+        // rotate to Pmiss-q frame: Pmiss is the z axis, q is in x-z plane: q=(q[x],0,q[Pmiss])
+        double Pmiss_phi = Pmiss.Phi() , Pmiss_theta = Pmiss.Theta() ;
+        q3Vector_in_Pmiss_q_system = q3Vector;
+        q3Vector_in_Pmiss_q_system.RotateZ(-Pmiss_phi);
+        q3Vector_in_Pmiss_q_system.RotateY(-Pmiss_theta);
+        double q_Phi = q3Vector_in_Pmiss_q_system.Phi();
+        q3Vector_in_Pmiss_q_system.RotateZ(-q_Phi);
+        
+        Pmiss_in_Pmiss_q_system = Pmiss;
+        Pmiss_in_Pmiss_q_system.RotateZ(-Pmiss_phi);
+        Pmiss_in_Pmiss_q_system.RotateY(-Pmiss_theta);
+        
+        
+        // rotate to q-Pmiss frame: q is the z axis, Pmiss is in x-z plane: Pmiss=(Pmiss[x],0,Pmiss[q])
+        if(debug > 2) cout << "rotate to q-Pmiss frame" << endl;
+        double q_q_phi = q3Vector.Phi() , q_q_theta = q3Vector.Theta() ;
+        Pmiss_q_sys = q3Vector;
+        Pmiss_q_sys.RotateZ(-q_q_phi);
+        Pmiss_q_sys.RotateY(-q_q_theta);
+        double Pmiss_Phi = Pmiss_q_sys.Phi();
+        Pmiss_q_sys.RotateZ(-Pmiss_Phi);
+        
+        q_q_sys = q3Vector;
+        q_q_sys.RotateZ(-q_q_phi);
+        q_q_sys.RotateY(-q_q_theta);
+        
+        
+        if(debug > 2) cout << "define omega and other variables" << endl;
+        double  omega   = 5.009 - sqrt( 0.000511*0.000511 + e.Mag()*e.Mag() );
+        ThetaPQ         = (180/TMath::Pi())*(Pp1.Angle(q3Vector));
+        ThetaPmissQ     = (180/TMath::Pi())*(Pmiss.Angle(q3Vector));
+        PoverQ          = Pp1.Mag()/q3Vector.Mag();
+        Proton          .SetVectM   ( Pp1 , 0.938 ); // struck proton
+        q4Vector        .SetXYZT    ( q3Vector.x() , q3Vector.y() , q3Vector.z() , omega );
+        m2N             .SetVectM   ( TVector3(0,0,0) , 2.*0.938 );
+        miss            = q4Vector + m2N - Proton;
+        Mmiss           = miss.Mag();
+        Rp1             .SetXYZ(Rproton[0][0],Rproton[0][1],Rproton[0][2]); // since there is no actual Rp2....
+        Rp2 = Rp1;// since there is no actual Rp2....
+        if(debug > 2) SHOW3( Mmiss , PoverQ , ThetaPmissQ );
+        
+        
+        for( int j = 0 ; j < NRand  ;  j++ ){    //MC event generation
+            
+            if(debug > 3) SHOW( j );
+            
+            float Px = gRandom -> Gaus( 0  , SigmaT );
+            float Py = gRandom -> Gaus( 0  , SigmaT );
+            float Pz = gRandom -> Gaus( ShiftL_a1*(PmissMag-0.3) + ShiftL_a2  , SigmaL_a1*(PmissMag-0.5) + SigmaL_a2 );
+            Pcm_in_Pmiss_q_system.SetXYZ ( Px , Py , Pz );
+            Precoil_in_Pmiss_q_system = Pcm_in_Pmiss_q_system - Pmiss_in_Pmiss_q_system;
+            if(debug > 3) cout << "set Pcm_in_Pmiss_q_system and Precoil_in_Pmiss_q_system " ;
+            
+            // for RooFits
+            Pmiss3Mag = Pmiss.Mag();
+            pcmX = Pcm_in_Pmiss_q_system.x() ;
+            pcmY = Pcm_in_Pmiss_q_system.y() ;
+            pcmZ = Pcm_in_Pmiss_q_system.z() ;
+            
+            // now, rotate back to lab frame
+            Pcm = Pcm_in_Pmiss_q_system;
+            Pcm.RotateZ  ( q_Phi );
+            Pcm.RotateY  ( Pmiss_theta );
+            Pcm.RotateZ  ( Pmiss_phi );
+            Precoil =   Pp2     = Pcm - Pmiss;
+            ThetaPmissPrecoil   = (180/TMath::Pi())*(Pmiss.Angle(Precoil));
+            
+            momentum[0] = e ; momentum[1] = Pp1; momentum[2] = Pp2;
+            if (DoGenTextFile) OutPutToTextFile(3, momentum , charge , mass , pid );
+            
+            if(debug > 3) cout << "rotate also to q-Pmiss frame: q is the z axis" << endl;
+            // rotate also to q-Pmiss frame: q is the z axis, Pmiss is in x-z plane: Pmiss=(Pmiss[x],0,Pmiss[q])
+            Pcm_q_sys = Pcm;
+            Pcm_q_sys.RotateZ(-q_q_phi);
+            Pcm_q_sys.RotateY(-q_q_theta);
+            Pcm_q_sys.RotateZ(-Pmiss_Phi);
+            
+            // compute event weight
+            ComputeWeights();
+            
+            // finish
+            Nevents++;
+            if(debug > 3) SHOW( Nevents );
+            
+            // recoil proton acceptance
+            // ------------------------------------------------
+            // decide if this event is accepted as a legitimate (e,e'pp) event based on the recoiling proton acceptance
+            AcceptEvent = false;
+            if ( !Do_pAcceptance )  AcceptEvent = true; // in case we do not want to use the proton acceptances
+            
+            
+            if ( eg2dm->protonFiducial( Precoil , debug ) == 1 ){
+                
+                // #IMPORTANT: the acceptance map that i've created i given in the lab frame
+                Double_t PrecoilMag = Precoil.Mag() , PrecoilTheta = r2d*Precoil.Theta() , PrecoilPhi = r2d*Precoil.Phi();
+                PrecoilPhi =  eg2dm->ChangePhiToPhiLab( PrecoilPhi ) ; // rescale phi angle to the range [-30,330]
+                if(debug > 3) SHOW3( PrecoilMag , PrecoilTheta , PrecoilPhi );
+                
+                if (    h_protonAcceptance->GetXaxis()->GetBinCenter(1) < PrecoilMag   && PrecoilMag   < h_protonAcceptance->GetXaxis()->GetBinCenter(h_protonAcceptance->GetNbinsX())
+                    && h_protonAcceptance->GetYaxis()->GetBinCenter(1) < PrecoilTheta && PrecoilTheta < h_protonAcceptance->GetYaxis()->GetBinCenter(h_protonAcceptance->GetNbinsY())
+                    && h_protonAcceptance->GetZaxis()->GetBinCenter(1) < PrecoilPhi   && PrecoilPhi   < h_protonAcceptance->GetZaxis()->GetBinCenter(h_protonAcceptance->GetNbinsZ())    ) {
+                    Double_t PrecoilAcceptance = h_protonAcceptance -> Interpolate( PrecoilMag , PrecoilTheta , PrecoilPhi ) / 100.;
+                    if(debug > 3) SHOW( PrecoilAcceptance );
+                    if( gRandom->Uniform() < PrecoilAcceptance ){ // event is accepted in PrecoilAcceptance %
+                        AcceptEvent = true;
+                    }
+                }
+            }
+            // ------------------------------------------------
+            
+            if (AcceptEvent){
+                if(debug > 3) Printf( "event was accepted" );
+                RootTree -> Fill();
+                NAcceptedEvents++ ;
+            } else {
+                if(debug > 3) Printf( "event was not accepted" );
+            }
+            if(debug > 3) SHOW( NAcceptedEvents );
+            
+        }
+    }
+    if (DoGetRootFile){
+        
+        RootFile -> Write();
+        RootFile -> Close();
+    }
+    if (DoGenTextFile){
+        TextFile.close();
+    }
+    
+    Printf("done generating events to %s",rootFilename.Data());
+    
+    return Nevents;
+
+}
+
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -56,7 +258,6 @@ Int_t GenerateEvents::DoGenerate( TString Type,
                                  bool DoReeNFromTree, bool DoReeNFromDist, bool DoFlateeN){
     // return the number of events
     NAcceptedEvents = Nevents = 0;
-    InputT          = new TChain("T");
     txtFilename     = Form("%s/eg_txtfiles/run%d.txt",Path.Data(),RunNumber);
     rootFilename    = Form("%s/eg_rootfiles/run%d.root",Path.Data(),RunNumber);
     if (DoGenTextFile){
@@ -71,28 +272,7 @@ Int_t GenerateEvents::DoGenerate( TString Type,
     SetRootTreeAddresses();
     if (Type == "(e,e'pp)" ){
         if(debug>0) Printf("(e,e'pp)");
-        
-        // Take 12C(e,e'p) SRC tree data
-        InputT          -> Add("/Users/erezcohen/Desktop/DataMining/GSIM/GUIEG/SRC_e1_C.root");
-        InputT          -> Add("/Users/erezcohen/Desktop/DataMining/GSIM/GUIEG/SRC_e2_C.root");
-        Float_t Pe[3]   , Pe_size;                                              // electron
-        Float_t Ep[2]   , Rproton[2][3] , Pproton[2][3] ,   Pproton_size[2];    // Proton
-        Float_t Pm[2][3], Pm_size[2];                                           // Proton missing momentum magnitude
-        Float_t q[3]    , q_size;                                               // q momentum transfer
-        
-        InputT -> SetBranchAddress("Q2"      ,           &Q2);
-        InputT -> SetBranchAddress("Xb"      ,           &Xb);
-        InputT -> SetBranchAddress("Pe"      ,           &Pe);
-        InputT -> SetBranchAddress("theta_e" ,           &theta_e);
-        InputT -> SetBranchAddress("Pe_size" ,           &Pe_size);
-        InputT -> SetBranchAddress("Ep"      ,           &Ep);
-        InputT -> SetBranchAddress("Pp"      ,           &Pproton);
-        InputT -> SetBranchAddress("Rp"      ,           &Rproton);           // proton vertex
-        InputT -> SetBranchAddress("Pp_size" ,           &Pproton_size);
-        InputT -> SetBranchAddress("Pmiss"   ,           &Pm);
-        InputT -> SetBranchAddress("Pmiss_size",         &Pm_size);
-        InputT -> SetBranchAddress("q"       ,           &q);
-        InputT -> SetBranchAddress("q_size"  ,           &q_size);
+        SetInputChain_eep();
         int InputNentries = InputT -> GetEntries();
         
         TVector3 * momentum = new TVector3[3];
@@ -101,7 +281,7 @@ Int_t GenerateEvents::DoGenerate( TString Type,
         int pid[3]              = { 11          , 2212      , 2212  };
         
         for (int entry = 0 ; entry < InputNentries ; entry++ ) {
-            if ( entry%(InputNentries/10) == 0 ) std::cout  <<  (int)(100*(double)entry/InputNentries)+1 << "%\n";
+            if ( entry%(InputNentries/4) == 0 ) std::cout  <<  (int)(100*(double)entry/InputNentries)+1 << "%\n";
             
             InputT -> GetEntry(entry);
             if(debug > 2) cout << "got entry " << entry << endl;
@@ -314,6 +494,7 @@ Int_t GenerateEvents::DoGenerate( TString Type,
 //    OutRunNumberFile << RunNumber << "\n" ;
 //    OutRunNumberFile.close();
     Printf("done generating events to %s",rootFilename.Data());
+    delete InputT;
     return Nevents;
 }
 
