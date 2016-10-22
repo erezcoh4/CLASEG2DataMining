@@ -309,10 +309,10 @@ Int_t GenerateEvents::DoGenerate( TString Type,
         TextFile.close();
     }
     
-    if (debug > 2) cout << "Out to Run Number File..." << endl;
-    OutRunNumberFile.open(runsFilename);
-    OutRunNumberFile << RunNumber << "\n" ;
-    OutRunNumberFile.close();
+//    if (debug > 2) cout << "Out to Run Number File..." << endl;
+//    OutRunNumberFile.open(runsFilename);
+//    OutRunNumberFile << RunNumber << "\n" ;
+//    OutRunNumberFile.close();
     Printf("done generating events to %s",rootFilename.Data());
     return Nevents;
 }
