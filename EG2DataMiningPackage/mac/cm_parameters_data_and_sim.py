@@ -1,14 +1,14 @@
 '''
     usage:
     ---------
-    python mac/cm_parameters_data_and_sim.py --option="generate runs" --worker=erez -core=0
+    python mac/cm_parameters_data_and_sim.py --option="generate runs"
     
     options (can be ran simultaneously):
-            scheme pp-SRC
-            extract data cm-parameters
-            create bands for EG
-            generate runs
-            find the best paramteres
+            "scheme pp-SRC"
+            "extract data cm-parameters"
+            "create bands for EG"
+            "generate runs" -core=0
+            "find the best paramteres"
     
 '''
 
@@ -42,22 +42,24 @@ if 'extract data cm-parameters' in flags.option: # DATA
 
     # (1) calc cm parameters of data
     ana_data = TAnalysisEG2( "ppSRCCut_DATA_%s"% dm.Target(A) )
-    tools.calc_cm_parameters( ana_data  , PmissBins , tools.CMParsFname(path+'/DATA/') , tools.CMfitsFname( path + '/DATA/') )
+    cm_parameters = tools.calc_cm_parameters( ana_data  , PmissBins , tools.CMRooFitsName( path + '/DATA/unweighted' ) , tools.CMRooFitsName( path + '/DATA/weighted' ) , DoSaveCanvas = True )
+    cm_parameters.to_csv( tools.CMParsFname(path+'/DATA/') , header=True , index = False)
+    tools.print_filename( tools.CMParsFname(path+'/DATA/')  ,"data c.m. parameters for different p(miss) bins at"); tools.print_line
 
     # (2) plot cm parameters
-    cm_parameters = pd.read_csv( tools.CMParsFname(path+'/DATA/') )
-    tools.plot_cm_parameters( cm_parameters , tools.CMfitsFname(path+'/DATA/') , tools.FigureFName(path+'/DATA/') )
+    fits = tools.fit_cm_parameters( 'data' , cm_parameters , tools.FigureFName(path+'/DATA/') , DoSaveCanvas = True )
+    fits.to_csv( tools.CMfitsFname(path+'/DATA/') , header=True , index = False)
+    tools.print_filename( tools.CMfitsFname(path+'/DATA/')  ,"data c.m. fits at"); tools.print_line
 
 
 
 
 if 'create bands for EG' in flags.option:
-    
+
     # (3) create bands for event generation
     cm_parameters = pd.read_csv( tools.CMParsFname(path+'/DATA/') )
-    cm_fits_parameters = pd.read_csv( tools.CMfitsFname( path+'/DATA/' ) )
-    tools.generate_cm_bands( cm_parameters , cm_fits_parameters , tools.CMBandFname( path+'/DATA/' ) , tools.FigureBandFName( path+'/simulation/' ))
-
+    fits = pd.read_csv( tools.CMfitsFname( path+'/DATA/' ) )
+    tools.generate_cm_bands( cm_parameters , fits , tools.CMBandFname( path+'/DATA/' ) , tools.FigureBandFName( path+'/DATA/' ) , DoSaveCanvas = True)
 
 
 if 'generate runs' in flags.option:
@@ -66,13 +68,13 @@ if 'generate runs' in flags.option:
     cm_pars_bands = pd.read_csv( tools.CMBandFname(path+'/DATA/') )
     cm_fits_parameters = pd.read_csv( tools.CMfitsFname( path+'/DATA/' ) )
     
-    NptsBand = 5
+    NptsBand = 4
     Ncores = 1 if flags.worker == "erez" else 50 if flags.worker == "helion" else 1
     if flags.i_core > Ncores:
         print 'error: i_core > Ncores!'
         exit(1)
-    tools.generate_runs_with_different_parameters( cm_fits_parameters , cm_pars_bands , start_run , tools.RunsInfoFileName( path+'/simulation/' ) ,
-                                                  flags.verbose , PmissBins , tools.SimParametersFileName( path+'/simulation/' ) , dm.Target(A)  ,
+    tools.generate_runs_with_different_parameters( cm_fits_parameters , cm_pars_bands , NRand = 10 ,
+                                                  start_run , flags.verbose , PmissBins , tools.resutlsFName( path+'/simulation/' ) , tools.CMfitsFname( path + '/simulation/' ) , dm.Target(A)  ,
                                                   NptsBand , Ncores , flags.i_core )
 
 
