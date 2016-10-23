@@ -212,7 +212,7 @@ def fit_cm_parameters( run , data , FigureFName = '' , DoSaveCanvas = False ): #
     if DoSaveCanvas:
         plt.savefig(FigureFName)
         print_filename( FigureFName , "and plot can be found at" )
-    print "computed fit parameters for run %d"%int(run)
+    print "computed fit parameters for ",run
     return df_fit_parameters
 
 
@@ -280,9 +280,10 @@ def linspace_single_core( band_min  , band_max  , NptsBand , Ncores , i_core ):
 
 # ------------------------------------------------------------------------------- #
 #def generate_runs_with_different_parameters( cm_fits_parameters , cm_pars_bands ,
-def generate_runs_with_different_parameters( data_fits , bands , NRand ,
-                                             start_run , debug , PmissBins , resutlsFName , reco_fitsFName , target ,
-                                             NptsBand , Ncores , i_core ):
+def generate_runs_with_different_parameters( option,
+                                            data_fits , bands , NRand ,
+                                            start_run , debug , PmissBins , resutlsFName , reco_fitsFName , target ,
+                                            NptsBand , Ncores , i_core ):
     
     # the data (nominal values)
     ana_data = TAnalysisEG2( "ppSRCCut_DATA_%s"% target )
@@ -312,13 +313,15 @@ def generate_runs_with_different_parameters( data_fits , bands , NRand ,
         (a) efficiency and acceptacne from the 'uniform' map i've generated using virtual CLAS
         (b) proton fiducial cuts (coded inside the event generator class)
     '''
-    pAcceptacneFile = ROOT.TFile("/Users/erezcohen/Desktop/DataMining/GSIM_DATA/PrecoilAcceptance.root")
-    h = pAcceptacneFile.Get("hRescaled")
-    gen_events = GenerateEvents( path , run , debug )
-    gen_events.SetNRand( NRand )
-    gen_events.Use_protonAcceptacne( True )
-    gen_events.Set_protonAcceptacne( h )
-    gen_events.SetInputChain_eep()
+    if 'generate' in option:
+        pAcceptacneFile = ROOT.TFile("/Users/erezcohen/Desktop/DataMining/GSIM_DATA/PrecoilAcceptance.root")
+        h = pAcceptacneFile.Get("hRescaled")
+        gen_events = GenerateEvents( path , run , debug )
+        gen_events.SetNRand( NRand )
+        gen_events.Use_protonAcceptacne( True )
+        gen_events.Set_protonAcceptacne( h )
+        gen_events.SetInputChain_eep()
+    
 
     # event generation (and analysis) loop
     for sT in sigT:
@@ -327,88 +330,99 @@ def generate_runs_with_different_parameters( data_fits , bands , NRand ,
                 for mLa1 in meanLa1:
                     for mLa2 in meanLa2:
                         run = run+1
-
-                        # (1) generate the simulated data (the 'run')
-                        # ----------------------------
-                        gen_events.Set_eep_Parameters( sT , sLa1 , sLa2 , mLa1 , mLa2 )
-                        gen_events.DoGenerateRun_eep( run )
-
-                        # (2) analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
-                        # ----------------------------
-                        ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
-                        reco_parameters = calc_cm_parameters( ana_sim  , PmissBins ) # , CMRooFitsName( path + '/eg_cm_roofits/run%d_unweighted_'%run ), CMRooFitsName( path + '/eg_cm_roofits/run%d_weighted_'%run ) )
-                        reco_fits = fit_cm_parameters( run , reco_parameters ) # , FigureFName( path + '/eg_cm_figures/run%d_'%run ) )
-
-                        # No Mott/FF - weighting
-                        # un - weighted roofit results
-                        NsigST_unweighted    = NsigmaScore( data_fits , reco_fits  , 'sT'   , 'unweighted' )
-                        NsigSL_a1_unweighted = NsigmaScore( data_fits , reco_fits  , 'sZa1' , 'unweighted' )
-                        NsigSL_a2_unweighted = NsigmaScore( data_fits , reco_fits  , 'sZa2' , 'unweighted' )
-                        NsigML_a1_unweighted = NsigmaScore( data_fits , reco_fits  , 'mZa1' , 'unweighted' )
-                        NsigML_a2_unweighted = NsigmaScore( data_fits , reco_fits  , 'mZa2' , 'unweighted' )
-                        NsigAvg_unweighted = (NsigST_unweighted + NsigSL_a1_unweighted + NsigSL_a2_unweighted + NsigML_a1_unweighted + NsigML_a2_unweighted)/5.
-                        if (debug>1): print "got unweighted roofit results"
                         
-                        # With Mott/FF - weighting
-                        # weighted roofit results
-                        NsigST_weighted    = NsigmaScore( data_fits , reco_fits  , 'sT'   , 'weighted' )
-                        NsigSL_a1_weighted = NsigmaScore( data_fits , reco_fits  , 'sZa1' , 'weighted' )
-                        NsigSL_a2_weighted = NsigmaScore( data_fits , reco_fits  , 'sZa2' , 'weighted' )
-                        NsigML_a1_weighted = NsigmaScore( data_fits , reco_fits  , 'mZa1' , 'weighted' )
-                        NsigML_a2_weighted = NsigmaScore( data_fits , reco_fits  , 'mZa2' , 'weighted' )
-                        NsigAvg_weighted = (NsigST_weighted + NsigSL_a1_weighted + NsigSL_a2_weighted + NsigML_a1_weighted + NsigML_a2_weighted)/5.
-                        if (debug>1): print "got weighted roofit results"
+                        if 'generate' in option:
 
-                        # KS test for the c.m. distributions in x,y,z directions
-                        KSpCMx = KStest( ana_sim , ana_data , "pcmX" ) # maybe make it 2D, with adding the pmiss magnitude as a second variable?
-                        KSpCMy = KStest( ana_sim , ana_data , "pcmY" )
-                        KSpCMz = KStest( ana_sim , ana_data , "pcmZ" )
-                        KSavg = (KSpCMx + KSpCMy + KSpCMz)/3.
-                        if (debug>1): print "performed KS tests"
+                            # (1) generate the simulated data (the 'run')
+                            # ----------------------------
+                            gen_events.Set_eep_Parameters( sT , sLa1 , sLa2 , mLa1 , mLa2 )
+                            gen_events.DoGenerateRun_eep( run )
 
 
-                        # (3) stream into file
-                        # ----------------------------
-                        results = pd.DataFrame({'run':int(run), 'time':str(datetime.datetime.now().strftime("%Y%B%d")),
-                                              'genSigmaT':sT    , 'genSigmaL_a1':sLa1   ,'genSigmaL_a2':sLa2    ,'genShiftL_a1':mLa1    ,'genShiftL_a2':mLa2    ,
-                                              'recSigmaT_unweighted':reco_fits.sT_unweighted        ,'recSigmaTErr_unweighted':reco_fits.sTerr_unweighted       ,
-                                              'recSigmaL_a1_unweighted':reco_fits.sZa1_unweighted   ,'recSigmaL_a1Err_unweighted':reco_fits.sZa1err_unweighted  ,
-                                              'recSigmaL_a2_unweighted':reco_fits.sZa2_unweighted   ,'recSigmaL_a2Err_unweighted':reco_fits.sZa2err_unweighted  ,
-                                              'recShiftL_a1_unweighted':reco_fits.mZa1_unweighted   ,'recShiftL_a1Err_unweighted':reco_fits.mZa1err_unweighted  ,
-                                              'recShiftL_a2_unweighted':reco_fits.mZa2_unweighted   ,'recShiftL_a2Err_unweighted':reco_fits.mZa2err_unweighted  ,
-                                              'NsigST_unweighted':NsigST_unweighted                 ,'NsigSL_a1_unweighted':NsigSL_a1_unweighted                ,   'NsigSL_a2_unweighted':NsigSL_a2_unweighted,
-                                              'NsigML_a1_unweighted':NsigML_a1_unweighted           ,'NsigML_a2_unweighted':NsigML_a2_unweighted                ,
-                                              'NsigAvg_unweighted':NsigAvg_unweighted               ,
-                                              'recSigmaT_weighted':reco_fits.sT_weighted            ,'recSigmaTErr_weighted':reco_fits.sTerr_weighted       ,
-                                              'recSigmaL_a1_weighted':reco_fits.sZa1_weighted       ,'recSigmaL_a1Err_weighted':reco_fits.sZa1err_weighted  ,
-                                              'recSigmaL_a2_weighted':reco_fits.sZa2_weighted       ,'recSigmaL_a2Err_weighted':reco_fits.sZa2err_weighted  ,
-                                              'recShiftL_a1_weighted':reco_fits.mZa1_weighted       ,'recShiftL_a1Err_weighted':reco_fits.mZa1err_weighted  ,
-                                              'recShiftL_a2_weighted':reco_fits.mZa2_weighted       ,'recShiftL_a2Err_weighted':reco_fits.mZa2err_weighted  ,
-                                              'NsigST_weighted':NsigST_weighted                     ,'NsigSL_a1_weighted':NsigSL_a1_weighted                ,   'NsigSL_a2_weighted':NsigSL_a2_weighted,
-                                              'NsigML_a1_weighted':NsigML_a1_weighted               ,'NsigML_a2_weighted':NsigML_a2_weighted                ,
-                                              'NsigAvg_weighted':NsigAvg_weighted                   ,
-                                              'KSpCMx':KSpCMx   ,'KSpCMy':KSpCMy    ,'KSpCMz':KSpCMz    ,'KSavg':KSavg  })
-                                              
-                        df_reco_parameters = df_reco_parameters.append( reco_parameters )
-                        df_reco_fits = df_reco_fits.append( reco_fits )
-                        df_results = df_results.append( results )
-                        if (debug>1): print "appended into pandas.DataFrames"
-                        ana_sim.CloseFile()
-                        garbage_list = [ ana_sim , reco_parameters , reco_fits  , results ]
-                        del garbage_list
+                        if 'analyze' in option or 'analyse' in option:
+                        
+                            if (debug>1): print "analyzing run %d"%run
+                            # (2) analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
+                            # ----------------------------
+                            ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
+                            reco_parameters = calc_cm_parameters( ana_sim  , PmissBins ) # , CMRooFitsName( path + '/eg_cm_roofits/run%d_unweighted_'%run ), CMRooFitsName( path + '/eg_cm_roofits/run%d_weighted_'%run ) )
+                            if (debug>1): print "reconstructed cm parameters"
+                            reco_fits = fit_cm_parameters( run , reco_parameters ) # , FigureFName( path + '/eg_cm_figures/run%d_'%run ) )
+                            if (debug>1): print "completed fiting processes"
+
+
+                            # No Mott/FF - weighting
+                            # un - weighted roofit results
+                            NsigST_unweighted    = NsigmaScore( data_fits , reco_fits  , 'sT'   , 'unweighted' )
+                            NsigSL_a1_unweighted = NsigmaScore( data_fits , reco_fits  , 'sZa1' , 'unweighted' )
+                            NsigSL_a2_unweighted = NsigmaScore( data_fits , reco_fits  , 'sZa2' , 'unweighted' )
+                            NsigML_a1_unweighted = NsigmaScore( data_fits , reco_fits  , 'mZa1' , 'unweighted' )
+                            NsigML_a2_unweighted = NsigmaScore( data_fits , reco_fits  , 'mZa2' , 'unweighted' )
+                            NsigAvg_unweighted = (NsigST_unweighted + NsigSL_a1_unweighted + NsigSL_a2_unweighted + NsigML_a1_unweighted + NsigML_a2_unweighted)/5.
+                            if (debug>1): print "got unweighted roofit results"
+                        
+                            # With Mott/FF - weighting
+                            # weighted roofit results
+                            NsigST_weighted    = NsigmaScore( data_fits , reco_fits  , 'sT'   , 'weighted' )
+                            NsigSL_a1_weighted = NsigmaScore( data_fits , reco_fits  , 'sZa1' , 'weighted' )
+                            NsigSL_a2_weighted = NsigmaScore( data_fits , reco_fits  , 'sZa2' , 'weighted' )
+                            NsigML_a1_weighted = NsigmaScore( data_fits , reco_fits  , 'mZa1' , 'weighted' )
+                            NsigML_a2_weighted = NsigmaScore( data_fits , reco_fits  , 'mZa2' , 'weighted' )
+                            NsigAvg_weighted = (NsigST_weighted + NsigSL_a1_weighted + NsigSL_a2_weighted + NsigML_a1_weighted + NsigML_a2_weighted)/5.
+                            if (debug>1): print "got weighted roofit results"
+
+                            # KS test for the c.m. distributions in x,y,z directions
+                            KSpCMx = KStest( ana_sim , ana_data , "pcmX" ) # maybe make it 2D, with adding the pmiss magnitude as a second variable?
+                            KSpCMy = KStest( ana_sim , ana_data , "pcmY" )
+                            KSpCMz = KStest( ana_sim , ana_data , "pcmZ" )
+                            KSavg = (KSpCMx + KSpCMy + KSpCMz)/3.
+                            ana_sim.CloseFile()
+                            if (debug>1): print "performed KS tests"
+
+
+                            # (3) stream into file
+                            # ----------------------------
+                            results = pd.DataFrame({'run':int(run), 'time':str(datetime.datetime.now().strftime("%Y%B%d")),
+                                                   'genSigmaT':sT    , 'genSigmaL_a1':sLa1   ,'genSigmaL_a2':sLa2    ,'genShiftL_a1':mLa1    ,'genShiftL_a2':mLa2       ,
+                                                   'recSigmaT_unweighted':      reco_fits.sT_unweighted     ,'recSigmaTErr_unweighted':     reco_fits.sTerr_unweighted  ,
+                                                   'recSigmaL_a1_unweighted':   reco_fits.sZa1_unweighted   ,'recSigmaL_a1Err_unweighted':  reco_fits.sZa1err_unweighted,
+                                                   'recSigmaL_a2_unweighted':   reco_fits.sZa2_unweighted   ,'recSigmaL_a2Err_unweighted':  reco_fits.sZa2err_unweighted,
+                                                   'recShiftL_a1_unweighted':   reco_fits.mZa1_unweighted   ,'recShiftL_a1Err_unweighted':  reco_fits.mZa1err_unweighted,
+                                                   'recShiftL_a2_unweighted':   reco_fits.mZa2_unweighted   ,'recShiftL_a2Err_unweighted':  reco_fits.mZa2err_unweighted,
+                                                   'NsigST_unweighted':         NsigST_unweighted           ,'NsigSL_a1_unweighted':        NsigSL_a1_unweighted        ,'NsigSL_a2_unweighted':    NsigSL_a2_unweighted,
+                                                   'NsigML_a1_unweighted':      NsigML_a1_unweighted        ,'NsigML_a2_unweighted':        NsigML_a2_unweighted        ,
+                                                   'NsigAvg_unweighted':        NsigAvg_unweighted          ,
+                                                   'recSigmaT_weighted':        reco_fits.sT_weighted       ,'recSigmaTErr_weighted':       reco_fits.sTerr_weighted    ,
+                                                   'recSigmaL_a1_weighted':     reco_fits.sZa1_weighted     ,'recSigmaL_a1Err_weighted':    reco_fits.sZa1err_weighted  ,
+                                                   'recSigmaL_a2_weighted':     reco_fits.sZa2_weighted     ,'recSigmaL_a2Err_weighted':    reco_fits.sZa2err_weighted  ,
+                                                   'recShiftL_a1_weighted':     reco_fits.mZa1_weighted     ,'recShiftL_a1Err_weighted':    reco_fits.mZa1err_weighted  ,
+                                                   'recShiftL_a2_weighted':     reco_fits.mZa2_weighted     ,'recShiftL_a2Err_weighted':    reco_fits.mZa2err_weighted  ,
+                                                   'NsigST_weighted':           NsigST_weighted             ,'NsigSL_a1_weighted':          NsigSL_a1_weighted          ,'NsigSL_a2_weighted':      NsigSL_a2_weighted,
+                                                   'NsigML_a1_weighted':        NsigML_a1_weighted          ,'NsigML_a2_weighted':          NsigML_a2_weighted          ,
+                                                   'NsigAvg_weighted':          NsigAvg_weighted            ,
+                                                   'KSpCMx':KSpCMx   ,'KSpCMy':KSpCMy    ,'KSpCMz':KSpCMz    ,'KSavg':KSavg  } , index = [int(run)])
+
+                            df_reco_parameters = df_reco_parameters.append( reco_parameters )
+                            df_reco_fits = df_reco_fits.append( reco_fits )
+                            df_results = df_results.append( results )
+                            if (debug>1): print "appended into pandas.DataFrames"
+                            if (debug>2): print "resutls: ",df_results
+                            garbage_list = [ ana_sim , reco_parameters , reco_fits  , results ]
+                            del garbage_list
+                                
                         print_important( "completed run %d"%run ) ; print_line
     
 
 
-    gen_events.ReleaseInputChain_eep()
+    if 'generate' in option:
+        gen_events.ReleaseInputChain_eep()
 
-
-
-    stream_dataframe_to_file( df_reco_fits, reco_fitsFName  )
-    print_filename( reco_fitsFName , "reconstructed parameters fits wrote to" )
-    stream_dataframe_to_file( df_results, resutlsFName  )
-    print_filename( resutlsFName , "done... see " )
-    print_line
+    if 'analyze' in option:
+        stream_dataframe_to_file( df_reco_fits, reco_fitsFName  )
+        print_filename( reco_fitsFName , "reconstructed parameters fits wrote to" )
+        stream_dataframe_to_file( df_results, resutlsFName  )
+        print_filename( resutlsFName , "results wrote to " )
+    print_important("done...") ; print_line
 
 
 # ------------------------------------------------------------------------------- #

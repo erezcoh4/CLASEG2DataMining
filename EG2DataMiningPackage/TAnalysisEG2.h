@@ -47,7 +47,7 @@ public:
     ~TAnalysisEG2(){}
     
     
-    void            CloseFile (){InFile->Close();};
+    void            CloseFile (){   InFile->Close();    File->Close(); };
     
     
     
