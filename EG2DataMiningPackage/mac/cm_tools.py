@@ -1,13 +1,15 @@
 import time , sys , os , math , datetime , ROOT
 import matplotlib , pandas as pd , numpy as np
-import matplotlib as mpl , seaborn as sns; sns.set(style="white", color_codes=True , font_scale=3)
+import matplotlib as mpl , seaborn as sns; sns.set(style="white", color_codes=True , font_scale=1)
 from matplotlib import pyplot as plt
-from ROOT import TAnalysisEG2,GenerateEvents
-from root_numpy import hist2array
+from ROOT import TAnalysis, TAnalysisEG2, GenerateEvents, TSchemeDATA
+from root_numpy import hist2array , tree2array
 from scipy.stats import ks_2samp
 sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
 import GeneralPlot as gp
 import gc
+analysis = TAnalysis()
+scheme = TSchemeDATA()
 
 # ------------------------------------------------------------------------------- #
 # definitions
@@ -44,14 +46,14 @@ results_columns = ['run','time'
                    ,'recSigmaT_weighted','recSigmaTErr_weighted'
                    ,'recSigmaL_a1_weighted','recSigmaL_a1Err_weighted','recSigmaL_a2_weighted','recSigmaL_a2Err_weighted','recShiftL_a1_weighted','recShiftL_a1Err_weighted','recShiftL_a2_weighted','recShiftL_a2Err_weighted'
                    ,'NsigST_weighted','NsigSL_a1_weighted','NsigSL_a2_weighted','NsigML_a1_weighted','NsigML_a2_weighted','NsigAvg_weighted'
-                   ,'KSpCMx','KSpCMy','KSpCMz','KSavg']
+                   ,'KSxPval','KSyPval','KSzPval']
 
 
 
 # prints
 def print_line(): print '\033[93m' + '--------------------------------------------------------------' + '\033[0m'
 def print_important(string): print '\033[94m' + '\033[1m' + string + '\033[0m' ; print_line
-def print_filename(filename,action_on_file=""): print action_on_file + ' ' + '\033[91m' + filename + '\033[0m'
+def print_filename(filename,action_on_file=""): print action_on_file + '\n' + '\033[91m' + filename + '\033[0m'
 
 # file names
 def CMParsFname( path ):
@@ -79,38 +81,45 @@ def NsigmaScore( dataset1 , dataset2  , var   , weighting ):
 
 
 # ------------------------------------------------------------------------------- #
-def KStest( ana1 , ana2 , var , cut=ROOT.TCut() , Nbins=50, xmin=0 , xmax=2 ):
+def KStest( ana1 , ana2 , var , cut=ROOT.TCut() , Nbins=50, xmin=0 , xmax=2 , debug=0):
     # [http://docs.scipy.org/doc/scipy-0.15.1/reference/generated/scipy.stats.ks_2samp.html]
     h1 = ana1.H1( var, cut,"goff", Nbins, xmin, xmax)
     h2 = ana2.H1( var, cut,"goff", Nbins, xmin, xmax)
-    array1 , array2 = hist2array(h1) , hist2array(h2)
+    array1 , array2 = tree2array(ana1.GetTree(),branches=var) , tree2array(ana2.GetTree(),branches=var)
     D , Pvalue = ks_2samp( array1 , array2 )
-    return D
+
+    if (debug > 2 ):
+        fig, ax = plt.subplots(figsize=[20,20])
+        for array,col in zip([array1 , array2],['black','red']):
+            sns.distplot(array, bins=Nbins, ax=ax, kde=False , color=col , norm_hist=True , axlabel=var)
+        fig.savefig("/Users/erezcohen/Desktop/cmPYTHONhistos_%s.pdf"%var)
+        print_important( "KS test of data vs. simulation for %s is D = %f, Pvalue = %f"%(var , D , Pvalue) )
+
+    return D , Pvalue
 
 
 # ------------------------------------------------------------------------------- #
-def plot_errorbar_and_fit( ax , x , y , xerr , yerr , color , marker , lstyle , label , fit_type='const',offset=0.3):
-    plt.errorbar(x, y, xerr=xerr, yerr=yerr, color=color, marker=marker , linestyle=lstyle , label=None)
+def plot_errorbar_and_fit( ax , x , y , xerr , yerr , color , marker , lstyle , label , fit_type='const' ):
+    plt.errorbar(x, y, xerr=xerr, yerr=yerr, color=color, marker=marker , linestyle=lstyle , label=None , markersize=15)
     if fit_type=='const':
-        p1,v1 = np.polyfit( x , y , 0 , cov=True)
-        ax.plot(x, np.ones(len(x))*p1[0] , color=color , label=label + "$=%.3f\pm%.3f$"%(p1[0],math.sqrt(v1[0][0])))
-        # return a 2D variable - the const. fit + its error
-        return [p1[0],math.sqrt(v1[0][0])]
+        [ const_fit , const_fitErr ] = fit_as_a_function_of_pmiss( x , y , 'const' )
+        ax.plot(x, np.ones(len(x))*const_fit , color=color , linestyle='--', linewidth = 2 , label=label + "$=%.3f\pm%.3f$"%(const_fit,const_fitErr))
+        return [ const_fit , const_fitErr ]
+    
     elif fit_type=='linear':
-        p2,v2 = np.polyfit( x , y , 1, cov=True)
-        ax.plot(x, p2[0] * (x-offset) + p2[0]*offset + p2[1], color=color ,
-                label=label + "$=%.2f(p_{miss}-%.1f)+(%.2f)$"%(p2[0],offset,p2[0]*offset + p2[1]))
-                # return a set of 2D variables - the fit parameters + their errors
-        return [p2[0],math.sqrt(v2[0][0])] , [p2[0]*offset + p2[1],math.sqrt(v2[0][0]*offset+v2[1][1])]
+        [ a1 , a1err] , [ a2 , a2err ] = fit_as_a_function_of_pmiss( x , y , 'linear' )
+        ax.plot( x, a1 * x + a2 , color = color , label=label + "$=(%.2f)p_{miss}+(%.2f)$"%( a1 , a2 ))
+        return [ a1 , a1err] , [ a2 , a2err ]
 
 # ------------------------------------------------------------------------------- #
-def errorbar_and_fit( x , y , fit_type='const' , offset=0.3): # same as plot_errorbar_and_fit without plot
+def fit_as_a_function_of_pmiss( x , y , fit_type='const' ): # same as plot_errorbar_and_fit without plot
     if fit_type=='const':
         p1,v1 = np.polyfit( x , y , 0 , cov=True)
         return [p1[0],math.sqrt(v1[0][0])]
     elif fit_type=='linear':
-        p2,v2 = np.polyfit( x , y , 1, cov=True)
-        return [p2[0],math.sqrt(v2[0][0])] , [p2[0]*offset + p2[1],math.sqrt(v2[0][0]*offset+v2[1][1])]
+        p2,v2 = np.polyfit( x , y , 1 , cov=True)
+        # fit a polynomial p2(x) = p2[0] * x + p2[1]
+        return [p2[0],math.sqrt(v2[0][0])] , [ p2[1] ,math.sqrt(v2[1][1]) ]
 
 # ------------------------------------------------------------------------------- #
 def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weightedRoofitsFName = '' , DoSaveCanvas = False ):
@@ -147,6 +156,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
     return df_pMissBins
 
 
+
 # ------------------------------------------------------------------------------- #
 def set_frame( ax , title , xlabel , ylabel , legend_location="upper left" ):
 
@@ -158,7 +168,7 @@ def set_frame( ax , title , xlabel , ylabel , legend_location="upper left" ):
 
 
 # ------------------------------------------------------------------------------- #
-def fit_par_plot( fig , i_subplot , data , var , weight , title , zOffset): # a sub-routine to fit a single parameter
+def fit_par_plot( fig , i_subplot , data , var , weight , title ): # a sub-routine to fit a single parameter
 
     Pmiss = (data.pMiss_max + data.pMiss_min)/2.
     pMissUpErr , pMissLowErr = data.pMiss_max - Pmiss , Pmiss - data.pMiss_min
@@ -168,19 +178,19 @@ def fit_par_plot( fig , i_subplot , data , var , weight , title , zOffset): # a 
     [Xfit,XfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_x_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_xErr_' + weight ],data[ var + '_xErr_' + weight ]], 'black','v','none',r'$%s_{x}$'%title ,'const')
     [Yfit,YfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_y_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_yErr_' + weight ],data[ var + '_yErr_' + weight ]], 'red'  ,'o','none',r'$%s_{y}$'%title ,'const')
     Tfit , TfitErr = 0.5*(Xfit + Yfit) ,  math.sqrt(XfitErr*XfitErr + YfitErr*YfitErr)
-    [Za1,Za1err],[Za2,Za2err] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_zErr_' + weight ],data[ var + '_zErr_' + weight ]], 'blue' ,'s','none',r'$%s_{\vec{p}_{miss}}$'%title ,'linear', zOffset)
+    [Za1,Za1err],[Za2,Za2err] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_zErr_' + weight ],data[ var + '_zErr_' + weight ]], 'blue' ,'s','none',r'$%s_{\vec{p}_{miss}}$'%title ,'linear')
     set_frame( ax , r'%s $%s$'%(weight,title) , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left")
     return Xfit , XfitErr , Yfit , YfitErr , Tfit , TfitErr, Za1 , Za1err , Za2 , Za2err
 
 # ------------------------------------------------------------------------------- #
-def fit_par_noplot( data , var , weight , title , zOffset): # a sub-routine to fit a single parameter; same as fit_par_plot without a plot
+def fit_par_noplot( data , var , weight , title ): # a sub-routine to fit a single parameter; same as fit_par_plot without a plot
     
     Pmiss = (data.pMiss_max + data.pMiss_min)/2.
     pMissUpErr , pMissLowErr = data.pMiss_max - Pmiss , Pmiss - data.pMiss_min
-    [Xfit,XfitErr] = errorbar_and_fit( Pmiss, data[ var + '_x_' + weight] ,'const')
-    [Yfit,YfitErr] = errorbar_and_fit( Pmiss, data[ var + '_y_' + weight] ,'const')
+    [Xfit,XfitErr] = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_x_' + weight] ,'const')
+    [Yfit,YfitErr] = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_y_' + weight] ,'const')
     Tfit , TfitErr = 0.5*(Xfit + Yfit) ,  math.sqrt(XfitErr*XfitErr + YfitErr*YfitErr)
-    [Za1,Za1err],[Za2,Za2err] = errorbar_and_fit( Pmiss, data[ var + '_z_' + weight] , 'linear' , zOffset)
+    [Za1,Za1err],[Za2,Za2err] = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_z_' + weight] , 'linear' )
     return Xfit , XfitErr , Yfit , YfitErr , Tfit , TfitErr, Za1 , Za1err , Za2 , Za2err
 
 
@@ -190,15 +200,15 @@ def fit_cm_parameters( run , data , FigureFName = '' , DoSaveCanvas = False ): #
 
     if DoSaveCanvas: # this means we want plots
         fig = plt.figure(figsize=(40,20)) # four plots, two unweighted and two weighted
-        sX_unweighted, sXerr_unweighted, sY_unweighted, sYerr_unweighted, sT_unweighted, sTerr_unweighted, sZa1_unweighted, sZa1err_unweighted, sZa2_unweighted, sZa2err_unweighted = fit_par_plot ( fig , 221, data , 'sigma', 'unweighted' , '\sigma' , 0.5 )
-        mX_unweighted, mXerr_unweighted, mY_unweighted, mYerr_unweighted, mT_unweighted, mTerr_unweighted, mZa1_unweighted, mZa1err_unweighted, mZa2_unweighted, mZa2err_unweighted = fit_par_plot( fig , 222, data , 'mean' , 'unweighted' , 'mean'   , 0.3 )
-        sX_weighted, sXerr_weighted, sY_weighted, sYerr_weighted, sT_weighted, sTerr_weighted, sZa1_weighted, sZa1err_weighted, sZa2_weighted, sZa2err_weighted = fit_par_plot( fig , 223, data , 'sigma', 'weighted' , '\sigma' , 0.5 )
-        mX_weighted, mXerr_weighted, mY_weighted, mYerr_weighted, mT_weighted, mTerr_weighted, mZa1_weighted, mZa1err_weighted, mZa2_weighted, mZa2err_weighted = fit_par_plot( fig , 224, data , 'mean' , 'weighted' , 'mean'   , 0.3 )
+        sX_unweighted, sXerr_unweighted, sY_unweighted, sYerr_unweighted, sT_unweighted, sTerr_unweighted, sZa1_unweighted, sZa1err_unweighted, sZa2_unweighted, sZa2err_unweighted = fit_par_plot ( fig , 221, data , 'sigma', 'unweighted' , '\sigma' )
+        mX_unweighted, mXerr_unweighted, mY_unweighted, mYerr_unweighted, mT_unweighted, mTerr_unweighted, mZa1_unweighted, mZa1err_unweighted, mZa2_unweighted, mZa2err_unweighted = fit_par_plot( fig , 222, data , 'mean' , 'unweighted' , 'mean'   )
+        sX_weighted, sXerr_weighted, sY_weighted, sYerr_weighted, sT_weighted, sTerr_weighted, sZa1_weighted, sZa1err_weighted, sZa2_weighted, sZa2err_weighted = fit_par_plot( fig , 223, data , 'sigma', 'weighted' , '\sigma' )
+        mX_weighted, mXerr_weighted, mY_weighted, mYerr_weighted, mT_weighted, mTerr_weighted, mZa1_weighted, mZa1err_weighted, mZa2_weighted, mZa2err_weighted = fit_par_plot( fig , 224, data , 'mean' , 'weighted' , 'mean'   )
     else:
-        sX_unweighted, sXerr_unweighted, sY_unweighted, sYerr_unweighted, sT_unweighted, sTerr_unweighted, sZa1_unweighted, sZa1err_unweighted, sZa2_unweighted, sZa2err_unweighted = fit_par_noplot ( data , 'sigma', 'unweighted' , '\sigma' , 0.5 )
-        mX_unweighted, mXerr_unweighted, mY_unweighted, mYerr_unweighted, mT_unweighted, mTerr_unweighted, mZa1_unweighted, mZa1err_unweighted, mZa2_unweighted, mZa2err_unweighted = fit_par_noplot( data , 'mean' , 'unweighted' , 'mean'   , 0.3 )
-        sX_weighted, sXerr_weighted, sY_weighted, sYerr_weighted, sT_weighted, sTerr_weighted, sZa1_weighted, sZa1err_weighted, sZa2_weighted, sZa2err_weighted = fit_par_noplot( data , 'sigma', 'weighted' , '\sigma' , 0.5 )
-        mX_weighted, mXerr_weighted, mY_weighted, mYerr_weighted, mT_weighted, mTerr_weighted, mZa1_weighted, mZa1err_weighted, mZa2_weighted, mZa2err_weighted = fit_par_noplot( data , 'mean' , 'weighted' , 'mean'   , 0.3 )
+        sX_unweighted, sXerr_unweighted, sY_unweighted, sYerr_unweighted, sT_unweighted, sTerr_unweighted, sZa1_unweighted, sZa1err_unweighted, sZa2_unweighted, sZa2err_unweighted = fit_par_noplot ( data , 'sigma', 'unweighted' , '\sigma' )
+        mX_unweighted, mXerr_unweighted, mY_unweighted, mYerr_unweighted, mT_unweighted, mTerr_unweighted, mZa1_unweighted, mZa1err_unweighted, mZa2_unweighted, mZa2err_unweighted = fit_par_noplot( data , 'mean' , 'unweighted' , 'mean'    )
+        sX_weighted, sXerr_weighted, sY_weighted, sYerr_weighted, sT_weighted, sTerr_weighted, sZa1_weighted, sZa1err_weighted, sZa2_weighted, sZa2err_weighted = fit_par_noplot( data , 'sigma', 'weighted' , '\sigma' )
+        mX_weighted, mXerr_weighted, mY_weighted, mYerr_weighted, mT_weighted, mTerr_weighted, mZa1_weighted, mZa1err_weighted, mZa2_weighted, mZa2err_weighted = fit_par_noplot( data , 'mean' , 'weighted' , 'mean'   )
 
     df_fit_parameters = pd.DataFrame({ 'run':run
                                      ,'sX_unweighted':sX_unweighted,'sXerr_unweighted':sXerr_unweighted,'sY_unweighted':sY_unweighted,'sYerr_unweighted':sYerr_unweighted,'sT_unweighted':sT_unweighted,'sTerr_unweighted':sTerr_unweighted
@@ -212,17 +222,17 @@ def fit_cm_parameters( run , data , FigureFName = '' , DoSaveCanvas = False ): #
     if DoSaveCanvas:
         plt.savefig(FigureFName)
         print_filename( FigureFName , "and plot can be found at" )
-    print "computed fit parameters for ",run
+    print "computed fit parameters for ",run 
     return df_fit_parameters
 
 
 # ------------------------------------------------------------------------------- #
-def plot_band_around_cm_parameter_fits( fig , i_subplot , data , var , weight , title , zOffset , TBand , ZBandMin , ZBandMax ):
+def plot_band_around_cm_parameter_fits( fig , i_subplot , data , var , weight , title  , TBand , ZBandMin , ZBandMax ):
 
     Pmiss = (data.pMiss_max + data.pMiss_min)/2.
     pMissUpErr , pMissLowErr = data.pMiss_max - Pmiss , Pmiss - data.pMiss_min
 
-    fit_par_plot( fig , i_subplot , data , var , weight , title , zOffset)
+    fit_par_plot( fig , i_subplot , data , var , weight , title )
     plt.fill_between(Pmiss, TBand[0] , TBand[1] ,alpha=0.5, edgecolor='#CC4F1B', facecolor='#FF9848')
     plt.fill_between(Pmiss, ZBandMin , ZBandMax ,alpha=0.5, edgecolor='#C14F1B', facecolor='#1122CC')
 
@@ -236,19 +246,19 @@ def generate_cm_bands( cm_parameters , fit_pars , CMBandFname , FigureBandFName 
     sTBand = np.ones(len(Pmiss))*[fit_pars.sT_unweighted*0.9,fit_pars.sT_unweighted*1.1]
     sZa1BandMin , sZa1BandMax = fit_pars.sZa1_unweighted*0.9,fit_pars.sZa1_unweighted*1.1
     sZa2BandMin , sZa2BandMax = fit_pars.sZa2_unweighted*0.9,fit_pars.sZa2_unweighted*1.1
-    sZBandMax = float(sZa1BandMax)*(Pmiss-0.5)+float(sZa2BandMax)
-    sZBandMin = float(sZa1BandMin)*(Pmiss-0.5)+float(sZa2BandMin)
+    sZBandMax = float(sZa1BandMax)*(Pmiss)+float(sZa2BandMax)
+    sZBandMin = float(sZa1BandMin)*(Pmiss)+float(sZa2BandMin)
 
     mTBand = np.zeros(len(Pmiss))
     mZa1BandMin , mZa1BandMax = fit_pars.mZa1_unweighted*0.8,fit_pars.mZa1_unweighted*1.2
     mZa2BandMin , mZa2BandMax = fit_pars.mZa2_unweighted*0.8,fit_pars.mZa2_unweighted*1.2
-    mZBandMax = float(mZa1BandMax)*(Pmiss-0.3)+float(mZa2BandMax)
-    mZBandMin = float(mZa1BandMin)*(Pmiss-0.3)+float(mZa2BandMin)
+    mZBandMax = float(mZa1BandMax)*(Pmiss)+float(mZa2BandMax)
+    mZBandMin = float(mZa1BandMin)*(Pmiss)+float(mZa2BandMin)
 
     if DoSaveCanvas:
         fig = plt.figure(figsize=(40,10))
-        plot_band_around_cm_parameter_fits( fig , 121, cm_parameters , 'sigma', 'unweighted' , '\sigma' , 0.5 , sTBand , sZBandMin , sZBandMax  )
-        plot_band_around_cm_parameter_fits( fig , 122, cm_parameters , 'mean', 'unweighted' , 'mean' , 0.3 , mTBand , mZBandMin , mZBandMax  )
+        plot_band_around_cm_parameter_fits( fig , 121, cm_parameters , 'sigma', 'unweighted' , '\sigma' , sTBand , sZBandMin , sZBandMax  )
+        plot_band_around_cm_parameter_fits( fig , 122, cm_parameters , 'mean', 'unweighted' , 'mean' , mTBand , mZBandMin , mZBandMax  )
         plt.savefig(FigureBandFName)
         print_filename( FigureBandFName , "plots to file" )
 
@@ -283,7 +293,7 @@ def linspace_single_core( band_min  , band_max  , NptsBand , Ncores , i_core ):
 def generate_runs_with_different_parameters( option,
                                             data_fits , bands , NRand ,
                                             start_run , debug , PmissBins , resutlsFName , reco_fitsFName , target ,
-                                            NptsBand , Ncores , i_core ):
+                                            NptsBand , Ncores = 1 , i_core = 0 ):
     
     # the data (nominal values)
     ana_data = TAnalysisEG2( "ppSRCCut_DATA_%s"% target )
@@ -297,11 +307,18 @@ def generate_runs_with_different_parameters( option,
 
 
     # the bands around data (around nominal values)
-    sigT    = linspace_single_core( bands.sTBandMin[0]  ,bands.sTBandMax[0]    , NptsBand , Ncores , i_core )
-    sigLa1  = linspace_single_core( bands.sZa1Min[0]  ,bands.sZa1Max[0]      , NptsBand , Ncores , i_core )
-    sigLa2  = linspace_single_core( bands.sZa2Min[0]  ,bands.sZa2Max[0]      , NptsBand , Ncores , i_core )
-    meanLa1 = linspace_single_core( bands.mZa1Min[0]  ,bands.mZa1Max[0]     , NptsBand , Ncores , i_core )
-    meanLa2 = linspace_single_core( bands.mZa2Min[0]  ,bands.mZa2Max[0]     , NptsBand , Ncores , i_core )
+#    sigT    = linspace_single_core( bands.sTBandMin[0],bands.sTBandMax[0] , NptsBand , Ncores , i_core )
+#    sigLa1  = linspace_single_core( bands.sZa1Min[0]  ,bands.sZa1Max[0]   , NptsBand , Ncores , i_core )
+#    sigLa2  = linspace_single_core( bands.sZa2Min[0]  ,bands.sZa2Max[0]   , NptsBand , Ncores , i_core )
+#    meanLa1 = linspace_single_core( bands.mZa1Min[0]  ,bands.mZa1Max[0]   , NptsBand , Ncores , i_core )
+#    meanLa2 = linspace_single_core( bands.mZa2Min[0]  ,bands.mZa2Max[0]   , NptsBand , Ncores , i_core )
+    sigT    = np.linspace( bands.sTBandMin[0]   + (bands.sTBandMax[0] - bands.sTBandMin[0]) / (NptsBand+1)  , bands.sTBandMax[0] , NptsBand , endpoint=False)
+    sigLa1  = np.linspace( bands.sZa1Min[0]     + (bands.sZa1Max[0] - bands.sZa1Min[0]) / (NptsBand+1)      , bands.sZa1Max[0]   , NptsBand , endpoint=False)
+    sigLa2  = np.linspace( bands.sZa2Min[0]     + (bands.sZa2Max[0] - bands.sZa2Min[0]) / (NptsBand+1)      , bands.sZa2Max[0]   , NptsBand , endpoint=False)
+    meanLa1 = np.linspace( bands.mZa1Min[0]     + (bands.mZa1Max[0] - bands.mZa1Min[0]) / (NptsBand+1)      , bands.mZa1Max[0]   , NptsBand , endpoint=False)
+    meanLa2 = np.linspace( bands.mZa2Min[0]     + (bands.mZa2Max[0] - bands.mZa2Min[0]) / (NptsBand+1)      , bands.mZa2Max[0]   , NptsBand , endpoint=False)
+    if debug>1: print "sigT:",sigT , "\nsigLa1:",sigLa1 , "\nsigLa2:",sigLa2 , "\nmeanLa1:",meanLa1, "\nmeanLa2:",meanLa2
+    print "pcmZ = %f * p(miss) + %f"%(meanLa1 , meanLa2  )
     
     NrunsThisCore , NrunsTotal = len(sigT)*len(sigLa1)*len(sigLa2)*len(meanLa1)*len(meanLa2) , NptsBand*NptsBand*NptsBand*NptsBand*NptsBand
     if (debug>0): print '\033[95m' + 'Core %d (out of %d) will procees %d runs (total %d runs)'%(i_core,Ncores,NrunsThisCore,NrunsTotal) + '\033[0m'
@@ -337,6 +354,10 @@ def generate_runs_with_different_parameters( option,
                             # ----------------------------
                             gen_events.Set_eep_Parameters( sT , sLa1 , sLa2 , mLa1 , mLa2 )
                             gen_events.DoGenerateRun_eep( run )
+                            
+                            # and now scheme them to our desired pp-SRC cuts
+                            ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
+                            scheme.SchemeOnTCut( path + '/eg_rootfiles' , 'run%d.root'%run , "anaTree", 'run%d.root'%run , ana_sim.EGppSRCCut + ana_sim.PrecFiducial )
 
 
                         if 'analyze' in option or 'analyse' in option:
@@ -345,71 +366,73 @@ def generate_runs_with_different_parameters( option,
                             # (2) analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
                             # ----------------------------
                             ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
-                            reco_parameters = calc_cm_parameters( ana_sim  , PmissBins ) # , CMRooFitsName( path + '/eg_cm_roofits/run%d_unweighted_'%run ), CMRooFitsName( path + '/eg_cm_roofits/run%d_weighted_'%run ) )
-                            if (debug>1): print "reconstructed cm parameters"
-                            reco_fits = fit_cm_parameters( run , reco_parameters ) # , FigureFName( path + '/eg_cm_figures/run%d_'%run ) )
-                            if (debug>1): print "completed fiting processes"
-
-
-                            # No Mott/FF - weighting
-                            # un - weighted roofit results
-                            NsigST_unweighted    = NsigmaScore( data_fits , reco_fits  , 'sT'   , 'unweighted' )
-                            NsigSL_a1_unweighted = NsigmaScore( data_fits , reco_fits  , 'sZa1' , 'unweighted' )
-                            NsigSL_a2_unweighted = NsigmaScore( data_fits , reco_fits  , 'sZa2' , 'unweighted' )
-                            NsigML_a1_unweighted = NsigmaScore( data_fits , reco_fits  , 'mZa1' , 'unweighted' )
-                            NsigML_a2_unweighted = NsigmaScore( data_fits , reco_fits  , 'mZa2' , 'unweighted' )
-                            NsigAvg_unweighted = (NsigST_unweighted + NsigSL_a1_unweighted + NsigSL_a2_unweighted + NsigML_a1_unweighted + NsigML_a2_unweighted)/5.
-                            if (debug>1): print "got unweighted roofit results"
-                        
-                            # With Mott/FF - weighting
-                            # weighted roofit results
-                            NsigST_weighted    = NsigmaScore( data_fits , reco_fits  , 'sT'   , 'weighted' )
-                            NsigSL_a1_weighted = NsigmaScore( data_fits , reco_fits  , 'sZa1' , 'weighted' )
-                            NsigSL_a2_weighted = NsigmaScore( data_fits , reco_fits  , 'sZa2' , 'weighted' )
-                            NsigML_a1_weighted = NsigmaScore( data_fits , reco_fits  , 'mZa1' , 'weighted' )
-                            NsigML_a2_weighted = NsigmaScore( data_fits , reco_fits  , 'mZa2' , 'weighted' )
-                            NsigAvg_weighted = (NsigST_weighted + NsigSL_a1_weighted + NsigSL_a2_weighted + NsigML_a1_weighted + NsigML_a2_weighted)/5.
-                            if (debug>1): print "got weighted roofit results"
+#                            reco_parameters = calc_cm_parameters( ana_sim  , PmissBins ) # , CMRooFitsName( path + '/eg_cm_roofits/run%d_unweighted_'%run ), CMRooFitsName( path + '/eg_cm_roofits/run%d_weighted_'%run ) )
+#                            if (debug>1): print "reconstructed cm parameters"
+#                            if (debug>4): print "reco_parameters: ",reco_parameters
+#                            reco_fits = fit_cm_parameters( run , reco_parameters ) # , FigureFName( path + '/eg_cm_figures/run%d_'%run ) )
+#                            if (debug>1): print "completed fiting processes"
+#                            if (debug>4): print "reco_fits: ",reco_fits
+#
+#
+#                            # No Mott/FF - weighting
+#                            # un - weighted roofit results
+#                            NsigST_unweighted    = NsigmaScore( data_fits , reco_fits  , 'sT'   , 'unweighted' )
+#                            NsigSL_a1_unweighted = NsigmaScore( data_fits , reco_fits  , 'sZa1' , 'unweighted' )
+#                            NsigSL_a2_unweighted = NsigmaScore( data_fits , reco_fits  , 'sZa2' , 'unweighted' )
+#                            NsigML_a1_unweighted = NsigmaScore( data_fits , reco_fits  , 'mZa1' , 'unweighted' )
+#                            NsigML_a2_unweighted = NsigmaScore( data_fits , reco_fits  , 'mZa2' , 'unweighted' )
+#                            NsigAvg_unweighted = (NsigST_unweighted + NsigSL_a1_unweighted + NsigSL_a2_unweighted + NsigML_a1_unweighted + NsigML_a2_unweighted)/5.
+#                            if (debug>1): print "got unweighted roofit results"
+#                        
+#                            # With Mott/FF - weighting
+#                            # weighted roofit results
+#                            NsigST_weighted    = NsigmaScore( data_fits , reco_fits  , 'sT'   , 'weighted' )
+#                            NsigSL_a1_weighted = NsigmaScore( data_fits , reco_fits  , 'sZa1' , 'weighted' )
+#                            NsigSL_a2_weighted = NsigmaScore( data_fits , reco_fits  , 'sZa2' , 'weighted' )
+#                            NsigML_a1_weighted = NsigmaScore( data_fits , reco_fits  , 'mZa1' , 'weighted' )
+#                            NsigML_a2_weighted = NsigmaScore( data_fits , reco_fits  , 'mZa2' , 'weighted' )
+#                            NsigAvg_weighted = (NsigST_weighted + NsigSL_a1_weighted + NsigSL_a2_weighted + NsigML_a1_weighted + NsigML_a2_weighted)/5.
+#                            if (debug>1): print "got weighted roofit results"
 
                             # KS test for the c.m. distributions in x,y,z directions
-                            KSpCMx = KStest( ana_sim , ana_data , "pcmX" ) # maybe make it 2D, with adding the pmiss magnitude as a second variable?
-                            KSpCMy = KStest( ana_sim , ana_data , "pcmY" )
-                            KSpCMz = KStest( ana_sim , ana_data , "pcmZ" )
-                            KSavg = (KSpCMx + KSpCMy + KSpCMz)/3.
-                            ana_sim.CloseFile()
+                            KSpCMx , KSxPval = KStest( ana_sim , ana_data , "pcmX" , ROOT.TCut('') , 50 , -1.5 , 1.5 , debug) # maybe make it 2D, with adding the pmiss magnitude as a second variable?
+                            KSpCMy , KSyPval = KStest( ana_sim , ana_data , "pcmY" , ROOT.TCut('') , 50 , -1.5 , 1.5 , debug)
+                            KSpCMz , KSzPval = KStest( ana_sim , ana_data , "pcmZ" , ROOT.TCut('') , 50 , -1.5 , 1.5 , debug)
                             if (debug>1): print "performed KS tests"
 
 
-                            # (3) stream into file
-                            # ----------------------------
-                            results = pd.DataFrame({'run':int(run), 'time':str(datetime.datetime.now().strftime("%Y%B%d")),
-                                                   'genSigmaT':sT    , 'genSigmaL_a1':sLa1   ,'genSigmaL_a2':sLa2    ,'genShiftL_a1':mLa1    ,'genShiftL_a2':mLa2       ,
-                                                   'recSigmaT_unweighted':      reco_fits.sT_unweighted     ,'recSigmaTErr_unweighted':     reco_fits.sTerr_unweighted  ,
-                                                   'recSigmaL_a1_unweighted':   reco_fits.sZa1_unweighted   ,'recSigmaL_a1Err_unweighted':  reco_fits.sZa1err_unweighted,
-                                                   'recSigmaL_a2_unweighted':   reco_fits.sZa2_unweighted   ,'recSigmaL_a2Err_unweighted':  reco_fits.sZa2err_unweighted,
-                                                   'recShiftL_a1_unweighted':   reco_fits.mZa1_unweighted   ,'recShiftL_a1Err_unweighted':  reco_fits.mZa1err_unweighted,
-                                                   'recShiftL_a2_unweighted':   reco_fits.mZa2_unweighted   ,'recShiftL_a2Err_unweighted':  reco_fits.mZa2err_unweighted,
-                                                   'NsigST_unweighted':         NsigST_unweighted           ,'NsigSL_a1_unweighted':        NsigSL_a1_unweighted        ,'NsigSL_a2_unweighted':    NsigSL_a2_unweighted,
-                                                   'NsigML_a1_unweighted':      NsigML_a1_unweighted        ,'NsigML_a2_unweighted':        NsigML_a2_unweighted        ,
-                                                   'NsigAvg_unweighted':        NsigAvg_unweighted          ,
-                                                   'recSigmaT_weighted':        reco_fits.sT_weighted       ,'recSigmaTErr_weighted':       reco_fits.sTerr_weighted    ,
-                                                   'recSigmaL_a1_weighted':     reco_fits.sZa1_weighted     ,'recSigmaL_a1Err_weighted':    reco_fits.sZa1err_weighted  ,
-                                                   'recSigmaL_a2_weighted':     reco_fits.sZa2_weighted     ,'recSigmaL_a2Err_weighted':    reco_fits.sZa2err_weighted  ,
-                                                   'recShiftL_a1_weighted':     reco_fits.mZa1_weighted     ,'recShiftL_a1Err_weighted':    reco_fits.mZa1err_weighted  ,
-                                                   'recShiftL_a2_weighted':     reco_fits.mZa2_weighted     ,'recShiftL_a2Err_weighted':    reco_fits.mZa2err_weighted  ,
-                                                   'NsigST_weighted':           NsigST_weighted             ,'NsigSL_a1_weighted':          NsigSL_a1_weighted          ,'NsigSL_a2_weighted':      NsigSL_a2_weighted,
-                                                   'NsigML_a1_weighted':        NsigML_a1_weighted          ,'NsigML_a2_weighted':          NsigML_a2_weighted          ,
-                                                   'NsigAvg_weighted':          NsigAvg_weighted            ,
-                                                   'KSpCMx':KSpCMx   ,'KSpCMy':KSpCMy    ,'KSpCMz':KSpCMz    ,'KSavg':KSavg  } , index = [int(run)])
+#                            # (3) stream into file
+#                            # ----------------------------
+#                            results = pd.DataFrame({'run':int(run), 'time':str(datetime.datetime.now().strftime("%Y%B%d")),
+#                                                   'genSigmaT':sT    , 'genSigmaL_a1':sLa1   ,'genSigmaL_a2':sLa2 ,'genShiftL_a1':mLa1    ,'genShiftL_a2':mLa2       ,
+#                                                   'recSigmaT_unweighted':      float(reco_fits.sT_unweighted)    ,'recSigmaTErr_unweighted':     float(reco_fits.sTerr_unweighted)  ,
+#                                                   'recSigmaL_a1_unweighted':   float(reco_fits.sZa1_unweighted)   ,'recSigmaL_a1Err_unweighted':  float(reco_fits.sZa1err_unweighted),
+#                                                   'recSigmaL_a2_unweighted':   float(reco_fits.sZa2_unweighted)   ,'recSigmaL_a2Err_unweighted':  float(reco_fits.sZa2err_unweighted),
+#                                                   'recShiftL_a1_unweighted':   float(reco_fits.mZa1_unweighted)   ,'recShiftL_a1Err_unweighted':  float(reco_fits.mZa1err_unweighted),
+#                                                   'recShiftL_a2_unweighted':   float(reco_fits.mZa2_unweighted)   ,'recShiftL_a2Err_unweighted':  float(reco_fits.mZa2err_unweighted),
+#                                                   'NsigST_unweighted':         NsigST_unweighted           ,'NsigSL_a1_unweighted':        NsigSL_a1_unweighted        ,'NsigSL_a2_unweighted':    NsigSL_a2_unweighted,
+#                                                   'NsigML_a1_unweighted':      NsigML_a1_unweighted        ,'NsigML_a2_unweighted':        NsigML_a2_unweighted        ,
+#                                                   'NsigAvg_unweighted':        NsigAvg_unweighted          ,
+#                                                   'recSigmaT_weighted':        float(reco_fits.sT_weighted)       ,'recSigmaTErr_weighted':       float(reco_fits.sTerr_weighted)    ,
+#                                                   'recSigmaL_a1_weighted':     float(reco_fits.sZa1_weighted)     ,'recSigmaL_a1Err_weighted':    float(reco_fits.sZa1err_weighted)  ,
+#                                                   'recSigmaL_a2_weighted':     float(reco_fits.sZa2_weighted)     ,'recSigmaL_a2Err_weighted':    float(reco_fits.sZa2err_weighted)  ,
+#                                                   'recShiftL_a1_weighted':     float(reco_fits.mZa1_weighted)     ,'recShiftL_a1Err_weighted':    float(reco_fits.mZa1err_weighted)  ,
+#                                                   'recShiftL_a2_weighted':     float(reco_fits.mZa2_weighted)     ,'recShiftL_a2Err_weighted':    float(reco_fits.mZa2err_weighted)  ,
+#                                                   'NsigST_weighted':           NsigST_weighted             ,'NsigSL_a1_weighted':          NsigSL_a1_weighted          ,'NsigSL_a2_weighted':      NsigSL_a2_weighted,
+#                                                   'NsigML_a1_weighted':        NsigML_a1_weighted          ,'NsigML_a2_weighted':          NsigML_a2_weighted          ,
+#                                                   'NsigAvg_weighted':          NsigAvg_weighted            ,
+#                                                   'KSxPval':KSxPval           ,'KSyPval':KSyPval           ,'KSzPval':KSzPval } , index = [int(run)])
 
-                            df_reco_parameters = df_reco_parameters.append( reco_parameters )
-                            df_reco_fits = df_reco_fits.append( reco_fits )
-                            df_results = df_results.append( results )
-                            if (debug>1): print "appended into pandas.DataFrames"
-                            if (debug>2): print "resutls: ",df_results
-                            garbage_list = [ ana_sim , reco_parameters , reco_fits  , results ]
-                            del garbage_list
-                                
+#                            if (debug>4): print "results: ",results
+#                            df_reco_parameters = df_reco_parameters.append( reco_parameters )
+#                            df_reco_fits = df_reco_fits.append( reco_fits )
+#                            df_results = df_results.append( results )
+#                            ana_sim.CloseFile()
+#                            if (debug>1): print "appended into pandas.DataFrames"
+#                            if (debug>2): print "resutls: ",df_results
+#                            garbage_list = [ ana_sim , reco_parameters , reco_fits  , results ]
+#                            del garbage_list
+
                         print_important( "completed run %d"%run ) ; print_line
     
 

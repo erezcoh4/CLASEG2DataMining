@@ -75,7 +75,7 @@ public:
     TCut    cutAngles2p , cutAngles3p       , cutSRCNoPm;
     TCut    pCTOFCut[3] , p1EdepCut         , p1CTOFCut     , ppEdepCut     , ppCTOFCut     , pppEdepCut    ;
     TCut    pppCTOFCut  ;
-    TCut    cutSRC      , eepFinalCut       , cut1pSRC      , ppSRCCut      ;
+    TCut    cutSRC      , eepFinalCut       , cut1pSRC      , ppSRCCut      , EGppSRCCut ;
     TCut    pppSRCCut   , pppSRCMmiss       , Final3pCut    ;
     TCut    pppRandomBkg, pppCut            , pppCutPmT     , pppCutPmTMm   ;
     TCut    Sim3pSRCCut , FinalSim3pSRCCut  , Sim3pWmissCut ;

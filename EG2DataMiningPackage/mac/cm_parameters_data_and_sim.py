@@ -45,13 +45,13 @@ if 'extract data cm-parameters' in flags.option: # DATA
     cm_parameters = tools.calc_cm_parameters( ana_data  , PmissBins , tools.CMRooFitsName( path + '/DATA/unweighted' ) , tools.CMRooFitsName( path + '/DATA/weighted' ) , DoSaveCanvas = True )
     cm_parameters.to_csv( tools.CMParsFname(path+'/DATA/data') , header=True , index = False)
     tools.print_filename( tools.CMParsFname(path+'/DATA/data')  ,"data c.m. parameters for different p(miss) bins at")
-    tools.print_line
+    tools.print_line()
 
     # (2) plot cm parameters
     fits = tools.fit_cm_parameters( 'data' , cm_parameters , tools.FigureFName(path+'/DATA/data') , DoSaveCanvas = True )
     fits.to_csv( tools.CMfitsFname(path+'/DATA/data') , header=True , index = False)
     tools.print_filename( tools.CMfitsFname(path+'/DATA/data')  ,"data c.m. fits at")
-    tools.print_line
+    tools.print_line()
 
 
 
@@ -70,12 +70,13 @@ if 'runs' in flags.option and ('generate' in flags.option or 'analyze' in flags.
     cm_pars_bands = pd.read_csv( tools.CMBandFname(path+'/DATA/data') )
     cm_fits_parameters = pd.read_csv( tools.CMfitsFname( path+'/DATA/data' ) )
     NRand = 10
-    NptsBand = 4
-    Ncores , i_core = 1 , 0 # Ncores = 1 if flags.worker == "erez" else 50 if flags.worker == "helion" else 1 / flags.i_core
+    NptsBand = 1 if flags.files_frac<1 else flags.files_frac
+    start_run = 10000 # for debugging
     tools.generate_runs_with_different_parameters( flags.option ,
                                                   cm_fits_parameters , cm_pars_bands , NRand ,
                                                   start_run , flags.verbose , PmissBins , tools.resutlsFName( path+'/simulation/simulation' ) , tools.CMfitsFname( path + '/simulation/simulation' ) , dm.Target(A)  ,
-                                                  NptsBand , Ncores , i_core )
+                                                  NptsBand )
+
 
 
 
