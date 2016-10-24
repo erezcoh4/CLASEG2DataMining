@@ -95,7 +95,7 @@ public:
     void           OutPutToTextFile ( const int, TVector3*, int*, float*, int*);
     void          SetInputChain_eep ();
     void      ReleaseInputChain_eep ();
-    
+    void                  InitEvent ();
     
     
     // simple setters
@@ -142,7 +142,7 @@ public:
     TVector3 q3Vector_in_Pmiss_q_system ,       Pmiss_in_Pmiss_q_system ,   Pcm_in_Pmiss_q_system   , Precoil_in_Pmiss_q_system;
     TVector3 q_q_sys                    ,       Pmiss_q_sys             ,   Pcm_q_sys;
 
-    TLorentzVector  Proton                  ,   q4Vector        , m2N       , miss;
+    TLorentzVector  Proton  ,       Prec    ,   q4Vector        , m2N       , miss;
 
     TString     Path , RunsInfoFileName , txtFilename , rootFilename , runsFilename;
     
@@ -154,6 +154,11 @@ public:
     time_t      now ;
     tm          * dt;
 
+    
+    vector<Int_t>       pFiducCut     ;
+    vector<TVector3>    pVertex   ;
+    
+    
 };
 
 #endif
