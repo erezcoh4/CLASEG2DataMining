@@ -71,11 +71,11 @@ public:
     Float_t Theta       , Mott      , DipoleFF      , rooWeight;
     const Float_t Ebeam = 5.009 , e2 = 1; // sqaure of e-charge in e-charge units (for simplcity)
     
-    Double_t k0         , kCMmag    , Px    , Py    ,Pz;
+    Double_t k0         , kCMmag    , Px    , Py    ,Pz ;
     
-    Float_t             Pmiss3Mag   , pcmX        , pcmY          , pcmZ          ;
-    Float_t             TpMiss      , m_A_1         , E_p_init      , M_p_init  , pq;
-    vector<Float_t>     alpha       , pEdep         , pCTOF         , Tp        , proton_angle;
+    Float_t             Pmiss3Mag   , pcmX          , pcmY          , pcmT      , pcmZ          ;
+    Float_t             TpMiss      , m_A_1         , E_p_init      , M_p_init  , pq            ;
+    vector<Float_t>     alpha       , pEdep         , pCTOF         , Tp        , proton_angle  ;
     vector<Int_t>       pCTOFCut    , pFiducCut     , pFiducCut_g;
     
     

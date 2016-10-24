@@ -21,6 +21,7 @@ import input_flags, cm_tools as tools
 flags = input_flags.get_args()
 
 PmissBins = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65] , [0.65,0.75] , [0.75,1.0]]
+#PmissBins = [[0.3,0.5]  , [0.5,0.7] , [0.7,1.0]]
 path = "/Users/erezcohen/Desktop/DataMining/Analysis_DATA/ppSRCcm"
 A = 12
 start_run  = flags.run
@@ -28,7 +29,7 @@ dm = TEG2dm()
 
 
 
-if 'scheme pp-SRC' in flags.option: # scheme to pp-SRC
+if 'scheme pp-SRC' in flags.option or 'scheme' in flags.option: # scheme to pp-SRC
 
     DataName    = "DATA_%s"% dm.Target(flags.atomic_mass)
     SchemedName = "ppSRCCut_%s"% DataName
@@ -38,7 +39,7 @@ if 'scheme pp-SRC' in flags.option: # scheme to pp-SRC
     print 'schemed to %s'%SchemedName
 
 
-if 'extract data cm-parameters' in flags.option: # DATA
+if 'extract data cm-parameters' in flags.option or 'extract' in flags.option: # DATA
 
     # (1) calc cm parameters of data
     ana_data = TAnalysisEG2( "ppSRCCut_DATA_%s"% dm.Target(A) )
@@ -54,9 +55,7 @@ if 'extract data cm-parameters' in flags.option: # DATA
     tools.print_line()
 
 
-
-
-if 'create bands for EG' in flags.option:
+if 'create bands for EG' in flags.option or 'bands' in flags.option:
 
     # (3) create bands for event generation
     cm_parameters = pd.read_csv( tools.CMParsFname(path+'/DATA/data') )
@@ -64,14 +63,14 @@ if 'create bands for EG' in flags.option:
     tools.generate_cm_bands( cm_parameters , fits , tools.CMBandFname( path+'/DATA/data' ) , tools.FigureBandFName( path+'/DATA/data' ) , DoSaveCanvas = True)
 
 
-if 'runs' in flags.option and ('generate' in flags.option or 'analyze' in flags.option or 'analyse' in flags.option):
+if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 'analyze' in flags.option or 'analyse' in flags.option:
     
     # (4) generate runs with different parameters
     cm_pars_bands = pd.read_csv( tools.CMBandFname(path+'/DATA/data') )
     cm_fits_parameters = pd.read_csv( tools.CMfitsFname( path+'/DATA/data' ) )
     NRand = 10
-    NptsBand = 1 if flags.files_frac<1 else flags.files_frac
-    start_run = 10000 # for debugging
+    NptsBand = 4 if flags.files_frac<1 else flags.files_frac
+    start_run = 0 # for debugging
     tools.generate_runs_with_different_parameters( flags.option ,
                                                   cm_fits_parameters , cm_pars_bands , NRand ,
                                                   start_run , flags.verbose , PmissBins , tools.resutlsFName( path+'/simulation/simulation' ) , tools.CMfitsFname( path + '/simulation/simulation' ) , dm.Target(A)  ,

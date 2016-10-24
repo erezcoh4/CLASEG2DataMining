@@ -117,6 +117,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("Pmiss3Mag"           ,&Pmiss3Mag             , "Pmiss3Mag/F");
     OutTree -> Branch("pcmX"                ,&pcmX                  , "pcmX/F");
     OutTree -> Branch("pcmY"                ,&pcmY                  , "pcmY/F");
+    OutTree -> Branch("pcmT"                ,&pcmT                  , "pcmT/F");
     OutTree -> Branch("pcmZ"                ,&pcmZ                  , "pcmZ/F");
     OutTree -> Branch("rooWeight"           ,&rooWeight             , "rooWeight/F");
 
@@ -391,6 +392,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     // roofit
     pcmX = Pcm.Px();
     pcmY = Pcm.Py();
+    pcmT = Pcm.Pt();
     pcmZ = Pcm.Pz();
     ComputeWeights();
     
@@ -694,7 +696,8 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOWTLorentzVector(Pcm);
     SHOW3(TpMiss , theta_pq , p_over_q);
     SHOW3(NpBack , NpCumulative , NpCumulativeSRC );
-    
+    SHOW3(pcmX , pcmY , pcmT);
+    SHOW(pcmZ);
     EndEventBlock();
 }
 

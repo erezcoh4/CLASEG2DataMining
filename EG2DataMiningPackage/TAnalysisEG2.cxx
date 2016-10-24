@@ -143,29 +143,44 @@ std::vector<Double_t> TAnalysisEG2::RooFitCM( Float_t PmissMin, Float_t PmissMax
     // if PlotFits=true, it also plots the RooFits into three pads: start_cd, start_cd+1 , start_cd+2
     
     Double_t    PcmPars[2] = { 0 , 0.14 } ,   PcmParsErr[2] = { 0 , 0 };
-    
     std::vector<Double_t> results;
     
-    TCut cut = Form("%f < Pmiss3Mag && Pmiss3Mag < %f" , PmissMin , PmissMax);
-    // SHOW(Tree->GetEntries());
-    RooFit1D( Tree , "pcmX", cut , PcmPars , PcmParsErr , PlotFits , PlotFits ? c->cd(start_cd) : nullptr , Form("p(c.m.)-#bf{X} {%.2f<p(miss)<%.2f GeV/c}" , PmissMin , PmissMax) , DoWeight , "rooWeight" );
+    //    TCut cut = Form("%f < Pmiss3Mag && Pmiss3Mag < %f" , PmissMin , PmissMax);
+    TFile * tmpFile = new TFile( Path + "/tmpfile_ReducedTree_rooFit.root","recreate");
+    TTree * ReducedTree = Tree -> CopyTree(Form("%f < Pmiss3Mag && Pmiss3Mag < %f" , PmissMin , PmissMax));
+    TCut cut = "";
+    
+    // x direction
+    RooFit1D( ReducedTree , "pcmX", cut , PcmPars , PcmParsErr , PlotFits , PlotFits ? c->cd(start_cd) : nullptr , Form("#bf{X} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , ReducedTree->GetEntries()) , DoWeight , "rooWeight" );
     results.push_back(PcmPars[0]); // mean
     results.push_back(PcmParsErr[0]); // mean - err
     results.push_back(PcmPars[1]); // sigma
     results.push_back(PcmParsErr[1]); // sigma - err
     
-    RooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , PlotFits , PlotFits ? c->cd(start_cd+1) : nullptr , Form("p(c.m.)-#bf{Y} {%.2f<p(miss)<%.2f GeV/c}" , PmissMin , PmissMax) , DoWeight , "rooWeight"  );
+    // y direction
+    RooFit1D( ReducedTree , "pcmY", cut , PcmPars , PcmParsErr , PlotFits , PlotFits ? c->cd(start_cd+1) : nullptr , Form("#bf{Y} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , ReducedTree->GetEntries()) , DoWeight , "rooWeight"  );
+    results.push_back(PcmPars[0]); // mean
+    results.push_back(PcmParsErr[0]); // mean - err
+    results.push_back(PcmPars[1]); // sigma
+    results.push_back(PcmParsErr[1]); // sigma - err
+    
+    // transverse direction
+    RooFit1D( ReducedTree , "pcmT", cut , PcmPars , PcmParsErr , PlotFits , PlotFits ? c->cd(start_cd+2) : nullptr , Form("transverse {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , ReducedTree->GetEntries()) , DoWeight , "rooWeight"  );
+    results.push_back(PcmPars[0]); // mean
+    results.push_back(PcmParsErr[0]); // mean - err
+    results.push_back(PcmPars[1]); // sigma
+    results.push_back(PcmParsErr[1]); // sigma - err
+    
+    // longitudinal direction
+    RooFit1D( ReducedTree , "pcmZ", cut , PcmPars , PcmParsErr , PlotFits , PlotFits ? c->cd(start_cd+3) : nullptr , Form("#bf{Z} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , ReducedTree->GetEntries()) , DoWeight , "rooWeight"  );
     results.push_back(PcmPars[0]); // mean
     results.push_back(PcmParsErr[0]); // mean - err
     results.push_back(PcmPars[1]); // sigma
     results.push_back(PcmParsErr[1]); // sigma - err
 
-    RooFit1D( Tree , "pcmZ", cut , PcmPars , PcmParsErr , PlotFits , PlotFits ? c->cd(start_cd+2) : nullptr , Form("p(c.m.)-#bf{Z} {%.2f<p(miss)<%.2f GeV/c}" , PmissMin , PmissMax) , DoWeight , "rooWeight"  );
-    results.push_back(PcmPars[0]); // mean
-    results.push_back(PcmParsErr[0]); // mean - err
-    results.push_back(PcmPars[1]); // sigma
-    results.push_back(PcmParsErr[1]); // sigma - err
-
+    delete ReducedTree;
+    tmpFile->Close();
+    delete tmpFile;
     return results;
 }
 
