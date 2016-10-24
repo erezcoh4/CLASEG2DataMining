@@ -378,6 +378,11 @@ def generate_runs_with_different_parameters( option,
                             ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
                             scheme.SchemeOnTCut( path + '/eg_rootfiles' , 'run%d.root'%run , "anaTree", 'run%d.root'%run , ana_sim.EGppSRCCut + ana_sim.PrecFiducial )
 
+                            ana_sim.CloseFile()
+                            garbage_list = [ ana_sim ]
+                            del garbage_list
+
+
 
                         if 'analyze' in option or 'analyse' in option:
                         

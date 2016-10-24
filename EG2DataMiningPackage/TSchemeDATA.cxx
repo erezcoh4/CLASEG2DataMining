@@ -366,6 +366,9 @@ void TSchemeDATA::SchemeOnTCut(TString Path, TString fInFileName, TString fInTre
     Printf("schemed from %s to %s (%lld events passed the cut)",TmpInFile->GetName(),TmpOutFile->GetName(),TmpOutTree->GetEntries());
     TmpOutTree -> Write();
     TmpOutFile -> Close();
+    TmpInFile -> Close();
+    delete TmpOutFile;
+    delete TmpInFile;
 }
 
 
