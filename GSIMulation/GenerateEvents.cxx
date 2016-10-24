@@ -16,11 +16,12 @@ GenerateEvents::GenerateEvents( TString fPath , Int_t fRunNumber , Int_t fdebug 
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-void GenerateEvents::Set_eep_Parameters(Float_t fSigmaT , Float_t fSigmaL_a1 , Float_t fSigmaL_a2 , Float_t fShiftL_a1 , Float_t fShiftL_a2 ){
+void GenerateEvents::Set_eep_Parameters(Float_t fMeanX , Float_t fMeanY , Float_t fSigmaT , Float_t fSigmaL_a1 , Float_t fSigmaL_a2 , Float_t fShiftL_a1 , Float_t fShiftL_a2 ){
     // Px = gRandom -> Gaus( 0  , SigmaT )
     // Py = gRandom -> Gaus( 0  , SigmaT )
     // Pz = gRandom -> Gaus( ShiftL_a1*PmissMag + ShiftL_a2  , SigmaL_a1*PmissMag + SigmaL_a2 )
-    
+    MeanX     = fMeanX;
+    MeanY     = fMeanY;
     SigmaT    = fSigmaT;
     SigmaL_a1 = fSigmaL_a1;
     SigmaL_a2 = fSigmaL_a2;
@@ -170,11 +171,17 @@ Int_t GenerateEvents::DoGenerateRun_eep( Int_t fRunNumber, bool DoGetRootFile, b
             
             if(debug > 3) SHOW( j );
             
-            float Px = gRandom -> Gaus( 0  , SigmaT );
-            float Py = gRandom -> Gaus( 0  , SigmaT );
-            float Pz = gRandom -> Gaus( ShiftL_a1*PmissMag + ShiftL_a2  , SigmaL_a1*PmissMag + SigmaL_a2 );
-//            float Pz = gRandom -> Gaus( ShiftL_a1*PmissMag + ShiftL_a2  , 0.07 );
-            if(debug > 4) {SHOW3( ShiftL_a1 , ShiftL_a2 , PmissMag );  SHOW3( PmissMag , ShiftL_a1*PmissMag + ShiftL_a2 , Pz );}
+            float Px = gRandom -> Gaus( MeanX  , SigmaT );
+            float Py = gRandom -> Gaus( MeanY  , SigmaT );
+            float MeanZ = ShiftL_a1*PmissMag + ShiftL_a2;
+            float SigmaZ = 1*(SigmaL_a1*PmissMag + SigmaL_a2) ;
+            float Pz = gRandom -> Gaus( MeanZ  , SigmaZ ) ;
+            //            float Pz = gRandom -> Gaus( ShiftL_a1*PmissMag + ShiftL_a2  , 0.07 );
+            if(debug > 4) {
+                SHOW( PmissMag );
+                SHOW3( ShiftL_a1 , ShiftL_a2 , ShiftL_a1*PmissMag );
+                SHOW3( SigmaL_a1 , SigmaL_a1 , SigmaL_a1*PmissMag );
+                SHOW3( MeanZ , SigmaZ , Pz );}
             
             Pcm_in_Pmiss_q_system.SetXYZ ( Px , Py , Pz );
             Precoil_in_Pmiss_q_system = Pcm_in_Pmiss_q_system - Pmiss_in_Pmiss_q_system;
@@ -185,6 +192,7 @@ Int_t GenerateEvents::DoGenerateRun_eep( Int_t fRunNumber, bool DoGetRootFile, b
             // here we already work in the Pmiss(z) - q(x-z) frame
             pcmX = Px ;
             pcmY = Py ;
+            pcmT = sqrt(Px*Px + Py*Py);
             pcmZ = Pz ;
             ComputeWeights();
             
@@ -453,7 +461,7 @@ Int_t GenerateEvents::DoGenerate( TString Type,
         //------- TAKE DATA FROM TREE --------------//
         if (DoReeNFromTree){
             
-            Float_t PeMag   , Theta_e , Phi_e   , PpMag , Theta_p;
+            Float_t PeMag, Theta_e, Phi_e ;//   , PpMag , Theta_p;
             eeNTree -> SetBranchAddress("P_e"       ,   &PeMag);
             eeNTree -> SetBranchAddress("theta_e"   ,   &Theta_e);
             eeNTree -> SetBranchAddress("phi_e"     ,   &Phi_e);
@@ -552,6 +560,7 @@ void GenerateEvents::SetRootTreeAddresses(){
     RootTree -> Branch("Pmiss3Mag"           ,&Pmiss3Mag             , "Pmiss3Mag/F");
     RootTree -> Branch("pcmX"                ,&pcmX                  , "pcmX/F");
     RootTree -> Branch("pcmY"                ,&pcmY                  , "pcmY/F");
+    RootTree -> Branch("pcmT"                ,&pcmT                  , "pcmT/F");
     RootTree -> Branch("pcmZ"                ,&pcmZ                  , "pcmZ/F");
     RootTree -> Branch("rooWeight"           ,&rooWeight             , "rooWeight/F");
 
