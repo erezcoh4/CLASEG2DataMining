@@ -49,7 +49,7 @@ if 'extract data cm-parameters' in flags.option or 'extract' in flags.option: # 
     tools.print_line()
 
     # (2) plot cm parameters
-    fits = tools.fit_cm_parameters( 'data' , cm_parameters , tools.FigureFName(path+'/DATA/data') , DoSaveCanvas = True )
+    fits = tools.fit_cm_parameters( 'data' , cm_parameters , tools.FigureFName(path+'/DATA/data') , DoPlot = True )
     fits.to_csv( tools.CMfitsFname(path+'/DATA/data') , header=True , index = False)
     tools.print_filename( tools.CMfitsFname(path+'/DATA/data')  ,"data c.m. fits at")
     tools.print_line()
@@ -69,7 +69,7 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
     cm_pars_bands = pd.read_csv( tools.CMBandFname(path+'/DATA/data') )
     cm_fits_parameters = pd.read_csv( tools.CMfitsFname( path+'/DATA/data' ) )
     NRand = 10
-    NptsBand = 4 # if flags.files_frac<1 else flags.files_frac
+    NptsBand = 200 # if flags.files_frac<1 else flags.files_frac
     start_run = 0 # 10000 for debugging
     tools.generate_runs_with_different_parameters( flags.option ,
                                                   cm_fits_parameters , cm_pars_bands , NRand ,
