@@ -16,17 +16,20 @@ GenerateEvents::GenerateEvents( TString fPath , Int_t fRunNumber , Int_t fdebug 
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-void GenerateEvents::Set_eep_Parameters(Float_t fMeanX , Float_t fMeanY , Float_t fSigmaT , Float_t fSigmaL_a1 , Float_t fSigmaL_a2 , Float_t fShiftL_a1 , Float_t fShiftL_a2 ){
-    // Px = gRandom -> Gaus( 0  , SigmaT )
-    // Py = gRandom -> Gaus( 0  , SigmaT )
+void GenerateEvents::Set_eep_Parameters(Float_t fMeanX, Float_t fSigmaX,
+                                        Float_t fMeanY, Float_t fSigmaY,
+                                        Float_t fMeanZ_a1, Float_t fMeanZ_a2,
+                                        Float_t fSigmaZ_a1, Float_t fSigmaZ_a2 ) {
+
+    // Px = gRandom -> Gaus( MeanX  , SigmaX )
+    // Py = gRandom -> Gaus( MeanY  , SigmaY )
     // Pz = gRandom -> Gaus( ShiftL_a1*PmissMag + ShiftL_a2  , SigmaL_a1*PmissMag + SigmaL_a2 )
-    MeanX     = fMeanX;
-    MeanY     = fMeanY;
-    SigmaT    = fSigmaT;
-    SigmaL_a1 = fSigmaL_a1;
-    SigmaL_a2 = fSigmaL_a2;
-    ShiftL_a1 = fShiftL_a1;
-    ShiftL_a2 = fShiftL_a2;
+    MeanX     = fMeanX;    SigmaX    = fSigmaX;
+    MeanY     = fMeanY;    SigmaY    = fSigmaY;
+
+    MeanZ_a1  = fMeanZ_a1;    MeanZ_a2  = fMeanZ_a2;
+    SigmaZ_a1 = fSigmaZ_a1;    SigmaZ_a2 = fSigmaZ_a2;
+
 }
 
 
@@ -171,16 +174,17 @@ Int_t GenerateEvents::DoGenerateRun_eep( Int_t fRunNumber, bool DoGetRootFile, b
             
             if(debug > 3) SHOW( j );
             
-            float Px = gRandom -> Gaus( MeanX  , SigmaT );
-            float Py = gRandom -> Gaus( MeanY  , SigmaT );
-            float MeanZ = ShiftL_a1*PmissMag + ShiftL_a2;
-            float SigmaZ = 1*(SigmaL_a1*PmissMag + SigmaL_a2) ;
+            float Px = gRandom -> Gaus( MeanX  , SigmaX );
+            float Py = gRandom -> Gaus( MeanY  , SigmaY );
+            
+            float MeanZ = MeanZ_a1*PmissMag + MeanZ_a2    ;
+            float SigmaZ = SigmaZ_a1*PmissMag + SigmaZ_a2 ;
             float Pz = gRandom -> Gaus( MeanZ  , SigmaZ ) ;
             //            float Pz = gRandom -> Gaus( ShiftL_a1*PmissMag + ShiftL_a2  , 0.07 );
             if(debug > 4) {
                 SHOW( PmissMag );
-                SHOW3( ShiftL_a1 , ShiftL_a2 , ShiftL_a1*PmissMag );
-                SHOW3( SigmaL_a1 , SigmaL_a1 , SigmaL_a1*PmissMag );
+                SHOW3( MeanZ_a1 , MeanZ_a2 , MeanZ_a1*PmissMag );
+                SHOW3( SigmaZ_a1 , SigmaZ_a2 , SigmaZ_a1*PmissMag );
                 SHOW3( MeanZ , SigmaZ , Pz );}
             
             Pcm_in_Pmiss_q_system.SetXYZ ( Px , Py , Pz );

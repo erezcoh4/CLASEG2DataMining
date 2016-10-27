@@ -89,7 +89,7 @@ public:
     void       SetRootTreeAddresses ();
     void                  SetLimits ( Float_t , Float_t , Float_t , Float_t );
     void        SetHistThetaHistMag ( TH1F * , TH1F * );
-    void         Set_eep_Parameters ( Float_t , Float_t , Float_t , Float_t , Float_t , Float_t , Float_t );
+    void         Set_eep_Parameters ( Float_t , Float_t , Float_t , Float_t , Float_t , Float_t , Float_t , Float_t );
     void               Set_eeN_tree ( TTree * feeNTree) { eeNTree = feeNTree;};
     void            OutputInfo2File ();
     void           OutPutToTextFile ( const int, TVector3*, int*, float*, int*);
@@ -123,7 +123,8 @@ public:
     Float_t     Q2      , Xb            , PoverQ    , Mmiss;
     Float_t     ThetaPQ , ThetaPmissQ   , ThetaPmissPrecoil;
     Float_t     theta_e ;
-    Float_t     SigmaT  , SigmaL_a1     , SigmaL_a2 , ShiftL_a1 , ShiftL_a2 , MeanX , MeanY ;
+    Float_t     MeanX   , MeanY , SigmaX , SigmaY;
+    Float_t     SigmaZ_a1     , SigmaZ_a2 , MeanZ_a1 , MeanZ_a2  ;
     Float_t     Pmin    , Pmax  , Thetamin  , Thetamax;
     Float_t     Pmiss3Mag   , pcmX      , pcmY      , pcmT      , pcmZ  ;
     Float_t     Theta       , Mott      , DipoleFF              , rooWeight;

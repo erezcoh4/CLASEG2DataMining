@@ -738,7 +738,7 @@ void EGgui::DoGenerate(){
     bool fDoFlateeN  = (fFlateeN->IsOn()) ? true : false;
     gen_events -> SetLimits( Pmin , Pmax , Thetamin , Thetamax );
     if (Type == "(e,e'pp)") {
-        gen_events -> Set_eep_Parameters( 0 , 0 , SigmaT , SigmaL_a1 , SigmaL_a2 , ShiftL_a1 , ShiftL_a2 );
+        gen_events -> Set_eep_Parameters( 0 , 0 , SigmaT , SigmaT , SigmaL_a1 , SigmaL_a2 , ShiftL_a1 , ShiftL_a2 );
     }
     else{
         gen_events -> Set_eeN_tree(eeNTree);
