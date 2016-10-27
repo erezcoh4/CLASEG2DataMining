@@ -49,7 +49,6 @@ results_columns = ['run','time'
                    ,'recSigmaT_weighted','recSigmaTErr_weighted'
                    ,'recSigmaL_a1_weighted','recSigmaL_a1Err_weighted','recSigmaL_a2_weighted','recSigmaL_a2Err_weighted','recShiftL_a1_weighted','recShiftL_a1Err_weighted','recShiftL_a2_weighted','recShiftL_a2Err_weighted'
                    ,'NsigST_weighted','NsigSL_a1_weighted','NsigSL_a2_weighted','NsigML_a1_weighted','NsigML_a2_weighted','NsigAvg_weighted'
-#                   ,'KSxPval','KSyPval','KStPval','KSzPval']
                    ,'KSxPval_0','KSxPval_1','KSxPval_2','KSxPval_3','KSxPval_4','KSxPval_avg'
                    ,'KSyPval_0','KSyPval_1','KSyPval_2','KSyPval_3','KSyPval_4','KSyPval_avg'
                    ,'KStPval_0','KStPval_1','KStPval_2','KStPval_3','KStPval_4','KStPval_avg'
@@ -423,8 +422,12 @@ def generate_runs_with_different_parameters( option,
                             KSpCMy , KSyPval = KStest( PmissBins ,ana_sim , ana_data , "pcmY" , ROOT.TCut('') , debug)
                             KSpCMt , KStPval = KStest( PmissBins ,ana_sim , ana_data , "pcmT" , ROOT.TCut('') , debug)
                             KSpCMz , KSzPval = KStest( PmissBins ,ana_sim , ana_data , "pcmZ" , ROOT.TCut('') , debug)
+                            KSxPval_avg = np.average(KSxPval)
+                            KSyPval_avg = np.average(KSyPval)
+                            KStPval_avg = np.average(KStPval)
+                            KSzPval_avg = np.average(KSzPval)
                             if (debug>1): print "performed KS tests"
-                            if debug>3: print "KSxPval[0]:",KSxPval[0]
+                            if debug>3: print "KSxPval_avg, KSyPval_avg, KSzPval_avg:",KSxPval_avg, KSyPval_avg, KSzPval_avg
 
 
                             # (3) stream into file
@@ -447,10 +450,10 @@ def generate_runs_with_different_parameters( option,
                                                    'NsigST_weighted':           NsigST_weighted             ,'NsigSL_a1_weighted':          NsigSL_a1_weighted          ,'NsigSL_a2_weighted':      NsigSL_a2_weighted,
                                                    'NsigML_a1_weighted':        NsigML_a1_weighted          ,'NsigML_a2_weighted':          NsigML_a2_weighted          ,
                                                    'NsigAvg_weighted':          NsigAvg_weighted            ,
-                                                   'KSxPval_0':KSxPval[0]    , 'KSxPval_1':KSxPval[1] , 'KSxPval_2':KSxPval[2] , 'KSxPval_3':KSxPval[3] , 'KSxPval_4':KSxPval[4],'KSxPval_avg':np.average(KSxPval),
-                                                   'KSyPval_0':KSyPval[0]    , 'KSyPval_1':KSyPval[1] , 'KSyPval_2':KSyPval[2] , 'KSyPval_3':KSxPval[3] , 'KSyPval_4':KSyPval[4],'KSxPval_avg':np.average(KSyPval),
-                                                   'KStPval_0':KStPval[0]    , 'KStPval_1':KStPval[1] , 'KStPval_2':KStPval[2] , 'KStPval_3':KSxPval[3] , 'KStPval_4':KStPval[4],'KSxPval_avg':np.average(KStPval),
-                                                   'KSzPval_0':KSzPval[0]    , 'KSzPval_1':KSzPval[1] , 'KSzPval_2':KSzPval[2] , 'KSzPval_3':KSxPval[3] , 'KSzPval_4':KSzPval[4],'KSxPval_avg':np.average(KSzPval) } ,
+                                                   'KSxPval_0':KSxPval[0]    , 'KSxPval_1':KSxPval[1] , 'KSxPval_2':KSxPval[2] , 'KSxPval_3':KSxPval[3] , 'KSxPval_4':KSxPval[4],'KSxPval_avg':KSxPval_avg,
+                                                   'KSyPval_0':KSyPval[0]    , 'KSyPval_1':KSyPval[1] , 'KSyPval_2':KSyPval[2] , 'KSyPval_3':KSxPval[3] , 'KSyPval_4':KSyPval[4],'KSyPval_avg':KSyPval_avg,
+                                                   'KStPval_0':KStPval[0]    , 'KStPval_1':KStPval[1] , 'KStPval_2':KStPval[2] , 'KStPval_3':KSxPval[3] , 'KStPval_4':KStPval[4],'KStPval_avg':KStPval_avg,
+                                                   'KSzPval_0':KSzPval[0]    , 'KSzPval_1':KSzPval[1] , 'KSzPval_2':KSzPval[2] , 'KSzPval_3':KSxPval[3] , 'KSzPval_4':KSzPval[4],'KSzPval_avg':KSzPval_avg } ,
                                                    index = [int(run)])
 
 
