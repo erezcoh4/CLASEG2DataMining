@@ -69,11 +69,12 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
     cm_pars_bands = pd.read_csv( tools.CMBandFname(path+'/DATA/data') )
     cm_fits_parameters = pd.read_csv( tools.CMfitsFname( path+'/DATA/data' ) )
     NRand = 10
-    NptsBand = 200 # if flags.files_frac<1 else flags.files_frac
-    start_run = 0 # 10000 for debugging
+    NptsBand = 10 # if flags.files_frac<1 else flags.files_frac
+    start_run = 10000
     tools.generate_runs_with_different_parameters( flags.option ,
                                                   cm_fits_parameters , cm_pars_bands , NRand ,
-                                                  start_run , flags.verbose , PmissBins , tools.resutlsFName( path+'/simulation/simulation' ) , tools.CMfitsFname( path + '/simulation/simulation' ) , dm.Target(A)  ,
+                                                  start_run , flags.verbose , PmissBins ,
+                                                  tools.resutlsFName( path+'/simulation/simulation' ) , tools.buildup_resutlsFName( path+'/simulation/simulation' ) , tools.CMfitsFname( path + '/simulation/simulation' ) , dm.Target(A)  ,
                                                   NptsBand )
 
 

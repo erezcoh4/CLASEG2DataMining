@@ -81,6 +81,8 @@ def FigureBandFName( path ):
     return path+"cm_width_and_mean_Bands.pdf"
 def resutlsFName( path ):
     return path+"EG_simulated_runs_results_cm_parameters.csv"
+def buildup_resutlsFName( path ):
+    return path+"runs_results.csv"
 
 # computations
 # ------------------------------------------------------------------------------- #
@@ -361,7 +363,7 @@ def linspace_parameter( band_min  , band_max  , Npts ):
 #def generate_runs_with_different_parameters( cm_fits_parameters , cm_pars_bands ,
 def generate_runs_with_different_parameters( option,
                                             data_fits , bands , NRand ,
-                                            start_run , debug , PmissBins , resutlsFName , reco_fitsFName , target ,
+                                            start_run , debug , PmissBins , resutlsFName , buildup_resutlsFName , reco_fitsFName , target ,
                                             NptsBand , Ncores = 1 , i_core = 0 ):
     
     # the data (nominal values)
@@ -376,11 +378,11 @@ def generate_runs_with_different_parameters( option,
 
 
     # the bands around data (around nominal values)
-    SigmaT   = linspace_parameter( bands.SigmaTBandMin[0], bands.SigmaTBandMax[0], NptsBand )
-    SigmaZa1 = linspace_parameter( bands.SigmaZa1Min[0]  , bands.SigmaZa1Max[0]  , 1 )
-    SigmaZa2 = linspace_parameter( bands.SigmaZa2Min[0]  , bands.SigmaZa2Max[0]  , 1 )
-    MeanZa1  = linspace_parameter( bands.MeanZa1Min[0]   , bands.MeanZa1Max[0]   , 1 )
-    MeanZa2  = linspace_parameter( bands.MeanZa2Min[0]   , bands.MeanZa2Max[0]   , 1 )
+    SigmaT   = linspace_parameter( bands.SigmaTBandMin[0], bands.SigmaTBandMax[0], 10 )
+    SigmaZa1 = linspace_parameter( bands.SigmaZa1Min[0]  , bands.SigmaZa1Max[0]  , 10 )
+    SigmaZa2 = linspace_parameter( bands.SigmaZa2Min[0]  , bands.SigmaZa2Max[0]  , 4 )
+    MeanZa1  = linspace_parameter( bands.MeanZa1Min[0]   , bands.MeanZa1Max[0]   , 5 )
+    MeanZa2  = linspace_parameter( bands.MeanZa2Min[0]   , bands.MeanZa2Max[0]   , 5 )
     if debug>1: print "SigmaT:",SigmaT , "\nSigmaZa1:",SigmaZa1 , "\nSigmaZa2:",SigmaZa2 , "\nMeanZa1:",MeanZa1, "\nMeanZa2:",MeanZa2 , "\n mean(pcmZ) = %f * p(miss) + %f"%(MeanZa1 , MeanZa2  )
     NrunsThisCore , NrunsTotal = len(SigmaT)*len(SigmaZa1)*len(SigmaZa2)*len(MeanZa1)*len(MeanZa2) , len(SigmaT)*len(SigmaZa1)*len(SigmaZa2)*len(MeanZa1)*len(MeanZa2)
     if (debug>0): print '\033[95m' + 'Core %d (out of %d) will procees %d runs (total %d runs)'%(i_core,Ncores,NrunsThisCore,NrunsTotal) + '\033[0m'
@@ -513,6 +515,7 @@ def generate_runs_with_different_parameters( option,
                             if (debug>4): print "results: ",results
                             df_reco_parameters = df_reco_parameters.append( reco_parameters )
                             df_reco_fits = df_reco_fits.append( reco_fits )
+                            stream_dataframe_to_file( results, buildup_resutlsFName  )
                             df_results = df_results.append( results )
                             ana_sim.CloseFile()
                             if (debug>1): print "appended into pandas.DataFrames"
