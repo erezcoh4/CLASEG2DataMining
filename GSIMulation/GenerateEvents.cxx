@@ -583,7 +583,7 @@ void GenerateEvents::ComputeWeights(){
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-void GenerateEvents::OutPutToTextFile(const int N , TVector3 momentum[] , int charge[N] , float mass[N], int pid[N]){
+void GenerateEvents::OutPutToTextFile(const int N , TVector3 * momentum , int * charge , float * mass, int * pid){
     if (debug > 3) cout << "OutPutToTextFile..." << endl;
     float x = 0 , y  = 0 , z  = 0 , t_off = 0 ;
     int flag = 0;
