@@ -311,14 +311,14 @@ def generate_cm_bands( cm_parameters , fit_pars , CMBandFname , FigureBandFName 
     #    sTBand = np.ones(len(Pmiss))*[fit_pars.sT_unweighted*0.9,fit_pars.sT_unweighted*1.1]
     min_SigmaXY , max_SigmaXY = 0.7*np.min( [fit_pars.SigmaX_unweighted , fit_pars.SigmaY_unweighted] ) , 1.2*np.max( [fit_pars.SigmaX_unweighted,fit_pars.SigmaY_unweighted] )
     SigmaTBandMin   , SigmaTBandMax     = min_SigmaXY , max_SigmaXY
-    SigmaZa1BandMin , SigmaZa1BandMax   = fit_pars.SigmaZa1_unweighted*0.9,fit_pars.SigmaZa1_unweighted*1.1
-    SigmaZa2BandMin , SigmaZa2BandMax   = fit_pars.SigmaZa2_unweighted*0.9,fit_pars.SigmaZa2_unweighted*1.1
+    SigmaZa1BandMin , SigmaZa1BandMax   = fit_pars.SigmaZa1_unweighted*0.6,fit_pars.SigmaZa1_unweighted*1.3 # 0.9 , 1.1
+    SigmaZa2BandMin , SigmaZa2BandMax   = fit_pars.SigmaZa2_unweighted*0.6,fit_pars.SigmaZa2_unweighted*1.3
     SigmaZBandMin = float(SigmaZa1BandMin)*(Pmiss)+float(SigmaZa2BandMin)
     SigmaZBandMax = float(SigmaZa1BandMax)*(Pmiss)+float(SigmaZa2BandMax)
     
     MeanTBandMin   , MeanTBandMax     = np.zeros(len(Pmiss)) , np.zeros(len(Pmiss))
-    MeanZa1BandMin , MeanZa1BandMax   = fit_pars.MeanZa1_unweighted*0.7,fit_pars.MeanZa1_unweighted*1.3
-    MeanZa2BandMin , MeanZa2BandMax   = fit_pars.MeanZa2_unweighted*0.7,fit_pars.MeanZa2_unweighted*1.3
+    MeanZa1BandMin , MeanZa1BandMax   = fit_pars.MeanZa1_unweighted*0.5,fit_pars.MeanZa1_unweighted*1.5 # 0.7 , 1.3
+    MeanZa2BandMin , MeanZa2BandMax   = fit_pars.MeanZa2_unweighted*0.5,fit_pars.MeanZa2_unweighted*1.5
     MeanZBandMax = float(MeanZa1BandMax)*(Pmiss)+float(MeanZa2BandMax)
     MeanZBandMin = float(MeanZa1BandMin)*(Pmiss)+float(MeanZa2BandMin)
 
