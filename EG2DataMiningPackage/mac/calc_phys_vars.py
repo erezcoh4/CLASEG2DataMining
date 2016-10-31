@@ -27,10 +27,10 @@ SchemeType  = flags.SchemedType
 DataType    = flags.DataType
 
 
-if (flags.option == "ppSRC"):
-    axes_frame  = "Pmiss(z) - q(x-z) frame"
-else:
-    axes_frame  = "q(z) - Pmiss(x-z) frame"
+#if (flags.option == "ppSRC"):
+#    axes_frame  = "Pmiss(z) - q(x-z) frame"
+#else:
+#    axes_frame  = "q(z) - Pmiss(x-z) frame"
 
 
 if (DataType == "GSIM"):

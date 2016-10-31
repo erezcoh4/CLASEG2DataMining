@@ -34,3 +34,11 @@ analysis = TAnalysis()
 
 # flags
 A = flags.atomic_mass
+
+
+
+
+if (flags.option == "ppSRC"):
+    axes_frame  = "Pmiss(z) - q(x-z) frame"
+else:
+    axes_frame  = "q(z) - Pmiss(x-z) frame"
