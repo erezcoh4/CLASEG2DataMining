@@ -105,21 +105,21 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("neg. particles num." ,&Nnegative             ,"Nnegative/I");
     OutTree -> Branch("pCTOFCut"            ,&pCTOFCut              );// std::vector<Int_t>
     OutTree -> Branch("pFiducCut"           ,&pFiducCut             );// std::vector<Int_t>
-//
-//    
-//    // Float_t branches
-//    OutTree -> Branch("Xb"                  ,&Xb                    , "Xb/F");
-//    OutTree -> Branch("Bjorken x (moving p)",&XbMoving              , "XbMoving/F");
-//    OutTree -> Branch("Q2"                  ,&Q2                    , "Q2/F");
-//    OutTree -> Branch("Mmiss"               ,&Mmiss                 , "Mmiss/F");
-//    
-//    // p(cm) for RooFit
-//    OutTree -> Branch("Pmiss3Mag"           ,&Pmiss3Mag             , "Pmiss3Mag/F");
-//    OutTree -> Branch("pcmX"                ,&pcmX                  , "pcmX/F");
-//    OutTree -> Branch("pcmY"                ,&pcmY                  , "pcmY/F");
-//    OutTree -> Branch("pcmT"                ,&pcmT                  , "pcmT/F");
-//    OutTree -> Branch("pcmZ"                ,&pcmZ                  , "pcmZ/F");
-//    OutTree -> Branch("rooWeight"           ,&rooWeight             , "rooWeight/F");
+
+    
+    // Float_t branches
+    OutTree -> Branch("Xb"                  ,&Xb                    , "Xb/F");
+    OutTree -> Branch("Bjorken x (moving p)",&XbMoving              , "XbMoving/F");
+    OutTree -> Branch("Q2"                  ,&Q2                    , "Q2/F");
+    OutTree -> Branch("Mmiss"               ,&Mmiss                 , "Mmiss/F");
+    
+    // p(cm) for RooFit
+    OutTree -> Branch("Pmiss3Mag"           ,&Pmiss3Mag             , "Pmiss3Mag/F");
+    OutTree -> Branch("pcmX"                ,&pcmX                  , "pcmX/F");
+    OutTree -> Branch("pcmY"                ,&pcmY                  , "pcmY/F");
+    OutTree -> Branch("pcmT"                ,&pcmT                  , "pcmT/F");
+    OutTree -> Branch("pcmZ"                ,&pcmZ                  , "pcmZ/F");
+    OutTree -> Branch("rooWeight"           ,&rooWeight             , "rooWeight/F");
 //
 //    OutTree -> Branch("missing energy"      ,&Emiss                 , "Emiss/F");
 //    OutTree -> Branch("theta (pq)"          ,&theta_pq              , "theta_pq/F");
