@@ -4,17 +4,22 @@
 // #pragma statement: order matters! Google it ;)
 //
 
-
-#ifdef __MAKECINT__
-#pragma link C++ class std::vector<TVector3>+;
-#pragma link C++ class std::vector<TLorentzVector>+;
-#endif
+//
+//#ifdef __MAKECINT__
+//#pragma link C++ class std::vector<TVector3>+;
+//#pragma link C++ class std::vector<TLorentzVector>+;
+//#endif
 
 
 #ifdef __CINT__
 #pragma link off all globals;
 #pragma link off all classes;
 #pragma link off all functions;
+
+#pragma link C++ class TVector3+;
+#pragma link C++ class TLorentzVector+;
+#pragma link C++ class std::vector<TVector3>+;
+#pragma link C++ class std::vector<TLorentzVector>+;
 
 #pragma link C++ class TEG2dm+;
 #pragma link C++ class TSchemeDATA+;
