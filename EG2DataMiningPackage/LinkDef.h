@@ -19,7 +19,9 @@
 //#pragma link C++ class TVector3+;
 //#pragma link C++ class TLorentzVector+;
 //#pragma link C++ class std::vector<TVector3>+;
-//#pragma link C++ class std::vector<TLorentzVector>+;
+#ifdef __MAKECINT__
+#pragma link C++ class std::vector<TLorentzVector>+;
+#endif
 
 #pragma link C++ class TEG2dm+;
 #pragma link C++ class TSchemeDATA+;
