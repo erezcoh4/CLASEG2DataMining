@@ -47,6 +47,7 @@ else:
     OutFile     = ROOT.TFile(path + "/AnaFiles/"+"Ana_"+FileName+".root","recreate")
     print 'OutFile:',OutFile
 
+
 Nentries    = InTree.GetEntries()
 OutTree     = ROOT.TTree("anaTree","physical variables")
 calc    	= TCalcPhysVarsEG2( InTree , OutTree , A , flags.DataType , axes_frame , flags.verbose)
@@ -54,6 +55,8 @@ calc    	= TCalcPhysVarsEG2( InTree , OutTree , A , flags.DataType , axes_frame 
 if (DataType == "GSIM"):
     calc.SetNp_g(1)
 
+
+OutTree.Fill()
 #for entry in range(0, (int)(flags.evnts_frac*Nentries)):
 #    calc.ComputePhysVars( entry )
 #    if (flags.verbose>0 and entry%flags.print_mod == 0):
