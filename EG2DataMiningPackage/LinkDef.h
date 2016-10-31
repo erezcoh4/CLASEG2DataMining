@@ -4,11 +4,11 @@
 // #pragma statement: order matters! Google it ;)
 //
 
-//
-//#ifdef __MAKECINT__
-//#pragma link C++ class std::vector<TVector3>+;
-//#pragma link C++ class std::vector<TLorentzVector>+;
-//#endif
+
+#ifdef __MAKECINT__
+#pragma link C++ class std::vector<TVector3>+;
+#pragma link C++ class std::vector<TLorentzVector>+;
+#endif
 
 
 #ifdef __CINT__
