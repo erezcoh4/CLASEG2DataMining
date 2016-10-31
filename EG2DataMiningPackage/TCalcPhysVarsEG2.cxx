@@ -358,14 +358,17 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         Plead       = protons.at(0);            // now Plead is calculated in q-Pmiss frame
     }
     Prec        = Pcm - (Plead - q);        // Prec is the 4-vector sum of all recoiling protons
+    if (debug > 2) Printf("got Prec");
 
     
     // A(e,e'p) missing mass M²(miss) = (q + 2mN - Plead)² , all 4-vectors
     Mmiss       = (q + 2*NucleonAtRest - Plead).Mag();
+    if (debug > 2) Printf("got Mmiss");
 
     
     // Bjorken scaling for a moving nucleon
     XbMoving    = Q2 / ( Wtilde.Mag2() + Q2 - Mp2  ); // = Q2 / 2pq [Q2 / ( 2. * (Pmiss * q) )]
+    if (debug > 2) Printf("got XbMoving");
  
 
     // if we have 3 protons, randomize protons 2 and 3
@@ -387,6 +390,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         WmissCmEps  += protons.at(0);
     }
     thetaLeadRec = Plead.Vect().Angle(Prec.Vect());
+    if (debug > 2) Printf("got thetaLeadRec");
     
     
     // roofit
@@ -395,6 +399,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     pcmT = Pcm.Pt();
     pcmZ = Pcm.Pz();
     ComputeWeights();
+    if (debug > 2) Printf("got roofit c.m. ");
     
     // finally, fill the TTree output
     OutTree -> Fill();
