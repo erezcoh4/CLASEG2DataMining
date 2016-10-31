@@ -94,17 +94,17 @@ void TCalcPhysVarsEG2::InitInputTree(){
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::InitOutputTree(){
 
-//    // Integer branches
-//    OutTree -> Branch("target atomic mass"  ,&A                     ,"A/I");
-//    OutTree -> Branch("Np_g"                ,&Np_g                  ,"Np_g/I");
-//    OutTree -> Branch("Np"                  ,&Np                    ,"Np/I");
-//    OutTree -> Branch("NpBack"              ,&NpBack                ,"NpBack/I"); // number of backward going protons
-//    OutTree -> Branch("NpCumulative"        ,&NpCumulative          ,"NpCumulative/I"); // number of backward going protons with 0.3<p
-//    OutTree -> Branch("NpCumulativeSRC"     ,&NpCumulativeSRC       ,"NpCumulativeSRC/I"); // number of backward going protons with 0.3<p<0.7
-//    OutTree -> Branch("total particle num." ,&Ntotal                ,"Ntotal/I");
-//    OutTree -> Branch("neg. particles num." ,&Nnegative             ,"Nnegative/I");
-//    OutTree -> Branch("pCTOFCut"            ,&pCTOFCut              );// std::vector<Int_t>
-//    OutTree -> Branch("pFiducCut"           ,&pFiducCut             );// std::vector<Int_t>
+    // Integer branches
+    OutTree -> Branch("target atomic mass"  ,&A                     ,"A/I");
+    OutTree -> Branch("Np_g"                ,&Np_g                  ,"Np_g/I");
+    OutTree -> Branch("Np"                  ,&Np                    ,"Np/I");
+    OutTree -> Branch("NpBack"              ,&NpBack                ,"NpBack/I"); // number of backward going protons
+    OutTree -> Branch("NpCumulative"        ,&NpCumulative          ,"NpCumulative/I"); // number of backward going protons with 0.3<p
+    OutTree -> Branch("NpCumulativeSRC"     ,&NpCumulativeSRC       ,"NpCumulativeSRC/I"); // number of backward going protons with 0.3<p<0.7
+    OutTree -> Branch("total particle num." ,&Ntotal                ,"Ntotal/I");
+    OutTree -> Branch("neg. particles num." ,&Nnegative             ,"Nnegative/I");
+    OutTree -> Branch("pCTOFCut"            ,&pCTOFCut              );// std::vector<Int_t>
+    OutTree -> Branch("pFiducCut"           ,&pFiducCut             );// std::vector<Int_t>
 //
 //    
 //    // Float_t branches
