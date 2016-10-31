@@ -30,3 +30,7 @@ print "running option ",flags.option
 # instances
 dm  = TEG2dm()
 analysis = TAnalysis()
+
+
+# flags
+A = flags.atomic_mass

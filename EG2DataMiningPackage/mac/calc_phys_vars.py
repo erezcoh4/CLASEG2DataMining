@@ -22,7 +22,7 @@ from definitions import *
 
 
 #dm  = TEG2dm()
-A   = flags.atomic_mass
+#A = flags.atomic_mass
 SchemeType  = flags.SchemedType
 DataType    = flags.DataType
 

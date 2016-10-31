@@ -403,6 +403,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     // finally, fill the TTree output
     OutTree -> Fill();
+    if (debug > 2) Printf("filled output tree with %d entries ",(int)OutTree->GetEntries());
 
 }
 
