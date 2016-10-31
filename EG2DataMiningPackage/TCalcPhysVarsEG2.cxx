@@ -154,14 +154,14 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("PcmFinalState"       ,"TLorentzVector"       ,&PcmFinalState);
     OutTree -> Branch("Plead"               ,"TLorentzVector"       ,&Plead);
     OutTree -> Branch("Prec"                ,"TLorentzVector"       ,&Prec);
-    OutTree -> Branch("q"                   ,"TLorentzVector"       ,&q);
-    OutTree -> Branch("e"                   ,"TLorentzVector"       ,&e);
-    OutTree -> Branch("Wtilde"              ,"TLorentzVector"       ,&Wtilde);
-    OutTree -> Branch("Wmiss"               ,"TLorentzVector"       ,&Wmiss);
-    OutTree -> Branch("WmissWithCm"         ,"TLorentzVector"       ,&WmissWithCm);
-    OutTree -> Branch("WmissCmEps"          ,"TLorentzVector"       ,&WmissCmEps);
-    OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
-    OutTree -> Branch("protonsLab"          ,&protonsLab);          // std::vector<TLorentzVector>
+//    OutTree -> Branch("q"                   ,"TLorentzVector"       ,&q);
+//    OutTree -> Branch("e"                   ,"TLorentzVector"       ,&e);
+//    OutTree -> Branch("Wtilde"              ,"TLorentzVector"       ,&Wtilde);
+//    OutTree -> Branch("Wmiss"               ,"TLorentzVector"       ,&Wmiss);
+//    OutTree -> Branch("WmissWithCm"         ,"TLorentzVector"       ,&WmissWithCm);
+//    OutTree -> Branch("WmissCmEps"          ,"TLorentzVector"       ,&WmissCmEps);
+//    OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
+//    OutTree -> Branch("protonsLab"          ,&protonsLab);          // std::vector<TLorentzVector>
 
     
     
