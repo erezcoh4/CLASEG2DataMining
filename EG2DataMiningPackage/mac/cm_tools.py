@@ -1,14 +1,15 @@
-import time , sys , os , math , datetime , ROOT
-import matplotlib , pandas as pd , numpy as np
-import matplotlib as mpl , seaborn as sns; sns.set(style="white", color_codes=True , font_scale=1)
-from matplotlib import pyplot as plt
-from ROOT import TAnalysis, TAnalysisEG2, GenerateEvents, TSchemeDATA
-from root_numpy import hist2array , tree2array
-from scipy.stats import ks_2samp
-from math import sqrt
-sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
-import GeneralPlot as gp
-import gc
+#import time , sys , os , math , datetime , ROOT
+#import matplotlib , pandas as pd , numpy as np
+#import matplotlib as mpl , seaborn as sns; sns.set(style="white", color_codes=True , font_scale=1)
+#from matplotlib import pyplot as plt
+#from ROOT import TAnalysis, TAnalysisEG2, GenerateEvents, TSchemeDATA
+#from root_numpy import hist2array , tree2array
+#from scipy.stats import ks_2samp
+#from math import sqrt
+#sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
+#import GeneralPlot as gp
+#import gc
+from definitions import * 
 analysis = TAnalysis()
 scheme = TSchemeDATA()
 
@@ -211,7 +212,8 @@ def fit_par_plot( fig , i_subplot , data , var , weight , title ): # a sub-routi
     ax.grid(True,linestyle='-',color='0.95')
     [Xfit,XfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_x_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_xErr_' + weight ],data[ var + '_xErr_' + weight ]], 'black','v','none',r'$%s_{x}$'%title ,'const')
     [Yfit,YfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_y_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_yErr_' + weight ],data[ var + '_yErr_' + weight ]], 'red'  ,'o','none',r'$%s_{y}$'%title ,'const')
-    [Tfit,TfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_t_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_tErr_' + weight ],data[ var + '_tErr_' + weight ]], 'green','^','none',r'$%s_{\perp}$'%title ,'const')
+    [Tfit,TfitErr] = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_t_' + weight],'const')
+    #    [Tfit,TfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_t_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_tErr_' + weight ],data[ var + '_tErr_' + weight ]], 'green','^','none',r'$%s_{\perp}$'%title ,'const')
     #    Tfit , TfitErr = 0.5*(Xfit + Yfit) ,  math.sqrt(XfitErr*XfitErr + YfitErr*YfitErr)
     [Za1,Za1err],[Za2,Za2err] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_zErr_' + weight ],data[ var + '_zErr_' + weight ]], 'blue' ,'s','none',r'$%s_{\vec{p}_{miss}}$'%title ,'linear')
     set_frame( ax , r'%s $%s$'%(weight,title) , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left")
