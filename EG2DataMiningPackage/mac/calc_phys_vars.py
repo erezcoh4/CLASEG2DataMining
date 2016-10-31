@@ -6,22 +6,22 @@
     python mac/calc_phys_vars.py --DataType=GSIM -evf=0.01 -p10000 -r80 
     python mac/calc_phys_vars.py -A12 --DataType=New_NoCTofDATA --SchemedType=TwoSlowProtons_piminus_p -evf=1 -p100
 '''
+from definitions import *
+#import ROOT , os , sys
+#from ROOT import TEG2dm , TSchemeDATA , TAnalysisEG2 , TCalcPhysVarsEG2
+#sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
+#sys.path.insert(0, '/home/erez/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
+#import input_flags
+#flags = input_flags.get_args()
 
-import ROOT , os , sys
-from ROOT import TEG2dm , TSchemeDATA , TAnalysisEG2 , TCalcPhysVarsEG2
-sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
-sys.path.insert(0, '/home/erez/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
-import input_flags
-flags = input_flags.get_args()
+#if flags.worker == "erez":
+#    path = "/Users/erezcohen/Desktop/DataMining"
 
-if flags.worker == "erez":
-    path = "/Users/erezcohen/Desktop/DataMining"
-
-elif flags.worker == "helion":
-    path = "/home/erez/DataMining"
+#elif flags.worker == "helion":
+#    path = "/home/erez/DataMining"
 
 
-dm  = TEG2dm()
+#dm  = TEG2dm()
 A   = flags.atomic_mass
 SchemeType  = flags.SchemedType
 DataType    = flags.DataType
