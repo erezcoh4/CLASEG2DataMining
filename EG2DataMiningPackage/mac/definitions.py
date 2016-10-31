@@ -1,7 +1,7 @@
 
 import ROOT , time , sys , math , datetime ,  matplotlib
 import matplotlib as mpl, pandas as pd , numpy as np, seaborn as sns ; sns.set(style="white", color_codes=True , font_scale=1)
-from ROOT import TPlots, TAnalysisEG2, TAnalysisEG2 , TEG2dm , TSchemeDATA ,GenerateEvents
+from ROOT import TPlots, TAnalysis, TAnalysisEG2 , TEG2dm , TSchemeDATA ,GenerateEvents
 from matplotlib import pyplot as plt
 from root_numpy import hist2array , tree2array
 from scipy.stats import ks_2samp
