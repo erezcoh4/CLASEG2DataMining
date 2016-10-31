@@ -17,3 +17,4 @@ elif flags.worker == "helion":
     path = "/home/erez/DataMining"
 
 
+print "running option ",flags.option

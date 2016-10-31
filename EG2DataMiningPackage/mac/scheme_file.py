@@ -19,7 +19,6 @@ from definitions import *
 #elif flags.worker == "helion":
 #    path = "/home/erez/DataMining"
 
-
 dm          = TEG2dm()
 A           = flags.atomic_mass
 DataType    = flags.DataType
