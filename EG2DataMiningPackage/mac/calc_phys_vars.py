@@ -56,11 +56,10 @@ if (DataType == "GSIM"):
     calc.SetNp_g(1)
 
 
-OutTree.Fill()
-#for entry in range(0, (int)(flags.evnts_frac*Nentries)):
-#    calc.ComputePhysVars( entry )
-#    if (flags.verbose>0 and entry%flags.print_mod == 0):
-#        calc.PrintData( entry )
+for entry in range(0, (int)(flags.evnts_frac*Nentries)):
+    calc.ComputePhysVars( entry )
+    if (flags.verbose>0 and entry%flags.print_mod == 0):
+        calc.PrintData( entry )
 
 
 
