@@ -138,14 +138,14 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("q_phi"               ,&q_phi                 , "q_phi/F");
     OutTree -> Branch("q_theta"             ,&q_theta               , "q_theta/F");
     OutTree -> Branch("Pmiss_phi"           ,&Pmiss_phi             , "Pmiss_phi/F");
+
+
+    
+    // TVector3 branches
+    OutTree -> Branch("PmRctLab3"           ,"TVector3"             ,&PmRctLab3);
+    OutTree -> Branch("eVertex"             ,"TVector3"             ,&eVertex);
+    OutTree -> Branch("pVertex"             ,&pVertex);             // std::vector<TVector3>
 //
-//
-//    
-//    // TVector3 branches
-//    OutTree -> Branch("PmRctLab3"           ,"TVector3"             ,&PmRctLab3);
-//    OutTree -> Branch("eVertex"             ,"TVector3"             ,&eVertex);
-//    OutTree -> Branch("pVertex"             ,&pVertex);             // std::vector<TVector3>
-// 
 //    
 //    // TLorentzVector branches
 //    OutTree -> Branch("Pmiss"               ,"TLorentzVector"       ,&Pmiss);
