@@ -29,7 +29,6 @@
 #pragma link C++ class TCalcPhysVarsEG2+;
 #pragma link C++ class TAnalysisEG2+;
 #pragma link C++ class T3pSimulation+;
-#pragma link C++ class std::vector<TLorentzVector>+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
