@@ -145,23 +145,23 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("PmRctLab3"           ,"TVector3"             ,&PmRctLab3);
     OutTree -> Branch("eVertex"             ,"TVector3"             ,&eVertex);
     OutTree -> Branch("pVertex"             ,&pVertex);             // std::vector<TVector3>
-//
-//    
-//    // TLorentzVector branches
-//    OutTree -> Branch("Pmiss"               ,"TLorentzVector"       ,&Pmiss);
-//    OutTree -> Branch("PmissRct"            ,"TLorentzVector"       ,&PmissRct);
-//    OutTree -> Branch("Pcm"                 ,"TLorentzVector"       ,&Pcm);
-//    OutTree -> Branch("PcmFinalState"       ,"TLorentzVector"       ,&PcmFinalState);
-//    OutTree -> Branch("Plead"               ,"TLorentzVector"       ,&Plead);
-//    OutTree -> Branch("Prec"                ,"TLorentzVector"       ,&Prec);
-//    OutTree -> Branch("q"                   ,"TLorentzVector"       ,&q);
-//    OutTree -> Branch("e"                   ,"TLorentzVector"       ,&e);
-//    OutTree -> Branch("Wtilde"              ,"TLorentzVector"       ,&Wtilde);
-//    OutTree -> Branch("Wmiss"               ,"TLorentzVector"       ,&Wmiss);
-//    OutTree -> Branch("WmissWithCm"         ,"TLorentzVector"       ,&WmissWithCm);
-//    OutTree -> Branch("WmissCmEps"          ,"TLorentzVector"       ,&WmissCmEps);
-//    OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
-//    OutTree -> Branch("protonsLab"          ,&protonsLab);          // std::vector<TLorentzVector>
+
+    
+    // TLorentzVector branches
+    OutTree -> Branch("Pmiss"               ,"TLorentzVector"       ,&Pmiss);
+    OutTree -> Branch("PmissRct"            ,"TLorentzVector"       ,&PmissRct);
+    OutTree -> Branch("Pcm"                 ,"TLorentzVector"       ,&Pcm);
+    OutTree -> Branch("PcmFinalState"       ,"TLorentzVector"       ,&PcmFinalState);
+    OutTree -> Branch("Plead"               ,"TLorentzVector"       ,&Plead);
+    OutTree -> Branch("Prec"                ,"TLorentzVector"       ,&Prec);
+    OutTree -> Branch("q"                   ,"TLorentzVector"       ,&q);
+    OutTree -> Branch("e"                   ,"TLorentzVector"       ,&e);
+    OutTree -> Branch("Wtilde"              ,"TLorentzVector"       ,&Wtilde);
+    OutTree -> Branch("Wmiss"               ,"TLorentzVector"       ,&Wmiss);
+    OutTree -> Branch("WmissWithCm"         ,"TLorentzVector"       ,&WmissWithCm);
+    OutTree -> Branch("WmissCmEps"          ,"TLorentzVector"       ,&WmissCmEps);
+    OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
+    OutTree -> Branch("protonsLab"          ,&protonsLab);          // std::vector<TLorentzVector>
 
     
     
