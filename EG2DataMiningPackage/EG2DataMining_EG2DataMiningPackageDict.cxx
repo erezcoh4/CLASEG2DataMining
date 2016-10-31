@@ -47,6 +47,70 @@ namespace std {} using namespace std;
 // Header files passed via #pragma extra_include
 
 namespace ROOT {
+   static void *new_TVector3(void *p = 0);
+   static void *newArray_TVector3(Long_t size, void *p);
+   static void delete_TVector3(void *p);
+   static void deleteArray_TVector3(void *p);
+   static void destruct_TVector3(void *p);
+
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::TVector3*)
+   {
+      ::TVector3 *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::TVector3 >(0);
+      static ::ROOT::TGenericClassInfo 
+         instance("TVector3", ::TVector3::Class_Version(), "TVector3.h", 27,
+                  typeid(::TVector3), DefineBehavior(ptr, ptr),
+                  &::TVector3::Dictionary, isa_proxy, 4,
+                  sizeof(::TVector3) );
+      instance.SetNew(&new_TVector3);
+      instance.SetNewArray(&newArray_TVector3);
+      instance.SetDelete(&delete_TVector3);
+      instance.SetDeleteArray(&deleteArray_TVector3);
+      instance.SetDestructor(&destruct_TVector3);
+      return &instance;
+   }
+   TGenericClassInfo *GenerateInitInstance(const ::TVector3*)
+   {
+      return GenerateInitInstanceLocal((::TVector3*)0);
+   }
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::TVector3*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+} // end of namespace ROOT
+
+namespace ROOT {
+   static void *new_TLorentzVector(void *p = 0);
+   static void *newArray_TLorentzVector(Long_t size, void *p);
+   static void delete_TLorentzVector(void *p);
+   static void deleteArray_TLorentzVector(void *p);
+   static void destruct_TLorentzVector(void *p);
+
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::TLorentzVector*)
+   {
+      ::TLorentzVector *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::TLorentzVector >(0);
+      static ::ROOT::TGenericClassInfo 
+         instance("TLorentzVector", ::TLorentzVector::Class_Version(), "TLorentzVector.h", 38,
+                  typeid(::TLorentzVector), DefineBehavior(ptr, ptr),
+                  &::TLorentzVector::Dictionary, isa_proxy, 4,
+                  sizeof(::TLorentzVector) );
+      instance.SetNew(&new_TLorentzVector);
+      instance.SetNewArray(&newArray_TLorentzVector);
+      instance.SetDelete(&delete_TLorentzVector);
+      instance.SetDeleteArray(&deleteArray_TLorentzVector);
+      instance.SetDestructor(&destruct_TLorentzVector);
+      return &instance;
+   }
+   TGenericClassInfo *GenerateInitInstance(const ::TLorentzVector*)
+   {
+      return GenerateInitInstanceLocal((::TLorentzVector*)0);
+   }
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::TLorentzVector*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+} // end of namespace ROOT
+
+namespace ROOT {
    static TClass *TEG2dm_Dictionary();
    static void TEG2dm_TClassManip(TClass*);
    static void *new_TEG2dm(void *p = 0);
@@ -270,6 +334,142 @@ namespace ROOT {
    }
 
 } // end of namespace ROOT
+
+//______________________________________________________________________________
+atomic_TClass_ptr TVector3::fgIsA(0);  // static to hold class pointer
+
+//______________________________________________________________________________
+const char *TVector3::Class_Name()
+{
+   return "TVector3";
+}
+
+//______________________________________________________________________________
+const char *TVector3::ImplFileName()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::TVector3*)0x0)->GetImplFileName();
+}
+
+//______________________________________________________________________________
+int TVector3::ImplFileLine()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::TVector3*)0x0)->GetImplFileLine();
+}
+
+//______________________________________________________________________________
+TClass *TVector3::Dictionary()
+{
+   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::TVector3*)0x0)->GetClass();
+   return fgIsA;
+}
+
+//______________________________________________________________________________
+TClass *TVector3::Class()
+{
+   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::TVector3*)0x0)->GetClass(); }
+   return fgIsA;
+}
+
+//______________________________________________________________________________
+atomic_TClass_ptr TLorentzVector::fgIsA(0);  // static to hold class pointer
+
+//______________________________________________________________________________
+const char *TLorentzVector::Class_Name()
+{
+   return "TLorentzVector";
+}
+
+//______________________________________________________________________________
+const char *TLorentzVector::ImplFileName()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::TLorentzVector*)0x0)->GetImplFileName();
+}
+
+//______________________________________________________________________________
+int TLorentzVector::ImplFileLine()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::TLorentzVector*)0x0)->GetImplFileLine();
+}
+
+//______________________________________________________________________________
+TClass *TLorentzVector::Dictionary()
+{
+   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::TLorentzVector*)0x0)->GetClass();
+   return fgIsA;
+}
+
+//______________________________________________________________________________
+TClass *TLorentzVector::Class()
+{
+   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::TLorentzVector*)0x0)->GetClass(); }
+   return fgIsA;
+}
+
+//______________________________________________________________________________
+void TVector3::Streamer(TBuffer &R__b)
+{
+   // Stream an object of class TVector3.
+
+   if (R__b.IsReading()) {
+      R__b.ReadClassBuffer(TVector3::Class(),this);
+   } else {
+      R__b.WriteClassBuffer(TVector3::Class(),this);
+   }
+}
+
+namespace ROOT {
+   // Wrappers around operator new
+   static void *new_TVector3(void *p) {
+      return  p ? new(p) ::TVector3 : new ::TVector3;
+   }
+   static void *newArray_TVector3(Long_t nElements, void *p) {
+      return p ? new(p) ::TVector3[nElements] : new ::TVector3[nElements];
+   }
+   // Wrapper around operator delete
+   static void delete_TVector3(void *p) {
+      delete ((::TVector3*)p);
+   }
+   static void deleteArray_TVector3(void *p) {
+      delete [] ((::TVector3*)p);
+   }
+   static void destruct_TVector3(void *p) {
+      typedef ::TVector3 current_t;
+      ((current_t*)p)->~current_t();
+   }
+} // end of namespace ROOT for class ::TVector3
+
+//______________________________________________________________________________
+void TLorentzVector::Streamer(TBuffer &R__b)
+{
+   // Stream an object of class TLorentzVector.
+
+   if (R__b.IsReading()) {
+      R__b.ReadClassBuffer(TLorentzVector::Class(),this);
+   } else {
+      R__b.WriteClassBuffer(TLorentzVector::Class(),this);
+   }
+}
+
+namespace ROOT {
+   // Wrappers around operator new
+   static void *new_TLorentzVector(void *p) {
+      return  p ? new(p) ::TLorentzVector : new ::TLorentzVector;
+   }
+   static void *newArray_TLorentzVector(Long_t nElements, void *p) {
+      return p ? new(p) ::TLorentzVector[nElements] : new ::TLorentzVector[nElements];
+   }
+   // Wrapper around operator delete
+   static void delete_TLorentzVector(void *p) {
+      delete ((::TLorentzVector*)p);
+   }
+   static void deleteArray_TLorentzVector(void *p) {
+      delete [] ((::TLorentzVector*)p);
+   }
+   static void destruct_TLorentzVector(void *p) {
+      typedef ::TLorentzVector current_t;
+      ((current_t*)p)->~current_t();
+   }
+} // end of namespace ROOT for class ::TLorentzVector
 
 namespace ROOT {
    // Wrappers around operator new
@@ -650,10 +850,10 @@ R"DICTFWDDCLS(
 #pragma clang diagnostic ignored "-Wignored-attributes"
 #pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
 extern int __Cling_Autoloading_Map;
-class __attribute__((annotate("$clingAutoload$T3pSimulation.h")))  TVector3;
+class __attribute__((annotate(R"ATTRDUMP(A 3D physics vector)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$T3pSimulation.h")))  TVector3;
 namespace std{inline namespace __1{template <class _Tp> class __attribute__((annotate("$clingAutoload$string")))  allocator;
 }}
-class __attribute__((annotate("$clingAutoload$T3pSimulation.h")))  TLorentzVector;
+class __attribute__((annotate(R"ATTRDUMP(A four vector with (-,-,-,+) metric)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$T3pSimulation.h")))  TLorentzVector;
 class __attribute__((annotate("$clingAutoload$T3pSimulation.h")))  TEG2dm;
 class __attribute__((annotate("$clingAutoload$TSchemeDATA.h")))  TSchemeDATA;
 class __attribute__((annotate("$clingAutoload$T3pSimulation.h")))  TCalcPhysVarsEG2;
@@ -680,7 +880,9 @@ class __attribute__((annotate("$clingAutoload$T3pSimulation.h")))  T3pSimulation
 "TAnalysisEG2", payloadCode, "@",
 "TCalcPhysVarsEG2", payloadCode, "@",
 "TEG2dm", payloadCode, "@",
+"TLorentzVector", payloadCode, "@",
 "TSchemeDATA", payloadCode, "@",
+"TVector3", payloadCode, "@",
 nullptr};
 
     static bool isInitialized = false;
