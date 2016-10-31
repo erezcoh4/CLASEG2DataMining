@@ -120,24 +120,24 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("pcmT"                ,&pcmT                  , "pcmT/F");
     OutTree -> Branch("pcmZ"                ,&pcmZ                  , "pcmZ/F");
     OutTree -> Branch("rooWeight"           ,&rooWeight             , "rooWeight/F");
-//
-//    OutTree -> Branch("missing energy"      ,&Emiss                 , "Emiss/F");
-//    OutTree -> Branch("theta (pq)"          ,&theta_pq              , "theta_pq/F");
-//    OutTree -> Branch("p/q"                 ,&p_over_q              , "p_over_q/F");
-//    OutTree -> Branch("q LC fraction"       ,&alpha_q               , "alpha_q/F");
-//    OutTree -> Branch("sum of LC fractions" ,&sum_alpha             , "sum_alpha/F");
-//    OutTree -> Branch("theta p(miss)-p2 p3" ,&thetaMiss23           , "thetaMiss23/F");
-//    OutTree -> Branch("theta p(lead)-p(rec)",&thetaLeadRec          , "thetaLeadRec/F");
-//    OutTree -> Branch("phi p(miss)-p2 p3"   ,&phiMiss23             , "phiMiss23/F");
-//    OutTree -> Branch("alpha"               ,&alpha                 );// std::vector<Float_t>
-//    OutTree -> Branch("proton_angle"        ,&proton_angle          );// std::vector<Float_t>
-//    OutTree -> Branch("pCTOF"               ,&pCTOF                 );// std::vector<Float_t>
-//    OutTree -> Branch("pEdep"               ,&pEdep                 );// std::vector<Float_t>
-//    OutTree -> Branch("TpMiss"              ,&TpMiss                , "TpMiss/F");
-//    OutTree -> Branch("Tp"                  ,&Tp                    );// std::vector<Float_t> - kinetic energies
-//    OutTree -> Branch("q_phi"               ,&q_phi                 , "q_phi/F");
-//    OutTree -> Branch("q_theta"             ,&q_theta               , "q_theta/F");
-//    OutTree -> Branch("Pmiss_phi"           ,&Pmiss_phi             , "Pmiss_phi/F");
+
+    OutTree -> Branch("missing energy"      ,&Emiss                 , "Emiss/F");
+    OutTree -> Branch("theta (pq)"          ,&theta_pq              , "theta_pq/F");
+    OutTree -> Branch("p/q"                 ,&p_over_q              , "p_over_q/F");
+    OutTree -> Branch("q LC fraction"       ,&alpha_q               , "alpha_q/F");
+    OutTree -> Branch("sum of LC fractions" ,&sum_alpha             , "sum_alpha/F");
+    OutTree -> Branch("theta p(miss)-p2 p3" ,&thetaMiss23           , "thetaMiss23/F");
+    OutTree -> Branch("theta p(lead)-p(rec)",&thetaLeadRec          , "thetaLeadRec/F");
+    OutTree -> Branch("phi p(miss)-p2 p3"   ,&phiMiss23             , "phiMiss23/F");
+    OutTree -> Branch("alpha"               ,&alpha                 );// std::vector<Float_t>
+    OutTree -> Branch("proton_angle"        ,&proton_angle          );// std::vector<Float_t>
+    OutTree -> Branch("pCTOF"               ,&pCTOF                 );// std::vector<Float_t>
+    OutTree -> Branch("pEdep"               ,&pEdep                 );// std::vector<Float_t>
+    OutTree -> Branch("TpMiss"              ,&TpMiss                , "TpMiss/F");
+    OutTree -> Branch("Tp"                  ,&Tp                    );// std::vector<Float_t> - kinetic energies
+    OutTree -> Branch("q_phi"               ,&q_phi                 , "q_phi/F");
+    OutTree -> Branch("q_theta"             ,&q_theta               , "q_theta/F");
+    OutTree -> Branch("Pmiss_phi"           ,&Pmiss_phi             , "Pmiss_phi/F");
 //
 //
 //    
