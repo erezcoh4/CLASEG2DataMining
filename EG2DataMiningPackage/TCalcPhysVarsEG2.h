@@ -91,7 +91,7 @@ public:
     TLorentzVector      q           , q_g       , NucleonAtRest     , TargetAtRest  ;
     TLorentzVector      Plead       , Plead_g   , Pmiss     , Pmiss_g , Pcm   , Prec , PcmFinalState;
     TLorentzVector      PmissRct    , Nlead     , Nmiss     ;
-//    std::vector<TLorentzVector>  protons , protons_g , protonsLab;
+    std::vector<TLorentzVector>  protons , protons_g , protonsLab;
 
     
     /// Default constructor
@@ -140,12 +140,6 @@ public:
     
     void       PrintData (int);
 
-    #ifndef __CINT__
-    protected:
-    
-    std::vector<TLorentzVector>  protons , protons_g , protonsLab;
-    
-    #endif
 
 
 };
