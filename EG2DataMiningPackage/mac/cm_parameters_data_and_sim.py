@@ -1,7 +1,7 @@
 '''
     usage:
     ---------
-    python mac/cm_parameters_data_and_sim.py --option="generate runs"
+    python mac/cm_parameters_data_and_sim.py --option=generate
     
     options (can be ran simultaneously):
             "scheme pp-SRC"
@@ -12,20 +12,11 @@
     
 '''
 
-
-
-#import ROOT , time , sys , math , datetime ,  matplotlib , pandas as pd , numpy as np
-#from ROOT import TPlots, TAnalysisEG2 , TEG2dm , TSchemeDATA ,GenerateEvents
-#sys.path.append('../mac') ; sys.path.append('../../mySoftware/MySoftwarePackage/mac')
-#import input_flags, cm_tools as tools
-#flags = input_flags.get_args()
-
 from definitions import *
-import cm_tools
+import cm_tools as tools
 
 PmissBins = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65] , [0.65,0.75] , [0.75,1.0]]
 #PmissBins = [[0.3,0.5]  , [0.5,0.7] , [0.7,1.0]]
-#path = "/Users/erezcohen/Desktop/DataMining/Analysis_DATA/ppSRCcm"
 A = 12
 start_run  = flags.run
 dm = TEG2dm()

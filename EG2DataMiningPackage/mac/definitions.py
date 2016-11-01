@@ -30,6 +30,7 @@ print "running option ",flags.option
 # instances
 dm  = TEG2dm()
 analysis = TAnalysis()
+scheme = TSchemeDATA()
 
 
 # flags

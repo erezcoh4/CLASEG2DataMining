@@ -1,17 +1,4 @@
-#import time , sys , os , math , datetime , ROOT
-#import matplotlib , pandas as pd , numpy as np
-#import matplotlib as mpl , seaborn as sns; sns.set(style="white", color_codes=True , font_scale=1)
-#from matplotlib import pyplot as plt
-#from ROOT import TAnalysis, TAnalysisEG2, GenerateEvents, TSchemeDATA
-#from root_numpy import hist2array , tree2array
-#from scipy.stats import ks_2samp
-#from math import sqrt
-#sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
-#import GeneralPlot as gp
-#import gc
-from definitions import * 
-analysis = TAnalysis()
-scheme = TSchemeDATA()
+from definitions import *
 
 # ------------------------------------------------------------------------------- #
 # definitions
@@ -217,7 +204,7 @@ def fit_par_plot( fig , i_subplot , data , var , weight , title ): # a sub-routi
     #    Tfit , TfitErr = 0.5*(Xfit + Yfit) ,  math.sqrt(XfitErr*XfitErr + YfitErr*YfitErr)
     [Za1,Za1err],[Za2,Za2err] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_zErr_' + weight ],data[ var + '_zErr_' + weight ]], 'blue' ,'s','none',r'$%s_{\vec{p}_{miss}}$'%title ,'linear')
     set_frame( ax , r'%s $%s$'%(weight,title) , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left")
-    return Xfit , XfitErr , Yfit , YfitErr , Tfit , TfitErr, Za1 , Za1err , Za2 , Za2err
+    return Xfit , XfitErr , Yfit , YfitErr , Tfit , TfitErr, Za1 , Za1err , Za2 , Za2err , ax
 
 # ------------------------------------------------------------------------------- #
 def fit_par_noplot( data , var , weight , title ): # a sub-routine to fit a single parameter; same as fit_par_plot without a plot
@@ -298,10 +285,10 @@ def plot_band_around_cm_parameter_fits( fig , i_subplot , data , var , weight , 
 
     Pmiss = (data.pMiss_max + data.pMiss_min)/2.
     pMissUpErr , pMissLowErr = data.pMiss_max - Pmiss , Pmiss - data.pMiss_min
-
-    fit_par_plot( fig , i_subplot , data , var , weight , title )
+    a1,a2,a3,a4,a5,a6,a7,a8,a9,a10, ax = fit_par_plot( fig , i_subplot , data , var , weight , title )
     plt.fill_between(Pmiss, TBandMin , TBandMax ,alpha=0.5, edgecolor='#CC4F1B', facecolor='#FF9848')
     plt.fill_between(Pmiss, ZBandMin , ZBandMax ,alpha=0.5, edgecolor='#C14F1B', facecolor='#1122CC')
+    return ax
 
 
 # ------------------------------------------------------------------------------- #
@@ -314,20 +301,25 @@ def generate_cm_bands( cm_parameters , fit_pars , CMBandFname , FigureBandFName 
     min_SigmaXY , max_SigmaXY = 0.7*np.min( [fit_pars.SigmaX_unweighted , fit_pars.SigmaY_unweighted] ) , 1.2*np.max( [fit_pars.SigmaX_unweighted,fit_pars.SigmaY_unweighted] )
     SigmaTBandMin   , SigmaTBandMax     = min_SigmaXY , max_SigmaXY
     SigmaZa1BandMin , SigmaZa1BandMax   = fit_pars.SigmaZa1_unweighted*0.6,fit_pars.SigmaZa1_unweighted*1.3 # 0.9 , 1.1
-    SigmaZa2BandMin , SigmaZa2BandMax   = fit_pars.SigmaZa2_unweighted*0.6,fit_pars.SigmaZa2_unweighted*1.3
+    SigmaZa2BandMin , SigmaZa2BandMax   = fit_pars.SigmaZa2_unweighted*0.0,fit_pars.SigmaZa2_unweighted*3
     SigmaZBandMin = float(SigmaZa1BandMin)*(Pmiss)+float(SigmaZa2BandMin)
     SigmaZBandMax = float(SigmaZa1BandMax)*(Pmiss)+float(SigmaZa2BandMax)
     
     MeanTBandMin   , MeanTBandMax     = np.zeros(len(Pmiss)) , np.zeros(len(Pmiss))
     MeanZa1BandMin , MeanZa1BandMax   = fit_pars.MeanZa1_unweighted*0.5,fit_pars.MeanZa1_unweighted*1.5 # 0.7 , 1.3
-    MeanZa2BandMin , MeanZa2BandMax   = fit_pars.MeanZa2_unweighted*0.5,fit_pars.MeanZa2_unweighted*1.5
-    MeanZBandMax = float(MeanZa1BandMax)*(Pmiss)+float(MeanZa2BandMax)
-    MeanZBandMin = float(MeanZa1BandMin)*(Pmiss)+float(MeanZa2BandMin)
+    MeanZa2BandMin , MeanZa2BandMax   = fit_pars.MeanZa2_unweighted*0.2,fit_pars.MeanZa2_unweighted*2
+    MeanZBandMax = np.max([float(MeanZa1BandMax),float(MeanZa1BandMin)])*(Pmiss) + np.max([float(MeanZa2BandMax),float(MeanZa2BandMin)])
+    MeanZBandMin = np.min([float(MeanZa1BandMax),float(MeanZa1BandMin)])*(Pmiss) + np.min([float(MeanZa2BandMax),float(MeanZa2BandMin)])
 
     if DoSaveCanvas:
         fig = plt.figure(figsize=(40,10))
-        plot_band_around_cm_parameter_fits( fig , 121, cm_parameters , 'sigma', 'unweighted' , '\sigma' , SigmaTBandMin , SigmaTBandMax , SigmaZBandMin , SigmaZBandMax  )
-        plot_band_around_cm_parameter_fits( fig , 122, cm_parameters , 'mean', 'unweighted' , 'mean' , MeanTBandMin , MeanTBandMax , MeanZBandMin , MeanZBandMax  )
+        ax = plot_band_around_cm_parameter_fits( fig , 121, cm_parameters , 'sigma', 'unweighted' , '\sigma' , SigmaTBandMin , SigmaTBandMax , SigmaZBandMin , SigmaZBandMax  )
+        ax.text(0.7, 0.06, r'$%.2f<\sigma(x,y)<%.2f$'%(min_SigmaXY , max_SigmaXY), fontsize=25 , color='#FF9848')
+        ax.text(0.7, 0.04, r'$%.2f<\sigma(z): a_{1}<%.2f$'%(SigmaZa1BandMin , SigmaZa1BandMax), fontsize=25, color='#1122CC')
+        ax.text(0.7, 0.02, r'$%.2f<\sigma(z): a_{2}<%.2f$'%(SigmaZa2BandMin , SigmaZa2BandMax), fontsize=25, color='#1122CC')
+        ax = plot_band_around_cm_parameter_fits( fig , 122, cm_parameters , 'mean', 'unweighted' , 'mean' , MeanTBandMin , MeanTBandMax , MeanZBandMin , MeanZBandMax  )
+        ax.text(0.25, 0.6, r'$%.2f<\mu(z): a_{1}<%.2f$'%(MeanZa1BandMin , MeanZa1BandMax), fontsize=25, color='#1122CC')
+        ax.text(0.25, 0.5, r'$%.2f<\mu(z): a_{2}<%.2f$'%(MeanZa2BandMin , MeanZa2BandMax), fontsize=25, color='#1122CC')
         plt.savefig(FigureBandFName)
         print_filename( FigureBandFName , "plots to file" )
 

@@ -82,7 +82,7 @@ public:
     TVector3            Pbeam       , Pe        , Pe_g;
     TVector3            * NMom      , * P1Mom   , * P2Mom           , * e3Vector;
     TVector3            PmRctLab3   , eVertex   ;
-    vector<TVector3>    p3vec       , p3vec_g   , pVertex   ;
+    std::vector<TVector3>    p3vec       , p3vec_g   , pVertex   ;
     
     
     

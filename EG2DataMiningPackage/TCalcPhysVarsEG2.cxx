@@ -171,7 +171,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
         OutTree -> Branch("generated Q2"            ,&Q2_g          , "Q2_g/F");
         OutTree -> Branch("generated Bjorken x"     ,&Xb_g          , "Xb_g/F");
         OutTree -> Branch("protons_g"               ,&protons_g);             // std::vector<TLorentzVector>
-        OutTree -> Branch("pFiducCut_g"             ,&pFiducCut_g);// std::vector<Int_t>
+        OutTree -> Branch("pFiducCut_g"             ,&pFiducCut_g);     // std::vector<Int_t>
 
     }
     if(DataType == "(e,e'npp)"){
