@@ -417,10 +417,8 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     if (debug > 2) Printf("got roofit c.m. ");
     
     // finally, fill the TTree output
-    if (debug > 2){ Printf("output tree: %s , with %d entries ",OutTree->GetName(),(int)OutTree->GetEntries()); OutTree->Print();}
-    if (protons.size()>0) {
-        OutTree -> Fill();
-    }
+    if (debug > 2){ Printf("output tree: %s , with %d entries ",OutTree->GetName(),(int)OutTree->GetEntries()); PrintData(entry);}
+    OutTree -> Fill();
     if (debug > 2) Printf("filled output tree with %d entries ",(int)OutTree->GetEntries());
 
 }
