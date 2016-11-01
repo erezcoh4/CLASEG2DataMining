@@ -198,20 +198,35 @@ void TCalcPhysVarsEG2::InitGlobals(){
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::InitEvent(){
-    if (!p3vec.empty())     p3vec.clear();   // unsorted protons
-    if (!protons.empty())   protons.clear();
-    if (!protonsLab.empty())protonsLab.clear();
-    if (!pVertex.empty())   pVertex.clear();
-    if (!alpha.empty())     alpha.clear();
-    if (!pCTOF.empty())     pCTOF.clear();
-    if (!pCTOFCut.empty())  pCTOFCut.clear();
-    if (!pFiducCut.empty()) pFiducCut.clear();
-    if (!pEdep.empty())     pEdep.clear();
-    if (!Tp.empty())        Tp.clear();
-    if (!proton_angle.empty()) proton_angle.clear();
-    if (!p3vec_g.empty())   p3vec_g.clear();   // unsorted protons
-    if (!protons_g.empty()) protons_g.clear();
-    if (!pFiducCut_g.empty()) pFiducCut_g.clear();
+//    if (!p3vec.empty())     p3vec.clear();   // unsorted protons
+//    if (!protons.empty())   protons.clear();
+//    if (!protonsLab.empty())protonsLab.clear();
+//    if (!pVertex.empty())   pVertex.clear();
+//    if (!alpha.empty())     alpha.clear();
+//    if (!pCTOF.empty())     pCTOF.clear();
+//    if (!pCTOFCut.empty())  pCTOFCut.clear();
+//    if (!pFiducCut.empty()) pFiducCut.clear();
+//    if (!pEdep.empty())     pEdep.clear();
+//    if (!Tp.empty())        Tp.clear();
+//    if (!proton_angle.empty()) proton_angle.clear();
+//    if (!p3vec_g.empty())   p3vec_g.clear();   // unsorted protons
+//    if (!protons_g.empty()) protons_g.clear();
+//    if (!pFiducCut_g.empty()) pFiducCut_g.clear();
+    p3vec.clear();   // unsorted protons
+    protons.clear();
+    protonsLab.clear();
+    pVertex.clear();
+    alpha.clear();
+    pCTOF.clear();
+    pCTOFCut.clear();
+    pFiducCut.clear();
+    pEdep.clear();
+    Tp.clear();
+    proton_angle.clear();
+    p3vec_g.clear();   // unsorted protons
+    protons_g.clear();
+    pFiducCut_g.clear();
+
     Np = NpBack = NpCumulative = NpCumulativeSRC = 0;
     Plead = Plead_g = TLorentzVector();
     Wmiss.SetVectM( TVector3() , 3. * Mp  );
