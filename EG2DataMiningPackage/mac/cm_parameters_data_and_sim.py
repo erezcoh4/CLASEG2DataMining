@@ -29,7 +29,7 @@ if 'scheme pp-SRC' in flags.option or 'scheme' in flags.option: # scheme to pp-S
     SchemedName = "ppSRCCut_%s"% DataName
     ana     = TAnalysisEG2( "SRCPmissXb_"+DataName , flags.cut )
     scheme  = TSchemeDATA()
-    scheme.SchemeOnTCut( "/Users/erezcohen/Desktop/DataMining/AnaFiles" , "Ana_SRCPmissXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ana.ppSRCCut + ana.PrecFiducial)
+    scheme.SchemeOnTCut( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ana.ppSRCCut + ana.PrecFiducial)
     print 'schemed to %s'%SchemedName
 
 
