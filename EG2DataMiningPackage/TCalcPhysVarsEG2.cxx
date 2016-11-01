@@ -178,7 +178,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
         OutTree -> Branch("Nlead"               ,"TLorentzVector"       ,&Plead);
         OutTree -> Branch("Nmiss"               ,"TLorentzVector"       ,&Nmiss);
     }
-    
+    protons.clear();
     if (debug>0) std::cout << "Initialized Output Tree TCalcPhysVarsEG2 on " << OutTree -> GetTitle() << std::endl;
 }
 
