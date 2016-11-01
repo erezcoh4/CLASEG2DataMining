@@ -27,7 +27,7 @@ if 'scheme pp-SRC' in flags.option or 'scheme' in flags.option: # scheme to pp-S
 
     DataName    = "DATA_%s"% dm.Target(flags.atomic_mass)
     SchemedName = "ppSRCCut_%s"% DataName
-    ana     = TAnalysisEG2( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName+".root" , flags.cut )
+    ana     = TAnalysisEG2( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName , flags.cut )
     scheme  = TSchemeDATA()
     scheme.SchemeOnTCut( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ana.ppSRCCut + ana.PrecFiducial)
     print 'schemed to %s'%SchemedName
