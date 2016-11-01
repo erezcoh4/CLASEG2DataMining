@@ -11,6 +11,7 @@ OBJECTS = $(SOURCES:.cxx=.o)
 # include options for this package
 INCFLAGS  = -I.                       #Include itself
 INCFLAGS += -I$(LARLITE_USERDEVDIR)/mySoftware
+INCFLAGS += -I$(LARLITE_USERDEVDIR)/CLASEG2DataMining/GSIMulation
 
 
 # platform-specific options
