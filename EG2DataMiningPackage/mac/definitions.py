@@ -1,5 +1,5 @@
 
-import ROOT , time , sys , math , datetime ,  matplotlib
+import ROOT , time , os, sys , math , datetime ,  matplotlib
 sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
 sys.path.insert(0, '/home/erez/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
 sys.path.insert(0, '../../GSIMulation')

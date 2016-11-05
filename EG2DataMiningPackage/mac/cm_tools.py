@@ -204,7 +204,7 @@ def fit_par_plot( fig , i_subplot , data , var , weight , title ): # a sub-routi
     #    Tfit , TfitErr = 0.5*(Xfit + Yfit) ,  math.sqrt(XfitErr*XfitErr + YfitErr*YfitErr)
     [Za1,Za1err],[Za2,Za2err] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_zErr_' + weight ],data[ var + '_zErr_' + weight ]], 'blue' ,'s','none',r'$%s_{\vec{p}_{miss}}$'%title ,'linear')
     set_frame( ax , r'%s $%s$'%(weight,title) , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left")
-    return Xfit , XfitErr , Yfit , YfitErr , Tfit , TfitErr, Za1 , Za1err , Za2 , Za2err , ax
+    return [Xfit , XfitErr , Yfit , YfitErr , Tfit , TfitErr, Za1 , Za1err , Za2 , Za2err , ax]
 
 # ------------------------------------------------------------------------------- #
 def fit_par_noplot( data , var , weight , title ): # a sub-routine to fit a single parameter; same as fit_par_plot without a plot
@@ -216,7 +216,7 @@ def fit_par_noplot( data , var , weight , title ): # a sub-routine to fit a sing
     Tfit,TfitErr = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_t_' + weight] ,'const')
     #    Tfit , TfitErr = 0.5*(Xfit + Yfit) ,  math.sqrt(XfitErr*XfitErr + YfitErr*YfitErr)
     Za1,Za1err,Za2,Za2err = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_z_' + weight] , 'linear' )
-    return Xfit , XfitErr , Yfit , YfitErr , Tfit , TfitErr, Za1 , Za1err , Za2 , Za2err
+    return [Xfit , XfitErr , Yfit , YfitErr , Tfit , TfitErr, Za1 , Za1err , Za2 , Za2err , 0 ]
 
 
 
@@ -230,25 +230,25 @@ def fit_cm_parameters( run , data , FigureFName = '' , DoPlot = False ): # all p
      SigmaY_unweighted  , SigmaYerr_unweighted,
      sT_unweighted      , sTerr_unweighted,
      SigmaZa1_unweighted, SigmaZa1err_unweighted,
-     SigmaZa2_unweighted, SigmaZa2err_unweighted ] = fit_par_plot ( fig, 221, data, 'sigma', 'unweighted', '\sigma') if DoPlot else fit_par_noplot ( data,'sigma','unweighted','\sigma' )
+     SigmaZa2_unweighted, SigmaZa2err_unweighted, ax ] = fit_par_plot ( fig, 221, data, 'sigma', 'unweighted', '\sigma') if DoPlot else fit_par_noplot ( data,'sigma','unweighted','\sigma' )
 
     [MeanX_unweighted   , MeanXerr_unweighted,
      MeanY_unweighted   , MeanYerr_unweighted,
      mT_unweighted      , mTerr_unweighted,
      MeanZa1_unweighted , MeanZa1err_unweighted,
-     MeanZa2_unweighted , MeanZa2err_unweighted ] = fit_par_plot( fig, 222, data, 'mean', 'unweighted', 'mean') if DoPlot else fit_par_noplot( data, 'mean','unweighted','mean')
+     MeanZa2_unweighted , MeanZa2err_unweighted, ax ] = fit_par_plot( fig, 222, data, 'mean', 'unweighted', 'mean') if DoPlot else fit_par_noplot( data, 'mean','unweighted','mean')
 
     [SigmaX_weighted  , SigmaXerr_weighted,
      SigmaY_weighted  , SigmaYerr_weighted,
      sT_weighted      , sTerr_weighted,
      SigmaZa1_weighted, SigmaZa1err_weighted,
-     SigmaZa2_weighted, SigmaZa2err_weighted ] = fit_par_plot ( fig, 223, data, 'sigma', 'weighted', '\sigma') if DoPlot else fit_par_noplot ( data,'sigma','weighted','\sigma')
+     SigmaZa2_weighted, SigmaZa2err_weighted, ax ] = fit_par_plot ( fig, 223, data, 'sigma', 'weighted', '\sigma') if DoPlot else fit_par_noplot ( data,'sigma','weighted','\sigma')
      
     [MeanX_weighted   , MeanXerr_weighted,
      MeanY_weighted   , MeanYerr_weighted,
      mT_weighted      , mTerr_weighted,
      MeanZa1_weighted , MeanZa1err_weighted,
-     MeanZa2_weighted , MeanZa2err_weighted ] = fit_par_plot( fig, 224, data, 'mean', 'weighted', 'mean') if DoPlot else fit_par_noplot( data, 'mean','weighted','mean')
+     MeanZa2_weighted , MeanZa2err_weighted, ax ] = fit_par_plot( fig, 224, data, 'mean', 'weighted', 'mean') if DoPlot else fit_par_noplot( data, 'mean','weighted','mean')
      
 
     df_fit_parameters = pd.DataFrame({ 'run':run
@@ -285,7 +285,7 @@ def plot_band_around_cm_parameter_fits( fig , i_subplot , data , var , weight , 
 
     Pmiss = (data.pMiss_max + data.pMiss_min)/2.
     pMissUpErr , pMissLowErr = data.pMiss_max - Pmiss , Pmiss - data.pMiss_min
-    a1,a2,a3,a4,a5,a6,a7,a8,a9,a10, ax = fit_par_plot( fig , i_subplot , data , var , weight , title )
+    [a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,ax] = fit_par_plot( fig , i_subplot , data , var , weight , title )
     plt.fill_between(Pmiss, TBandMin , TBandMax ,alpha=0.5, edgecolor='#CC4F1B', facecolor='#FF9848')
     plt.fill_between(Pmiss, ZBandMin , ZBandMax ,alpha=0.5, edgecolor='#C14F1B', facecolor='#1122CC')
     return ax
@@ -356,9 +356,9 @@ def linspace_parameter( band_min  , band_max  , Npts ):
 # ------------------------------------------------------------------------------- #
 #def generate_runs_with_different_parameters( cm_fits_parameters , cm_pars_bands ,
 def generate_runs_with_different_parameters( option,
-                                            data_fits , bands , NRand ,
-                                            start_run , debug , PmissBins , resutlsFName , buildup_resutlsFName , reco_fitsFName , target ,
-                                            NptsBand , Ncores = 1 , i_core = 0 ):
+                                            data_fits , bands ,
+                                            start_run , debug , PmissBins , buildup_resutlsFName , reco_fitsFName , target ,
+                                            N , Ncores = 1 , i_core = 0 ):
     
     # the data (nominal values)
     ana_data = TAnalysisEG2( "ppSRCCut_DATA_%s"% target )
@@ -367,21 +367,22 @@ def generate_runs_with_different_parameters( option,
 
     # simulation pandas::DataFrame
     df_reco_parameters = pd.DataFrame(columns=cm_pars_columns)
-    df_reco_fits = pd.DataFrame(columns=fits_columns)
-    df_results = pd.DataFrame(columns=results_columns)
+#    df_reco_fits = pd.DataFrame(columns=fits_columns)
+#    df_results = pd.DataFrame(columns=results_columns)
 
 
     # the bands around data (around nominal values)
-    SigmaT   = linspace_parameter( bands.SigmaTBandMin[0], bands.SigmaTBandMax[0], 10 )
-    SigmaZa1 = linspace_parameter( bands.SigmaZa1Min[0]  , bands.SigmaZa1Max[0]  , 10 )
-    SigmaZa2 = linspace_parameter( bands.SigmaZa2Min[0]  , bands.SigmaZa2Max[0]  , 4 )
-    MeanZa1  = linspace_parameter( bands.MeanZa1Min[0]   , bands.MeanZa1Max[0]   , 5 )
-    MeanZa2  = linspace_parameter( bands.MeanZa2Min[0]   , bands.MeanZa2Max[0]   , 5 )
+    print "N: ",N
+    SigmaT   = linspace_parameter( bands.SigmaTBandMin[0], bands.SigmaTBandMax[0], int(N.SigmaT) )
+    SigmaZa1 = linspace_parameter( bands.SigmaZa1Min[0]  , bands.SigmaZa1Max[0]  , int(N.SigmaZa1) )
+    SigmaZa2 = linspace_parameter( bands.SigmaZa2Min[0]  , bands.SigmaZa2Max[0]  , int(N.SigmaZa2) )
+    MeanZa1  = linspace_parameter( bands.MeanZa1Min[0]   , bands.MeanZa1Max[0]   , int(N.MeanZa1) )
+    MeanZa2  = linspace_parameter( bands.MeanZa2Min[0]   , bands.MeanZa2Max[0]   , int(N.MeanZa2) )
     if debug>1: print "SigmaT:",SigmaT , "\nSigmaZa1:",SigmaZa1 , "\nSigmaZa2:",SigmaZa2 , "\nMeanZa1:",MeanZa1, "\nMeanZa2:",MeanZa2 , "\n mean(pcmZ) = %f * p(miss) + %f"%(MeanZa1 , MeanZa2  )
     NrunsThisCore , NrunsTotal = len(SigmaT)*len(SigmaZa1)*len(SigmaZa2)*len(MeanZa1)*len(MeanZa2) , len(SigmaT)*len(SigmaZa1)*len(SigmaZa2)*len(MeanZa1)*len(MeanZa2)
     if (debug>0): print '\033[95m' + 'Core %d (out of %d) will procees %d runs (total %d runs)'%(i_core,Ncores,NrunsThisCore,NrunsTotal) + '\033[0m'
     
-    run = start_run #+ (i_core+1)*1000
+    run = start_run
     
     '''
         recoil proton acceptances:
@@ -392,7 +393,7 @@ def generate_runs_with_different_parameters( option,
         pAcceptacneFile = ROOT.TFile("/Users/erezcohen/Desktop/DataMining/GSIM_DATA/PrecoilAcceptance.root")
         h = pAcceptacneFile.Get("hRescaled")
         gen_events = GenerateEvents( path , run , debug )
-        gen_events.SetNRand( NRand )
+        gen_events.SetNRand( int(N.NRand) )
         gen_events.Use_protonAcceptacne( True )
         gen_events.Set_protonAcceptacne( h )
         gen_events.SetInputChain_eep()
@@ -507,10 +508,8 @@ def generate_runs_with_different_parameters( option,
 
 
                             if (debug>4): print "results: ",results
-                            df_reco_parameters = df_reco_parameters.append( reco_parameters )
-                            df_reco_fits = df_reco_fits.append( reco_fits )
+                            stream_dataframe_to_file( reco_fits, reco_fitsFName  )
                             stream_dataframe_to_file( results, buildup_resutlsFName  )
-                            df_results = df_results.append( results )
                             ana_sim.CloseFile()
                             if (debug>1): print "appended into pandas.DataFrames"
                             if (debug>2): print "resutls: ",df_results
@@ -525,10 +524,8 @@ def generate_runs_with_different_parameters( option,
         gen_events.ReleaseInputChain_eep()
 
     if 'analyze' in option:
-        stream_dataframe_to_file( df_reco_fits, reco_fitsFName  )
         print_filename( reco_fitsFName , "reconstructed parameters fits wrote to" )
-        stream_dataframe_to_file( df_results, resutlsFName  )
-        print_filename( resutlsFName , "results wrote to " )
+        print_filename( buildup_resutlsFName , "results wrote to " )
     print_important("done...") ; print_line()
 
 

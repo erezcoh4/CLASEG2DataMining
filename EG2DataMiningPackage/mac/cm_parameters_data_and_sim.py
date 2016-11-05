@@ -62,14 +62,14 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
     # (4) generate runs with different parameters
     cm_pars_bands = pd.read_csv( tools.CMBandFname(ppPath+'/DATA/data') )
     cm_fits_parameters = pd.read_csv( tools.CMfitsFname( ppPath+'/DATA/data' ) )
-    NRand = 10
-    NptsBand = 10 # if flags.files_frac<1 else flags.files_frac
-    start_run = 10000
+    
+    test_name , start_run = 'VaryOnlyMeanZa2' , 21500
+    N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':500 , 'NRand':10}, index=[0])
+    full_path = ppPath+'/simulation/'+test_name+'_simulation'
     tools.generate_runs_with_different_parameters( flags.option ,
-                                                  cm_fits_parameters , cm_pars_bands , NRand ,
+                                                  cm_fits_parameters , cm_pars_bands ,
                                                   start_run , flags.verbose , PmissBins ,
-                                                  tools.resutlsFName( ppPath+'/simulation/simulation' ) , tools.buildup_resutlsFName( ppPath+'/simulation/simulation' ) , tools.CMfitsFname( ppPath + '/simulation/simulation' ) , dm.Target(A)  ,
-                                                  NptsBand )
+                                                  tools.buildup_resutlsFName( full_path ) , tools.CMfitsFname( full_path ) , dm.Target(A)  , N )
 
 
 
