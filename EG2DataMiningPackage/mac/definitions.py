@@ -9,6 +9,7 @@ from matplotlib import pyplot as plt
 from root_numpy import hist2array , tree2array
 from scipy.stats import ks_2samp
 from math import sqrt
+import rootpy.plotting.root2matplotlib as rplt
 import input_flags , GeneralPlot as gp , gc
 flags = input_flags.get_args()
 

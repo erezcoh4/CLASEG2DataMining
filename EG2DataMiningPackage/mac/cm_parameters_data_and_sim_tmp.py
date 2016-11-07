@@ -1,53 +1,32 @@
-from definitions import *
-import cm_tools as tools
 '''
     usage:
     ---------
     python mac/cm_parameters_data_and_sim.py --option=generate
     
     options (can be ran simultaneously):
-    acceptance  {"recoil proton acceptance"}
-    scheme      {"scheme pp-SRC"}
-    extract     {"extract data cm-parameters"}
-    bends       {"create bands for EG"}
-    generate    {"generate and analyze runs"}
+            acceptance  {"recoil proton acceptance"}
+            scheme      {"scheme pp-SRC"}
+            extract     {"extract data cm-parameters"}
+            bends       {"create bands for EG"}
+            generate    {"generate and analyze runs"}
     
 '''
 
+from definitions import *
+import cm_tools as tools
 
 PmissBins = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65] , [0.65,0.75] , [0.75,1.0]]
 #PmissBins = [[0.3,0.5]  , [0.5,0.7] , [0.7,1.0]]
+A = 12
+start_run  = flags.run
+dm = TEG2dm()
 
 
 if 'recoil proton acceptance' in flags.option or 'acceptance' in flags.option:
     pAcceptacneFile = ROOT.TFile("/Users/erezcohen/Desktop/DataMining/GSIM_DATA/PrecoilAcceptance.root")
     hAcceptance = pAcceptacneFile.Get("hRescaled")
-    hAcceptanceFiducial = hAcceptance
-    for binx in range(hAcceptance.GetXaxis().GetNbins()):
-        for biny in range(hAcceptance.GetYaxis().GetNbins()):
-            for binz in range(hAcceptance.GetZaxis().GetNbins()):
-                hAcceptanceFiducial.SetBinContent(hAcceptance.GetBinContent(binx,biny,binz))
-    df_recoil_proton = pd.DataFrame(columns=['p','theta','phi','acceptance'])
-    c = ROOT.TCanvas()
-    #    hThetaPhi = hAcceptance.Project3D("zy")
-    hThetaPhi = hAcceptanceFiducial.Project3D("zy")
-    hThetaPhi.Draw("col")
-    hThetaPhi.GetXaxis().SetTitle("#theta [deg.]")
-    hThetaPhi.GetYaxis().SetTitle("#phi [deg.]")
-    c.SaveAs("/Users/erezcohen/Desktop/acceptance_theta_phi.pdf")
-#    p_recoil = ROOT.TVector3()
-#    for i in range(0,10000):
-#        # random vector in the ranges
-#        p_recoil_mag    = random.uniform( 0 , 1 )
-#        p_recoil_theta  = random.uniform( 0 , 120 )
-#        p_recoil_phi    = random.uniform( -30 , 330 )
-#        # keep only fiducial protons
-#        p_recoil.SetMagThetaPhi( p_recoil_mag , p_recoil_theta/r2d , p_recoil_phi/r2d )
-#        if dm.protonFiducial ( p_recoil )
-#            p_acceptance = hAcceptance.Interpolate( p_recoil_mag, p_recoil_theta, p_recoil_phi ) / 100
-#            p_recoil_acceptance = pd.DataFrame({'p':p_recoil_mag,'theta':p_recoil_theta,'phi':p_recoil_phi,'acceptance':p_acceptance},index=i)
-#            df_recoil_proton = df_recoil_proton.append(p_recoil_acceptance)
-
+    hAcceptance.Draw()
+#    hThetaPhi = hAcceptance.Project3D("xy")
 
 
 
@@ -91,14 +70,14 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
     # (4) generate runs with different parameters
     cm_pars_bands = pd.read_csv( tools.CMBandFname(ppPath+'/DATA/data') )
     cm_fits_parameters = pd.read_csv( tools.CMfitsFname( ppPath+'/DATA/data' ) )
-    
-    test_name , start_run = 'VaryOnlyMeanZa2' , 21500
-    N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':500 , 'NRand':10}, index=[0])
-    full_path = ppPath+'/simulation/'+test_name+'_simulation'
+    NRand = 10
+    NptsBand = 10 # if flags.files_frac<1 else flags.files_frac
+    start_run = 10000
     tools.generate_runs_with_different_parameters( flags.option ,
-                                                  cm_fits_parameters , cm_pars_bands ,
+                                                  cm_fits_parameters , cm_pars_bands , NRand ,
                                                   start_run , flags.verbose , PmissBins ,
-                                                  tools.buildup_resutlsFName( full_path ) , tools.CMfitsFname( full_path ) , dm.Target(A)  , N )
+                                                  tools.resutlsFName( ppPath+'/simulation/simulation' ) , tools.buildup_resutlsFName( ppPath+'/simulation/simulation' ) , tools.CMfitsFname( ppPath + '/simulation/simulation' ) , dm.Target(A)  ,
+                                                  NptsBand )
 
 
 
