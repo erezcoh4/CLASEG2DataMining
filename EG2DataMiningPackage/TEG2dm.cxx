@@ -166,7 +166,8 @@ Int_t TEG2dm::protonFiducial( TVector3 pMomentum , int debug ){
     phi = ChangePhiToPhiLab( phi );
     
     // Check if within fiducials
-    int sector = (int)(phi/60);
+//    int sector = (int)(phi/60);
+    int sector = (int)((phi+30)/60);
     if (sector<0 || sector>5)
     return 0;
     

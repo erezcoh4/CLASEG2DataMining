@@ -19,35 +19,10 @@ PmissBins = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65] , [0.65,0.75] , [0.75,1.0]]
 #PmissBins = [[0.3,0.5]  , [0.5,0.7] , [0.7,1.0]]
 
 
-if 'recoil proton acceptance' in flags.option or 'acceptance' in flags.option:
-    pAcceptacneFile = ROOT.TFile("/Users/erezcohen/Desktop/DataMining/GSIM_DATA/PrecoilAcceptance.root")
-    hAcceptance = pAcceptacneFile.Get("hRescaled")
-    hAcceptanceFiducial = hAcceptance
-    for binx in range(hAcceptance.GetXaxis().GetNbins()):
-        for biny in range(hAcceptance.GetYaxis().GetNbins()):
-            for binz in range(hAcceptance.GetZaxis().GetNbins()):
-                hAcceptanceFiducial.SetBinContent(hAcceptance.GetBinContent(binx,biny,binz))
-    df_recoil_proton = pd.DataFrame(columns=['p','theta','phi','acceptance'])
-    c = ROOT.TCanvas()
-    #    hThetaPhi = hAcceptance.Project3D("zy")
-    hThetaPhi = hAcceptanceFiducial.Project3D("zy")
-    hThetaPhi.Draw("col")
-    hThetaPhi.GetXaxis().SetTitle("#theta [deg.]")
-    hThetaPhi.GetYaxis().SetTitle("#phi [deg.]")
-    c.SaveAs("/Users/erezcohen/Desktop/acceptance_theta_phi.pdf")
-#    p_recoil = ROOT.TVector3()
-#    for i in range(0,10000):
-#        # random vector in the ranges
-#        p_recoil_mag    = random.uniform( 0 , 1 )
-#        p_recoil_theta  = random.uniform( 0 , 120 )
-#        p_recoil_phi    = random.uniform( -30 , 330 )
-#        # keep only fiducial protons
-#        p_recoil.SetMagThetaPhi( p_recoil_mag , p_recoil_theta/r2d , p_recoil_phi/r2d )
-#        if dm.protonFiducial ( p_recoil )
-#            p_acceptance = hAcceptance.Interpolate( p_recoil_mag, p_recoil_theta, p_recoil_phi ) / 100
-#            p_recoil_acceptance = pd.DataFrame({'p':p_recoil_mag,'theta':p_recoil_theta,'phi':p_recoil_phi,'acceptance':p_acceptance},index=i)
-#            df_recoil_proton = df_recoil_proton.append(p_recoil_acceptance)
 
+if 'recoil proton acceptance' in flags.option or 'acceptance' in flags.option:
+    
+    tools.recoil_proton_acceptance()
 
 
 
@@ -92,8 +67,8 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
     cm_pars_bands = pd.read_csv( tools.CMBandFname(ppPath+'/DATA/data') )
     cm_fits_parameters = pd.read_csv( tools.CMfitsFname( ppPath+'/DATA/data' ) )
     
-    test_name , start_run = 'VaryOnlyMeanZa2' , 21500
-    N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':500 , 'NRand':10}, index=[0])
+    test_name , start_run = 'VaryAllTogether' , 30000
+    N = pd.DataFrame({'SigmaT':10,'SigmaZa1':10 ,'SigmaZa2':4 ,'MeanZa1':5 ,'MeanZa2':5 , 'NRand':10}, index=[0])
     full_path = ppPath+'/simulation/'+test_name+'_simulation'
     tools.generate_runs_with_different_parameters( flags.option ,
                                                   cm_fits_parameters , cm_pars_bands ,
@@ -109,11 +84,9 @@ if 'find the best paramteres' in flags.option:
     # (5) find the best-correspondance from the generated runs, to estimate nature's parameteres
     tools.print_filename(tools.SimParametersFileName( ppPath+'/simulation/' ),'reading file ')
     simulation_results = pd.read_csv( tools.SimParametersFileName( ppPath+'/simulation/' ) )
-#    tools.plot( simulation_results , 'genSigmaT' , 'recSigmaT_unweighted' )
-#    tools.plot( simulation_results , 'KSpCMx' , 'KSpCMy' )
-#    tools.plot( simulation_results , 'genSigmaT' , 'NsigST_unweighted' , 'generated $\sigma_T$ [GeV/c]' , 'unweighted N$\sigma$ ($\sigma_T$)' )
     tools.plot( simulation_results , 'genSigmaL_a1' , 'NsigSL_a1_unweighted' , 'generated a$_1$ ($\sigma_z$) [GeV/c]' , 'unweighted N$\sigma$ (a$_1$ ($\sigma_z$))' )
-#    tools.find_best_parameters( simulation_results )
+
+
 
 
 

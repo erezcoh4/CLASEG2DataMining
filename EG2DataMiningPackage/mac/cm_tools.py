@@ -566,3 +566,48 @@ def stream_dataframe_to_file( df , finename ):
 
 
 
+# ------------------------------------------------------------------------------- #
+def draw_projection_theta_phi( h , title , option = 'colz' ):
+
+    # continue here: take only a slice from zy plane
+    hThetaPhi = h.Project3D("zy")
+    binx = h.GetXaxis().GetNbins()
+    for binz in range(h.GetZaxis().GetNbins()):
+        for biny in range(h.GetYaxis().GetNbins()):
+            hThetaPhi.SetBinContent( binz , biny , h.GetBinContent(binx,biny,binz) )
+
+    hThetaPhi.GetXaxis().SetTitle("#theta [deg.]")
+    hThetaPhi.GetYaxis().SetTitle("#phi [deg.]")
+    hThetaPhi.SetTitle("recoil proton acceptance #theta vs. #phi, %s"%title)
+    hThetaPhi.Draw(option)
+
+
+# ------------------------------------------------------------------------------- #
+def recoil_proton_acceptance():
+    
+    pAcceptacneFile = ROOT.TFile("/Users/erezcohen/Desktop/DataMining/GSIM_DATA/PrecoilAcceptance.root")
+    hAcceptance = pAcceptacneFile.Get("hRescaled")
+    hAcceptanceFiducial = hAcceptance.Clone("hAcceptanceFiducial")
+    
+    p_recoil = ROOT.TVector3()
+    for binx in range(hAcceptance.GetXaxis().GetNbins()): # p(recoil) magnitude
+        p_recoil_mag = hAcceptance.GetXaxis().GetBinCenter(binx)
+        
+        for biny in range(hAcceptance.GetYaxis().GetNbins()): # p(recoil) theta
+            p_recoil_theta = hAcceptance.GetYaxis().GetBinCenter(biny)
+            
+            for binz in range(hAcceptance.GetZaxis().GetNbins()): # p(recoil) phi
+                p_recoil_phi = hAcceptance.GetZaxis().GetBinCenter(binz)
+                
+                p_recoil.SetMagThetaPhi( p_recoil_mag , math.radians(p_recoil_theta) , math.radians(p_recoil_phi) )
+                fiducial = dm.protonFiducial ( p_recoil , 1 )
+                acceptance = hAcceptance.GetBinContent(binx,biny,binz)
+                hAcceptanceFiducial.SetBinContent( binx, biny, binz,acceptance if fiducial else 0 )
+
+
+    c = ROOT.TCanvas()
+    draw_projection_theta_phi( hAcceptance , "full acceptance" , 'colz' )
+    draw_projection_theta_phi( hAcceptanceFiducial , "fiducial region" , 'same' )
+    c.SaveAs("/Users/erezcohen/Desktop/acceptance_theta_phi.png")
+
+
