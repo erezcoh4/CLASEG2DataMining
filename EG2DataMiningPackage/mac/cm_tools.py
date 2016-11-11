@@ -129,7 +129,7 @@ def plot_errorbar_and_fit( ax , x , y , xerr , yerr , color , marker , lstyle , 
     
     elif fit_type=='linear':
         a1 , a1err , a2 , a2err  = fit_as_a_function_of_pmiss( x , y , fit_type )
-        ax.plot( x , a1 * x + a2 , color = color , label=label + "$=(%.2f)p_{miss}+(%.2f)$"%( a1 , a2 ))
+        ax.plot( x , a1 * x + a2 , color = color , label=label + "$=(%.3f)p_{miss}+(%.3f)$"%( a1 , a2 ))
         return [ a1 , a1err] , [ a2 , a2err ]
 
 # ------------------------------------------------------------------------------- #
@@ -567,47 +567,67 @@ def stream_dataframe_to_file( df , finename ):
 
 
 # ------------------------------------------------------------------------------- #
-def draw_projection_theta_phi( h , title , option = 'colz' ):
+def draw_projection_theta_phi( h , name="" ):
 
     # continue here: take only a slice from zy plane
-    hThetaPhi = h.Project3D("zy")
-    binx = h.GetXaxis().GetNbins()
-    for binz in range(h.GetZaxis().GetNbins()):
-        for biny in range(h.GetYaxis().GetNbins()):
-            hThetaPhi.SetBinContent( binz , biny , h.GetBinContent(binx,biny,binz) )
+    hProj = h.Project3D("yz")
+    hThetaPhi = hProj.Clone("hThetaPhi")
 
-    hThetaPhi.GetXaxis().SetTitle("#theta [deg.]")
-    hThetaPhi.GetYaxis().SetTitle("#phi [deg.]")
-    hThetaPhi.SetTitle("recoil proton acceptance #theta vs. #phi, %s"%title)
-    hThetaPhi.Draw(option)
+    fig = plt.figure(figsize=[10,5])
+    fig, ax = plt.subplots(1,1, figsize=(10,10), subplot_kw={'aspect':'equal'})
+    NbinsTheta = hThetaPhi.GetXaxis().GetNbins()
+    NbinsPhi = hThetaPhi.GetYaxis().GetNbins()
+    H = np.ones((NbinsTheta, NbinsPhi))
+    for bin_theta in range(NbinsTheta):
+        for bin_phi in range(NbinsPhi):
+            bin_content = float(hThetaPhi.GetBinContent(bin_theta,bin_phi)) / (30*100)
+            H[bin_theta][bin_phi]= bin_content
+    extent = [0,120,-30,330]
+    im = plt.imshow(H,interpolation='none', origin='lower', extent=extent)
+    im = ax.imshow(np.ma.masked_where(H == 0, H), interpolation='none', origin='lower', extent=extent)
+    ax.set_xlabel('$\\theta$ [deg.]',fontsize=25)
+    ax.set_ylabel('$\\phi$ [deg.]',fontsize=25)
+    for tick in ax.xaxis.get_major_ticks():
+        tick.label.set_fontsize(25)
+    for tick in ax.yaxis.get_major_ticks():
+        tick.label.set_fontsize(25)
+    ax.set_aspect('auto')
+    cb = plt.colorbar()
+    for t in cb.ax.get_yticklabels():
+        t.set_fontsize(20)
+
+    outfile_name = "/Users/erezcohen/Desktop/acceptance_theta_phi_%s.pdf"%name
+    plt.savefig( outfile_name )
+    print_filename( outfile_name , "plot theta/phi acceptance")
 
 
 # ------------------------------------------------------------------------------- #
 def recoil_proton_acceptance():
     
     pAcceptacneFile = ROOT.TFile("/Users/erezcohen/Desktop/DataMining/GSIM_DATA/PrecoilAcceptance.root")
-    hAcceptance = pAcceptacneFile.Get("hRescaled")
-    hAcceptanceFiducial = hAcceptance.Clone("hAcceptanceFiducial")
+    h = pAcceptacneFile.Get("hRescaled")
+    hAcceptanceAll      = h.Clone("hAcceptanceAll")
+    hAcceptanceFiducial = h.Clone("hAcceptanceFiducial")
     
     p_recoil = ROOT.TVector3()
-    for binx in range(hAcceptance.GetXaxis().GetNbins()): # p(recoil) magnitude
-        p_recoil_mag = hAcceptance.GetXaxis().GetBinCenter(binx)
+    for binx in range(h.GetXaxis().GetNbins()): # p(recoil) magnitude
+        p_recoil_mag = h.GetXaxis().GetBinCenter(binx)
         
-        for biny in range(hAcceptance.GetYaxis().GetNbins()): # p(recoil) theta
-            p_recoil_theta = hAcceptance.GetYaxis().GetBinCenter(biny)
+        for biny in range(h.GetYaxis().GetNbins()): # p(recoil) theta
+            p_recoil_theta = h.GetYaxis().GetBinCenter(biny)
             
-            for binz in range(hAcceptance.GetZaxis().GetNbins()): # p(recoil) phi
-                p_recoil_phi = hAcceptance.GetZaxis().GetBinCenter(binz)
+            for binz in range(h.GetZaxis().GetNbins()): # p(recoil) phi
+                p_recoil_phi = h.GetZaxis().GetBinCenter(binz)
                 
                 p_recoil.SetMagThetaPhi( p_recoil_mag , math.radians(p_recoil_theta) , math.radians(p_recoil_phi) )
                 fiducial = dm.protonFiducial ( p_recoil , 1 )
-                acceptance = hAcceptance.GetBinContent(binx,biny,binz)
-                hAcceptanceFiducial.SetBinContent( binx, biny, binz,acceptance if fiducial else 0 )
+                acceptance = h.GetBinContent(binx,biny,binz)
+                hAcceptanceFiducial.SetBinContent( binx, biny, binz, acceptance if fiducial else 0 )
 
 
-    c = ROOT.TCanvas()
-    draw_projection_theta_phi( hAcceptance , "full acceptance" , 'colz' )
-    draw_projection_theta_phi( hAcceptanceFiducial , "fiducial region" , 'same' )
-    c.SaveAs("/Users/erezcohen/Desktop/acceptance_theta_phi.png")
+    draw_projection_theta_phi( hAcceptanceAll , "full_acceptance" )
+    draw_projection_theta_phi( hAcceptanceFiducial , "fiducial_region" )
+
+
 
 
