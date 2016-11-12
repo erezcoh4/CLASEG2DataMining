@@ -73,6 +73,10 @@ if 'create bands for EG' in flags.option or 'bands' in flags.option:
 
 # (5) generate runs with different parameters
 # ----------------------------------------------------------
+# ToDo: Continue here! make
+# (1) add to the CSV the mean and width in x,y,z in each Pmiss Bin!
+# (2) convert the CSV to a ROOT file as well
+# (3) re-run all the runs from scratch? if yes, with test_name changing .....
 if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 'analyze' in flags.option or 'analyse' in flags.option:
     
     cm_pars_bands = pd.read_csv( CMBandFname(ppPath+'/DATA/data') )

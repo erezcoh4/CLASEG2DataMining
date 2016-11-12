@@ -152,8 +152,8 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
         pMiss_min , pMiss_max = PmissBins[i][0] , PmissBins[i][1]
 
         if DoSaveCanvas:
-            unweighted = fana.RooFitCM( pMiss_min , pMiss_max , False , True, canvas_unweighted, 4*i + 1 )
-            weighted = fana.RooFitCM( pMiss_min , pMiss_max , True , True, canvas_weighted, 4*i + 1 )
+            unweighted = fana.RooFitCM( pMiss_min , pMiss_max , False , True, flags.verbose, canvas_unweighted, 4*i + 1 )
+            weighted = fana.RooFitCM( pMiss_min , pMiss_max , True , True, flags.verbose, canvas_weighted, 4*i + 1 )
         else:
             unweighted = fana.RooFitCM( pMiss_min , pMiss_max , False )
             weighted = fana.RooFitCM( pMiss_min , pMiss_max , True )
@@ -307,7 +307,7 @@ def generate_cm_bands( cm_parameters , fit_pars , CMBandFname , FigureBandFName 
     
     MeanTBandMin   , MeanTBandMax     = np.zeros(len(Pmiss)) , np.zeros(len(Pmiss))
     MeanZa1BandMin , MeanZa1BandMax   = fit_pars.MeanZa1_unweighted*0.5,fit_pars.MeanZa1_unweighted*1.5 # 0.7 , 1.3
-    MeanZa2BandMin , MeanZa2BandMax   = fit_pars.MeanZa2_unweighted*0.2,fit_pars.MeanZa2_unweighted*2
+    MeanZa2BandMin , MeanZa2BandMax   = np.min([fit_pars.MeanZa2_unweighted*0.2,fit_pars.MeanZa2_unweighted*2]) , np.max([fit_pars.MeanZa2_unweighted*0.2,fit_pars.MeanZa2_unweighted*2])
     MeanZBandMax = np.max([float(MeanZa1BandMax),float(MeanZa1BandMin)])*(Pmiss) + np.max([float(MeanZa2BandMax),float(MeanZa2BandMin)])
     MeanZBandMin = np.min([float(MeanZa1BandMax),float(MeanZa1BandMin)])*(Pmiss) + np.min([float(MeanZa2BandMax),float(MeanZa2BandMin)])
 
@@ -318,8 +318,8 @@ def generate_cm_bands( cm_parameters , fit_pars , CMBandFname , FigureBandFName 
         ax.text(0.7, 0.04, r'$%.2f<\sigma(z): a_{1}<%.2f$'%(SigmaZa1BandMin , SigmaZa1BandMax), fontsize=25, color='#1122CC')
         ax.text(0.7, 0.02, r'$%.2f<\sigma(z): a_{2}<%.2f$'%(SigmaZa2BandMin , SigmaZa2BandMax), fontsize=25, color='#1122CC')
         ax = plot_band_around_cm_parameter_fits( fig , 122, cm_parameters , 'mean', 'unweighted' , 'mean' , MeanTBandMin , MeanTBandMax , MeanZBandMin , MeanZBandMax  )
-        ax.text(0.25, 0.6, r'$%.2f<\mu(z): a_{1}<%.2f$'%(MeanZa1BandMin , MeanZa1BandMax), fontsize=25, color='#1122CC')
-        ax.text(0.25, 0.5, r'$%.2f<\mu(z): a_{2}<%.2f$'%(MeanZa2BandMin , MeanZa2BandMax), fontsize=25, color='#1122CC')
+        ax.text(0.75, -0.24, r'$%.2f<\mu(z): a_{1}<%.2f$'%(MeanZa1BandMin , MeanZa1BandMax), fontsize=25, color='#1122CC')
+        ax.text(0.75, -0.32, r'$%.2f<\mu(z): a_{2}<%.2f$'%(MeanZa2BandMin , MeanZa2BandMax), fontsize=25, color='#1122CC')
         plt.savefig(FigureBandFName)
         print_filename( FigureBandFName , "plots to file" )
 
@@ -367,8 +367,6 @@ def generate_runs_with_different_parameters( option,
 
     # simulation pandas::DataFrame
     df_reco_parameters = pd.DataFrame(columns=cm_pars_columns)
-#    df_reco_fits = pd.DataFrame(columns=fits_columns)
-#    df_results = pd.DataFrame(columns=results_columns)
 
 
     # the bands around data (around nominal values)
@@ -468,7 +466,7 @@ def generate_runs_with_different_parameters( option,
                             if (debug>1): print "got weighted roofit results"
 
                             # KS test for the c.m. distributions in x,y,z directions
-                            KSpCMx , KSxPval = KStest( PmissBins ,ana_sim , ana_data , "pcmX" , ROOT.TCut('') , debug) # maybe make it 2D, with adding the pmiss magnitude as a second variable?
+                            KSpCMx , KSxPval = KStest( PmissBins ,ana_sim , ana_data , "pcmX" , ROOT.TCut('') , debug) # maybe make it 2D? with adding the pmiss magnitude as a second variable?
                             KSpCMy , KSyPval = KStest( PmissBins ,ana_sim , ana_data , "pcmY" , ROOT.TCut('') , debug)
                             KSpCMt , KStPval = KStest( PmissBins ,ana_sim , ana_data , "pcmT" , ROOT.TCut('') , debug)
                             KSpCMz , KSzPval = KStest( PmissBins ,ana_sim , ana_data , "pcmZ" , ROOT.TCut('') , debug)

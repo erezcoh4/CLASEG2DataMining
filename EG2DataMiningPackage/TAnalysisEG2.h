@@ -87,7 +87,7 @@ public:
     
     
     // rooFit
-    std::vector<Double_t>    RooFitCM (Float_t PmissMin, Float_t PmissMax, bool DoWeight = false, bool PlotFits = false, TCanvas * c = nullptr, Int_t start_cd = 1 );
+    std::vector<Double_t>    RooFitCM (Float_t PmissMin, Float_t PmissMax, bool DoWeight = false, bool PlotFits = false, int debug = 0, TCanvas * c = nullptr, Int_t start_cd = 1 );
     vector<Float_t>       GetPcmEntry (int);
     vector<Float_t>   GetFullpppEvent (int, bool DoPrint = false);
     vector<Float_t>        GetGSIMEvt (int, bool DoPrint = false);

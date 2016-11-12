@@ -643,10 +643,13 @@ void TCalcPhysVarsEG2::p12Randomize(){
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::ComputeWeights(){
-    Theta           = r2d * e.Theta();
-    Mott            = pow( e2/(2*Ebeam) , 2 ) * pow( cos(Theta/2.) , 2 ) / pow( sin(Theta/2.) , 4 );
-    DipoleFF        = pow( 1/(1 + Q2/0.71) , 2);
-    rooWeight       =  1./ ( Mott * pow( DipoleFF ,2) ) ;
+    Theta           = e.Theta();
+    Mott            = pow( cos(Theta/2.) , 2 ) / pow( sin(Theta/2.) , 4 );
+    DipoleFF2       = pow( 1./(1. + Q2/0.71) , 4);
+    rooWeight       =  1./ ( Mott * DipoleFF2 ) ;
+    if (debug>3) {
+        SHOW3 ( Mott , DipoleFF2 , rooWeight) ;
+    }
 }
 
 
