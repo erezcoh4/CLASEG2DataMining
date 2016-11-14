@@ -538,12 +538,7 @@ def generate_runs_with_different_parameters( option,
                                                    ,'recSigmaX_unweighted_PmBin3':reco_parameters.get_value(3,'sigma_x_unweighted')
                                                    ,'recMeanX_unweighted_PmBin4':reco_parameters.get_value(4,'mean_x_unweighted')
                                                    ,'recSigmaX_unweighted_PmBin4':reco_parameters.get_value(4,'sigma_x_unweighted')
-#                                                   # y
-#                                                   ,'recMeanY_unweighted_PmBin0':float(reco_parameters[0].mean_y_unweighted)
-#                                                   ,'recMeanY_unweighted_PmBin1':float(reco_parameters[1].mean_y_unweighted)
-#                                                   ,'recMeanY_unweighted_PmBin2':float(reco_parameters[2].mean_y_unweighted)
-#                                                   ,'recMeanY_unweighted_PmBin3':float(reco_parameters[3].mean_y_unweighted)
-#                                                   ,'recMeanY_unweighted_PmBin4':float(reco_parameters[4].mean_y_unweighted)
+                                                   # y
 
                                                    } , index = [int(run)])
  
