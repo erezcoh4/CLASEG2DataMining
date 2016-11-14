@@ -24,7 +24,7 @@ else:
     InFile      = ROOT.TFile(path + "/Schemed_EG2_DATA/"+"Schemed_"+FileName+".root")
     InTree      = InFile.Get("T")
     OutFile     = ROOT.TFile(path + "/AnaFiles/"+"Ana_"+FileName+".root","recreate")
-    print 'OutFile:',OutFile
+    print 'InFile:',InFile,'OutFile:',OutFile
 
 
 Nentries    = InTree.GetEntries()

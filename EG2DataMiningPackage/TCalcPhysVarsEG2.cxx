@@ -25,12 +25,12 @@ TCalcPhysVarsEG2::TCalcPhysVarsEG2( TTree * fInTree, TTree * fOutTree, int fA , 
 void TCalcPhysVarsEG2::InitInputTree(){
     
     InTree -> SetBranchAddress("Xb"                 , &Xb);
-    InTree -> SetBranchAddress("Q2"                 , &Q2);
     InTree -> SetBranchAddress("P_nmb"              , &Np);
-    InTree -> SetBranchAddress("T_nmb"              , &Ntotal);
     InTree -> SetBranchAddress("N_nmb"              , &Nnegative);
   
     if (DataType == "DATA" || DataType == "GSIM") {
+        InTree -> SetBranchAddress("Q2"                 , &Q2);
+        InTree -> SetBranchAddress("T_nmb"              , &Ntotal);
         InTree -> SetBranchAddress("Nu"             , &Nu);
         InTree -> SetBranchAddress("Px_e"           , &Px_e);
         InTree -> SetBranchAddress("Py_e"           , &Py_e);
@@ -47,7 +47,7 @@ void TCalcPhysVarsEG2::InitInputTree(){
         InTree -> SetBranchAddress("CTOF"           , &uns_pCTOF);
     }
     
-    else if(DataType == "NoCTof_DATA" || DataType == "New_NoCTofDATA") {
+    else if(DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
         InTree -> SetBranchAddress("N_Px"           , &N_Px);    // negative particles momenta (electron is the first)
         InTree -> SetBranchAddress("N_Py"           , &N_Py);    // negative particles momenta (electron is the first)
         InTree -> SetBranchAddress("N_Pz"           , &N_Pz);    // negative particles momenta (electron is the first)
@@ -84,6 +84,9 @@ void TCalcPhysVarsEG2::InitInputTree(){
         InTree -> SetBranchAddress("Px_g"           , &PpX_g);
         InTree -> SetBranchAddress("Py_g"           , &PpY_g);
         InTree -> SetBranchAddress("Pz_g"           , &PpZ_g);
+    }
+    if(DataType == "New_NoCTofDATA"){
+        InTree -> SetBranchAddress("T_nmb"          , &Ntotal);
     }
     
     
@@ -198,34 +201,34 @@ void TCalcPhysVarsEG2::InitGlobals(){
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::InitEvent(){
-//    if (!p3vec.empty())     p3vec.clear();   // unsorted protons
-//    if (!protons.empty())   protons.clear();
-//    if (!protonsLab.empty())protonsLab.clear();
-//    if (!pVertex.empty())   pVertex.clear();
-//    if (!alpha.empty())     alpha.clear();
-//    if (!pCTOF.empty())     pCTOF.clear();
-//    if (!pCTOFCut.empty())  pCTOFCut.clear();
-//    if (!pFiducCut.empty()) pFiducCut.clear();
-//    if (!pEdep.empty())     pEdep.clear();
-//    if (!Tp.empty())        Tp.clear();
-//    if (!proton_angle.empty()) proton_angle.clear();
-//    if (!p3vec_g.empty())   p3vec_g.clear();   // unsorted protons
-//    if (!protons_g.empty()) protons_g.clear();
-//    if (!pFiducCut_g.empty()) pFiducCut_g.clear();
-    p3vec.clear();   // unsorted protons
-    protons.clear();
-    protonsLab.clear();
-    pVertex.clear();
-    alpha.clear();
-    pCTOF.clear();
-    pCTOFCut.clear();
-    pFiducCut.clear();
-    pEdep.clear();
-    Tp.clear();
-    proton_angle.clear();
-    p3vec_g.clear();   // unsorted protons
-    protons_g.clear();
-    pFiducCut_g.clear();
+    if (!p3vec.empty())     p3vec.clear();   // unsorted protons
+    if (!protons.empty())   protons.clear();
+    if (!protonsLab.empty())protonsLab.clear();
+    if (!pVertex.empty())   pVertex.clear();
+    if (!alpha.empty())     alpha.clear();
+    if (!pCTOF.empty())     pCTOF.clear();
+    if (!pCTOFCut.empty())  pCTOFCut.clear();
+    if (!pFiducCut.empty()) pFiducCut.clear();
+    if (!pEdep.empty())     pEdep.clear();
+    if (!Tp.empty())        Tp.clear();
+    if (!proton_angle.empty()) proton_angle.clear();
+    if (!p3vec_g.empty())   p3vec_g.clear();   // unsorted protons
+    if (!protons_g.empty()) protons_g.clear();
+    if (!pFiducCut_g.empty()) pFiducCut_g.clear();
+//    p3vec.clear();   // unsorted protons
+//    protons.clear();
+//    protonsLab.clear();
+//    pVertex.clear();
+//    alpha.clear();
+//    pCTOF.clear();
+//    pCTOFCut.clear();
+//    pFiducCut.clear();
+//    pEdep.clear();
+//    Tp.clear();
+//    proton_angle.clear();
+//    p3vec_g.clear();   // unsorted protons
+//    protons_g.clear();
+//    pFiducCut_g.clear();
 
     Np = NpBack = NpCumulative = NpCumulativeSRC = 0;
     Plead = Plead_g = TLorentzVector();
@@ -256,7 +259,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         Pe      = TVector3( Px_e , Py_e , Pz_e );
         eVertex = TVector3( X_e , Y_e , Z_e );
     }
-    else if (DataType == "NoCTOF_DATA" || DataType == "New_NoCTofDATA"){
+    else if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA"){
         Pe = TVector3( N_Px[0] , N_Py[0] , N_Pz[0] );
     }
     else if (DataType == "(e,e'npp)"){
@@ -526,7 +529,7 @@ void TCalcPhysVarsEG2::loop_protons(){
         
         
         // proton identification
-       if (DataType == "NoCTOF_DATA" || DataType == "New_NoCTofDATA") {
+       if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
             
             pCTOFCut.push_back( uns_pCut[i] * uns_pID[i] );
             pCTOF   .push_back( uns_pCTOF[i]  );
@@ -612,7 +615,7 @@ void TCalcPhysVarsEG2::p23Randomize(){
         std::iter_swap(alpha.begin()+1      ,alpha.begin()+2);
         
         std::iter_swap(pFiducCut.begin()+1  ,pFiducCut.begin()+2);
-        if (DataType == "NoCTOF_DATA" || DataType == "New_NoCTofDATA") {
+        if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
             std::iter_swap(pCTOFCut.begin()+1   ,pCTOFCut.begin()+2);
             std::iter_swap(pCTOF.begin()+1      ,pCTOF.begin()+2);
             std::iter_swap(pEdep.begin()+1      ,pEdep.begin()+2);
@@ -631,7 +634,7 @@ void TCalcPhysVarsEG2::p12Randomize(){
         std::iter_swap(alpha.begin()      ,alpha.begin()+1);
         
         std::iter_swap(pFiducCut.begin()  ,pFiducCut.begin()+1);
-        if (DataType == "NoCTOF_DATA" || DataType == "New_NoCTofDATA") {
+        if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
             std::iter_swap(pCTOFCut.begin()   ,pCTOFCut.begin()+1);
             std::iter_swap(pCTOF.begin()      ,pCTOF.begin()+1);
             std::iter_swap(pEdep.begin()      ,pEdep.begin()+1);

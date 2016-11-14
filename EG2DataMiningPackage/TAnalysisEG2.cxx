@@ -96,9 +96,9 @@ void TAnalysisEG2::SetSRCCuts(TCut MainCut){ // last editted March-22 for pppSRC
     pppCut      = cutSRC && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut;
     pppCutPmT   = pppCut && cutPmT;
     pppCutPmTMm = pppCutPmT && cutMmiss;
-    pppSRCCut   = cutSRC && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut && cutPmT && cutMmiss;
+    pppSRCCut   = cutSRC && "1.05<=Xb" && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut && cutPmT && cutMmiss;
     //    pppSRCMmiss = pppSRCCut && cutMmiss;
-    Final3pCut  = pppSRCMmiss && cutAngles3p;
+    //    Final3pCut  = pppSRCMmiss && cutAngles3p;
     
     
     
@@ -129,12 +129,14 @@ void TAnalysisEG2::PrintInCuts(){
     Printf( "%d A(e,e'p) events in SRC kinematics"   , GetEntries(cutSRC));
     Printf( "%d A(e,e'pp) events in SRC kinematics with recoil proton momemntum > 0.3 GeV/c"
            , GetEntries(cutSRC && " 2 <= Np" && cutP1 && cutP2 && ppEdepCut && ppCTOFCut) );
-    Printf( "%d A(e,e'pp) with theta > 155"
-           , GetEntries(cutSRC && " 2 <= Np" && cutP1 && cutP2 && ppEdepCut && ppCTOFCut && cutAngles2p) );
+//    Printf( "%d A(e,e'pp) with theta > 155"
+//           , GetEntries(cutSRC && " 2 <= Np" && cutP1 && cutP2 && ppEdepCut && ppCTOFCut && cutAngles2p) );
     Printf( "%d A(e,e'ppp) events in SRC kinematics with 2 recoil protons momemnta > 0.3 GeV/c"
            , GetEntries( cutSRC && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut) );
-    Printf( "%d A(e,e'ppp) with theta > 155 & phi < 15"
-           , GetEntries( cutSRC && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut && cutAngles3p) );
+    Printf( "%d A(e,e'ppp) events in pppSRCCut"
+           , GetEntries( pppSRCCut ) );
+//    Printf( "%d A(e,e'ppp) with theta > 155 & phi < 15"
+//           , GetEntries( cutSRC && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut && cutAngles3p) );
 }
 
 
