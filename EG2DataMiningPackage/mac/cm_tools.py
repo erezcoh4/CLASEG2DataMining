@@ -12,15 +12,15 @@ cm_pars_columns = ['pMiss_min','pMiss_max'
                    ,'mean_t_weighted','mean_tErr_weighted','sigma_t_weighted','sigma_tErr_weighted'
                    ,'mean_z_weighted','mean_zErr_weighted','sigma_z_weighted','sigma_zErr_weighted']
 
-fits_columns = [ 'run'
-                ,'SigmaX_unweighted'    ,'SigmaXerr_unweighted'     ,'SigmaY_unweighted'    ,'SigmaYerr_unweighted' ,'SigmaT_unweighted'    ,'SigmaTerr_unweighted'
-                ,'SigmaZa1_unweighted'  ,'SigmaZa1err_unweighted'   ,'SigmaZa2_unweighted'  ,'SigmaZa2err_unweighted'
-                ,'MeanX_unweighted'     ,'MeanXerr_unweighted'      ,'MeanY_unweighted'     ,'MeanYerr_unweighted'
-                ,'MeanZa1_unweighted'   ,'MeanZa1err_unweighted'    ,'MeanZa2_unweighted'   ,'MeanZa2err_unweighted'
-                ,'SigmaX_weighted'      ,'SigmaXerr_weighted'       ,'SigmaY_weighted'      ,'SigmaYerr_weighted'   ,'SigmaT_weighted'    ,'SigmaTerr_weighted'
-                ,'SigmaZa1_weighted'    ,'SigmaZa1err_weighted'     ,'SigmaZa2_weighted'    ,'SigmaZa2err_weighted'
-                ,'MeanX_weighted'       ,'MeanXerr_weighted'        ,'MeanY_weighted'       ,'MeanYerr_weighted'
-                ,'MeanZa1_weighted'     ,'MeanZa1err_weighted'      ,'MeanZa2_weighted'     ,'MeanZa2err_weighted']
+#fits_columns = [ 'run'
+#                ,'SigmaX_unweighted'    ,'SigmaXerr_unweighted'     ,'SigmaY_unweighted'    ,'SigmaYerr_unweighted' ,'SigmaT_unweighted'    ,'SigmaTerr_unweighted'
+#                ,'SigmaZa1_unweighted'  ,'SigmaZa1err_unweighted'   ,'SigmaZa2_unweighted'  ,'SigmaZa2err_unweighted'
+#                ,'MeanX_unweighted'     ,'MeanXerr_unweighted'      ,'MeanY_unweighted'     ,'MeanYerr_unweighted'
+#                ,'MeanZa1_unweighted'   ,'MeanZa1err_unweighted'    ,'MeanZa2_unweighted'   ,'MeanZa2err_unweighted'
+#                ,'SigmaX_weighted'      ,'SigmaXerr_weighted'       ,'SigmaY_weighted'      ,'SigmaYerr_weighted'   ,'SigmaT_weighted'    ,'SigmaTerr_weighted'
+#                ,'SigmaZa1_weighted'    ,'SigmaZa1err_weighted'     ,'SigmaZa2_weighted'    ,'SigmaZa2err_weighted'
+#                ,'MeanX_weighted'       ,'MeanXerr_weighted'        ,'MeanY_weighted'       ,'MeanYerr_weighted'
+#                ,'MeanZa1_weighted'     ,'MeanZa1err_weighted'      ,'MeanZa2_weighted'     ,'MeanZa2err_weighted']
 
 bands_columns = ['sTBandMin','sTBandMax'
                  ,'SigmaZa1Min','SigmaZa1Max'
@@ -29,23 +29,35 @@ bands_columns = ['sTBandMin','sTBandMax'
                  ,'MeanZa2Min','MeanZa2Max']
 
 
-results_columns = ['run','time'
-                   ,'genMeanX'                  ,'genSigmaX'            ,'genMeanY'                 ,'genSigmaY'
-                   ,'genMeanZa1'                ,'genMeanZa2'           ,'genSigmaZa1'              ,'genSigmaZa2'
-                   ,'recMeanX_unweighted'       ,'recSigmaX_unweighted' ,'recMeanY_unweighted'      ,'recSigmaY_unweighted'
-                   ,'recMeanZa1_unweighted'     ,'recMeanZa2_unweighted','recSigmaZa1_unweighted'   ,'recSigmaZa2_unweighted'
-                   ,'NsigSigmaX_unweighted'     ,'NsigSigmaY_unweighted'
-                   ,'NsigSigmaZa1_unweighted'   ,'NsigSigmaZa2_unweighted'
-                   ,'NsigMeanZa1_unweighted'    ,'NsigMeanZa2_unweighted'
-                   ,'recMeanX_weighted'         ,'recSigmaX_weighted'   ,'recMeanY_weighted'        ,'recSigmaY_weighted'
-                   ,'recMeanZa1_weighted'       ,'recMeanZa2_weighted'  ,'recSigmaZa1_weighted'     ,'recSigmaZa2_weighted'
-                   ,'NsigSigmaX_weighted'       ,'NsigSigmaY_weighted'
-                   ,'NsigSigmaZa1_weighted'     ,'NsigSigmaZa2_weighted'
-                   ,'NsigMeanZa1_weighted'      ,'NsigMeanZa2_weighted'
-                   ,'KSxPval_0','KSxPval_1' ,'KSxPval_2','KSxPval_3','KSxPval_4','KSxPval_avg'
-                   ,'KSyPval_0','KSyPval_1' ,'KSyPval_2','KSyPval_3','KSyPval_4','KSyPval_avg'
-                   ,'KStPval_0','KStPval_1' ,'KStPval_2','KStPval_3','KStPval_4','KStPval_avg'
-                   ,'KSzPval_0','KSzPval_1' ,'KSzPval_2','KSzPval_3','KSzPval_4','KSzPval_avg']
+#results_columns = ['run','time'
+#                   # generated
+#                   ,'genMeanX'                  ,'genSigmaX'            ,'genMeanY'                 ,'genSigmaY'
+#                   ,'genMeanZa1'                ,'genMeanZa2'           ,'genSigmaZa1'              ,'genSigmaZa2'
+#                   # reconstructed fits - unweighted
+#                   ,'recMeanX_unweighted'       ,'recSigmaX_unweighted' ,'recMeanY_unweighted'      ,'recSigmaY_unweighted'
+#                   ,'recMeanZa1_unweighted'     ,'recMeanZa2_unweighted','recSigmaZa1_unweighted'   ,'recSigmaZa2_unweighted'
+#                   ,'NsigSigmaX_unweighted'     ,'NsigSigmaY_unweighted'
+#                   ,'NsigSigmaZa1_unweighted'   ,'NsigSigmaZa2_unweighted'
+#                   ,'NsigMeanZa1_unweighted'    ,'NsigMeanZa2_unweighted'
+#                   # reconstructed fits - weighted by Mott+FF cross section
+#                   ,'recMeanX_weighted'         ,'recSigmaX_weighted'   ,'recMeanY_weighted'        ,'recSigmaY_weighted'
+#                   ,'recMeanZa1_weighted'       ,'recMeanZa2_weighted'  ,'recSigmaZa1_weighted'     ,'recSigmaZa2_weighted'
+#                   ,'NsigSigmaX_weighted'       ,'NsigSigmaY_weighted'
+#                   ,'NsigSigmaZa1_weighted'     ,'NsigSigmaZa2_weighted'
+#                   ,'NsigMeanZa1_weighted'      ,'NsigMeanZa2_weighted'
+#                   # per 5 p(miss) bins
+#                   ,'recMeanX_unweighted'
+#                   ,'recSigmaX_unweighted'
+#                   ,'recMeanY_unweighted'
+#                   ,'recSigmaY_unweighted'
+#                   ,'recMeanZa1_unweighted'
+#                   ,'recMeanZa2_unweighted'
+#                   ,'recSigmaZa1_unweighted'
+#                   ,'recSigmaZa2_unweighted'
+#                   ,'KSxPval_0','KSxPval_1' ,'KSxPval_2','KSxPval_3','KSxPval_4','KSxPval_avg'
+#                   ,'KSyPval_0','KSyPval_1' ,'KSyPval_2','KSyPval_3','KSyPval_4','KSyPval_avg'
+#                   ,'KStPval_0','KStPval_1' ,'KStPval_2','KStPval_3','KStPval_4','KStPval_avg'
+#                   ,'KSzPval_0','KSzPval_1' ,'KSzPval_2','KSzPval_3','KSzPval_4','KSzPval_avg']
 
 
 
@@ -276,7 +288,7 @@ def fit_cm_parameters( run , data , FigureFName = '' , DoPlot = False ): # all p
         plt.savefig(FigureFName)
         print_filename( FigureFName , "and plot can be found at" )
         print_line()
-    print "computed fit parameters for ",run
+    print "computed fit parameters for run ",run
     return df_fit_parameters
 
 
@@ -478,8 +490,12 @@ def generate_runs_with_different_parameters( option,
                             # (3) stream into file
                             # ----------------------------
                             results = pd.DataFrame({'run':int(run), 'time':str(datetime.datetime.now().strftime("%Y%B%d"))
+                                                   
+                                                   # generated
                                                    ,'genMeanX':genMeanX     ,'genSigmaX':genSigmaX      ,'genMeanY':genMeanY        ,'genSigmaY':genSigmaY
                                                    ,'genMeanZa1':genMeanZa1 ,'genMeanZa2':genMeanZa2    ,'genSigmaZa1':genSigmaZa1  ,'genSigmaZa2':genSigmaZa2
+                                                   
+                                                   # reconstructed fits - unweighted
                                                    ,'recMeanX_unweighted':float(reco_fits.MeanX_unweighted)         ,'recMeanY_unweighted':float(reco_fits.MeanY_unweighted)
                                                    ,'recSigmaX_unweighted':float(reco_fits.SigmaX_unweighted)       ,'recSigmaY_unweighted':float(reco_fits.SigmaY_unweighted)
                                                    ,'recMeanZa1_unweighted':float(reco_fits.MeanZa1_unweighted)     ,'recMeanZa2_unweighted':float(reco_fits.MeanZa2_unweighted)
@@ -487,6 +503,8 @@ def generate_runs_with_different_parameters( option,
                                                    ,'NsigSigmaX_unweighted':NsigSigmaX_unweighted               ,'NsigSigmaY_unweighted':NsigSigmaY_unweighted
                                                    ,'NsigMeanZa1_unweighted':NsigMeanZa1_unweighted             ,'NsigMeanZa2_unweighted':NsigMeanZa2_unweighted
                                                    ,'NsigSigmaZa1_unweighted':NsigSigmaZa1_unweighted           ,'NsigSigmaZa2_unweighted':NsigSigmaZa2_unweighted
+                                                   
+                                                   # reconstructed fits - weighted by Mott+FF cross section
                                                    ,'recMeanX_weighted':float(reco_fits.MeanX_weighted)         ,'recMeanY_weighted':float(reco_fits.MeanY_weighted)
                                                    ,'recSigmaX_weighted':float(reco_fits.SigmaX_weighted)       ,'recSigmaY_weighted':float(reco_fits.SigmaY_weighted)
                                                    ,'recMeanZa1_weighted':float(reco_fits.MeanZa1_weighted)     ,'recMeanZa2_weighted':float(reco_fits.MeanZa2_weighted)
@@ -494,15 +512,41 @@ def generate_runs_with_different_parameters( option,
                                                    ,'NsigSigmaX_weighted':NsigSigmaX_weighted                   ,'NsigSigmaY_weighted':NsigSigmaY_weighted
                                                    ,'NsigMeanZa1_weighted':NsigMeanZa1_weighted                 ,'NsigMeanZa2_weighted':NsigMeanZa2_weighted
                                                    ,'NsigSigmaZa1_weighted':NsigSigmaZa1_weighted               ,'NsigSigmaZa2_weighted':NsigSigmaZa2_weighted
-                                                   ,'KSxPval_0':KSxPval[0], 'KSxPval_1':KSxPval[1], 'KSxPval_2':KSxPval[2], 'KSxPval_3':KSxPval[3], 'KSxPval_4':KSxPval[4]
+                                                   
+                                                   # per 5 p(miss) bins
+                                                   ,'KSxPval_PmBin0':KSxPval[0], 'KSxPval_PmBin1':KSxPval[1], 'KSxPval_PmBin2':KSxPval[2]
+                                                   , 'KSxPval_PmBin3':KSxPval[3], 'KSxPval_PmBin4':KSxPval[4]
                                                    ,'KSxPval_avg':KSxPval_avg
-                                                   ,'KSyPval_0':KSyPval[0], 'KSyPval_1':KSyPval[1], 'KSyPval_2':KSyPval[2], 'KSyPval_3':KSxPval[3], 'KSyPval_4':KSyPval[4]
+                                                   ,'KSyPval_PmBin0':KSyPval[0], 'KSyPval_PmBin1':KSyPval[1], 'KSyPval_PmBin2':KSyPval[2]
+                                                   , 'KSyPval_PmBin3':KSxPval[3], 'KSyPval_PmBin4':KSyPval[4]
                                                    ,'KSyPval_avg':KSyPval_avg
-                                                   ,'KStPval_0':KStPval[0], 'KStPval_1':KStPval[1], 'KStPval_2':KStPval[2], 'KStPval_3':KSxPval[3], 'KStPval_4':KStPval[4]
+                                                   ,'KStPval_PmBin0':KStPval[0], 'KStPval_PmBin1':KStPval[1], 'KStPval_PmBin2':KStPval[2]
+                                                   , 'KStPval_PmBin3':KSxPval[3], 'KStPval_PmBin4':KStPval[4]
                                                    ,'KStPval_avg':KStPval_avg
-                                                   ,'KSzPval_0':KSzPval[0], 'KSzPval_1':KSzPval[1], 'KSzPval_2':KSzPval[2], 'KSzPval_3':KSxPval[3], 'KSzPval_4':KSzPval[4]
-                                                   ,'KSzPval_avg':KSzPval_avg } ,
-                                                   index = [int(run)])
+                                                   ,'KSzPval_PmBin0':KSzPval[0], 'KSzPval_PmBin1':KSzPval[1], 'KSzPval_PmBin2':KSzPval[2]
+                                                   , 'KSzPval_PmBin3':KSxPval[3], 'KSzPval_PmBin4':KSzPval[4]
+                                                   ,'KSzPval_avg':KSzPval_avg
+                                                   # reconstructed parameters in p(miss) bins
+                                                   # x
+                                                   ,'recMeanX_unweighted_PmBin0':reco_parameters.get_value(0,'mean_x_unweighted')
+                                                   ,'recSigmaX_unweighted_PmBin0':reco_parameters.get_value(0,'sigma_x_unweighted')
+                                                   ,'recMeanX_unweighted_PmBin1':reco_parameters.get_value(1,'mean_x_unweighted')
+                                                   ,'recSigmaX_unweighted_PmBin1':reco_parameters.get_value(1,'sigma_x_unweighted')
+                                                   ,'recMeanX_unweighted_PmBin2':reco_parameters.get_value(2,'mean_x_unweighted')
+                                                   ,'recSigmaX_unweighted_PmBin2':reco_parameters.get_value(2,'sigma_x_unweighted')
+                                                   ,'recMeanX_unweighted_PmBin3':reco_parameters.get_value(3,'mean_x_unweighted')
+                                                   ,'recSigmaX_unweighted_PmBin3':reco_parameters.get_value(3,'sigma_x_unweighted')
+                                                   ,'recMeanX_unweighted_PmBin4':reco_parameters.get_value(4,'mean_x_unweighted')
+                                                   ,'recSigmaX_unweighted_PmBin4':reco_parameters.get_value(4,'sigma_x_unweighted')
+#                                                   # y
+#                                                   ,'recMeanY_unweighted_PmBin0':float(reco_parameters[0].mean_y_unweighted)
+#                                                   ,'recMeanY_unweighted_PmBin1':float(reco_parameters[1].mean_y_unweighted)
+#                                                   ,'recMeanY_unweighted_PmBin2':float(reco_parameters[2].mean_y_unweighted)
+#                                                   ,'recMeanY_unweighted_PmBin3':float(reco_parameters[3].mean_y_unweighted)
+#                                                   ,'recMeanY_unweighted_PmBin4':float(reco_parameters[4].mean_y_unweighted)
+
+                                                   } , index = [int(run)])
+ 
 
 
                             if (debug>4): print "results: ",results

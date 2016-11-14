@@ -17,7 +17,7 @@ from cm_tools import *
 
 
 PmissBins = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65] , [0.65,0.75] , [0.75,1.0]]
-#PmissBins = [[0.3,0.5]  , [0.5,0.7] , [0.7,1.0]]
+#PmissBins = [[0.3,0.5]  , [0.5,0.7] , [0.7,1.0]] # 3 bins, irrelevant
 
 
 # proton acceptance plot
@@ -82,8 +82,8 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
     cm_pars_bands = pd.read_csv( CMBandFname(ppPath+'/DATA/data') )
     cm_fits_parameters = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' ) )
     
-    test_name , start_run = 'VaryAllTogether' , 30000
-    N = pd.DataFrame({'SigmaT':10,'SigmaZa1':10 ,'SigmaZa2':4 ,'MeanZa1':5 ,'MeanZa2':5 , 'NRand':10}, index=[0])
+    test_name , start_run = 'debug_test' , 0
+    N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1 , 'NRand':1}, index=[0])
     full_path = ppPath+'/simulation/'+test_name+'_simulation'
     generate_runs_with_different_parameters( flags.option ,
                                                   cm_fits_parameters , cm_pars_bands ,
