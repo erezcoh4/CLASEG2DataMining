@@ -575,6 +575,7 @@ def generate_runs_with_different_parameters( option,
                             if (debug>4): print "results: ",results
                             stream_dataframe_to_file( reco_fits, reco_fitsFName  )
                             stream_dataframe_to_file( results, buildup_resutlsFName  )
+                            array2root( results, root_resutlsFName, treename='ppSRCsimanaTree',mode='update')
                             ana_sim.CloseFile()
                             if (debug>1): print "appended into pandas.DataFrames"
                             if (debug>2): print "resutls: ",df_results
@@ -592,28 +593,27 @@ def generate_runs_with_different_parameters( option,
         print_filename( reco_fitsFName , "reconstructed parameters fits wrote to" )
         print_filename( buildup_resutlsFName , "results wrote to " )
 
-    array2root
     print_filename( root_resutlsFName , "results converted also to root format " )
     print_important("done...") ; print_line()
 
 
-# ------------------------------------------------------------------------------- #
-def plot( simulation_results , x , y , xlabel = '' , ylabel = '' ):
-    sr = simulation_results
-    cmap = mpl.cm.hot
-    my_hot_cmap = gp.reverse_colourmap(cmap)
-    
-    with sns.axes_style("white"):
-        g = sns.jointplot(x=sr[x], y=sr[y] , cmap=my_hot_cmap, kind="hex", stat_func=None, marginal_kws={'color': 'green'})
-    g.set_axis_labels(xlabel,ylabel)
-    plt.colorbar()
-    plt.show()
-
-
-# ------------------------------------------------------------------------------- #
-def find_best_parameters( simulation_results ):
-    sr = simulation_results
-    gp.sns2d_with_projections( sr.genSigmaT , sr.recSigmaT_unweighted , axes_labels=[r'generated $\sigma_{T}$ [GeV/c]',r'un-weighted reconstructed $\sigma_{T}$ [GeV/c]'] , kind="hex")
+## ------------------------------------------------------------------------------- #
+#def plot( simulation_results , x , y , xlabel = '' , ylabel = '' ):
+#    sr = simulation_results
+#    cmap = mpl.cm.hot
+#    my_hot_cmap = gp.reverse_colourmap(cmap)
+#    
+#    with sns.axes_style("white"):
+#        g = sns.jointplot(x=sr[x], y=sr[y] , cmap=my_hot_cmap, kind="hex", stat_func=None, marginal_kws={'color': 'green'})
+#    g.set_axis_labels(xlabel,ylabel)
+#    plt.colorbar()
+#    plt.show()
+#
+#
+## ------------------------------------------------------------------------------- #
+#def find_best_parameters( simulation_results ):
+#    sr = simulation_results
+#    gp.sns2d_with_projections( sr.genSigmaT , sr.recSigmaT_unweighted , axes_labels=[r'generated $\sigma_{T}$ [GeV/c]',r'un-weighted reconstructed $\sigma_{T}$ [GeV/c]'] , kind="hex")
 
 
 

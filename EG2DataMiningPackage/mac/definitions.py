@@ -7,7 +7,7 @@ import matplotlib as mpl, pandas as pd , numpy as np
 import seaborn as sns ; sns.set(style="white", color_codes=True , font_scale=1)
 from ROOT import TPlots, TAnalysis, TAnalysisEG2 , TEG2dm , TCalcPhysVarsEG2 , TSchemeDATA ,GenerateEvents
 from matplotlib import pyplot as plt
-from root_numpy import hist2array , tree2array
+from root_numpy import hist2array , tree2array , array2root
 from scipy.stats import ks_2samp
 from math import sqrt
 
