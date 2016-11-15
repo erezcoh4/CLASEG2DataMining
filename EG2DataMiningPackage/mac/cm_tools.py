@@ -527,6 +527,11 @@ def generate_runs_with_different_parameters( option,
                                                    , 'KSzPval_PmBin3':KSxPval[3], 'KSzPval_PmBin4':KSzPval[4]
                                                    ,'KSzPval_avg':KSzPval_avg
                                                    # reconstructed parameters in p(miss) bins
+                                                   ,'PmissMin_PmBin0':reco_parameters.get_value(0,'pMiss_min') ,'PmissMax_PmBin0':reco_parameters.get_value(0,'pMiss_max')
+                                                   ,'PmissMin_PmBin1':reco_parameters.get_value(1,'pMiss_min') ,'PmissMax_PmBin1':reco_parameters.get_value(1,'pMiss_max')
+                                                   ,'PmissMin_PmBin2':reco_parameters.get_value(2,'pMiss_min') ,'PmissMax_PmBin2':reco_parameters.get_value(2,'pMiss_max')
+                                                   ,'PmissMin_PmBin3':reco_parameters.get_value(3,'pMiss_min') ,'PmissMax_PmBin3':reco_parameters.get_value(3,'pMiss_max')
+                                                   ,'PmissMin_PmBin4':reco_parameters.get_value(4,'pMiss_min') ,'PmissMax_PmBin4':reco_parameters.get_value(4,'pMiss_max')
                                                    # x
                                                    ,'recMeanX_unweighted_PmBin0':reco_parameters.get_value(0,'mean_x_unweighted')
                                                    ,'recSigmaX_unweighted_PmBin0':reco_parameters.get_value(0,'sigma_x_unweighted')
@@ -539,7 +544,27 @@ def generate_runs_with_different_parameters( option,
                                                    ,'recMeanX_unweighted_PmBin4':reco_parameters.get_value(4,'mean_x_unweighted')
                                                    ,'recSigmaX_unweighted_PmBin4':reco_parameters.get_value(4,'sigma_x_unweighted')
                                                    # y
-
+                                                   ,'recMeanY_unweighted_PmBin0':reco_parameters.get_value(0,'mean_y_unweighted')
+                                                   ,'recSigmaY_unweighted_PmBin0':reco_parameters.get_value(0,'sigma_y_unweighted')
+                                                   ,'recMeanY_unweighted_PmBin1':reco_parameters.get_value(1,'mean_y_unweighted')
+                                                   ,'recSigmaY_unweighted_PmBin1':reco_parameters.get_value(1,'sigma_y_unweighted')
+                                                   ,'recMeanY_unweighted_PmBin2':reco_parameters.get_value(2,'mean_y_unweighted')
+                                                   ,'recSigmaY_unweighted_PmBin2':reco_parameters.get_value(2,'sigma_y_unweighted')
+                                                   ,'recMeanY_unweighted_PmBin3':reco_parameters.get_value(3,'mean_y_unweighted')
+                                                   ,'recSigmaY_unweighted_PmBin3':reco_parameters.get_value(3,'sigma_y_unweighted')
+                                                   ,'recMeanY_unweighted_PmBin4':reco_parameters.get_value(4,'mean_y_unweighted')
+                                                   ,'recSigmaY_unweighted_PmBin4':reco_parameters.get_value(4,'sigma_y_unweighted')
+                                                   # z
+                                                   ,'recMeanZ_unweighted_PmBin0':reco_parameters.get_value(0,'mean_z_unweighted')
+                                                   ,'recSigmaZ_unweighted_PmBin0':reco_parameters.get_value(0,'sigma_z_unweighted')
+                                                   ,'recMeanZ_unweighted_PmBin1':reco_parameters.get_value(1,'mean_z_unweighted')
+                                                   ,'recSigmaZ_unweighted_PmBin1':reco_parameters.get_value(1,'sigma_z_unweighted')
+                                                   ,'recMeanZ_unweighted_PmBin2':reco_parameters.get_value(2,'mean_z_unweighted')
+                                                   ,'recSigmaZ_unweighted_PmBin2':reco_parameters.get_value(2,'sigma_z_unweighted')
+                                                   ,'recMeanZ_unweighted_PmBin3':reco_parameters.get_value(3,'mean_z_unweighted')
+                                                   ,'recSigmaZ_unweighted_PmBin3':reco_parameters.get_value(3,'sigma_z_unweighted')
+                                                   ,'recMeanZ_unweighted_PmBin4':reco_parameters.get_value(4,'mean_z_unweighted')
+                                                   ,'recSigmaZ_unweighted_PmBin4':reco_parameters.get_value(4,'sigma_z_unweighted')
                                                    } , index = [int(run)])
  
 
