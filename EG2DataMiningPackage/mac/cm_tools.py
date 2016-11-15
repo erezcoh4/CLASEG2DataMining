@@ -373,7 +373,7 @@ def generate_runs_with_different_parameters( option,
                                             data_fits , bands ,
                                             start_run , debug , PmissBins , buildup_resutlsFName , reco_fitsFName , target ,
                                             N , Ncores = 1 , i_core = 0 ,
-                                            root_resutlsFName ):
+                                            root_resutlsFName = '' ):
     
     # the data (nominal values)
     ana_data = TAnalysisEG2( "ppSRCCut_DATA_%s"% target )
