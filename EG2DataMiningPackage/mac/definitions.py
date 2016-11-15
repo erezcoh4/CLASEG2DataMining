@@ -11,7 +11,6 @@ from root_numpy import hist2array , tree2array
 from scipy.stats import ks_2samp
 from math import sqrt
 
-import rootpy.plotting.root2matplotlib as rplt
 import input_flags , Initiation as init, GeneralPlot as gp , gc
 flags = input_flags.get_args()
 
@@ -20,6 +19,7 @@ flags = input_flags.get_args()
 
 # paths
 if flags.worker == "erez":
+    import rootpy.plotting.root2matplotlib as rplt
     path = "/Users/erezcohen/Desktop/DataMining"
 
 elif flags.worker == "helion":

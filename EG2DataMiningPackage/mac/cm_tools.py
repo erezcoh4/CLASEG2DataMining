@@ -83,6 +83,8 @@ def resutlsFName( path ):
     return path+"EG_simulated_runs_results_cm_parameters.csv"
 def buildup_resutlsFName( path ):
     return path+"runs_results.csv"
+def root_resutlsFName( path ):
+    return path+"runs_results.root"
 
 # computations
 # ------------------------------------------------------------------------------- #
@@ -370,7 +372,8 @@ def linspace_parameter( band_min  , band_max  , Npts ):
 def generate_runs_with_different_parameters( option,
                                             data_fits , bands ,
                                             start_run , debug , PmissBins , buildup_resutlsFName , reco_fitsFName , target ,
-                                            N , Ncores = 1 , i_core = 0 ):
+                                            N , Ncores = 1 , i_core = 0 ,
+                                            root_resutlsFName ):
     
     # the data (nominal values)
     ana_data = TAnalysisEG2( "ppSRCCut_DATA_%s"% target )
@@ -588,6 +591,9 @@ def generate_runs_with_different_parameters( option,
     if 'analyze' in option:
         print_filename( reco_fitsFName , "reconstructed parameters fits wrote to" )
         print_filename( buildup_resutlsFName , "results wrote to " )
+
+    array2root
+    print_filename( root_resutlsFName , "results converted also to root format " )
     print_important("done...") ; print_line()
 
 
