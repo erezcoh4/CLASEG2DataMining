@@ -1,4 +1,8 @@
 from definitions import *
+from root_numpy import hist2array , tree2array
+from root_pandas import to_root
+from scipy.stats import ks_2samp
+from math import sqrt
 
 # ------------------------------------------------------------------------------- #
 # definitions
@@ -371,9 +375,10 @@ def linspace_parameter( band_min  , band_max  , Npts ):
 #def generate_runs_with_different_parameters( cm_fits_parameters , cm_pars_bands ,
 def generate_runs_with_different_parameters( option,
                                             data_fits , bands ,
-                                            start_run , debug , PmissBins , buildup_resutlsFName , reco_fitsFName , target ,
-                                            N , Ncores = 1 , i_core = 0 ,
-                                            root_resutlsFName = '' ):
+                                            start_run , debug , PmissBins , buildup_resutlsFName ,
+                                            reco_fitsFName , target ,
+                                            N ,
+                                            root_resutlsFName ):
     
     # the data (nominal values)
     ana_data = TAnalysisEG2( "ppSRCCut_DATA_%s"% target )
@@ -393,8 +398,9 @@ def generate_runs_with_different_parameters( option,
     MeanZa2  = linspace_parameter( bands.MeanZa2Min[0]   , bands.MeanZa2Max[0]   , int(N.MeanZa2) )
     if debug>1: print "SigmaT:",SigmaT , "\nSigmaZa1:",SigmaZa1 , "\nSigmaZa2:",SigmaZa2 , "\nMeanZa1:",MeanZa1, "\nMeanZa2:",MeanZa2 , "\n mean(pcmZ) = %f * p(miss) + %f"%(MeanZa1 , MeanZa2  )
     NrunsThisCore , NrunsTotal = len(SigmaT)*len(SigmaZa1)*len(SigmaZa2)*len(MeanZa1)*len(MeanZa2) , len(SigmaT)*len(SigmaZa1)*len(SigmaZa2)*len(MeanZa1)*len(MeanZa2)
-    if (debug>0): print '\033[95m' + 'Core %d (out of %d) will procees %d runs (total %d runs)'%(i_core,Ncores,NrunsThisCore,NrunsTotal) + '\033[0m'
-    
+#    if debug: print '\033[95m' + 'Core %d (out of %d) will procees %d runs (total %d runs)'%(i_core,Ncores,NrunsThisCore,NrunsTotal) + '\033[0m'
+    if debug: print '\033[95m' + 'processing %d runs'%NrunsTotal + '\033[0m'
+
     run = start_run
     
     '''
@@ -492,7 +498,9 @@ def generate_runs_with_different_parameters( option,
 
                             # (3) stream into file
                             # ----------------------------
-                            results = pd.DataFrame({'run':int(run), 'time':str(datetime.datetime.now().strftime("%Y%B%d"))
+                            results = pd.DataFrame({'run':int(run),
+                                                   'time':str(datetime.datetime.now().strftime("%Y%B%d")),
+                                                   'NentriesSimRun':ana_sim.GetEntries(),
                                                    
                                                    # generated
                                                    ,'genMeanX':genMeanX     ,'genSigmaX':genSigmaX      ,'genMeanY':genMeanY        ,'genSigmaY':genSigmaY
@@ -575,7 +583,7 @@ def generate_runs_with_different_parameters( option,
                             if (debug>4): print "results: ",results
                             stream_dataframe_to_file( reco_fits, reco_fitsFName  )
                             stream_dataframe_to_file( results, buildup_resutlsFName  )
-                            array2root( results, root_resutlsFName, treename='ppSRCsimanaTree',mode='update')
+                            stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
                             ana_sim.CloseFile()
                             if (debug>1): print "appended into pandas.DataFrames"
                             if (debug>2): print "resutls: ",df_results
@@ -618,13 +626,25 @@ def generate_runs_with_different_parameters( option,
 
 
 # ------------------------------------------------------------------------------- #
-def stream_dataframe_to_file( df , finename ):
+def stream_dataframe_to_file( df , filename ):
     # if file does not exist write header
-    if not os.path.isfile(finename):
-        df.to_csv(finename,header ='column_names' , index = False)
+    if not os.path.isfile(filename):
+        df.to_csv(filename,header ='column_names' , index = False)
     else: # else it exists so append without writing the header
-        df.to_csv(finename,mode = 'a', header=False , index = False)
+        df.to_csv(filename,mode = 'a', header=False , index = False)
 
+
+
+# ------------------------------------------------------------------------------- #
+def stream_dataframe_to_root( df , filename , treename='tree' ):
+    print_filename(filename, "appending root")
+    # if file does not exist create it
+    if not os.path.isfile(filename):
+        df.to_root(filename, key=treename )
+#        array2root( arr, filename, treename=treename,mode='update')
+    else: # else just update it
+        df.to_root(filename, key=treename , mode='a')
+#        array2root( arr, filename, treename=treename,mode='recreate')
 
 
 

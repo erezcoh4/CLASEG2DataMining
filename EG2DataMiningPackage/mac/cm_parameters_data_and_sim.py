@@ -83,12 +83,15 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
     cm_fits_parameters = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' ) )
     
     test_name , start_run = 'debug_test' , 0
-    N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1 , 'NRand':1}, index=[0])
+    N = pd.DataFrame({'SigmaT':2,'SigmaZa1':1 ,'SigmaZa2':2 ,'MeanZa1':1 ,'MeanZa2':1 , 'NRand':1}, index=[0])
     full_path = ppPath+'/simulation/'+test_name+'_simulation'
     generate_runs_with_different_parameters( flags.option ,
                                             cm_fits_parameters , cm_pars_bands ,
                                             start_run , flags.verbose , PmissBins ,
-                                            buildup_resutlsFName( full_path ) , CMfitsFname( full_path ) , dm.Target(A)  , N ,
+                                            buildup_resutlsFName( full_path ) ,
+                                            CMfitsFname( full_path ) ,
+                                            dm.Target(A) ,
+                                            N ,
                                             root_resutlsFName( full_path ) )
 
 
