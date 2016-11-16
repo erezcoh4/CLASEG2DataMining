@@ -127,7 +127,7 @@ public:
     Float_t     SigmaZ_a1     , SigmaZ_a2 , MeanZ_a1 , MeanZ_a2  ;
     Float_t     Pmin    , Pmax  , Thetamin  , Thetamax;
     Float_t     Pmiss3Mag   , pcmX      , pcmY      , pcmT      , pcmZ  ;
-    Float_t     Theta       , Mott      , DipoleFF              , rooWeight;
+    Float_t     Theta       , Mott      , DipoleFF2             , rooWeight;
     const Float_t Ebeam = 5.009 , e2 = 1; // sqaure of e-charge in e-charge units (for simplcity)
 
     Float_t Pe[3]   , Pe_size;                                              // electron
