@@ -4,27 +4,11 @@
     python mac/scheme_file.py -A12  --option="(e,e'pp?)" --DataType=New_NoCTofDATA
     python mac/scheme_file.py -A12  --option=GSIM -r93
 '''
-#
-#import ROOT,os, sys , math , os.path , math
-#from ROOT import TEG2dm , TSchemeDATA
-#sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
-#sys.path.insert(0, '/home/erez/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
-#import input_flags
-#flags = input_flags.get_args()
 from definitions import *
 
-#if flags.worker == "erez":
-#    path = "/Users/erezcohen/Desktop/DataMining"
-#
-#elif flags.worker == "helion":
-#    path = "/home/erez/DataMining"
-
-dm          = TEG2dm()
-A           = flags.atomic_mass
 DataType    = flags.DataType
-
 FileName    = DataType+"_%s"% dm.Target(A)
-scheme      = TSchemeDATA( DataType , path , FileName , "T")
+scheme      = TSchemeDATA( DataType , path , FileName , "T" , flags.verbose)
 pMin , pMax = 0.3 , 0.7
 
 # ------------------------------------------------------------------ #

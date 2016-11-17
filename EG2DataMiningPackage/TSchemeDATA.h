@@ -38,7 +38,7 @@ public:
     TPlots  plot;
     
     
-    int     Nentries    ;
+    int     Nentries    , debug;
     
     
     
@@ -60,8 +60,8 @@ public:
     
     
     /// Default constructor
-    TSchemeDATA(){}
-    TSchemeDATA(TString,TString,TString,TString);
+    TSchemeDATA (){}
+    TSchemeDATA ( TString, TString, TString, TString, Int_t fdebug = 1);
     
     /// Default destructor
     ~TSchemeDATA(){}
@@ -80,6 +80,7 @@ public:
     void   SetOutFileName (TString name){OutFileName = name;};
     void    SetInTreeName (TString name){InTreeName = name;};
     void   SetOutTreeName (TString name){OutTreeName = name;};
+    void         SetDebug (int d)       {debug = d;};
     
     
     

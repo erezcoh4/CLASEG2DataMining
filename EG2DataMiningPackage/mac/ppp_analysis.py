@@ -46,24 +46,3 @@ if 'plot ppp sample cuts' in flags.option or 'cuts' in flags.option:
 if "count e,e'p/pp/ppp" in flags.option or 'count' in flags.option:
     print_important("count e,e'p/pp/ppp")
     ana_all.PrintInCuts()
-
-#    print_important("plot ppp sample cuts")
-#    cuts_vars = pd.DataFrame({
-#                             'var':     ['Xb'   ,'Pmiss.P()'    ,'Pmiss.Pt()'   ,'theta_pq'     ,'p_over_q' ],
-#                             'ppp_cut': [xB_cut ,p_miss_cut     ,p_miss_t_cut   ,theta_pq_cut   ,p_over_q_cut],
-#                             'xmin':    [0.8    ,0              ,0              ,0              ,0.2],
-#                             'xmax':    [4      ,1.5            ,1              ,100            ,1.1],
-#                             'nbins':   [30     ,35             ,30             ,40             ,30],
-#                             })
-#    do1d = False
-#    if do1d:
-#        plot_hist1d_ppp( cuts_vars , 'Xb' , '$x_B$' )
-#        plot_hist1d_ppp( cuts_vars , 'Pmiss.P()' , '|$p_{miss}$| [GeV/c]' )
-#        plot_hist1d_ppp( cuts_vars , 'Pmiss.Pt()', '$(p_{miss})_T$ [GeV/c]' )
-#    do2d = True
-#    if do2d:
-##        plot_hist2d_ppp( cuts_vars , 'p_over_q' , 'p/q', 'theta_pq',  '$\\theta(p,q)$ [deg.]' )
-#        plot_hist2d_ppp( cuts_vars , 'p_over_q' , 'p/q', 'theta_pq',  '$\\theta(p,q)$ [deg.]' )
-
-
-

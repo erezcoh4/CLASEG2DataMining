@@ -1,7 +1,7 @@
 '''
     usage:
     --------
-    > python mac/compute_phys_vars.py -A12 -werez --option=TwoSlowProtons --DataType=New_NoCTofDATA
+    python mac/compute_phys_vars.py -A12 -werez --option=TwoSlowProtons --DataType=New_NoCTofDATA
     other DataType options:  NoCTofDATA  New_NoCTofDATA  GSIM
 '''
 

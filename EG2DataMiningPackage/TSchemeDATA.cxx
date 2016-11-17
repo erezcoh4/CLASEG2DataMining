@@ -8,13 +8,15 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 TSchemeDATA::TSchemeDATA(TString fDataType, TString fPath,
-                         TString fInFileName  , TString fInTreeName ) {
+                         TString fInFileName  , TString fInTreeName ,
+                         Int_t fdebug ) {
     SetDataType     (fDataType);
     SetPath         (fPath);
     SetInFileName   (fInFileName);
     SetOutFileName  ("Schemed"+fInFileName);
     SetInTreeName   (fInTreeName);
     SetOutTreeName  (fInTreeName);
+    SetDebug        (fdebug);
 }
 
 
@@ -167,9 +169,6 @@ void TSchemeDATA::TwoSlowProtons(int fTargetType , float fpMin, float fpMax){
 
     if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
 
-        if (DataType == "New_NoCTofDATA") {
-            targ_type = 2; // for 27Al or the new 12C Meytal cooked Aug-2016
-        }
 
         
         for (Long64_t i = 0; i < Nentries ; i++) {
@@ -180,7 +179,10 @@ void TSchemeDATA::TwoSlowProtons(int fTargetType , float fpMin, float fpMax){
             }
             NpGood = 0;
             InTree -> GetEntry(i);
-//            SHOW3(Ntotal , Nn , Np);
+            if (DataType == "New_NoCTofDATA") {targ_type = 2; Ntotal=Nn+Np;} // for 27Al or the new 12C Meytal cooked Aug-2016
+            
+            if(debug > 2) SHOW3(Ntotal , Nn , Np);
+            
             // look for events with only one negative particle (electron) and two positive (protons)
             if( ( Np == 2 ) && ( Nn == 1 ) && ( Ntotal == 3 ) && (targ_type == TargetType) ) {
 
