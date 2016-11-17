@@ -3,7 +3,7 @@ from cm_tools import *
 '''
     usage:
     ---------
-    python mac/cm_parameters_data_and_sim.py --option=generate
+    python mac/cm_parameters_data_and_sim.py --option="generate and analyze"
     
     options (can be ran simultaneously):
     acceptance  {"recoil proton acceptance"}
@@ -82,8 +82,10 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
     cm_pars_bands = pd.read_csv( CMBandFname(ppPath+'/DATA/data') )
     cm_fits_parameters = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' ) )
     
-    test_name , start_run = 'debug_test' , 0
-    N = pd.DataFrame({'SigmaT':2,'SigmaZa1':1 ,'SigmaZa2':2 ,'MeanZa1':1 ,'MeanZa2':1 , 'NRand':1}, index=[0])
+    start_run = 20000
+    N = pd.DataFrame({'SigmaT':10,'SigmaZa1':5 ,'SigmaZa2':8 ,'MeanZa1':5 ,'MeanZa2':5 , 'NRand':10}, index=[0])
+    #    N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1 , 'NRand':1}, index=[0]) # for debugging
+    test_name = 'runs%dto%d_NsigmaT_%d_NSigmaZa1_%d_NSigmaZa2_%d_NMeanZa1_%d_NMeanZa2_%d_NRand_%d'%(start_run,start_run+(N.SigmaT*N.SigmaZa1*N.SigmaZa2*N.MeanZa1*N.MeanZa2),N.SigmaT,N.SigmaZa1,N.SigmaZa2,N.MeanZa1,N.MeanZa2,N.NRand)
     full_path = ppPath+'/simulation/'+test_name+'_simulation'
     generate_runs_with_different_parameters( flags.option ,
                                             cm_fits_parameters , cm_pars_bands ,

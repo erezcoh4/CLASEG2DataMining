@@ -498,9 +498,9 @@ def generate_runs_with_different_parameters( option,
 
                             # (3) stream into file
                             # ----------------------------
-                            results = pd.DataFrame({'run':int(run),
-                                                   'time':str(datetime.datetime.now().strftime("%Y%B%d")),
-                                                   'NentriesSimRun':ana_sim.GetEntries(),
+                            results = pd.DataFrame({'run':int(run)
+                                                   ,'time':str(datetime.datetime.now().strftime("%Y%B%d"))
+                                                   ,'NentriesSimRun':ana_sim.GetEntries()
                                                    
                                                    # generated
                                                    ,'genMeanX':genMeanX     ,'genSigmaX':genSigmaX      ,'genMeanY':genMeanY        ,'genSigmaY':genSigmaY
@@ -637,14 +637,11 @@ def stream_dataframe_to_file( df , filename ):
 
 # ------------------------------------------------------------------------------- #
 def stream_dataframe_to_root( df , filename , treename='tree' ):
-    print_filename(filename, "appending root")
     # if file does not exist create it
     if not os.path.isfile(filename):
         df.to_root(filename, key=treename )
-#        array2root( arr, filename, treename=treename,mode='update')
     else: # else just update it
         df.to_root(filename, key=treename , mode='a')
-#        array2root( arr, filename, treename=treename,mode='recreate')
 
 
 
