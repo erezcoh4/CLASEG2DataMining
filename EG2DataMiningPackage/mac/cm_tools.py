@@ -436,7 +436,7 @@ def generate_runs_with_different_parameters( option,
                         if 'generate' in option:
 
                             gen_events.Set_eep_Parameters( genMeanX , genSigmaX , genMeanY , genSigmaY , genMeanZa1 , genMeanZa2 , genSigmaZa1 , genSigmaZa2 )
-                            gen_events.DoGenerateRun_eep( run )
+                            gen_events.DoGenerateRun_eepp( run )
                             
                             # and now scheme them to our desired pp-SRC cuts
                             ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
