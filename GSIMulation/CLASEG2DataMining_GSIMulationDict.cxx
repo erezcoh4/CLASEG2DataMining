@@ -56,7 +56,7 @@ namespace ROOT {
       ::EGgui *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::EGgui));
       static ::ROOT::TGenericClassInfo 
-         instance("EGgui", "EGgui.h", 70,
+         instance("EGgui", "EGgui.h", 24,
                   typeid(::EGgui), DefineBehavior(ptr, ptr),
                   &EGgui_Dictionary, isa_proxy, 4,
                   sizeof(::EGgui) );

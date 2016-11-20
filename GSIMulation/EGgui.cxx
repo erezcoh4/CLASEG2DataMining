@@ -15,13 +15,19 @@ EGgui::EGgui( const TGWindow *pgWindow , UInt_t w , UInt_t h ){
     AddeeppButtonsFrame();
     AddeeNButtonsFrame();
     AddFlateeNRanges();
+
+    //    AddeeButtonsFrame();
+    // AddFlateeRanges();
     
     AddeeNFromDistributions();
     AddeeNFromTree();
     AddGenerationButtonsFrame();
+    
+
+    
     MapMainFrame();
     fMain -> HideFrame(eeNButtonsFrame);
-    fMain -> HideFrame(FlateeNFrame);
+//    fMain -> HideFrame(FlateeNFrame);
     fMain -> HideFrame(eeNFromDistributionsFrame);
     fMain -> HideFrame(eeNFromTreeFrame);
 }
@@ -64,6 +70,8 @@ void EGgui::SetGlobals(){
     ShiftL_a1   = 0.;           ShiftL_a2   = 0.;     //       shift = a1 + a2*(P(miss)-0.3);
     
     NPTheta     = 100;
+    NeTheta     = 10;
+    
     NRand       = 1;
     Nevents     = 0;
     DrawString  = "Precoil.Mag()";
@@ -109,8 +117,11 @@ void EGgui::AddMainButtonsFrame(){
     fReepp              -> SetState(kButtonDown);
     fReeN               = new TGRadioButton(fMainButtonsFrame,new TGHotString("(e,e'B)"),1000);
     fReeN               -> Connect("Pressed()", "EGgui", this, "Do_eeN()");
+    fRee                = new TGRadioButton(fMainButtonsFrame,new TGHotString("(e,e')"),1000);
+    fRee                -> Connect("Pressed()", "EGgui", this, "Do_ee()");
     fMainButtonsFrame   -> AddFrame(fReepp, new TGLayoutHints(kLHintsCenterX,10,10,15,4) );
     fMainButtonsFrame   -> AddFrame(fReeN, new TGLayoutHints(kLHintsCenterX,10,10,15,4) );
+    fMainButtonsFrame   -> AddFrame(fRee, new TGLayoutHints(kLHintsCenterX,10,10,15,4) );
     AddTextButton(fMainButtonsFrame , "&Exit" , "DoExit()");
     fMain               -> AddFrame(fMainButtonsFrame, new TGLayoutHints(kLHintsCenterX,2,2,2,2));
 }
@@ -231,6 +242,7 @@ void EGgui::DoSetNRand(){
 void EGgui::Do_eepp(){
     fReepp  -> SetState(kButtonDown);
     fReeN   -> SetState(kButtonUp);
+    fRee    -> SetState(kButtonUp);
     fMain -> HideFrame(eeNButtonsFrame);
     fMain -> ShowFrame(eeppButtonsFrame);
     fDrawString -> SetText("Precoil.Phi():Precoil.Theta()");
@@ -308,6 +320,95 @@ void EGgui::DoSetShiftL(){
 
 
 
+// ---------- (e,e') ---------- //
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void EGgui::Do_ee(){
+    fReepp  -> SetState(kButtonUp);
+    fReeN   -> SetState(kButtonUp);
+    fRee    -> SetState(kButtonDown);
+    fMain   -> HideFrame(eeppButtonsFrame);
+    fMain   -> ShowFrame(eeNButtonsFrame);
+    fMain   -> HideFrame(eeNFromDistributionsFrame);
+    fMain   -> HideFrame(eeNFromTreeFrame);
+    fMain   -> ShowFrame(FlateeNFrame);
+    DoSetBaryonName();
+}
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//void EGgui::DoFlatee(){
+//    fFlatee -> SetState(kButtonDown);
+//    fMain   -> ShowFrame(FlateeFrame);
+//}
+
+
+
+////....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//void EGgui::AddFlateeRanges(){
+//    FlateeFrame         = new TGHorizontalFrame(fMain,900,40);
+//    PminPmaxFrame       = new TGGroupFrame(FlateeFrame, Form("%.3f < |p(e)| < %.3f GeV/c",Pmin,Pmax),kHorizontalFrame);
+//    fPmin               = new TGNumberEntry(PminPmaxFrame,Pmin,5,999, TGNumberFormat::kNESRealThree, TGNumberFormat::kNEANonNegative);
+//    fPmin               -> Connect("ValueSet(Long_t)", "EGgui", this, "DoSetPminPmax()");
+//    PminPmaxFrame       -> AddFrame(fPmin, new TGLayoutHints(kMainFrame));
+//    fPmax               = new TGNumberEntry(PminPmaxFrame,Pmax,5,999, TGNumberFormat::kNESRealThree, TGNumberFormat::kNEANonNegative);
+//    fPmax               -> Connect("ValueSet(Long_t)", "EGgui", this, "DoSetPminPmax()");
+//    PminPmaxFrame       -> AddFrame(fPmax, new TGLayoutHints(kMainFrame));
+//    FlateeFrame         -> AddFrame(PminPmaxFrame, new TGLayoutHints(kLHintsTop | kLHintsLeft, 5, 5, 5, 5));
+//    ThetaminThetamaxFrame   = new TGGroupFrame(FlateeFrame, Form("%.1f < theta < %.1f deg.",Thetamin,Thetamax),kHorizontalFrame);
+//    fThetamin               = new TGNumberEntry(ThetaminThetamaxFrame,Thetamin,5,999
+//                                                , TGNumberFormat::kNESRealThree, TGNumberFormat::kNEANonNegative);
+//    fThetamin               -> Connect("ValueSet(Long_t)", "EGgui", this, "DoSetThetaminThetamax()");
+//    ThetaminThetamaxFrame   -> AddFrame(fThetamin, new TGLayoutHints(kMainFrame));
+//    fThetamax               = new TGNumberEntry(ThetaminThetamaxFrame,Thetamax,5,999
+//                                                , TGNumberFormat::kNESRealThree, TGNumberFormat::kNEANonNegative);
+//    fThetamax               -> Connect("ValueSet(Long_t)", "EGgui", this, "DoSetThetaminThetamax()");
+//    ThetaminThetamaxFrame   -> AddFrame(fThetamax, new TGLayoutHints(kMainFrame));
+//    FlateeFrame             -> AddFrame(ThetaminThetamaxFrame, new TGLayoutHints(kLHintsTop | kLHintsLeft, 5, 5, 5, 5));
+//    fMain                   -> AddFrame(FlateeFrame, new TGLayoutHints(kLHintsCenterX,2,2,2,2));
+//}
+//
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//void EGgui::DoSetNetheta(){
+//    NeTheta         = fNeTheta -> GetNumberEntry() -> GetIntNumber();
+//    NeThetaFrame    -> SetTitle(Form("Netheta=%d",NeTheta));
+//}
+
+//
+////....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//void EGgui::AddeeNButtonsFrame(){
+//    eeButtonsFrame      = new TGHorizontalFrame(fMain,900,40);
+//    fMain               -> AddFrame(eeButtonsFrame, new TGLayoutHints(kLHintsCenterX,2,2,2,2));
+//    fFlatee             = new TGRadioButton(eeNButtonsFrame,new TGHotString("Flat distributions"),1000);
+//    fFlatee             -> Connect("Pressed()", "EGgui", this, "DoFlatee()");
+//    fFlatee             -> SetState(kButtonDown);
+//    eeNButtonsFrame      -> AddFrame(fFlatee, new TGLayoutHints(kLHintsCenterX,10,10,15,4) );
+//    NeThetaFrame        = new TGGroupFrame(eeNButtonsFrame, Form("NeTheta=%d",NeTheta),kHorizontalFrame);
+//    fNeTheta            = new TGNumberEntry(NeThetaFrame,NeTheta,5,1999, TGNumberFormat::kNESInteger, TGNumberFormat::kNEANonNegative);
+//    fNeTheta            -> Connect("ValueSet(Long_t)", "EGgui", this, "DoSetNetheta()");
+//    NeThetaFrame        -> AddFrame(fNeTheta, new TGLayoutHints(kMainFrame));
+//    eeNButtonsFrame      -> AddFrame(NeThetaFrame, new TGLayoutHints(kLHintsCenterX,10,10,15,4) );
+//    fMain               -> AddFrame(eeNButtonsFrame, new TGLayoutHints(kLHintsCenterX,2,2,2,2));
+//}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -318,6 +419,7 @@ void EGgui::DoSetShiftL(){
 void EGgui::Do_eeN(){
     fReepp  -> SetState(kButtonUp);
     fReeN   -> SetState(kButtonDown);
+    fRee    -> SetState(kButtonUp);
     fMain   -> HideFrame(eeppButtonsFrame);
     fMain   -> ShowFrame(eeNButtonsFrame);
     fMain   -> HideFrame(eeNFromDistributionsFrame);
@@ -543,11 +645,16 @@ void EGgui::DoGenMCFiles(){
 // main generation processes....
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void EGgui::DoGenerate(){
-    gen_events = new GenerateEvents( Path , RunNumber , 2 );
-    TString Type = (fReepp -> IsOn()) ? "(e,e'pp)" : "(e,e'B)";
+    gen_events = new GenerateEvents( Path , RunNumber , 1 );
+    TString Type = "";
+    if (fReepp -> IsOn())       Type = "(e,e'pp)";
+    else if (fReeN -> IsOn())   Type = "(e,e'B)";
+    else if (fRee -> IsOn())    Type = "(e,e')";
     bool fDoReeNFromTree = (fReeNFromTree -> IsOn()) ? true : false;
-    bool fDoReeNFromDist = (fReeNFromDist->IsOn()) ? true : false;
-    bool fDoFlateeN  = (fFlateeN->IsOn()) ? true : false;
+    bool fDoReeNFromDist = (fReeNFromDist -> IsOn()) ? true : false;
+    bool fDoFlateeN  = (fFlateeN -> IsOn()) ? true : false;
+    SHOW3( fDoReeNFromTree , fDoReeNFromDist , fDoFlateeN );
+    
     gen_events -> SetLimits( Pmin , Pmax , Thetamin , Thetamax );
     if (Type == "(e,e'pp)") {
         gen_events -> Set_eep_Parameters( 0 , 0 , SigmaT , SigmaT , SigmaL_a1 , SigmaL_a2 , ShiftL_a1 , ShiftL_a2 );
@@ -558,12 +665,14 @@ void EGgui::DoGenerate(){
     }
     gen_events -> SetNRand(NRand);
     gen_events -> SetNPTheta(NPTheta);
-    gen_events -> DoGenerate( Type , BaryonName , fDoReeNFromTree , fDoReeNFromDist , fDoFlateeN );
+    gen_events -> SetNeTheta(NPTheta);
+    gen_events -> DoGenerate( Type , true , true , BaryonName , fDoReeNFromTree , fDoReeNFromDist , fDoFlateeN );
     DoDrawGenerated();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void EGgui::DoDrawGenerated(){
+    rootFilename    = Form("%s/eg_rootfiles/run%d.root",Path.Data(),RunNumber);
     RootFile = new TFile( rootFilename );
     RootTree = (TTree*)RootFile->Get("anaTree");
     fGenLabelData           -> SetText(Form("Generated %lld Events",RootTree->GetEntries()));

@@ -14,52 +14,6 @@
 #ifndef EGGUI_H
 #define EGGUI_H
 
-//#include <iostream>
-//#include "MySoftwarePackage/myIncludes.h"
-//#include "MySoftwarePackage/TPlots.h"
-//
-//
-//#include <TSystem.h>
-//#include <TFile.h>
-//#include <TTree.h>
-//#include <TBranchElement.h>
-//#include <TROOT.h>
-//#include <TCanvas.h>
-//#include <TH1F.h>
-//#include <TH2F.h>
-//#include <TProfile.h>
-//#include <TPad.h>
-//#include <TStyle.h>
-//#include <TMultiGraph.h>
-//#include <TGraphErrors.h>
-//#include <TLegend.h>
-//#include <TPaveStats.h>
-//#include <TChain.h>
-//#include <TBranch.h>
-//#include <TLeaf.h>
-//#include <TMath.h>
-//#include <TCut.h>
-//
-//#include <TGClient.h>
-//#include <TCanvas.h>
-//#include <TF1.h>
-//#include <TRandom.h>
-//#include <TGButton.h>
-//#include <TGFrame.h>
-//#include <TRootEmbeddedCanvas.h>
-//#include <RQ_OBJECT.h>
-//#include "TApplication.h"
-//#include "TGButtonGroup.h"
-//#include "TGFileDialog.h"
-//#include "TGNumberEntry.h"
-//#include "TGTextEntry.h"
-//#include "TGLabel.h"
-//#include "TText.h"
-//
-//#include <unistd.h>
-//#include <TRandom3.h>
-//#include <ctime>
-
 #include "GenerateEvents.h"
 
 /**
@@ -148,11 +102,21 @@ public:
     TGNumberEntry     * fShiftL_a2;
     float               ShiftL_a2;
     
+    // (e,e')
+    TGHorizontalFrame * eeButtonsFrame;
+    TGRadioButton     * fRee;               // generate (e,e')
+    TGRadioButton     * fFlatee;
+    
+    int                 NeTheta;
+    TGGroupFrame      * NeThetaFrame;
+    TGNumberEntry     * fNeTheta;
+    TGHorizontalFrame * FlateeFrame;
+    
     
     // (e,e'N)
     TGHorizontalFrame * eeNButtonsFrame;
-    TGRadioButton     * fReeN;            // generate (e,e'N)
-    TGRadioButton     * fReeDelta;        // generate (e,e'𝚫)
+    TGRadioButton     * fReeN;              // generate (e,e'N)
+    TGRadioButton     * fReeDelta;          // generate (e,e'𝚫)
     TGRadioButton     * fReep;
     TGRadioButton     * fReen;
     TGRadioButton     * fFlateeN;
@@ -263,7 +227,7 @@ public:
     
     void DoGenMCFiles               ();
     void DoGenerate                 ();
-//    void SetRootTreeAddresses       ();
+
     void DoDrawGenerated            ();
     void DoSetDrawString            ();
     
@@ -280,9 +244,13 @@ public:
     void DoSetInHistNames           ();
     void DoSeteeNTreeName           ();
     void AddTextButton              ( TGHorizontalFrame *, TString , TString );
-//    void            OutputInfo2File ();
-//    void           OutPutToTextFile ( const int, TVector3*, int*, float*, int*);
 
+    
+    void Do_ee                      ();
+    void DoFlatee                   ();
+    void AddeeButtonsFrame          ();
+    void DoSetNetheta               ();
+    void AddFlateeRanges            ();
 };
 
 #endif
