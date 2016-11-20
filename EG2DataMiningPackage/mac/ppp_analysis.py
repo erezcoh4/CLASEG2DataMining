@@ -41,8 +41,29 @@ if 'plot ppp sample cuts' in flags.option or 'cuts' in flags.option:
     print_important("ipynb notebooks/ppp_analysis.ipynb")
 
 
+
 # (2) count the number of events in our sample
 # ----------------------------------------
 if "count e,e'p/pp/ppp" in flags.option or 'count' in flags.option:
     print_important("count e,e'p/pp/ppp")
     ana_all.PrintInCuts()
+
+
+
+
+# (3) merge 12C/27Al/56Fe/208Pb
+# ----------------------------------------
+if "count e,e'p/pp/ppp" in flags.option or 'count' in flags.option:
+    print_important('cd /Users/erezcohen/Desktop/DataMining/AnaFiles/')
+    print_important('hadd Ana_pppSRCCut_NoCTofDATA_C12_Al27_Fe56_Pb208.root Ana_pppSRCCut_NoCTofDATA_*')
+
+
+
+
+
+
+
+
+
+
+
