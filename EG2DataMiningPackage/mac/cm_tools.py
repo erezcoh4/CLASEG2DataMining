@@ -25,9 +25,9 @@ bands_columns = ['sTBandMin','sTBandMax'
 
 
 # prints
-def print_line(): print '\033[92m' + '--------------------------------------------------------------' + '\033[0m'
-def print_important(string): print '\033[94m' + '\033[1m' + string + '\033[0m' ; print_line
-def print_filename(filename,action_on_file=""): print action_on_file + '\n' + '\033[91m' + filename + '\033[0m'
+#def print_line(): print '\033[92m' + '--------------------------------------------------------------' + '\033[0m'
+#def print_important(string): print '\033[94m' + '\033[1m' + string + '\033[0m' ; print_line
+#def print_filename(filename,action_on_file=""): print action_on_file + '\n' + '\033[91m' + filename + '\033[0m'
 
 # file names
 def CMParsFname( path ):
@@ -73,11 +73,13 @@ def compute_Nsigma_scores( data_fits , reco_fits , weighting ):
 
 # ------------------------------------------------------------------------------- #
 def Pval( dataset1 , dataset2  , var   , weighting ):
-    return Pval2variablesGauss( dataset1[var+'_'+weighting] , dataset1[var+'err_'+weighting]  , dataset2[var+'_'+weighting] , dataset2[var+'err_'+weighting] )
+    v1 , v1Err = float(dataset1[var+'_'+weighting]) , float(dataset1[var+'err_'+weighting])
+    v2 , v2Err = float(dataset2[var+'_'+weighting]) , float(dataset2[var+'err_'+weighting])
+    return Pval2varsAssumeGausDist( v1 , v1Err , v2 , v2Err , flags.verbose )
 
 
 # ------------------------------------------------------------------------------- #
-def compute_Pval_parameters( data_fits , reco_fits , 'unweighted' )
+def compute_Pval_parameters( data_fits , reco_fits , weighting ):
 
     PvalSigmaX = Pval( data_fits , reco_fits  , 'SigmaX'   , weighting )
     PvalSigmaY = Pval( data_fits , reco_fits  , 'SigmaY'   , weighting )
@@ -86,7 +88,7 @@ def compute_Pval_parameters( data_fits , reco_fits , 'unweighted' )
     PvalSigmaZa1 = Pval( data_fits , reco_fits  , 'SigmaZa1'   , weighting )
     PvalSigmaZa2 = Pval( data_fits , reco_fits  , 'SigmaZa2'   , weighting )
     
-    return [NsigSigmaX , NsigSigmaY , NsigMeanZa1 , NsigMeanZa2 , NsigSigmaZa1 , NsigSigmaZa2]
+    return [PvalSigmaX , PvalSigmaY , PvalMeanZa1 , PvalMeanZa2 , PvalSigmaZa1 , PvalSigmaZa2]
 
 
 # ------------------------------------------------------------------------------- #
@@ -461,12 +463,16 @@ def generate_runs_with_different_parameters( option,
                             [PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
                              PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ,
                              PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] = compute_Pval_parameters( data_fits , reco_fits , 'unweighted' )
-                             if (debug>1): print "got unweighted P(value) results"
+                            if (debug>1): print "got unweighted P(value) results"
                        
                             # With Mott/FF - weighting (weighted roofit results)
                             [NsigSigmaX_weighted , NsigSigmaY_weighted ,
                              NsigMeanZa1_weighted , NsigMeanZa2_weighted ,
                              NsigSigmaZa1_weighted , NsigSigmaZa2_weighted] = compute_Nsigma_scores( data_fits , reco_fits , 'weighted' )
+                             # With Mott/FF - weighting (un - weighted roofit results)
+                            [PvalSigmaX_weighted, PvalSigmaY_weighted ,
+                              PvalMeanZa1_weighted , PvalMeanZa2_weighted ,
+                              PvalSigmaZa1_weighted , PvalSigmaZa2_weighted ] = compute_Pval_parameters( data_fits , reco_fits , 'weighted' )
                             if (debug>1): print "got weighted roofit results"
 
                             # KS test for the c.m. distributions in x,y,z directions
@@ -497,6 +503,9 @@ def generate_runs_with_different_parameters( option,
                                                    ,'NsigSigmaX_unweighted':NsigSigmaX_unweighted               ,'NsigSigmaY_unweighted':NsigSigmaY_unweighted
                                                    ,'NsigMeanZa1_unweighted':NsigMeanZa1_unweighted             ,'NsigMeanZa2_unweighted':NsigMeanZa2_unweighted
                                                    ,'NsigSigmaZa1_unweighted':NsigSigmaZa1_unweighted           ,'NsigSigmaZa2_unweighted':NsigSigmaZa2_unweighted
+                                                   ,'PvalSigmaX_unweighted':PvalSigmaX_unweighted               ,'PvalSigmaY_unweighted':PvalSigmaY_unweighted
+                                                   ,'PvalMeanZa1_unweighted':PvalMeanZa1_unweighted             ,'PvalMeanZa2_unweighted':PvalMeanZa2_unweighted
+                                                   ,'PvalSigmaZa1_unweighted':PvalSigmaZa1_unweighted           ,'PvalSigmaZa2_unweighted':PvalSigmaZa2_unweighted
                                                    
                                                    # reconstructed fits - weighted by Mott+FF cross section
                                                    ,'recMeanX_weighted':float(reco_fits.MeanX_weighted)         ,'recMeanY_weighted':float(reco_fits.MeanY_weighted)
@@ -506,6 +515,9 @@ def generate_runs_with_different_parameters( option,
                                                    ,'NsigSigmaX_weighted':NsigSigmaX_weighted                   ,'NsigSigmaY_weighted':NsigSigmaY_weighted
                                                    ,'NsigMeanZa1_weighted':NsigMeanZa1_weighted                 ,'NsigMeanZa2_weighted':NsigMeanZa2_weighted
                                                    ,'NsigSigmaZa1_weighted':NsigSigmaZa1_weighted               ,'NsigSigmaZa2_weighted':NsigSigmaZa2_weighted
+                                                   ,'PvalSigmaX_weighted':PvalSigmaX_weighted               ,'PvalSigmaY_weighted':PvalSigmaY_weighted
+                                                   ,'PvalMeanZa1_weighted':PvalMeanZa1_weighted             ,'PvalMeanZa2_weighted':PvalMeanZa2_weighted
+                                                   ,'PvalSigmaZa1_weighted':PvalSigmaZa1_weighted           ,'PvalSigmaZa2_weighted':PvalSigmaZa2_weighted
                                                    
                                                    # per 5 p(miss) bins
                                                    ,'KSxPval_PmBin0':KSxPval[0], 'KSxPval_PmBin1':KSxPval[1], 'KSxPval_PmBin2':KSxPval[2]
