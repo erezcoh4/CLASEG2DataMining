@@ -9,6 +9,7 @@ from ROOT import TPlots, TAnalysis, TAnalysisEG2 , TEG2dm , TCalcPhysVarsEG2 , T
 from matplotlib import pyplot as plt
 
 import input_flags , Initiation as init, GeneralPlot as gp , gc
+from my_tools import *
 flags = input_flags.get_args()
 
 

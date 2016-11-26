@@ -16,52 +16,11 @@ cm_pars_columns = ['pMiss_min','pMiss_max'
                    ,'mean_t_weighted','mean_tErr_weighted','sigma_t_weighted','sigma_tErr_weighted'
                    ,'mean_z_weighted','mean_zErr_weighted','sigma_z_weighted','sigma_zErr_weighted']
 
-#fits_columns = [ 'run'
-#                ,'SigmaX_unweighted'    ,'SigmaXerr_unweighted'     ,'SigmaY_unweighted'    ,'SigmaYerr_unweighted' ,'SigmaT_unweighted'    ,'SigmaTerr_unweighted'
-#                ,'SigmaZa1_unweighted'  ,'SigmaZa1err_unweighted'   ,'SigmaZa2_unweighted'  ,'SigmaZa2err_unweighted'
-#                ,'MeanX_unweighted'     ,'MeanXerr_unweighted'      ,'MeanY_unweighted'     ,'MeanYerr_unweighted'
-#                ,'MeanZa1_unweighted'   ,'MeanZa1err_unweighted'    ,'MeanZa2_unweighted'   ,'MeanZa2err_unweighted'
-#                ,'SigmaX_weighted'      ,'SigmaXerr_weighted'       ,'SigmaY_weighted'      ,'SigmaYerr_weighted'   ,'SigmaT_weighted'    ,'SigmaTerr_weighted'
-#                ,'SigmaZa1_weighted'    ,'SigmaZa1err_weighted'     ,'SigmaZa2_weighted'    ,'SigmaZa2err_weighted'
-#                ,'MeanX_weighted'       ,'MeanXerr_weighted'        ,'MeanY_weighted'       ,'MeanYerr_weighted'
-#                ,'MeanZa1_weighted'     ,'MeanZa1err_weighted'      ,'MeanZa2_weighted'     ,'MeanZa2err_weighted']
-
 bands_columns = ['sTBandMin','sTBandMax'
                  ,'SigmaZa1Min','SigmaZa1Max'
                  ,'SigmaZa2Min','SigmaZa2Max'
                  ,'MeanZa1Min','MeanZa1Max'
                  ,'MeanZa2Min','MeanZa2Max']
-
-
-#results_columns = ['run','time'
-#                   # generated
-#                   ,'genMeanX'                  ,'genSigmaX'            ,'genMeanY'                 ,'genSigmaY'
-#                   ,'genMeanZa1'                ,'genMeanZa2'           ,'genSigmaZa1'              ,'genSigmaZa2'
-#                   # reconstructed fits - unweighted
-#                   ,'recMeanX_unweighted'       ,'recSigmaX_unweighted' ,'recMeanY_unweighted'      ,'recSigmaY_unweighted'
-#                   ,'recMeanZa1_unweighted'     ,'recMeanZa2_unweighted','recSigmaZa1_unweighted'   ,'recSigmaZa2_unweighted'
-#                   ,'NsigSigmaX_unweighted'     ,'NsigSigmaY_unweighted'
-#                   ,'NsigSigmaZa1_unweighted'   ,'NsigSigmaZa2_unweighted'
-#                   ,'NsigMeanZa1_unweighted'    ,'NsigMeanZa2_unweighted'
-#                   # reconstructed fits - weighted by Mott+FF cross section
-#                   ,'recMeanX_weighted'         ,'recSigmaX_weighted'   ,'recMeanY_weighted'        ,'recSigmaY_weighted'
-#                   ,'recMeanZa1_weighted'       ,'recMeanZa2_weighted'  ,'recSigmaZa1_weighted'     ,'recSigmaZa2_weighted'
-#                   ,'NsigSigmaX_weighted'       ,'NsigSigmaY_weighted'
-#                   ,'NsigSigmaZa1_weighted'     ,'NsigSigmaZa2_weighted'
-#                   ,'NsigMeanZa1_weighted'      ,'NsigMeanZa2_weighted'
-#                   # per 5 p(miss) bins
-#                   ,'recMeanX_unweighted'
-#                   ,'recSigmaX_unweighted'
-#                   ,'recMeanY_unweighted'
-#                   ,'recSigmaY_unweighted'
-#                   ,'recMeanZa1_unweighted'
-#                   ,'recMeanZa2_unweighted'
-#                   ,'recSigmaZa1_unweighted'
-#                   ,'recSigmaZa2_unweighted'
-#                   ,'KSxPval_0','KSxPval_1' ,'KSxPval_2','KSxPval_3','KSxPval_4','KSxPval_avg'
-#                   ,'KSyPval_0','KSyPval_1' ,'KSyPval_2','KSyPval_3','KSyPval_4','KSyPval_avg'
-#                   ,'KStPval_0','KStPval_1' ,'KStPval_2','KStPval_3','KStPval_4','KStPval_avg'
-#                   ,'KSzPval_0','KSzPval_1' ,'KSzPval_2','KSzPval_3','KSzPval_4','KSzPval_avg']
 
 
 
@@ -110,6 +69,25 @@ def compute_Nsigma_scores( data_fits , reco_fits , weighting ):
     NsigSigmaZa2 = NsigmaScore( data_fits , reco_fits  , 'SigmaZa2'   , weighting )
     
     return [NsigSigmaX , NsigSigmaY , NsigMeanZa1 , NsigMeanZa2 , NsigSigmaZa1 , NsigSigmaZa2]
+
+
+# ------------------------------------------------------------------------------- #
+def Pval( dataset1 , dataset2  , var   , weighting ):
+    return Pval2variablesGauss( dataset1[var+'_'+weighting] , dataset1[var+'err_'+weighting]  , dataset2[var+'_'+weighting] , dataset2[var+'err_'+weighting] )
+
+
+# ------------------------------------------------------------------------------- #
+def compute_Pval_parameters( data_fits , reco_fits , 'unweighted' )
+
+    PvalSigmaX = Pval( data_fits , reco_fits  , 'SigmaX'   , weighting )
+    PvalSigmaY = Pval( data_fits , reco_fits  , 'SigmaY'   , weighting )
+    PvalMeanZa1 = Pval( data_fits , reco_fits  , 'MeanZa1'   , weighting )
+    PvalMeanZa2 = Pval( data_fits , reco_fits  , 'MeanZa2'   , weighting )
+    PvalSigmaZa1 = Pval( data_fits , reco_fits  , 'SigmaZa1'   , weighting )
+    PvalSigmaZa2 = Pval( data_fits , reco_fits  , 'SigmaZa2'   , weighting )
+    
+    return [NsigSigmaX , NsigSigmaY , NsigMeanZa1 , NsigMeanZa2 , NsigSigmaZa1 , NsigSigmaZa2]
+
 
 # ------------------------------------------------------------------------------- #
 def KStest( PmissBins , ana_sim , ana_data , var , cut=ROOT.TCut() , debug=2 , Nbins=20):
@@ -478,8 +456,13 @@ def generate_runs_with_different_parameters( option,
                             [NsigSigmaX_unweighted , NsigSigmaY_unweighted ,
                              NsigMeanZa1_unweighted , NsigMeanZa2_unweighted ,
                              NsigSigmaZa1_unweighted , NsigSigmaZa2_unweighted ] = compute_Nsigma_scores( data_fits , reco_fits , 'unweighted' )
-                            if (debug>1): print "got unweighted roofit results"
-                        
+                            if (debug>1): print "got unweighted N(sigma) results"
+                            # No Mott/FF - weighting (un - weighted roofit results)
+                            [PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
+                             PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ,
+                             PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] = compute_Pval_parameters( data_fits , reco_fits , 'unweighted' )
+                             if (debug>1): print "got unweighted P(value) results"
+                       
                             # With Mott/FF - weighting (weighted roofit results)
                             [NsigSigmaX_weighted , NsigSigmaY_weighted ,
                              NsigMeanZa1_weighted , NsigMeanZa2_weighted ,
