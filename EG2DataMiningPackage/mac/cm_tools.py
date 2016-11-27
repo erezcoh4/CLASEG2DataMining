@@ -24,7 +24,7 @@ bands_columns = ['sTBandMin','sTBandMax'
 
 
 
-# prints
+# prints - deprecated, delete December 10
 #def print_line(): print '\033[92m' + '--------------------------------------------------------------' + '\033[0m'
 #def print_important(string): print '\033[94m' + '\033[1m' + string + '\033[0m' ; print_line
 #def print_filename(filename,action_on_file=""): print action_on_file + '\n' + '\033[91m' + filename + '\033[0m'
@@ -378,7 +378,6 @@ def generate_runs_with_different_parameters( option,
     MeanZa2  = linspace_parameter( bands.MeanZa2Min[0]   , bands.MeanZa2Max[0]   , int(N.MeanZa2) )
     if debug>1: print "SigmaT:",SigmaT , "\nSigmaZa1:",SigmaZa1 , "\nSigmaZa2:",SigmaZa2 , "\nMeanZa1:",MeanZa1, "\nMeanZa2:",MeanZa2 , "\n mean(pcmZ) = %f * p(miss) + %f"%(MeanZa1 , MeanZa2  )
     NrunsThisCore , NrunsTotal = len(SigmaT)*len(SigmaZa1)*len(SigmaZa2)*len(MeanZa1)*len(MeanZa2) , len(SigmaT)*len(SigmaZa1)*len(SigmaZa2)*len(MeanZa1)*len(MeanZa2)
-#    if debug: print '\033[95m' + 'Core %d (out of %d) will procees %d runs (total %d runs)'%(i_core,Ncores,NrunsThisCore,NrunsTotal) + '\033[0m'
     if debug: print '\033[95m' + 'processing %d runs'%NrunsTotal + '\033[0m'
 
     run = start_run
@@ -463,6 +462,9 @@ def generate_runs_with_different_parameters( option,
                             [PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
                              PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ,
                              PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] = compute_Pval_parameters( data_fits , reco_fits , 'unweighted' )
+                            PvalTotal_unweighted = Fisher_combination_Pvals( [PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
+                                                                               PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ,
+                                                                               PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] )
                             if (debug>1): print "got unweighted P(value) results"
                        
                             # With Mott/FF - weighting (weighted roofit results)
@@ -473,6 +475,10 @@ def generate_runs_with_different_parameters( option,
                             [PvalSigmaX_weighted, PvalSigmaY_weighted ,
                               PvalMeanZa1_weighted , PvalMeanZa2_weighted ,
                               PvalSigmaZa1_weighted , PvalSigmaZa2_weighted ] = compute_Pval_parameters( data_fits , reco_fits , 'weighted' )
+                            PvalTotal_weighted = Fisher_combination_Pvals( [PvalSigmaX_weighted, PvalSigmaY_weighted ,
+                                                                            PvalMeanZa1_weighted , PvalMeanZa2_weighted ,
+                                                                            PvalSigmaZa1_weighted , PvalSigmaZa2_weighted ] )
+
                             if (debug>1): print "got weighted roofit results"
 
                             # KS test for the c.m. distributions in x,y,z directions
@@ -506,6 +512,7 @@ def generate_runs_with_different_parameters( option,
                                                    ,'PvalSigmaX_unweighted':PvalSigmaX_unweighted               ,'PvalSigmaY_unweighted':PvalSigmaY_unweighted
                                                    ,'PvalMeanZa1_unweighted':PvalMeanZa1_unweighted             ,'PvalMeanZa2_unweighted':PvalMeanZa2_unweighted
                                                    ,'PvalSigmaZa1_unweighted':PvalSigmaZa1_unweighted           ,'PvalSigmaZa2_unweighted':PvalSigmaZa2_unweighted
+                                                   ,'PvalTotal_unweighted':PvalTotal_unweighted
                                                    
                                                    # reconstructed fits - weighted by Mott+FF cross section
                                                    ,'recMeanX_weighted':float(reco_fits.MeanX_weighted)         ,'recMeanY_weighted':float(reco_fits.MeanY_weighted)
@@ -518,7 +525,8 @@ def generate_runs_with_different_parameters( option,
                                                    ,'PvalSigmaX_weighted':PvalSigmaX_weighted               ,'PvalSigmaY_weighted':PvalSigmaY_weighted
                                                    ,'PvalMeanZa1_weighted':PvalMeanZa1_weighted             ,'PvalMeanZa2_weighted':PvalMeanZa2_weighted
                                                    ,'PvalSigmaZa1_weighted':PvalSigmaZa1_weighted           ,'PvalSigmaZa2_weighted':PvalSigmaZa2_weighted
-                                                   
+                                                   ,'PvalTotal_weighted':PvalTotal_weighted
+
                                                    # per 5 p(miss) bins
                                                    ,'KSxPval_PmBin0':KSxPval[0], 'KSxPval_PmBin1':KSxPval[1], 'KSxPval_PmBin2':KSxPval[2]
                                                    , 'KSxPval_PmBin3':KSxPval[3], 'KSxPval_PmBin4':KSxPval[4]
@@ -641,72 +649,69 @@ def stream_dataframe_to_root( df , filename , treename='tree' ):
 
 
 
-
-
-
-
-
-# ------------------------------------------------------------------------------- #
-def draw_projection_theta_phi( h , name="" ):
-
-    # continue here: take only a slice from zy plane
-    hProj = h.Project3D("yz")
-    hThetaPhi = hProj.Clone("hThetaPhi")
-
-    fig = plt.figure(figsize=[10,5])
-    fig, ax = plt.subplots(1,1, figsize=(10,10), subplot_kw={'aspect':'equal'})
-    NbinsTheta = hThetaPhi.GetXaxis().GetNbins()
-    NbinsPhi = hThetaPhi.GetYaxis().GetNbins()
-    H = np.ones((NbinsTheta, NbinsPhi))
-    for bin_theta in range(NbinsTheta):
-        for bin_phi in range(NbinsPhi):
-            bin_content = float(hThetaPhi.GetBinContent(bin_theta,bin_phi)) / (30*100)
-            H[bin_theta][bin_phi]= bin_content
-    extent = [0,120,-30,330]
-    im = plt.imshow(H,interpolation='none', origin='lower', extent=extent)
-    im = ax.imshow(np.ma.masked_where(H == 0, H), interpolation='none', origin='lower', extent=extent)
-    ax.set_xlabel('$\\theta$ [deg.]',fontsize=25)
-    ax.set_ylabel('$\\phi$ [deg.]',fontsize=25)
-    for tick in ax.xaxis.get_major_ticks():
-        tick.label.set_fontsize(25)
-    for tick in ax.yaxis.get_major_ticks():
-        tick.label.set_fontsize(25)
-    ax.set_aspect('auto')
-    cb = plt.colorbar()
-    for t in cb.ax.get_yticklabels():
-        t.set_fontsize(20)
-
-    outfile_name = "/Users/erezcohen/Desktop/acceptance_theta_phi_%s.pdf"%name
-    plt.savefig( outfile_name )
-    print_filename( outfile_name , "plot theta/phi acceptance")
-
-
-# ------------------------------------------------------------------------------- #
-def recoil_proton_acceptance():
-    
-    pAcceptacneFile = ROOT.TFile("/Users/erezcohen/Desktop/DataMining/GSIM_DATA/PrecoilAcceptance.root")
-    h = pAcceptacneFile.Get("hRescaled")
-    hAcceptanceAll      = h.Clone("hAcceptanceAll")
-    hAcceptanceFiducial = h.Clone("hAcceptanceFiducial")
-    
-    p_recoil = ROOT.TVector3()
-    for binx in range(h.GetXaxis().GetNbins()): # p(recoil) magnitude
-        p_recoil_mag = h.GetXaxis().GetBinCenter(binx)
-        
-        for biny in range(h.GetYaxis().GetNbins()): # p(recoil) theta
-            p_recoil_theta = h.GetYaxis().GetBinCenter(biny)
-            
-            for binz in range(h.GetZaxis().GetNbins()): # p(recoil) phi
-                p_recoil_phi = h.GetZaxis().GetBinCenter(binz)
-                
-                p_recoil.SetMagThetaPhi( p_recoil_mag , math.radians(p_recoil_theta) , math.radians(p_recoil_phi) )
-                fiducial = dm.protonFiducial ( p_recoil , 1 )
-                acceptance = h.GetBinContent(binx,biny,binz)
-                hAcceptanceFiducial.SetBinContent( binx, biny, binz, acceptance if fiducial else 0 )
-
-
-    draw_projection_theta_phi( hAcceptanceAll , "full_acceptance" )
-    draw_projection_theta_phi( hAcceptanceFiducial , "fiducial_region" )
+# deprecated (moved to ipython notebooks) delete Dec-30
+#
+## ------------------------------------------------------------------------------- #
+#def draw_projection_theta_phi( h , name="" ):
+#
+#    # continue here: take only a slice from zy plane
+#    hProj = h.Project3D("yz")
+#    hThetaPhi = hProj.Clone("hThetaPhi")
+#
+#    fig = plt.figure(figsize=[10,5])
+#    fig, ax = plt.subplots(1,1, figsize=(10,10), subplot_kw={'aspect':'equal'})
+#    NbinsTheta = hThetaPhi.GetXaxis().GetNbins()
+#    NbinsPhi = hThetaPhi.GetYaxis().GetNbins()
+#    H = np.ones((NbinsTheta, NbinsPhi))
+#    for bin_theta in range(NbinsTheta):
+#        for bin_phi in range(NbinsPhi):
+#            bin_content = float(hThetaPhi.GetBinContent(bin_theta,bin_phi)) / (30*100)
+#            H[bin_theta][bin_phi]= bin_content
+#    extent = [0,120,-30,330]
+#    im = plt.imshow(H,interpolation='none', origin='lower', extent=extent)
+#    im = ax.imshow(np.ma.masked_where(H == 0, H), interpolation='none', origin='lower', extent=extent)
+#    ax.set_xlabel('$\\theta$ [deg.]',fontsize=25)
+#    ax.set_ylabel('$\\phi$ [deg.]',fontsize=25)
+#    for tick in ax.xaxis.get_major_ticks():
+#        tick.label.set_fontsize(25)
+#    for tick in ax.yaxis.get_major_ticks():
+#        tick.label.set_fontsize(25)
+#    ax.set_aspect('auto')
+#    cb = plt.colorbar()
+#    for t in cb.ax.get_yticklabels():
+#        t.set_fontsize(20)
+#
+#    outfile_name = "/Users/erezcohen/Desktop/acceptance_theta_phi_%s.pdf"%name
+#    plt.savefig( outfile_name )
+#    print_filename( outfile_name , "plot theta/phi acceptance")
+#
+#
+## ------------------------------------------------------------------------------- #
+#def recoil_proton_acceptance():
+#    
+#    pAcceptacneFile = ROOT.TFile("/Users/erezcohen/Desktop/DataMining/GSIM_DATA/PrecoilAcceptance.root")
+#    h = pAcceptacneFile.Get("hRescaled")
+#    hAcceptanceAll      = h.Clone("hAcceptanceAll")
+#    hAcceptanceFiducial = h.Clone("hAcceptanceFiducial")
+#    
+#    p_recoil = ROOT.TVector3()
+#    for binx in range(h.GetXaxis().GetNbins()): # p(recoil) magnitude
+#        p_recoil_mag = h.GetXaxis().GetBinCenter(binx)
+#        
+#        for biny in range(h.GetYaxis().GetNbins()): # p(recoil) theta
+#            p_recoil_theta = h.GetYaxis().GetBinCenter(biny)
+#            
+#            for binz in range(h.GetZaxis().GetNbins()): # p(recoil) phi
+#                p_recoil_phi = h.GetZaxis().GetBinCenter(binz)
+#                
+#                p_recoil.SetMagThetaPhi( p_recoil_mag , math.radians(p_recoil_theta) , math.radians(p_recoil_phi) )
+#                fiducial = dm.protonFiducial ( p_recoil , 1 )
+#                acceptance = h.GetBinContent(binx,biny,binz)
+#                hAcceptanceFiducial.SetBinContent( binx, biny, binz, acceptance if fiducial else 0 )
+#
+#
+#    draw_projection_theta_phi( hAcceptanceAll , "full_acceptance" )
+#    draw_projection_theta_phi( hAcceptanceFiducial , "fiducial_region" )
 
 
 

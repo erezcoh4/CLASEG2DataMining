@@ -3,9 +3,10 @@ from cm_tools import *
 '''
     usage:
     ---------
-    python mac/cm_parameters_data_and_sim.py --option="generate and analyze"
+    python mac/cm_parameters_data_and_sim.py --option=analyze
     
     options (can be ran simultaneously):
+    ------------------------------------
     acceptance  {"recoil proton acceptance"}
     calc        {"calc. phys. vars."}
     scheme      {"scheme pp-SRC"}
