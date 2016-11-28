@@ -202,6 +202,9 @@ void TCalcPhysVarsEG2::InitGlobals(){
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::InitEvent(){
+    if (debug>3) 
+        Printf("starting event number %d",entry);
+    
     if (!p3vec.empty())     p3vec.clear();   // unsorted protons
     if (!protons.empty())   protons.clear();
     if (!protonsLab.empty())protonsLab.clear();
