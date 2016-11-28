@@ -130,6 +130,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("q LC fraction"       ,&alpha_q               , "alpha_q/F");
     OutTree -> Branch("sum of LC fractions" ,&sum_alpha             , "sum_alpha/F");
     OutTree -> Branch("theta p(miss)-p2 p3" ,&thetaMiss23           , "thetaMiss23/F");
+    OutTree -> Branch("OpeningAngle"        ,&thetaMiss23           , "OpeningAngle/F");
     OutTree -> Branch("theta p(lead)-p(rec)",&thetaLeadRec          , "thetaLeadRec/F");
     OutTree -> Branch("phi p(miss)-p2 p3"   ,&phiMiss23             , "phiMiss23/F");
     OutTree -> Branch("alpha"               ,&alpha                 );// std::vector<Float_t>

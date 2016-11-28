@@ -12,6 +12,18 @@ dm  = TEG2dm()
 
 
 
+path = "/Users/erezcohen/Desktop/DataMining"
+
+# ----------------------------------------------------------
+def plot_hist1d( ana , var , xmin , xmax , nbins=10 , x_label='' , y_label=''
+                , color='b', alpha=1, histtype='stepfilled', do_preliminary=True ):
+    
+    fig , ax = plt.subplots(figsize = [10,10])
+    n , bins , patches = plt.hist( ana[var] , bins=np.linspace(xmin,xmax,nbins) , color=color , alpha=alpha , histtype=histtype )
+    pt.set_axes( ax , x_label , y_label , fontsize=30)
+    if do_preliminary:
+        ax.text( xmin+(xmax-xmin)/3. , 0.6*np.max(n) , 'preliminary' , color='red' , alpha=0.2 , fontsize=50 )
+                        
 # ----------------------------------------------------------
 def plot_hist1d_ppp( var , xmin , xmax , nbins , x_label ):
     
@@ -27,6 +39,4 @@ def plot_hist1d_ppp( var , xmin , xmax , nbins , x_label ):
         tick.label.set_fontsize(25)
     for tick in ax.yaxis.get_major_ticks():
         tick.label.set_fontsize(25)
-#    plt.show()
-#    fig.savefig( dirname + "/ppp_" + var + ".pdf" )
 
