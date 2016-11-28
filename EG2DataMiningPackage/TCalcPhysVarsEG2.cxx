@@ -426,6 +426,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     // finally, fill the TTree output
     if (debug > 2){ Printf("output tree: %s , with %d entries ",OutTree->GetName(),(int)OutTree->GetEntries()); PrintData(entry);}
+    OutTree->Print();
     if(!OutTree) {
         std::cerr << "Cannot call " << __FUNCTION__
         << " before tree is ok!" << std::endl;
