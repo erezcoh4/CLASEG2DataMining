@@ -7,11 +7,12 @@
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-TSchemeDATA::TSchemeDATA(TString fDataType, TString fPath,
+TSchemeDATA::TSchemeDATA(TString fDataType, TString fDataPath, TString fSchemedPath,
                          TString fInFileName  , TString fInTreeName ,
                          Int_t fdebug ) {
     SetDataType     (fDataType);
-    SetPath         (fPath);
+    SetDataPath     (fDataPath);
+    SetSchemedPath  (fSchemedPath);
     SetInFileName   (fInFileName);
     SetOutFileName  ("Schemed"+fInFileName);
     SetInTreeName   (fInTreeName);
@@ -23,7 +24,7 @@ TSchemeDATA::TSchemeDATA(TString fDataType, TString fPath,
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TSchemeDATA::LoadInTree(){
-    InFile      = new TFile(Form("%s/EG2_DATA/%s.root",Path.Data(),InFileName.Data()));
+    InFile      = new TFile(Form("%s/%s.root",DataPath.Data(),InFileName.Data()));
     InTree      = (TTree*)InFile -> Get(InTreeName);
     Nentries    = InTree -> GetEntries();
     SHOW(Nentries);
@@ -339,7 +340,7 @@ void TSchemeDATA::TwoSlowProtons_npp(float fn_pMin , float fpMin, float fpMax){
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TSchemeDATA::CreateOutTree(){
-    OutFile = new TFile(Form("%s/Schemed_EG2_DATA/Schemed_%s_%s.root",Path.Data(),SchemeType.Data(),InFileName.Data()),"recreate");
+    OutFile = new TFile(Form("%s/Schemed_%s_%s.root",SchemedPath.Data(),SchemeType.Data(),InFileName.Data()),"recreate");
     OutTree = InTree -> CloneTree(0);
 }
 

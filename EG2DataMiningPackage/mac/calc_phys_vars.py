@@ -2,7 +2,7 @@
 '''
     usage:
     --------
-    python mac/calc_phys_vars.py -A12 -werez --option=ppSRC --DataType=DATA -evf=1 -p1000 -v2
+    python mac/calc_phys_vars.py -A12 -werez --option=ppSRC --DataType=DATA -evf=1 -p10000 -v2
     python mac/calc_phys_vars.py --DataType=GSIM -evf=0.01 -p10000 -r80 
     python mac/calc_phys_vars.py -A12 --DataType=New_NoCTofDATA --SchemedType=TwoSlowProtons -evf=1 -p10000
     python mac/calc_phys_vars.py -A12 --DataType=New_NoCTofDATA --SchemedType=TwoSlowProtons_piminus_p -evf=1 -p10000

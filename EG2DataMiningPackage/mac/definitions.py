@@ -17,13 +17,19 @@ flags = input_flags.get_args()
 
 
 # paths
-if flags.worker == "erez":
+if 'erez' in flags.worker or 'Erez' in flags.worker :
     import rootpy.plotting.root2matplotlib as rplt
     path = "/Users/erezcohen/Desktop/DataMining"
 
 elif flags.worker == "helion":
     path = "/home/erez/DataMining"
 
+eg2_data_path = path + "/EG2_DATA"
+
+if 'Lacie' in flags.worker:
+    eg2_data_path = "/Volumes/LaCie/erezcohen/Desktop/DataMining/EG2_DATA"
+
+schemed_eg2_data_path = path + "/Schemed_EG2_DATA"
 ppPath = path + "/Analysis_DATA/ppSRCcm"
 
 print "running option ",flags.option

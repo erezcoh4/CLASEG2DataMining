@@ -2,18 +2,19 @@
     usage:
     --------
     python mac/scheme_file.py -A12  --option="(e,e'pp?)" --DataType=New_NoCTofDATA
+    python mac/scheme_file.py -A27  --DataType=DATA --option=SRCPmissXb
     python mac/scheme_file.py -A12  --option=GSIM -r93
 '''
 from definitions import *
 
 DataType    = flags.DataType
 FileName    = DataType+"_%s"% dm.Target(A)
-scheme      = TSchemeDATA( DataType , path , FileName , "T" , flags.verbose)
+scheme      = TSchemeDATA( DataType , eg2_data_path , schemed_eg2_data_path , FileName , "T" , flags.verbose )
 pMin , pMax = 0.3 , 0.7
 
 # ------------------------------------------------------------------ #
 if (flags.option=="SRCPmissXb"):
-    scheme.SRCPmissXb( 2 , 0.8 , 1 , 4) # target-type = 2, Bjorken x > 0.8
+    scheme.SRCPmissXb( 2 , 0.8 , 1 , 4 ) # target-type = 2, Bjorken x > 0.8
     print "schemed for SRC in nuclear target (1 > p(miss) > 0.3 GeV/c) and Xb > 0.8, 1-4 protons"
 # ------------------------------------------------------------------ #
 

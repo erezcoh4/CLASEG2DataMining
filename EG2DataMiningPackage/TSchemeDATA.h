@@ -29,7 +29,7 @@ public:
     
     
     TString DataType    , SchemeType;
-    TString Path;
+    TString DataPath    , SchemedPath;
     TString InFileName  , InTreeName;
     TString OutFileName , OutTreeName;
     
@@ -61,7 +61,7 @@ public:
     
     /// Default constructor
     TSchemeDATA (){}
-    TSchemeDATA ( TString, TString, TString, TString, Int_t fdebug = 1);
+    TSchemeDATA ( TString, TString, TString, TString, TString, Int_t fdebug = 1);
     
     /// Default destructor
     ~TSchemeDATA(){}
@@ -75,7 +75,8 @@ public:
     // SETs
     void      SetDataType (TString type){DataType = type;};
     void    SetSchemeType (TString type){SchemeType = type;};
-    void          SetPath (TString path){Path = path;};
+    void      SetDataPath (TString path){DataPath = path;};
+    void   SetSchemedPath (TString path){SchemedPath = path;};
     void    SetInFileName (TString name){InFileName = name;};
     void   SetOutFileName (TString name){OutFileName = name;};
     void    SetInTreeName (TString name){InTreeName = name;};
