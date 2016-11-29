@@ -164,7 +164,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("Wmiss"               ,"TLorentzVector"       ,&Wmiss);
     OutTree -> Branch("WmissWithCm"         ,"TLorentzVector"       ,&WmissWithCm);
     OutTree -> Branch("WmissCmEps"          ,"TLorentzVector"       ,&WmissCmEps);
-//    OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
+    OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
 //    OutTree -> Branch("protonsLab"          ,&protonsLab);          // std::vector<TLorentzVector>
 //    protons.clear();
 //    protonsLab.clear();
@@ -426,7 +426,6 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     // finally, fill the TTree output
     if (debug > 2){ Printf("output tree: %s , with %d entries ",OutTree->GetName(),(int)OutTree->GetEntries()); PrintData(entry);}
-    OutTree->Print();
     if(!OutTree) {
         std::cerr << "Cannot call " << __FUNCTION__
         << " before tree is ok!" << std::endl;
