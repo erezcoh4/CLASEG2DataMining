@@ -167,7 +167,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     fout = TFile::Open("out.root","RECREATE");
     tree = new TTree("tree","");
     tree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
-//    OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
+    OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
 //    protons.clear();
 //    OutTree -> Branch("protonsLab"          ,&protonsLab);          // std::vector<TLorentzVector>
     
@@ -437,11 +437,11 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         << " before tree is ok!" << std::endl;
         throw std::exception();
     }
-    OutTree -> Fill();
-    Printf("OutTree -> Fill();");
     protons.clear();
     TLorentzVector proton( p3vec[0] , sqrt( p3vec[0].Mag2() + Mp2 ) );
     protons.push_back( proton );
+    OutTree -> Fill();
+    Printf("OutTree -> Fill();");
 
     TLorentzVector in1(protons[0].Px(),protons[0].Py(),protons[0].Pz(),protons[0].E());
     vec1.push_back(in1);
