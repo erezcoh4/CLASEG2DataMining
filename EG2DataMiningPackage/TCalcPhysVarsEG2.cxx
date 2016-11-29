@@ -439,7 +439,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     }
     OutTree -> Fill();
     Printf("OutTree -> Fill();");
-    protons.clear();
+//    protons.clear();
 
     TLorentzVector in1(protons[0].Px(),protons[0].Py(),protons[0].Pz(),protons[0].E());
     vec1.push_back(in1);
@@ -555,7 +555,9 @@ void TCalcPhysVarsEG2::loop_protons(){
         }
         if (debug > 3) Printf("rotated proton to %s",FrameName.Data());
         
-        protons.push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
+//        protons.push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
+        TLorentzVector proton( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) )
+        protons.push_back( proton );
         Pcm += protons.back();
         PcmFinalState += protons.back();
         
