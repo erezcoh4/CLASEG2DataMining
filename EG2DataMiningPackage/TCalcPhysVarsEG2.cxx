@@ -443,9 +443,9 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     // finally, fill the TTree output
     if (debug > 2){ Printf("output tree: %s , with %d entries ",OutTree->GetName(),(int)OutTree->GetEntries()); PrintData(entry);}
-//    protons.clear();
-//    TLorentzVector proton( p3vec[0] , sqrt( p3vec[0].Mag2() + Mp2 ) );
-//    protons.push_back( proton );
+    protons.clear();
+    TLorentzVector proton( p3vec[0] , sqrt( p3vec[0].Mag2() + Mp2 ) );
+    protons.push_back( proton );
     OutTree -> Fill();
 
     if (debug > 2) Printf("filled output tree with %d entries ",(int)OutTree->GetEntries());
