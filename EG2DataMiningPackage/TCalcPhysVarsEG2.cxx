@@ -389,109 +389,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     if (debug > 2) Printf("starting to sort the protons and loop over them");
     // sort the protons and loop on them for variables calculations only once more!
-//    loop_protons();
-    
-    for (auto i: sort_pMag( p3vec )){
-        
-        protonsLab.push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
-        
-        // proton fiducial cut is calculated in the lab frame, so it must come before we rotate the protons...
-        pFiducCut.push_back( protonFiducial( p3vec.at(i) , debug ) );
-        
-        // protons
-        if (FrameName == "q(z) - Pmiss(x-z) frame"){
-            RotVec2_q_Pm_Frame( & p3vec.at(i) , q_phi, q_theta, Pmiss_phi );
-        }
-        else if(FrameName == "Pmiss(z) - q(x-z) frame"){
-            RotVec2_Pm_q_Frame( & p3vec.at(i) , Pmiss_phi, Pmiss_theta, q_phi );
-        }
-        else if (FrameName == "lab frame"){
-            if (debug>2) cout << "staying in lab frame..." << endl;
-        }
-        if (debug > 3) Printf("rotated proton to %s",FrameName.Data());
-        
-        protons.push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
-        //        TLorentzVector proton( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) );
-        //        protons.push_back( proton );
-        Pcm += protons.back();
-        PcmFinalState += protons.back();
-        
-        
-        
-        // proton vertex
-        pVertex .push_back( TVector3( Xp[i] , Yp[i] , Zp[i] ) );
-        
-        // kinetic energies
-        Tp.push_back( protons.back().E() - protons.back().M() );
-        
-        
-        // proton identification
-        if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
-            
-            pCTOFCut.push_back( uns_pCut[i] * uns_pID[i] );
-            pCTOF   .push_back( uns_pCTOF[i]  );
-            pEdep   .push_back( uns_pEdep[i]  );
-            if (debug > 2) Printf("extracted proton identification information");
-        }
-        else {
-            pCTOFCut.push_back( 1 );
-        }
-        
-        
-        // cumulative protons
-        proton_angle.push_back(r2d * p3vec.at(i).Angle(q.Vect()));
-        if ( pCTOFCut.back()==1 && proton_angle.back() > 90. ){
-            NpBack ++ ;
-            if (p3vec.at(i).Mag()>0.3){
-                NpCumulative++;
-                if (p3vec.at(i).Mag()<0.7){
-                    NpCumulativeSRC++;
-                }
-            }
-        }
-        
-        
-        // α-s
-        alpha.push_back( LCfraction(protons.back() , A_over_mA ) );
-        sum_alpha += alpha.back();
-        
-        
-        
-        // A(e,e'p)X missing energy
-        Emiss      -= protons.back().E() - Mp;
-        
-        
-        // Invariant mass of the system produced in the interaction of balancing nucleon with a virtual photon
-        Wtilde     -= protons.back();
-        Wmiss      -= protons.back();
-        WmissWithCm-= protons.back();
-        WmissCmEps -= protons.back();
-        if (debug > 3) Printf("finished going over this proton...");
-    }
-    
-    if (DataType == "GSIM"){
-        for (auto i: sort_pMag( p3vec_g )){
-            
-            // proton fiducial cut is calculated in the lab frame, so it must come first...
-            pFiducCut_g.push_back( protonFiducial( p3vec_g.at(i) ) );
-            
-            // protons
-            if (FrameName == "q(z) - Pmiss(x-z) frame"){
-                RotVec2_q_Pm_Frame( & p3vec_g.at(i) , q_phi_g, q_theta_g, Pmiss_phi_g );
-            }
-            else if(FrameName == "Pmiss(z) - q(x-z) frame"){
-                RotVec2_Pm_q_Frame( & p3vec_g.at(i) , Pmiss_phi_g, Pmiss_theta_g, q_phi_g );
-            }
-            else if (FrameName == "lab frame"){
-                if (debug>2) cout << "staying in lab frame..." << endl;
-            }
-            if (debug > 3) Printf("rotated proton to %s",FrameName.Data());
-            
-            protons_g.push_back( TLorentzVector( p3vec_g.at(i) , sqrt( p3vec_g.at(i).Mag2() + Mp2 ) ) );
-        }
-    }
-
-    
+    loop_protons();
     
     if (debug > 2) Printf("finished sorting the protons and looping over them");
 
@@ -542,7 +440,11 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     pcmZ = Pcm.Pz();
     ComputeWeights();
     if (debug > 2) Printf("got roofit c.m. ");
-    
+    std::vector <TLorentzVector> protons_vector = protons;
+    protons.clear()
+    for (auto & proton:protons_vector){
+        protons.push_back(protons_vector);
+    }
     // finally, fill the TTree output
 //    if (debug > 2){ Printf("output tree: %s , with %d entries ",OutTree->GetName(),(int)OutTree->GetEntries()); PrintData(entry);}
 //    protons.clear();
