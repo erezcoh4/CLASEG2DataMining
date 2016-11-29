@@ -42,6 +42,7 @@ for entry in range(0, (int)(flags.evnts_frac*Nentries)):
         calc.PrintData( entry )
 
 
+calc.Close()
 
 print "done filling %d events" % OutTree.GetEntries()
 print "wrote file " + OutFile.GetName()

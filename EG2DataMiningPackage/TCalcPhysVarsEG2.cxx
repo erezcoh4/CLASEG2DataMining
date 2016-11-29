@@ -164,7 +164,12 @@ void TCalcPhysVarsEG2::InitOutputTree(){
 //    OutTree -> Branch("Wmiss"               ,"TLorentzVector"       ,&Wmiss);
 //    OutTree -> Branch("WmissWithCm"         ,"TLorentzVector"       ,&WmissWithCm);
 //    OutTree -> Branch("WmissCmEps"          ,"TLorentzVector"       ,&WmissCmEps);
-    OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
+    fout = TFile::Open("out.root","RECREATE");
+    tree = new TTree("tree","");
+    tree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
+    protons.clear();
+//    OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
+//    protons.clear();
 //    OutTree -> Branch("protonsLab"          ,&protonsLab);          // std::vector<TLorentzVector>
     
     
@@ -430,9 +435,28 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         throw std::exception();
     }
     OutTree -> Fill();
+    Printf("OutTree -> Fill();");
+    tree->Fill();
+    Printf("tree -> Fill();");
     if (debug > 2) Printf("filled output tree with %d entries ",(int)OutTree->GetEntries());
 
 }
+
+void TCalcPhysVarsEG2::Close()
+{
+    if(!fout || !tree) {
+        std::cerr << "Cannot call " << __FUNCTION__
+        << " before file is opened!" << std::endl;
+        throw std::exception();
+    }
+    fout->cd();
+    tree->Write();
+    fout->Close();
+    
+    fout = nullptr;
+    tree = nullptr;
+}
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::ChangeAxesFrame(){

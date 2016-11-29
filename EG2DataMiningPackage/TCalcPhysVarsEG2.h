@@ -33,6 +33,12 @@ public:
     TString InFileName  , InTreeName;
     TString OutFileName , OutTreeName;
     
+    // Tako Test
+    TFile* fout;
+    TTree* tree;
+    void Close ();
+    // ------- Tako Test
+
     TFile   * InFile    , * OutFile;
     TTree   * InTree    , * OutTree;
     TPlots  plot;
