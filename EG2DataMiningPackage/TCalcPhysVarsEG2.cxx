@@ -441,7 +441,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     ComputeWeights();
     if (debug > 2) Printf("got roofit c.m. ");
     std::vector <TLorentzVector> protons_vector = protons;
-    protons.clear()
+    protons.clear();
     for (auto & proton:protons_vector){
         protons.push_back(protons_vector);
     }
