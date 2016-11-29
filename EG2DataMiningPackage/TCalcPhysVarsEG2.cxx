@@ -25,7 +25,6 @@ TCalcPhysVarsEG2::TCalcPhysVarsEG2( TTree * fInTree, TString fOutFileName, int f
     SetDebug        (fdebug);
     SetDataType     (fDataType);
     SetInTree       (fInTree);
-//    SetOutTree      (fOutTree);
     SetOutFileName  (fOutFileName);
     SetOutTree      (fOutFileName);
     SetFrameName    (fFrameName);
@@ -113,78 +112,74 @@ void TCalcPhysVarsEG2::InitInputTree(){
 void TCalcPhysVarsEG2::InitOutputTree(){
 
     // Integer branches
-//    OutTree -> Branch("target atomic mass"  ,&A                     ,"A/I");
-//    OutTree -> Branch("Np_g"                ,&Np_g                  ,"Np_g/I");
-//    OutTree -> Branch("Np"                  ,&Np                    ,"Np/I");
-//    OutTree -> Branch("NpBack"              ,&NpBack                ,"NpBack/I"); // number of backward going protons
-//    OutTree -> Branch("NpCumulative"        ,&NpCumulative          ,"NpCumulative/I"); // number of backward going protons with 0.3<p
-//    OutTree -> Branch("NpCumulativeSRC"     ,&NpCumulativeSRC       ,"NpCumulativeSRC/I"); // number of backward going protons with 0.3<p<0.7
-//    OutTree -> Branch("total particle num." ,&Ntotal                ,"Ntotal/I");
-//    OutTree -> Branch("neg. particles num." ,&Nnegative             ,"Nnegative/I");
-//    OutTree -> Branch("pCTOFCut"            ,&pCTOFCut              );// std::vector<Int_t>
-//    OutTree -> Branch("pFiducCut"           ,&pFiducCut             );// std::vector<Int_t>
-//
-//    
-//    // Float_t branches
-//    OutTree -> Branch("Xb"                  ,&Xb                    , "Xb/F");
-//    OutTree -> Branch("Bjorken x (moving p)",&XbMoving              , "XbMoving/F");
-//    OutTree -> Branch("Q2"                  ,&Q2                    , "Q2/F");
-//    OutTree -> Branch("Mmiss"               ,&Mmiss                 , "Mmiss/F");
-//    
-//    // p(cm) for RooFit
-//    OutTree -> Branch("Pmiss3Mag"           ,&Pmiss3Mag             , "Pmiss3Mag/F");
-//    OutTree -> Branch("pcmX"                ,&pcmX                  , "pcmX/F");
-//    OutTree -> Branch("pcmY"                ,&pcmY                  , "pcmY/F");
-//    OutTree -> Branch("pcmT"                ,&pcmT                  , "pcmT/F");
-//    OutTree -> Branch("pcmZ"                ,&pcmZ                  , "pcmZ/F");
-//    OutTree -> Branch("rooWeight"           ,&rooWeight             , "rooWeight/F");
-//
-//    OutTree -> Branch("missing energy"      ,&Emiss                 , "Emiss/F");
-//    OutTree -> Branch("theta (pq)"          ,&theta_pq              , "theta_pq/F");
-//    OutTree -> Branch("p/q"                 ,&p_over_q              , "p_over_q/F");
-//    OutTree -> Branch("q LC fraction"       ,&alpha_q               , "alpha_q/F");
-//    OutTree -> Branch("sum of LC fractions" ,&sum_alpha             , "sum_alpha/F");
-//    OutTree -> Branch("theta p(miss)-p2 p3" ,&thetaMiss23           , "thetaMiss23/F");
-//    OutTree -> Branch("OpeningAngle"        ,&thetaMiss23           , "OpeningAngle/F");
-//    OutTree -> Branch("theta p(lead)-p(rec)",&thetaLeadRec          , "thetaLeadRec/F");
-//    OutTree -> Branch("phi p(miss)-p2 p3"   ,&phiMiss23             , "phiMiss23/F");
-//    OutTree -> Branch("alpha"               ,&alpha                 );// std::vector<Float_t>
-//    OutTree -> Branch("proton_angle"        ,&proton_angle          );// std::vector<Float_t>
-//    OutTree -> Branch("pCTOF"               ,&pCTOF                 );// std::vector<Float_t>
-//    OutTree -> Branch("pEdep"               ,&pEdep                 );// std::vector<Float_t>
-//    OutTree -> Branch("TpMiss"              ,&TpMiss                , "TpMiss/F");
-//    OutTree -> Branch("Tp"                  ,&Tp                    );// std::vector<Float_t> - kinetic energies
-//    OutTree -> Branch("q_phi"               ,&q_phi                 , "q_phi/F");
-//    OutTree -> Branch("q_theta"             ,&q_theta               , "q_theta/F");
-//    OutTree -> Branch("Pmiss_phi"           ,&Pmiss_phi             , "Pmiss_phi/F");
-//
-//
-//    
-//    // TVector3 branches
-//    OutTree -> Branch("PmRctLab3"           ,"TVector3"             ,&PmRctLab3);
-//    OutTree -> Branch("eVertex"             ,"TVector3"             ,&eVertex);
-//    OutTree -> Branch("pVertex"             ,&pVertex);             // std::vector<TVector3>
-//
-//    
-//    // TLorentzVector branches
-//    OutTree -> Branch("Pmiss"               ,"TLorentzVector"       ,&Pmiss);
-//    OutTree -> Branch("PmissRct"            ,"TLorentzVector"       ,&PmissRct);
-//    OutTree -> Branch("Pcm"                 ,"TLorentzVector"       ,&Pcm);
-//    OutTree -> Branch("PcmFinalState"       ,"TLorentzVector"       ,&PcmFinalState);
-//    OutTree -> Branch("Plead"               ,"TLorentzVector"       ,&Plead);
-//    OutTree -> Branch("Prec"                ,"TLorentzVector"       ,&Prec);
-//    OutTree -> Branch("q"                   ,"TLorentzVector"       ,&q);
-//    OutTree -> Branch("e"                   ,"TLorentzVector"       ,&e);
-//    OutTree -> Branch("Wtilde"              ,"TLorentzVector"       ,&Wtilde);
-//    OutTree -> Branch("Wmiss"               ,"TLorentzVector"       ,&Wmiss);
-//    OutTree -> Branch("WmissWithCm"         ,"TLorentzVector"       ,&WmissWithCm);
-//    OutTree -> Branch("WmissCmEps"          ,"TLorentzVector"       ,&WmissCmEps);
-//    fout = TFile::Open("out.root","RECREATE");
-//    tree = new TTree("tree","");
-//    tree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
+    OutTree -> Branch("target atomic mass"  ,&A                     ,"A/I");
+    OutTree -> Branch("Np_g"                ,&Np_g                  ,"Np_g/I");
+    OutTree -> Branch("Np"                  ,&Np                    ,"Np/I");
+    OutTree -> Branch("NpBack"              ,&NpBack                ,"NpBack/I"); // number of backward going protons
+    OutTree -> Branch("NpCumulative"        ,&NpCumulative          ,"NpCumulative/I"); // number of backward going protons with 0.3<p
+    OutTree -> Branch("NpCumulativeSRC"     ,&NpCumulativeSRC       ,"NpCumulativeSRC/I"); // number of backward going protons with 0.3<p<0.7
+    OutTree -> Branch("total particle num." ,&Ntotal                ,"Ntotal/I");
+    OutTree -> Branch("neg. particles num." ,&Nnegative             ,"Nnegative/I");
+    OutTree -> Branch("pCTOFCut"            ,&pCTOFCut              );// std::vector<Int_t>
+    OutTree -> Branch("pFiducCut"           ,&pFiducCut             );// std::vector<Int_t>
+
+    
+    // Float_t branches
+    OutTree -> Branch("Xb"                  ,&Xb                    , "Xb/F");
+    OutTree -> Branch("Bjorken x (moving p)",&XbMoving              , "XbMoving/F");
+    OutTree -> Branch("Q2"                  ,&Q2                    , "Q2/F");
+    OutTree -> Branch("Mmiss"               ,&Mmiss                 , "Mmiss/F");
+    
+    // p(cm) for RooFit
+    OutTree -> Branch("Pmiss3Mag"           ,&Pmiss3Mag             , "Pmiss3Mag/F");
+    OutTree -> Branch("pcmX"                ,&pcmX                  , "pcmX/F");
+    OutTree -> Branch("pcmY"                ,&pcmY                  , "pcmY/F");
+    OutTree -> Branch("pcmT"                ,&pcmT                  , "pcmT/F");
+    OutTree -> Branch("pcmZ"                ,&pcmZ                  , "pcmZ/F");
+    OutTree -> Branch("rooWeight"           ,&rooWeight             , "rooWeight/F");
+
+    OutTree -> Branch("missing energy"      ,&Emiss                 , "Emiss/F");
+    OutTree -> Branch("theta (pq)"          ,&theta_pq              , "theta_pq/F");
+    OutTree -> Branch("p/q"                 ,&p_over_q              , "p_over_q/F");
+    OutTree -> Branch("q LC fraction"       ,&alpha_q               , "alpha_q/F");
+    OutTree -> Branch("sum of LC fractions" ,&sum_alpha             , "sum_alpha/F");
+    OutTree -> Branch("theta p(miss)-p2 p3" ,&thetaMiss23           , "thetaMiss23/F");
+    OutTree -> Branch("OpeningAngle"        ,&thetaMiss23           , "OpeningAngle/F");
+    OutTree -> Branch("theta p(lead)-p(rec)",&thetaLeadRec          , "thetaLeadRec/F");
+    OutTree -> Branch("phi p(miss)-p2 p3"   ,&phiMiss23             , "phiMiss23/F");
+    OutTree -> Branch("alpha"               ,&alpha                 );// std::vector<Float_t>
+    OutTree -> Branch("proton_angle"        ,&proton_angle          );// std::vector<Float_t>
+    OutTree -> Branch("pCTOF"               ,&pCTOF                 );// std::vector<Float_t>
+    OutTree -> Branch("pEdep"               ,&pEdep                 );// std::vector<Float_t>
+    OutTree -> Branch("TpMiss"              ,&TpMiss                , "TpMiss/F");
+    OutTree -> Branch("Tp"                  ,&Tp                    );// std::vector<Float_t> - kinetic energies
+    OutTree -> Branch("q_phi"               ,&q_phi                 , "q_phi/F");
+    OutTree -> Branch("q_theta"             ,&q_theta               , "q_theta/F");
+    OutTree -> Branch("Pmiss_phi"           ,&Pmiss_phi             , "Pmiss_phi/F");
+
+
+    
+    // TVector3 branches
+    OutTree -> Branch("PmRctLab3"           ,"TVector3"             ,&PmRctLab3);
+    OutTree -> Branch("eVertex"             ,"TVector3"             ,&eVertex);
+    OutTree -> Branch("pVertex"             ,&pVertex);             // std::vector<TVector3>
+
+    
+    // TLorentzVector branches
+    OutTree -> Branch("Pmiss"               ,"TLorentzVector"       ,&Pmiss);
+    OutTree -> Branch("PmissRct"            ,"TLorentzVector"       ,&PmissRct);
+    OutTree -> Branch("Pcm"                 ,"TLorentzVector"       ,&Pcm);
+    OutTree -> Branch("PcmFinalState"       ,"TLorentzVector"       ,&PcmFinalState);
+    OutTree -> Branch("Plead"               ,"TLorentzVector"       ,&Plead);
+    OutTree -> Branch("Prec"                ,"TLorentzVector"       ,&Prec);
+    OutTree -> Branch("q"                   ,"TLorentzVector"       ,&q);
+    OutTree -> Branch("e"                   ,"TLorentzVector"       ,&e);
+    OutTree -> Branch("Wtilde"              ,"TLorentzVector"       ,&Wtilde);
+    OutTree -> Branch("Wmiss"               ,"TLorentzVector"       ,&Wmiss);
+    OutTree -> Branch("WmissWithCm"         ,"TLorentzVector"       ,&WmissWithCm);
+    OutTree -> Branch("WmissCmEps"          ,"TLorentzVector"       ,&WmissCmEps);
     OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
-//    protons.clear();
-//    OutTree -> Branch("protonsLab"          ,&protonsLab);          // std::vector<TLorentzVector>
+    OutTree -> Branch("protonsLab"          ,&protonsLab);          // std::vector<TLorentzVector>
     
     
 
@@ -201,10 +196,6 @@ void TCalcPhysVarsEG2::InitOutputTree(){
         OutTree -> Branch("Nmiss"               ,"TLorentzVector"       ,&Nmiss);
     }
     
-    
-//    tree->Branch("vec1",&vec1);
-//    vec1.clear();
-
     if (debug>0) std::cout << "Initialized Output Tree TCalcPhysVarsEG2 on " << OutTree -> GetTitle() << std::endl;
 }
 
@@ -273,6 +264,11 @@ void TCalcPhysVarsEG2::InitEvent(){
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
+    if(!OutTree) {
+        std::cerr << "Cannot call " << __FUNCTION__
+        << " before tree is ok!" << std::endl;
+        throw std::exception();
+    }
     if (debug>3) Printf("starting event number %d",entry);
     
 
@@ -447,40 +443,17 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     // finally, fill the TTree output
     if (debug > 2){ Printf("output tree: %s , with %d entries ",OutTree->GetName(),(int)OutTree->GetEntries()); PrintData(entry);}
-    if(!OutTree) {
-        std::cerr << "Cannot call " << __FUNCTION__
-        << " before tree is ok!" << std::endl;
-        throw std::exception();
-    }
-    protons.clear();
-    TLorentzVector proton( p3vec[0] , sqrt( p3vec[0].Mag2() + Mp2 ) );
-    protons.push_back( proton );
+//    protons.clear();
+//    TLorentzVector proton( p3vec[0] , sqrt( p3vec[0].Mag2() + Mp2 ) );
+//    protons.push_back( proton );
     OutTree -> Fill();
-    Printf("OutTree -> Fill();");
 
-//    TLorentzVector in1(protons[0].Px(),protons[0].Py(),protons[0].Pz(),protons[0].E());
-//    vec1.push_back(in1);
-//    tree->Fill();
-//    vec1.clear();
-//    Printf("tree -> Fill();");
     if (debug > 2) Printf("filled output tree with %d entries ",(int)OutTree->GetEntries());
 
 }
 
 void TCalcPhysVarsEG2::Close()
 {
-//    if(!fout || !tree) {
-//        std::cerr << "Cannot call " << __FUNCTION__
-//        << " before file is opened!" << std::endl;
-//        throw std::exception();
-//    }
-//    fout->cd();
-//    tree->Write();
-//    fout->Close();
-//    
-//    fout = nullptr;
-//    tree = nullptr;
-    
     if(!OutFile || !OutTree) {
         std::cerr << "Cannot call " << __FUNCTION__
         << " before file is opened!" << std::endl;
