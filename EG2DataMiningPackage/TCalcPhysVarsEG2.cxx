@@ -166,8 +166,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
 //    OutTree -> Branch("WmissCmEps"          ,"TLorentzVector"       ,&WmissCmEps);
     fout = TFile::Open("out.root","RECREATE");
     tree = new TTree("tree","");
-    tree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
-    protons.clear();
+//    tree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
 //    OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
 //    protons.clear();
 //    OutTree -> Branch("protonsLab"          ,&protonsLab);          // std::vector<TLorentzVector>
@@ -186,7 +185,11 @@ void TCalcPhysVarsEG2::InitOutputTree(){
         OutTree -> Branch("Nlead"               ,"TLorentzVector"       ,&Plead);
         OutTree -> Branch("Nmiss"               ,"TLorentzVector"       ,&Nmiss);
     }
-    protons.clear();
+    
+    
+    tree->Branch("vec1",&vec1);
+    vec1.clear();
+
     if (debug>0) std::cout << "Initialized Output Tree TCalcPhysVarsEG2 on " << OutTree -> GetTitle() << std::endl;
 }
 
@@ -436,6 +439,9 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     }
     OutTree -> Fill();
     Printf("OutTree -> Fill();");
+
+    TLorentzVector in1(vec1.size(), vec1.size(), vec1.size(), vec1.size());
+    vec1.push_back(in1);
     tree->Fill();
     Printf("tree -> Fill();");
     if (debug > 2) Printf("filled output tree with %d entries ",(int)OutTree->GetEntries());

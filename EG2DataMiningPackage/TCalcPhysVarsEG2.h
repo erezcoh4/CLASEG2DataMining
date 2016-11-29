@@ -36,6 +36,7 @@ public:
     // Tako Test
     TFile* fout;
     TTree* tree;
+    std::vector<TLorentzVector> vec1;
     void Close ();
     // ------- Tako Test
 
