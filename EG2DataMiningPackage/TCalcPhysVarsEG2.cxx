@@ -439,6 +439,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     }
     OutTree -> Fill();
     Printf("OutTree -> Fill();");
+    protons.clear();
 
     TLorentzVector in1(protons[0].Px(),protons[0].Py(),protons[0].Pz(),protons[0].E());
     vec1.push_back(in1);
