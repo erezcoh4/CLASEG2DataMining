@@ -17,14 +17,14 @@ if (DataType == "GSIM"):
     FileName    = "GSIM_run%04d_eep"%flags.run
     InFile      = ROOT.TFile(path + "/GSIM_DATA/"+FileName+".root")
     InTree      = InFile.Get("proton_data")
-    OutFile     = ROOT.TFile(path + "/AnaFiles/"+"Ana_"+FileName+".root","recreate")
+    OutFile     = ROOT.TFile(path + "/AnaFiles/"+"Ana_"+FileName+".root","RECREATE")
     axes_frame  = "lab frame"
 
 else:
     FileName    = "%s_%s_%s"% (SchemeType,DataType,dm.Target(A))
-    InFile      = ROOT.TFile(path + "/Schemed_EG2_DATA/"+"Schemed_"+FileName+".root")
+    InFile      = ROOT.TFile( schemed_eg2_data_path + "/"+"Schemed_"+FileName+".root" )
     InTree      = InFile.Get("T")
-    OutFile     = ROOT.TFile(path + "/AnaFiles/"+"Ana_"+FileName+".root","recreate")
+    OutFile     = ROOT.TFile(path + "/AnaFiles/"+"Ana_"+FileName+".root","RECREATE")
     print 'InFile:',InFile,'OutFile:',OutFile
 
 

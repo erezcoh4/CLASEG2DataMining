@@ -443,6 +443,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     TLorentzVector in1(protons[0].Px(),protons[0].Py(),protons[0].Pz(),protons[0].E());
     vec1.push_back(in1);
     tree->Fill();
+    vec1.clear();
     Printf("tree -> Fill();");
     if (debug > 2) Printf("filled output tree with %d entries ",(int)OutTree->GetEntries());
 
