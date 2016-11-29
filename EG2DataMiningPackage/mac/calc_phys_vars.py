@@ -17,26 +17,30 @@ if (DataType == "GSIM"):
     FileName    = "GSIM_run%04d_eep"%flags.run
     InFile      = ROOT.TFile(path + "/GSIM_DATA/"+FileName+".root")
     InTree      = InFile.Get("proton_data")
-    OutFile     = ROOT.TFile(path + "/AnaFiles/"+"Ana_"+FileName+".root","RECREATE")
+    OutFileName = path + "/AnaFiles/"+"Ana_"+FileName+".root"
+    OutFile     = ROOT.TFile( OutFileName ,"RECREATE")
     axes_frame  = "lab frame"
 
 else:
     FileName    = "%s_%s_%s"% (SchemeType,DataType,dm.Target(A))
     InFile      = ROOT.TFile( schemed_eg2_data_path + "/"+"Schemed_"+FileName+".root" )
     InTree      = InFile.Get("T")
-    OutFile     = ROOT.TFile(path + "/AnaFiles/"+"Ana_"+FileName+".root","RECREATE")
+    OutFileName = path + "/AnaFiles/"+"Ana_"+FileName+".root"
+    OutFile     = ROOT.TFile( OutFileName ,"RECREATE")
     print 'InFile:',InFile,'OutFile:',OutFile
 
 
 Nentries    = InTree.GetEntries()
-OutTree     = ROOT.TTree("anaTree","physical variables")
-calc    	= TCalcPhysVarsEG2( InTree , OutTree , A , flags.DataType , axes_frame , flags.verbose)
+#OutTree     = ROOT.TTree("anaTree","physical variables")
+#calc    	= TCalcPhysVarsEG2( InTree , OutTree , A , flags.DataType , axes_frame , flags.verbose)
+
+TCalcPhysVarsEG2( InTree , OutFileName , A , flags.DataType , axes_frame , flags.verbose)
 
 if (DataType == "GSIM"):
     calc.SetNp_g(1)
 
 
-for entry in range(0, (int)(flags.evnts_frac*Nentries)):
+for entry in range(0, int(flags.evnts_frac*Nentries)):
     calc.ComputePhysVars( entry )
     if (flags.verbose>0 and entry%flags.print_mod == 0):
         calc.PrintData( entry )
@@ -44,11 +48,11 @@ for entry in range(0, (int)(flags.evnts_frac*Nentries)):
 
 calc.Close()
 
-print "done filling %d events" % OutTree.GetEntries()
-print "wrote file " + OutFile.GetName()
+print "done filling %d events" % int(flags.evnts_frac*Nentries)
+print "wrote file " + OutFileName
 
-OutTree.Write()
-OutFile.Close()
+#OutTree.Write()
+#OutFile.Close()
 
 
 

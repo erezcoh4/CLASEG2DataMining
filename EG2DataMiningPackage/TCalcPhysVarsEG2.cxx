@@ -20,6 +20,21 @@ TCalcPhysVarsEG2::TCalcPhysVarsEG2( TTree * fInTree, TTree * fOutTree, int fA , 
     InitOutputTree  ();
 }
 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+TCalcPhysVarsEG2::TCalcPhysVarsEG2( TTree * fInTree, TString fOutFileName, int fA , TString fDataType, TString fFrameName, int fdebug){
+    SetDebug        (fdebug);
+    SetDataType     (fDataType);
+    SetInTree       (fInTree);
+//    SetOutTree      (fOutTree);
+    SetOutFileName  (fOutFileName);
+    SetOutTree      (fOutFileName);
+    SetFrameName    (fFrameName);
+    Setk0           (0.15);
+    A = fA;
+    InitGlobals     ();
+    InitInputTree   ();
+    InitOutputTree  ();
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::InitInputTree(){
@@ -454,17 +469,30 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
 void TCalcPhysVarsEG2::Close()
 {
-    if(!fout || !tree) {
+//    if(!fout || !tree) {
+//        std::cerr << "Cannot call " << __FUNCTION__
+//        << " before file is opened!" << std::endl;
+//        throw std::exception();
+//    }
+//    fout->cd();
+//    tree->Write();
+//    fout->Close();
+//    
+//    fout = nullptr;
+//    tree = nullptr;
+    
+    if(!OutFile || !OutTree) {
         std::cerr << "Cannot call " << __FUNCTION__
         << " before file is opened!" << std::endl;
         throw std::exception();
     }
-    fout->cd();
-    tree->Write();
-    fout->Close();
+    OutFile->cd();
+    OutTree->Write();
+    OutFile->Close();
     
-    fout = nullptr;
-    tree = nullptr;
+    OutFile = nullptr;
+    OutTree = nullptr;
+
 }
 
 

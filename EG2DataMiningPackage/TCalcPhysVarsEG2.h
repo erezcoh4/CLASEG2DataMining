@@ -104,6 +104,7 @@ public:
     /// Default constructor
     TCalcPhysVarsEG2    (){}
     TCalcPhysVarsEG2    (TTree * fInTree, TTree * fOutTree, int fA = 12, TString fDataType = "data" , TString fFrameName = "q(z) - Pmiss(x-z) frame", int fdebug = 1);
+    TCalcPhysVarsEG2    (TTree * fInTree, TString fOutFileName, int fA = 12, TString fDataType = "data" , TString fFrameName = "q(z) - Pmiss(x-z) frame", int fdebug = 1);
 
  
     /// Default destructor
@@ -119,6 +120,8 @@ public:
     void          SetPath (TString path){Path = path;};
     void        SetInTree (TTree * tree){InTree = tree;};
     void       SetOutTree (TTree * tree){OutTree = tree;};
+    void   SetOutFileName (TString name){OutFileName = name;};
+    void       SetOutTree (TString fOutFileName){ OutFile = TFile::Open(fOutFileName,"RECREATE"); OutTree = new TTree("anaTree","physical variables");};
     void     SetFrameName (TString name){FrameName = name;};
     void            Setk0 (Float_t  fk0){k0 = fk0;};
     void         SetDebug (int d)       {debug = d;};
