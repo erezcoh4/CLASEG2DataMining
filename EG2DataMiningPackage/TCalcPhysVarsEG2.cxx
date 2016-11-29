@@ -164,10 +164,10 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("Wmiss"               ,"TLorentzVector"       ,&Wmiss);
     OutTree -> Branch("WmissWithCm"         ,"TLorentzVector"       ,&WmissWithCm);
     OutTree -> Branch("WmissCmEps"          ,"TLorentzVector"       ,&WmissCmEps);
-    OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
-    OutTree -> Branch("protonsLab"          ,&protonsLab);          // std::vector<TLorentzVector>
-    protons.clear();
-    protonsLab.clear();
+//    OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
+//    OutTree -> Branch("protonsLab"          ,&protonsLab);          // std::vector<TLorentzVector>
+//    protons.clear();
+//    protonsLab.clear();
     
     
 
