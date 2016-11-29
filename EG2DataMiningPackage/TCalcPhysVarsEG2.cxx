@@ -440,16 +440,12 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     pcmZ = Pcm.Pz();
     ComputeWeights();
     if (debug > 2) Printf("got roofit c.m. ");
-    std::vector <TLorentzVector> protons_vector = protons;
-    protons.clear();
-    for (auto & proton:protons_vector){
-        protons.push_back( proton );
-    }
+    
     // finally, fill the TTree output
-//    if (debug > 2){ Printf("output tree: %s , with %d entries ",OutTree->GetName(),(int)OutTree->GetEntries()); PrintData(entry);}
-//    protons.clear();
-//    TLorentzVector proton( p3vec[0] , sqrt( p3vec[0].Mag2() + Mp2 ) );
-//    protons.push_back( proton );
+    // problem with plugging std::vector<TLorentzVector> into the root file is solved by pushing back into the protons vector only before filling...
+    std::vector <TLorentzVector> protons_vector = protons;    protons.clear();
+    for (auto & proton:protons_vector)  protons.push_back( proton );
+    
     OutTree -> Fill();
 
     if (debug > 2) Printf("filled output tree with %d entries ",(int)OutTree->GetEntries());
