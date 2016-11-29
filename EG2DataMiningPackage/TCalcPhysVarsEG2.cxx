@@ -166,7 +166,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
 //    OutTree -> Branch("WmissCmEps"          ,"TLorentzVector"       ,&WmissCmEps);
     fout = TFile::Open("out.root","RECREATE");
     tree = new TTree("tree","");
-//    tree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
+    tree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
 //    OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
 //    protons.clear();
 //    OutTree -> Branch("protonsLab"          ,&protonsLab);          // std::vector<TLorentzVector>
