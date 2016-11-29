@@ -443,7 +443,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     std::vector <TLorentzVector> protons_vector = protons;
     protons.clear();
     for (auto & proton:protons_vector){
-        protons.push_back(protons_vector);
+        protons.push_back( proton );
     }
     // finally, fill the TTree output
 //    if (debug > 2){ Printf("output tree: %s , with %d entries ",OutTree->GetName(),(int)OutTree->GetEntries()); PrintData(entry);}
