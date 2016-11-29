@@ -31,7 +31,7 @@ else:
 
 
 Nentries    = InTree.GetEntries()
-#OutTree     = ROOT.TTree("anaTree","physical variables")
+OutTree     = ROOT.TTree("anaTree","physical variables")
 #calc    	= TCalcPhysVarsEG2( InTree , OutTree , A , flags.DataType , axes_frame , flags.verbose)
 
 calc = TCalcPhysVarsEG2( InTree , OutFileName , A , flags.DataType , axes_frame , flags.verbose)
