@@ -279,6 +279,50 @@ def fit_cm_parameters( run , data , FigureFName = '' , DoPlot = False ): # all p
 
 
 # ------------------------------------------------------------------------------- #
+def fit_widths_z( cm_pars_list , colors , labels , FigureFName = '' ): # all parameters
+    
+    Pmiss = (cm_pars_list[0].pMiss_max + cm_pars_list[0].pMiss_min)/2.
+    pMissUpErr , pMissLowErr = cm_pars_list[0].pMiss_max - Pmiss , Pmiss - cm_pars_list[0].pMiss_min
+    fig , ax = plt.subplots(figsize=(20,10)) # four plots, two unweighted and two weighted
+    for color, label , data in zip(colors,labels,cm_pars_list):
+       plot_errorbar_and_fit( ax ,Pmiss,data[ 'sigma_z_unweighted'] ,
+                             [pMissLowErr,pMissUpErr] ,
+                             [data[ 'sigma_zErr_unweighted'],data[ 'sigma_zErr_unweighted']],
+                             color=color ,marker='s',lstyle='none',
+                             label=label ,fit_type='linear')
+    set_frame( ax , r'c.m. $\sigma$ (unweighted by the cross-section)' ,
+              r'$p_{miss}$ [GeV/c]' ,
+              r'longitudinal c.m. momentum $\sigma$ [Gev/c]' , "upper left")
+    ax.set_ylim(0.11,0.31)
+    plt.savefig(FigureFName)
+    print_filename( FigureFName , "longitudinal widths plot at" )
+    print_line()
+
+
+# ------------------------------------------------------------------------------- #
+def fit_means_z( cm_pars_list , colors , labels , FigureFName = '' ): # all parameters
+    
+    Pmiss = (cm_pars_list[0].pMiss_max + cm_pars_list[0].pMiss_min)/2.
+    pMissUpErr , pMissLowErr = cm_pars_list[0].pMiss_max - Pmiss , Pmiss - cm_pars_list[0].pMiss_min
+    fig , ax = plt.subplots(figsize=(20,10)) # four plots, two unweighted and two weighted
+    for color, label , data in zip(colors,labels,cm_pars_list):
+        plot_errorbar_and_fit( ax ,Pmiss,data[ 'mean_z_unweighted'] ,
+                              [pMissLowErr,pMissUpErr] ,
+                              [data[ 'mean_zErr_unweighted'],data[ 'mean_zErr_unweighted']],
+                              color=color ,marker='s',lstyle='none',
+                              label=label ,fit_type='linear')
+    set_frame( ax , r'c.m. $mean$ (unweighted by the cross-section)' ,
+              r'$p_{miss}$ [GeV/c]' ,
+              r'longitudinal c.m. momentum $mean$ [Gev/c]' , "upper left")
+    ax.set_ylim(0,0.5)
+    plt.savefig(FigureFName)
+    print_filename( FigureFName , "longitudinal widths plot at" )
+    print_line()
+
+
+
+
+# ------------------------------------------------------------------------------- #
 def plot_band_around_cm_parameter_fits( fig , i_subplot , data , var , weight , title  , TBandMin , TBandMax , ZBandMin , ZBandMax ):
 
     Pmiss = (data.pMiss_max + data.pMiss_min)/2.

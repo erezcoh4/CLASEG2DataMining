@@ -63,6 +63,49 @@ if 'extract data cm-parameters' in flags.option or 'extract' in flags.option: # 
     print_line()
 
 
+
+
+# (3).1 plot all parameters together
+# ----------------------------------------------------------
+if 'plot all parameters for all targets' in flags.option or 'AllTragets' in flags.option: # DATA
+    
+    # (A) compute width and mean for all nuclei
+    targets = ['C12'        , 'Al27'        , 'Fe56'        , 'Pb208'       ]
+    colors  = ['black'      , 'red'         , 'green'       , 'blue'        ]
+    labels  = ['$^{12}$C'   , '$^{27}$Al'   , '$^{56}$Fe'   , '$^{208}$Pb'  ]
+    
+    ana , cm_pars = [] , []
+    if 'extraction' in flags.option:
+        for target in targets:
+            ana.append( TAnalysisEG2( "ppSRCCut_DATA_%s"%target ) )
+            cm_parameters = calc_cm_parameters( ana[-1]  , PmissBins ,
+                                               CMRooFitsName( ppPath + '/DATA/%s_unweighted'%target ) ,
+                                               CMRooFitsName( ppPath + '/DATA/%s_weighted'%target ) ,
+                                               DoSaveCanvas = True )
+            cm_parameters.to_csv( CMParsFname(ppPath+'/DATA/%s_data'%target) , header=True , index = False)
+            cm_pars.append( cm_parameters )
+    else:
+        for target in targets:
+            cm_parameters = pd.read_csv( CMParsFname(ppPath+'/DATA/%s_data'%target) )
+            print 'read ',ppPath+'/DATA/%s_data'%target
+            cm_pars.append( cm_parameters )
+
+
+
+    # (B) plot longitudinal width and mean for all nuclei
+    widths_z = fit_widths_z( cm_pars , colors=colors , labels=labels ,
+                            FigureFName = FigureFName(ppPath+'/DATA/widths_z_all_nuclei') )
+    mean_z = fit_means_z( cm_pars , colors=colors , labels=labels ,
+                         FigureFName = FigureFName(ppPath+'/DATA/means_z_all_nuclei') )
+    print_line()
+
+
+
+
+
+
+
+
 # (4) create bands for Event-Generation
 # ----------------------------------------------------------
 if 'create bands for EG' in flags.option or 'bands' in flags.option:
