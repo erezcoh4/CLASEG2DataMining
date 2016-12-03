@@ -23,12 +23,6 @@ bands_columns = ['sTBandMin','sTBandMax'
                  ,'MeanZa2Min','MeanZa2Max']
 
 
-
-# prints - deprecated, delete December 10
-#def print_line(): print '\033[92m' + '--------------------------------------------------------------' + '\033[0m'
-#def print_important(string): print '\033[94m' + '\033[1m' + string + '\033[0m' ; print_line
-#def print_filename(filename,action_on_file=""): print action_on_file + '\n' + '\033[91m' + filename + '\033[0m'
-
 # file names
 def CMParsFname( path ):
     return path+"CMparameters.csv"
@@ -118,16 +112,19 @@ def KStest( PmissBins , ana_sim , ana_data , var , cut=ROOT.TCut() , debug=2 , N
 
 
 # ------------------------------------------------------------------------------- #
-def plot_errorbar_and_fit( ax , x , y , xerr , yerr , color , marker , lstyle , label , fit_type='const' ):
+def plot_errorbar_and_fit( ax , x , y , xerr , yerr , color , marker , lstyle , label ,
+                          fit_type='const' ,do_plot_fit_pars=True):
     plt.errorbar(x, y, xerr=xerr, yerr=yerr, color=color, marker=marker , linestyle=lstyle , label=None , markersize=15)
     if fit_type=='const':
         const_fit , const_fitErr = fit_as_a_function_of_pmiss( x , y , fit_type )
-        ax.plot(x, np.ones(len(x))*const_fit , color=color , linestyle='--', linewidth = 2 , label=label + "$=%.3f\pm%.3f$"%(const_fit,const_fitErr))
+        if do_plot_fit_pars: label=label + "$=%.3f\pm%.3f$"%(const_fit,const_fitErr)
+        ax.plot(x, np.ones(len(x))*const_fit , color=color , linestyle='--', label=label,linewidth = 2 , )
         return [ const_fit , const_fitErr ]
     
     elif fit_type=='linear':
         a1 , a1err , a2 , a2err  = fit_as_a_function_of_pmiss( x , y , fit_type )
-        ax.plot( x , a1 * x + a2 , color = color , label=label + "$=(%.3f)p_{miss}+(%.3f)$"%( a1 , a2 ))
+        if do_plot_fit_pars: label=label + "$=(%.3f)p_{miss}+(%.3f)$"%( a1 , a2 )
+        ax.plot( x , a1 * x + a2 , color = color ,label=label )
         return [ a1 , a1err] , [ a2 , a2err ]
 
 # ------------------------------------------------------------------------------- #
@@ -182,25 +179,25 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
 def set_frame( ax , title , xlabel , ylabel , legend_location="upper left" ):
 
     plt.title( title ,fontsize=25)
-    plt.xlabel( xlabel,fontsize=25)
-    plt.ylabel( ylabel,fontsize=25)
-    ax.tick_params(axis='both', which='major', labelsize=25)
-    ax.legend(loc=legend_location,scatterpoints=1,fontsize=25)
+    plt.xlabel( xlabel,fontsize=35)
+    plt.ylabel( ylabel,fontsize=35)
+    ax.tick_params(axis='both', which='major', labelsize=35)
+    ax.legend(loc=legend_location,scatterpoints=1,fontsize=35)
 
 
 # ------------------------------------------------------------------------------- #
-def fit_par_plot( fig , i_subplot , data , var , weight , title ): # a sub-routine to fit a single parameter
+def fit_par_plot( fig , i_subplot , data , var , weight , title , do_plot_fit_pars=True): # a sub-routine to fit a single parameter
 
     Pmiss = (data.pMiss_max + data.pMiss_min)/2.
     pMissUpErr , pMissLowErr = data.pMiss_max - Pmiss , Pmiss - data.pMiss_min
     ax = fig.add_subplot( i_subplot )
     ax.grid(True,linestyle='-',color='0.95')
-    [Xfit,XfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_x_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_xErr_' + weight ],data[ var + '_xErr_' + weight ]], 'black','v','none',r'$%s_{x}$'%title ,'const')
-    [Yfit,YfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_y_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_yErr_' + weight ],data[ var + '_yErr_' + weight ]], 'red'  ,'o','none',r'$%s_{y}$'%title ,'const')
+    [Xfit,XfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_x_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_xErr_' + weight ],data[ var + '_xErr_' + weight ]], 'black','v','none',r'$%s_{x}$'%title ,'const',do_plot_fit_pars=do_plot_fit_pars)
+    [Yfit,YfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_y_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_yErr_' + weight ],data[ var + '_yErr_' + weight ]], 'red'  ,'o','none',r'$%s_{y}$'%title ,'const',do_plot_fit_pars=do_plot_fit_pars)
     [Tfit,TfitErr] = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_t_' + weight],'const')
     #    [Tfit,TfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_t_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_tErr_' + weight ],data[ var + '_tErr_' + weight ]], 'green','^','none',r'$%s_{\perp}$'%title ,'const')
     #    Tfit , TfitErr = 0.5*(Xfit + Yfit) ,  math.sqrt(XfitErr*XfitErr + YfitErr*YfitErr)
-    [Za1,Za1err],[Za2,Za2err] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_zErr_' + weight ],data[ var + '_zErr_' + weight ]], 'blue' ,'s','none',r'$%s_{\vec{p}_{miss}}$'%title ,'linear')
+    [Za1,Za1err],[Za2,Za2err] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_zErr_' + weight ],data[ var + '_zErr_' + weight ]], 'blue' ,'s','none',r'$%s_{\vec{p}_{miss}}$'%title ,'linear',do_plot_fit_pars=do_plot_fit_pars)
     set_frame( ax , r'%s $%s$'%(weight,title) , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left")
     return [Xfit , XfitErr , Yfit , YfitErr , Tfit , TfitErr, Za1 , Za1err , Za2 , Za2err , ax]
 
@@ -327,7 +324,7 @@ def plot_band_around_cm_parameter_fits( fig , i_subplot , data , var , weight , 
 
     Pmiss = (data.pMiss_max + data.pMiss_min)/2.
     pMissUpErr , pMissLowErr = data.pMiss_max - Pmiss , Pmiss - data.pMiss_min
-    [a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,ax] = fit_par_plot( fig , i_subplot , data , var , weight , title )
+    [a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,ax] = fit_par_plot( fig , i_subplot , data , var , weight , title , do_plot_fit_pars=False)
     plt.fill_between(Pmiss, TBandMin , TBandMax ,alpha=0.5, edgecolor='#CC4F1B', facecolor='#FF9848')
     plt.fill_between(Pmiss, ZBandMin , ZBandMax ,alpha=0.5, edgecolor='#C14F1B', facecolor='#1122CC')
     return ax
@@ -354,14 +351,16 @@ def generate_cm_bands( cm_parameters , fit_pars , CMBandFname , FigureBandFName 
     MeanZBandMin = np.min([float(MeanZa1BandMax),float(MeanZa1BandMin)])*(Pmiss) + np.min([float(MeanZa2BandMax),float(MeanZa2BandMin)])
 
     if DoSaveCanvas:
-        fig = plt.figure(figsize=(40,10))
+        fig = plt.figure(figsize=(40,14))
         ax = plot_band_around_cm_parameter_fits( fig , 121, cm_parameters , 'sigma', 'unweighted' , '\sigma' , SigmaTBandMin , SigmaTBandMax , SigmaZBandMin , SigmaZBandMax  )
-        ax.text(0.7, 0.06, r'$%.2f<\sigma(x,y)<%.2f$'%(min_SigmaXY , max_SigmaXY), fontsize=25 , color='#FF9848')
-        ax.text(0.7, 0.04, r'$%.2f<\sigma(z): a_{1}<%.2f$'%(SigmaZa1BandMin , SigmaZa1BandMax), fontsize=25, color='#1122CC')
-        ax.text(0.7, 0.02, r'$%.2f<\sigma(z): a_{2}<%.2f$'%(SigmaZa2BandMin , SigmaZa2BandMax), fontsize=25, color='#1122CC')
+        ax.text(0.7, 0.06, r'$%.2f<\sigma(x,y)<%.2f$'%(min_SigmaXY , max_SigmaXY), fontsize=35 , color='#FF9848')
+        ax.text(0.7, 0.04, r'$%.2f<\sigma(z): a_{1}<%.2f$'%(SigmaZa1BandMin , SigmaZa1BandMax), fontsize=35, color='#1122CC')
+        ax.text(0.7, 0.02, r'$%.2f<\sigma(z): a_{2}<%.2f$'%(SigmaZa2BandMin , SigmaZa2BandMax), fontsize=35, color='#1122CC')
+        ax.set_xlim(0.3,1)
         ax = plot_band_around_cm_parameter_fits( fig , 122, cm_parameters , 'mean', 'unweighted' , 'mean' , MeanTBandMin , MeanTBandMax , MeanZBandMin , MeanZBandMax  )
-        ax.text(0.75, -0.24, r'$%.2f<\mu(z): a_{1}<%.2f$'%(MeanZa1BandMin , MeanZa1BandMax), fontsize=25, color='#1122CC')
-        ax.text(0.75, -0.32, r'$%.2f<\mu(z): a_{2}<%.2f$'%(MeanZa2BandMin , MeanZa2BandMax), fontsize=25, color='#1122CC')
+        ax.text(0.71, -0.24, r'$%.2f<\mu(z): a_{1}<%.2f$'%(MeanZa1BandMin , MeanZa1BandMax), fontsize=35, color='#1122CC')
+        ax.text(0.68, -0.32, r'$%.2f<\mu(z): a_{2}<%.2f$'%(MeanZa2BandMin , MeanZa2BandMax), fontsize=35, color='#1122CC')
+        ax.set_xlim(0.3,1)
         plt.savefig(FigureBandFName)
         print_filename( FigureBandFName , "plots to file" )
 
