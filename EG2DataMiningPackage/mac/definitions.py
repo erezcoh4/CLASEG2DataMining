@@ -48,7 +48,7 @@ A = flags.atomic_mass
 
 
 
-if (flags.option == "ppSRC"):
+if 'ppSRC' in flags.option or 'pppSRC' in flags.option:
     axes_frame  = "Pmiss(z) - q(x-z) frame"
 else:
     axes_frame  = "q(z) - Pmiss(x-z) frame"

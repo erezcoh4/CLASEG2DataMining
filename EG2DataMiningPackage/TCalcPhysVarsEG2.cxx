@@ -145,6 +145,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("sum of LC fractions" ,&sum_alpha             , "sum_alpha/F");
     OutTree -> Branch("theta p(miss)-p2 p3" ,&thetaMiss23           , "thetaMiss23/F");
     OutTree -> Branch("OpeningAngle"        ,&thetaMiss23           , "OpeningAngle/F");
+    OutTree -> Branch("theta23"             ,&theta23               , "theta23/F");
     OutTree -> Branch("theta p(lead)-p(rec)",&thetaLeadRec          , "thetaLeadRec/F");
     OutTree -> Branch("phi p(miss)-p2 p3"   ,&phiMiss23             , "phiMiss23/F");
     OutTree -> Branch("alpha"               ,&alpha                 );// std::vector<Float_t>
@@ -600,7 +601,7 @@ void TCalcPhysVarsEG2::loop_protons(){
         
         
         // α-s
-        alpha.push_back( LCfraction(protons.back() , A_over_mA ) );
+        alpha.push_back( LCfraction(protons.back() , q , A_over_mA ) );
         sum_alpha += alpha.back();
         
         

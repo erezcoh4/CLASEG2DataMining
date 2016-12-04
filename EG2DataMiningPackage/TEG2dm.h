@@ -55,7 +55,8 @@ public:
     void       RotVec_from_q_Pm_Frame ( TVector3* , float , float , float);
     void           RotVec2_Pm_q_Frame ( TVector3* , float , float , float);
 
-    Float_t                LCfraction ( TLorentzVector , Float_t );
+    Float_t                LCfraction ( TLorentzVector , Float_t ); // for a vector in the q-frame
+    Float_t                LCfraction ( TLorentzVector , TLorentzVector , Float_t ); // for a general vector + q
 
     
     TCutG                  * pEdepCut (int);

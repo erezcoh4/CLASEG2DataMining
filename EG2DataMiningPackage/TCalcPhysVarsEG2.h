@@ -74,7 +74,7 @@ public:
     Float_t Mrec        , Trec      ;                           // protons kinetic energy, recoil mass & kinetic energy
     Float_t uns_pCTOF[20], uns_pEdep[20]     ;
     Float_t N_Px[20]    , N_Py[20]  , N_Pz[20];                 // for raw data
-    Float_t thetaMiss23 , phiMiss23 , thetaLeadRec;
+    Float_t thetaMiss23 , phiMiss23 , thetaLeadRec   , theta23;
     Float_t Theta       , Mott      , DipoleFF2      , rooWeight;
     const Float_t Ebeam = 5.009 , e2 = 1; // sqaure of e-charge in e-charge units (for simplcity)
     

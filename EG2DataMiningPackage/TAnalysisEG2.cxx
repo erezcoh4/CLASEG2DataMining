@@ -80,12 +80,13 @@ void TAnalysisEG2::SetSRCCuts(TCut MainCut){ // last editted March-22 for pppSRC
     cutP1       = "(-27 < pVertex[0].Z() && pVertex[0].Z() < -20)";
     cutP2       = "0.3 < protons[1].P() && (-27 < pVertex[1].Z() && pVertex[1].Z() < -20)";
     cutP3       = "0.3 < protons[2].P() && (-27 < pVertex[2].Z() && pVertex[2].Z() < -20)";
-    cutMmiss    = "Pcm.Mag() < 3*0.938";
+    cutMmiss    = "Pcm.Mag() < 3*0.938 + 0.15";
     cutWmiss    = "Wmiss.Mag() > 0";
     cutAngles2p = Form("%s > 150", TPlots::Theta("Pmiss.Vect()","Prec.Vect()").Data());
-    cutAngles3p = "thetaMiss23 > 155 && fabs(phiMiss23) < 15";
+    cutAngles3p = "thetaMiss23 > 139 && fabs(phiMiss23) < 21";
     
     
+    ppNothingCut = "PcmFinalState.Pt()<0.4";
     ppNothing_alpha12_vs_XbCut = TEG2dm::alpha12_vs_XbCut();
     alpha12_vs_XbCutDIS = ppNothing_alpha12_vs_XbCut->GetName();
     alpha12_vs_XbCutCorrelation = Form("!%s",ppNothing_alpha12_vs_XbCut->GetName());
@@ -96,7 +97,7 @@ void TAnalysisEG2::SetSRCCuts(TCut MainCut){ // last editted March-22 for pppSRC
     pppCut      = cutSRC && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut;
     pppCutPmT   = pppCut && cutPmT;
     pppCutPmTMm = pppCutPmT && cutMmiss;
-    pppSRCCut   = cutSRC && "1.05<=Xb" && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut && cutPmT && cutMmiss;
+    pppSRCCut   = cutSRC && "1.05<=Xb" && " 3 <= Np" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut && cutPmT && cutMmiss && cutAngles3p;
     //    pppSRCMmiss = pppSRCCut && cutMmiss;
     //    Final3pCut  = pppSRCMmiss && cutAngles3p;
     

@@ -5,10 +5,19 @@ from cuts import *
 
 
 
-ana_all = TAnalysisEG2("SRCPmissXb_NoCTofDATA_%s"% dm.Target(flags.atomic_mass) , ROOT.TCut(xB_cut))
-ana_ppp = TAnalysisEG2("pppSRCCut_NoCTofDATA_%s"% dm.Target(flags.atomic_mass) , ROOT.TCut(xB_cut) )
 
 
+def mix_ppp_events( ana3p ):
+    file = ROOT.TFile("$DataMiningAnaFiles/Ana_Mixed_C12_Al27_Fe56_Pb28.root","recreate")
+    tree = ROOT.TTree("anaTree","mixed pppSRC C12+Al27+Fe56+Pb28")
+    ana3p.MixEvents(tree,False)
+    tree.Write()
+    file.Close()
+    print 'done mixing....'
+
+
+#ana_all = TAnalysisEG2("SRCPmissXb_NoCTofDATA_%s"% dm.Target(flags.atomic_mass) , ROOT.TCut(xB_cut))
+#ana_ppp = TAnalysisEG2("pppSRCCut_NoCTofDATA_%s"% dm.Target(flags.atomic_mass) , ROOT.TCut(xB_cut) )
 #variables = ['Xb'   ,'Pmiss.P()'    ,'Pmiss.Pt()'   ,'theta_pq'     ,'p_over_q' ]
 #all_events = tree2array( ana_all.GetTree() , branches=variables , selection=None )
 #all_ppp = tree2array( ana_all.GetTree() , branches=variables , selection='Np>=3' )

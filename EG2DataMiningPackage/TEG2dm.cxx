@@ -91,6 +91,12 @@ Float_t TEG2dm::LCfraction(TLorentzVector v, Float_t A_over_mA ){
 }
 
 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+Float_t TEG2dm::LCfraction(TLorentzVector v, TLorentzVector q, Float_t A_over_mA ){
+    return A_over_mA * ( v.E() - v.Vect().Dot(q.Vect().Unit()) );
+}
+
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 TCutG * TEG2dm::pEdepCut(int p){

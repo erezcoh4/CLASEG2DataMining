@@ -22,7 +22,7 @@ if 'calc. phys. vars.' in flags.option or 'calc' in flags.option:
 
 
 
-# (2) scheme for pp-src
+# (2) scheme for ppp-src
 # ----------------------------------------
 if 'scheme ppp-SRC' in flags.option or 'scheme' in flags.option: # scheme to ppp-SRC
     
@@ -33,6 +33,18 @@ if 'scheme ppp-SRC' in flags.option or 'scheme' in flags.option: # scheme to ppp
     scheme.SchemeOnTCut( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ana.pppSRCCut )
     print 'schemed to %s'%SchemedName
 
+
+# (2) merge all nuclei
+# ----------------------------------------
+if 'merge ppp-SRC all nuclei' in flags.option or 'merge' in flags.option:
+    print_important('cd /Users/erezcohen/Desktop/DataMining/AnaFiles \nhadd Ana_pppSRCCut_NoCTofDATA_C12_Al27_Fe56_Pb208.root Ana_pppSRCCut_NoCTofDATA_*')
+
+
+# (2) mix
+# ----------------------------------------
+if 'mix ppp-SRC all nuclei' in flags.option or 'mix' in flags.option:
+    ana = TAnalysisEG2( path+"/AnaFiles" , "Ana_pppSRCCut_NoCTofDATA_C12_Al27_Fe56_Pb208" , ROOT.TCut('Xb>1.05') )
+    mix_ppp_events( ana )
 
 
 # (1) SRC and kinematical cuts
