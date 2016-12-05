@@ -185,8 +185,6 @@ void TCalcPhysVarsEG2::InitOutputTree(){
 //    OutTree -> Branch("protonsLab"          ,&protonsLab);          // std::vector<TLorentzVector>
     
     
-
-    
     if(DataType == "GSIM") {
         OutTree -> Branch("generated Q2"            ,&Q2_g          , "Q2_g/F");
         OutTree -> Branch("generated Bjorken x"     ,&Xb_g          , "Xb_g/F");
@@ -198,6 +196,12 @@ void TCalcPhysVarsEG2::InitOutputTree(){
         OutTree -> Branch("Nlead"               ,"TLorentzVector"       ,&Plead);
         OutTree -> Branch("Nmiss"               ,"TLorentzVector"       ,&Nmiss);
     }
+    
+    
+    
+    
+    // cuts
+    OutTree -> Branch("ppSRCcutFiducial"    ,&ppSRCcutFiducial          ,"ppSRCcutFiducial/I"); // passed all pp-SRC cuts, and the recoiling proton also passed fiducial cuts
     
     if (debug>0) std::cout << "Initialized Output Tree TCalcPhysVarsEG2 on " << OutTree -> GetTitle() << std::endl;
 }
@@ -232,20 +236,6 @@ void TCalcPhysVarsEG2::InitEvent(){
     if (!p3vec_g.empty())   p3vec_g.clear();   // unsorted protons
     if (!protons_g.empty()) protons_g.clear();
     if (!pFiducCut_g.empty()) pFiducCut_g.clear();
-//    p3vec.clear();   // unsorted protons
-//    protons.clear();
-//    protonsLab.clear();
-//    pVertex.clear();
-//    alpha.clear();
-//    pCTOF.clear();
-//    pCTOFCut.clear();
-//    pFiducCut.clear();
-//    pEdep.clear();
-//    Tp.clear();
-//    proton_angle.clear();
-//    p3vec_g.clear();   // unsorted protons
-//    protons_g.clear();
-//    pFiducCut_g.clear();
 
     Np = NpBack = NpCumulative = NpCumulativeSRC = 0;
     Plead = Plead_g = TLorentzVector();
@@ -451,14 +441,37 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     std::vector <TLorentzVector> protons_vector = protons;    protons.clear();
     for (auto & proton:protons_vector)  protons.push_back( proton );
     
+    SetCuts();
+    
     OutTree -> Fill();
 
     if (debug > 2) Printf("filled output tree with %d entries ",(int)OutTree->GetEntries());
 
 }
 
-void TCalcPhysVarsEG2::Close()
-{
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void TCalcPhysVarsEG2::SetCuts(){
+    ppSRCcutFiducial = false;
+    if ( Np>=2
+        && Xb>1.2
+        && theta_pq < 25
+        && 0.62 < p_over_q && p_over_q < 0.96
+        && Mmiss < 1.1
+        && 0.3 < Pmiss.P() && Pmiss.P() < 1.0
+        && -24.5 < pVertex[0].Z() && pVertex[0].Z() < -20
+        && 0.35 < Prec.P()  &&  -24.5 < pVertex[1].Z() && pVertex[1].Z() < -20
+        && pFiducCut[1] == 1){
+        ppSRCcutFiducial = true;
+    }
+
+}
+
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void TCalcPhysVarsEG2::Close(){
     if(!OutFile || !OutTree) {
         std::cerr << "Cannot call " << __FUNCTION__
         << " before file is opened!" << std::endl;
@@ -564,8 +577,6 @@ void TCalcPhysVarsEG2::loop_protons(){
         if (debug > 3) Printf("rotated proton to %s",FrameName.Data());
         
         protons.push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
-//        TLorentzVector proton( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) );
-//        protons.push_back( proton );
         Pcm += protons.back();
         PcmFinalState += protons.back();
         

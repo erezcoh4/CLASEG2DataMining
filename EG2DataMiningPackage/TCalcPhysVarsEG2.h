@@ -56,6 +56,10 @@ public:
     Int_t   NpBack      , NpCumulative  , NpCumulativeSRC;
     Int_t   uns_pCut[20], uns_pID[20];
     
+    // cuts
+    Int_t   ppSRCcutFiducial;
+    
+    
     // for GSIM: generated
     Float_t Xb_g          , Q2_g        , Nu_g        ;
     Float_t PpX_g[20]     , PpY_g[20]   , PpZ_g[20]   ;   // proton momentum and vertex
@@ -132,6 +136,7 @@ public:
     void   InitOutputTree ();
     void      InitGlobals ();
     void        InitEvent ();
+    void          SetCuts ();
     
     
     void  ComputePhysVars (int entry);

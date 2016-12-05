@@ -18,7 +18,6 @@ from cm_tools import *
 
 
 PmissBins = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65] , [0.65,0.75] , [0.75,1.0]]
-#PmissBins = [[0.3,0.5]  , [0.5,0.7] , [0.7,1.0]] # 3 bins, irrelevant
 
 
 # proton acceptance plot
@@ -41,7 +40,7 @@ if 'scheme pp-SRC' in flags.option or 'scheme' in flags.option: # scheme to pp-S
     SchemedName = "ppSRCCut_%s"% DataName
     ana     = TAnalysisEG2( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName , flags.cut )
     scheme  = TSchemeDATA()
-    scheme.SchemeOnTCut( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ana.ppSRCCutFiducial)
+    scheme.SchemeOnTCut( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ROOT.TCut("ppSRCcutFiducial") )
     print 'schemed to %s'%SchemedName
 
 
