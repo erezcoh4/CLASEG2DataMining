@@ -365,9 +365,10 @@ void TSchemeDATA::SchemeOnTCut(TString Path, TString fInFileName, TString fInTre
     Printf("scheming from %s/%s",Path.Data() , fInFileName.Data());
     TFile * TmpInFile = new TFile(Form("%s/%s",Path.Data() , fInFileName.Data()));
     TTree * TmpTree = (TTree*) TmpInFile -> Get(fInTreeName);
+    Printf("scheming to %s/%s",Path.Data(), fOutFileName.Data());
     TFile * TmpOutFile = new TFile(Form("%s/%s",Path.Data(), fOutFileName.Data()),"recreate");
     TTree * TmpOutTree = TmpTree -> CopyTree(cut);
-    Printf("schemed to %s (%lld events passed the cut)",TmpOutFile->GetName(),TmpOutTree->GetEntries());
+    Printf("done scheming. (%lld events passed the cut)",TmpOutTree->GetEntries());
     TmpOutTree -> Write();
     TmpOutFile -> Close();
     TmpInFile -> Close();
