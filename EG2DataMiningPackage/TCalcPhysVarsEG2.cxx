@@ -140,6 +140,8 @@ void TCalcPhysVarsEG2::InitOutputTree(){
 
     OutTree -> Branch("missing energy"      ,&Emiss                 , "Emiss/F");
     OutTree -> Branch("theta (pq)"          ,&theta_pq              , "theta_pq/F");
+    OutTree -> Branch("theta (rec-q)"       ,&theta_rec_q           , "theta_rec_q/F");
+    OutTree -> Branch("theta (miss-q)"      ,&theta_miss_q          , "theta_miss_q/F");
     OutTree -> Branch("p/q"                 ,&p_over_q              , "p_over_q/F");
     OutTree -> Branch("q LC fraction"       ,&alpha_q               , "alpha_q/F");
     OutTree -> Branch("sum of LC fractions" ,&sum_alpha             , "sum_alpha/F");
@@ -431,6 +433,8 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         WmissCmEps  += protons.at(0);
     }
     thetaLeadRec = Plead.Vect().Angle(Prec.Vect());
+    theta_rec_q  = q.Vect().Angle(Prec.Vect());
+    theta_miss_q = q.Vect().Angle(Pmiss.Vect());
     if (debug > 2) Printf("got thetaLeadRec");
     
     

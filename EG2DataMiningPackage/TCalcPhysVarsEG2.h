@@ -71,7 +71,7 @@ public:
     Float_t q_phi_g     , q_theta_g , Pmiss_phi_g, Pmiss_theta_g;
     Float_t Emiss       , Mmiss;
     Float_t mA          , CoulombDeltaE         , A_over_mA ;
-    Float_t Mrec        , Trec      ;                           // protons kinetic energy, recoil mass & kinetic energy
+    Float_t Mrec        , Trec      , theta_rec_q   , theta_miss_q;   // protons kinetic energy, recoil mass & kinetic energy
     Float_t uns_pCTOF[20], uns_pEdep[20]     ;
     Float_t N_Px[20]    , N_Py[20]  , N_Pz[20];                 // for raw data
     Float_t thetaMiss23 , phiMiss23 , thetaLeadRec   , theta23;
