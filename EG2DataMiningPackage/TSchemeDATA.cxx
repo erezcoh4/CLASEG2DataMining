@@ -370,7 +370,7 @@ void TSchemeDATA::SchemeOnTCut(TString Path, TString fInFileName, TString fInTre
 //    TFile * TmpOutFile = new TFile(Form("%s/%s",Path.Data(), fOutFileName.Data()),"recreate");
     Printf("opened output file, writing %lld entries",TmpTree -> GetEntries(cut));
 //    TTree * TmpOutTree = TmpTree -> CopyTree(cut);
-    Printf("done scheming. (%lld events passed the cut)",TmpOutTree->GetEntries());
+//    Printf("done scheming. (%lld events passed the cut)",TmpOutTree->GetEntries());
 //    TmpOutTree -> Write();
 //    TmpOutFile -> Close();
 //    TmpInFile -> Close();
