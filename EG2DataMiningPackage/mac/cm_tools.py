@@ -651,24 +651,6 @@ def generate_runs_with_different_parameters( option,
     print_important("done...") ; print_line()
 
 
-## ------------------------------------------------------------------------------- #
-#def plot( simulation_results , x , y , xlabel = '' , ylabel = '' ):
-#    sr = simulation_results
-#    cmap = mpl.cm.hot
-#    my_hot_cmap = gp.reverse_colourmap(cmap)
-#    
-#    with sns.axes_style("white"):
-#        g = sns.jointplot(x=sr[x], y=sr[y] , cmap=my_hot_cmap, kind="hex", stat_func=None, marginal_kws={'color': 'green'})
-#    g.set_axis_labels(xlabel,ylabel)
-#    plt.colorbar()
-#    plt.show()
-#
-#
-## ------------------------------------------------------------------------------- #
-#def find_best_parameters( simulation_results ):
-#    sr = simulation_results
-#    gp.sns2d_with_projections( sr.genSigmaT , sr.recSigmaT_unweighted , axes_labels=[r'generated $\sigma_{T}$ [GeV/c]',r'un-weighted reconstructed $\sigma_{T}$ [GeV/c]'] , kind="hex")
-
 
 
 # ------------------------------------------------------------------------------- #
@@ -688,74 +670,6 @@ def stream_dataframe_to_root( df , filename , treename='tree' ):
         df.to_root(filename, key=treename )
     else: # else just update it
         df.to_root(filename, key=treename , mode='a')
-
-
-
-
-# deprecated (moved to ipython notebooks) delete Dec-30
-#
-## ------------------------------------------------------------------------------- #
-#def draw_projection_theta_phi( h , name="" ):
-#
-#    # continue here: take only a slice from zy plane
-#    hProj = h.Project3D("yz")
-#    hThetaPhi = hProj.Clone("hThetaPhi")
-#
-#    fig = plt.figure(figsize=[10,5])
-#    fig, ax = plt.subplots(1,1, figsize=(10,10), subplot_kw={'aspect':'equal'})
-#    NbinsTheta = hThetaPhi.GetXaxis().GetNbins()
-#    NbinsPhi = hThetaPhi.GetYaxis().GetNbins()
-#    H = np.ones((NbinsTheta, NbinsPhi))
-#    for bin_theta in range(NbinsTheta):
-#        for bin_phi in range(NbinsPhi):
-#            bin_content = float(hThetaPhi.GetBinContent(bin_theta,bin_phi)) / (30*100)
-#            H[bin_theta][bin_phi]= bin_content
-#    extent = [0,120,-30,330]
-#    im = plt.imshow(H,interpolation='none', origin='lower', extent=extent)
-#    im = ax.imshow(np.ma.masked_where(H == 0, H), interpolation='none', origin='lower', extent=extent)
-#    ax.set_xlabel('$\\theta$ [deg.]',fontsize=25)
-#    ax.set_ylabel('$\\phi$ [deg.]',fontsize=25)
-#    for tick in ax.xaxis.get_major_ticks():
-#        tick.label.set_fontsize(25)
-#    for tick in ax.yaxis.get_major_ticks():
-#        tick.label.set_fontsize(25)
-#    ax.set_aspect('auto')
-#    cb = plt.colorbar()
-#    for t in cb.ax.get_yticklabels():
-#        t.set_fontsize(20)
-#
-#    outfile_name = "/Users/erezcohen/Desktop/acceptance_theta_phi_%s.pdf"%name
-#    plt.savefig( outfile_name )
-#    print_filename( outfile_name , "plot theta/phi acceptance")
-#
-#
-## ------------------------------------------------------------------------------- #
-#def recoil_proton_acceptance():
-#    
-#    pAcceptacneFile = ROOT.TFile("/Users/erezcohen/Desktop/DataMining/GSIM_DATA/PrecoilAcceptance.root")
-#    h = pAcceptacneFile.Get("hRescaled")
-#    hAcceptanceAll      = h.Clone("hAcceptanceAll")
-#    hAcceptanceFiducial = h.Clone("hAcceptanceFiducial")
-#    
-#    p_recoil = ROOT.TVector3()
-#    for binx in range(h.GetXaxis().GetNbins()): # p(recoil) magnitude
-#        p_recoil_mag = h.GetXaxis().GetBinCenter(binx)
-#        
-#        for biny in range(h.GetYaxis().GetNbins()): # p(recoil) theta
-#            p_recoil_theta = h.GetYaxis().GetBinCenter(biny)
-#            
-#            for binz in range(h.GetZaxis().GetNbins()): # p(recoil) phi
-#                p_recoil_phi = h.GetZaxis().GetBinCenter(binz)
-#                
-#                p_recoil.SetMagThetaPhi( p_recoil_mag , math.radians(p_recoil_theta) , math.radians(p_recoil_phi) )
-#                fiducial = dm.protonFiducial ( p_recoil , 1 )
-#                acceptance = h.GetBinContent(binx,biny,binz)
-#                hAcceptanceFiducial.SetBinContent( binx, biny, binz, acceptance if fiducial else 0 )
-#
-#
-#    draw_projection_theta_phi( hAcceptanceAll , "full_acceptance" )
-#    draw_projection_theta_phi( hAcceptanceFiducial , "fiducial_region" )
-
 
 
 

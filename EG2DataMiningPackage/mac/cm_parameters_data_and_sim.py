@@ -3,7 +3,7 @@ from cm_tools import *
 '''
     usage:
     ---------
-    python mac/cm_parameters_data_and_sim.py --option=analyze
+    python mac/cm_parameters_data_and_sim.py --option=scheme
     
     options (can be ran simultaneously):
     ------------------------------------
@@ -49,7 +49,7 @@ if 'scheme pp-SRC' in flags.option or 'scheme' in flags.option: # scheme to pp-S
 if 'extract data cm-parameters' in flags.option or 'extract' in flags.option: # DATA
 
     # (A) calc cm parameters of data
-    ana_data = TAnalysisEG2( "ppSRCCut_DATA_%s"% dm.Target(A) )
+    ana_data = TAnalysisEG2( path+"/AnaFiles" , "ppSRCCut_DATA_%s"% dm.Target(A) )
     cm_parameters = calc_cm_parameters( ana_data  , PmissBins , CMRooFitsName( ppPath + '/DATA/unweighted' ) , CMRooFitsName( ppPath + '/DATA/weighted' ) , DoSaveCanvas = True )
     cm_parameters.to_csv( CMParsFname(ppPath+'/DATA/data') , header=True , index = False)
     print_filename( CMParsFname(ppPath+'/DATA/data')  ,"data c.m. parameters for different p(miss) bins at")
