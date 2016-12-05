@@ -368,7 +368,7 @@ void TSchemeDATA::SchemeOnTCut(TString Path, TString fInFileName, TString fInTre
 //    TmpInFile->Close();
     Printf("scheming to %s/%s",Path.Data(), fOutFileName.Data());
 //    TFile * TmpOutFile = new TFile(Form("%s/%s",Path.Data(), fOutFileName.Data()),"recreate");
-    Printf("opened output file, writing %lld entries",TmpTree -> GetEntries("(((((((theta_pq < 25)&&(0.62 < p_over_q && p_over_q < 0.96))&&(0.3 < Pmiss.P() && Pmiss.P() < 1.0))&&(1.2 <= Xb))&&(Mmiss < 1.1))&&(2 <= Np))&&(-24.5 < pVertex[0].Z() && pVertex[0].Z() < -20) &&(0.35 < Prec.P())) "));
+    Printf("opened output file, writing %lld entries",TmpTree -> GetEntries("((((((theta_pq < 25)&&(0.62 < p_over_q && p_over_q < 0.96))&&(0.3 < Pmiss.P() && Pmiss.P() < 1.0))&&(1.2 <= Xb))&&(Mmiss < 1.1))&&(2 <= Np))&&(-24.5 < pVertex[0].Z() && pVertex[0].Z() < -20)"));
     // &&(0.35 < Prec.P()  &&  (-24.5 < pVertex[1].Z() && pVertex[1].Z() < -20)))&&(pFiducCut[1] == 1)
 //    TTree * TmpOutTree = TmpTree -> CopyTree(cut);
 //    Printf("done scheming. (%lld events passed the cut)",TmpOutTree->GetEntries());
