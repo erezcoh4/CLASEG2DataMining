@@ -81,7 +81,7 @@ public:
     TCut    Sim3pSRCCut , FinalSim3pSRCCut  , Sim3pWmissCut ;
     TCut    Mix3pSRCCut , FinalMix3pSRCCut  , Mix3pPmT      , Mix3pPmTMm    ;
     TCut    eepInSRCCut , eeppInSRCCut      , PrecFiducial;
-    TCut    ppNothingCut;
+    TCut    ppNothingCut, ppSRCCutFiducial;
     
     void         SetSRCCuts ( TCut MainCut = "1.05 <= Xb");
     void        PrintInCuts ();
