@@ -12,6 +12,7 @@
 
 #ifdef __MAKECINT__
 #pragma link C++ class std::vector<TLorentzVector>+;
+#pragma link C++ class std::vector<TVector3>+;
 #endif
 
 #ifdef __CINT__
