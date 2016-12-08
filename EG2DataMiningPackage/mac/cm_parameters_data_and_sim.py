@@ -29,7 +29,7 @@ if 'recoil proton acceptance' in flags.option or 'acceptance' in flags.option:
 # (1) calculate physical variables
 # ----------------------------------------
 if 'calc. phys. vars.' in flags.option or 'calc' in flags.option:
-    print_important("python mac/calc_phys_vars.py -A12 -werez --option=ppSRC --DataType=DATA -evf=1 -p1000 -v2")
+    print_important("python mac/calc_phys_vars.py -A12 -w%s --option=ppSRC --DataType=DATA -evf=1 -p10000"%flags.worker)
 
 
 # (2) scheme for pp-src
@@ -37,10 +37,12 @@ if 'calc. phys. vars.' in flags.option or 'calc' in flags.option:
 if 'scheme pp-SRC' in flags.option or 'scheme' in flags.option: # scheme to pp-SRC
 
     DataName    = "DATA_%s"% dm.Target(flags.atomic_mass)
-    SchemedName = "ppSRCCut_%s"% DataName
     ana     = TAnalysisEG2( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName , flags.cut )
     scheme  = TSchemeDATA()
+    SchemedName = "ppSRCCut_%s"% DataName
     scheme.SchemeOnTCut( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ROOT.TCut("ppSRCcutFiducial") )
+    SchemedName = "eep_in_ppSRCCut_%s"% DataName
+    scheme.SchemeOnTCut( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ROOT.TCut("eep_in_ppSRCcut") )
     print 'schemed to %s'%SchemedName
 
 

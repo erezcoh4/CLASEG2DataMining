@@ -201,7 +201,11 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     
     
     // cuts
-    OutTree -> Branch("ppSRCcutFiducial"    ,&ppSRCcutFiducial          ,"ppSRCcutFiducial/I"); // passed all pp-SRC cuts, and the recoiling proton also passed fiducial cuts
+    
+    // (e,e'p) for ppSRC analysis
+    OutTree -> Branch("eep_in_ppSRCcut"     ,&eep_in_ppSRCcut           ,"eep_in_ppSRCcut/I");
+    // (e,e'pp) for ppSRC analysis, and the recoiling proton also passed fiducial cuts
+    OutTree -> Branch("ppSRCcutFiducial"    ,&ppSRCcutFiducial          ,"ppSRCcutFiducial/I");
     
     if (debug>0) std::cout << "Initialized Output Tree TCalcPhysVarsEG2 on " << OutTree -> GetTitle() << std::endl;
 }
@@ -452,19 +456,24 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TCalcPhysVarsEG2::SetCuts(){
+    
+    eep_in_ppSRCcut = false;
     ppSRCcutFiducial = false;
-    if ( Np>=2
+    
+    if ( Np>=1
         && Xb>1.2
         && theta_pq < 25
         && 0.62 < p_over_q && p_over_q < 0.96
         && Mmiss < 1.1
         && 0.3 < Pmiss.P() && Pmiss.P() < 1.0
-        && -24.5 < pVertex[0].Z() && pVertex[0].Z() < -20
-        && 0.35 < Prec.P()  &&  -24.5 < pVertex[1].Z() && pVertex[1].Z() < -20
-        && pFiducCut[1] == 1){
-        ppSRCcutFiducial = true;
+        && -24.5 < pVertex[0].Z() && pVertex[0].Z() < -20){
+        eep_in_ppSRCcut = true;
+        
+        if (0.35 < Prec.P()  &&  -24.5 < pVertex[1].Z() && pVertex[1].Z() < -20
+            && pFiducCut[1] == 1) {
+            ppSRCcutFiducial = true;
+        }
     }
-
 }
 
 

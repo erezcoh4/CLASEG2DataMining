@@ -24,6 +24,9 @@ if 'erez' in flags.worker or 'Erez' in flags.worker :
 elif flags.worker == "helion":
     path = "/home/erez/DataMining"
 
+elif 'jlab' in flags.worker or 'Jlab' in flags.worker or 'JLAB' in flags.worker or 'farm' in flags.worker :
+    path = "/work/halla/e07006/disk1/Erez/DataMining"
+
 eg2_data_path = path + "/EG2_DATA"
 
 if 'Lacie' in flags.worker:

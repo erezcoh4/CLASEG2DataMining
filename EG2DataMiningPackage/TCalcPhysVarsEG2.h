@@ -57,7 +57,7 @@ public:
     Int_t   uns_pCut[20], uns_pID[20];
     
     // cuts
-    Int_t   ppSRCcutFiducial;
+    Int_t   ppSRCcutFiducial , eep_in_ppSRCcut;
     
     
     // for GSIM: generated
