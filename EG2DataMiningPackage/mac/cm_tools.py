@@ -36,6 +36,8 @@ def FigureFName( path ):
     return path+"cm_width_and_mean.pdf"
 def FigureBandFName( path ):
     return path+"cm_width_and_mean_Bands.pdf"
+def GeneParsFName( path ):
+    return path+"GeneratedParameters.csv"
 def resutlsFName( path ):
     return path+"EG_simulated_runs_results_cm_parameters.csv"
 def buildup_resutlsFName( path ):
@@ -329,9 +331,14 @@ def plot_band_around_cm_parameter_fits( fig , i_subplot , data , var , weight , 
     plt.fill_between(Pmiss, ZBandMin , ZBandMax ,alpha=0.5, edgecolor='#C14F1B', facecolor='#1122CC')
     return ax
 
+# ------------------------------------------------------------------------------- #
+def linspace_parameter( band_min  , band_max  , Npts ):
+    return np.linspace( band_min + (band_max - band_min) / (Npts+1) , band_max , Npts , endpoint=False)
 
 # ------------------------------------------------------------------------------- #
-def generate_cm_bands( cm_parameters , fit_pars , CMBandFname , FigureBandFName , DoSaveCanvas = False ):
+def generate_cm_bands( cm_parameters , fit_pars , N ,
+                      debug ,
+                      CMBandFname , FigureBandFName , GeneParsFName , DoSaveCanvas = False ):
  
     df = pd.DataFrame(columns=bands_columns)
     Pmiss = (cm_parameters.pMiss_max + cm_parameters.pMiss_min)/2.
@@ -372,40 +379,64 @@ def generate_cm_bands( cm_parameters , fit_pars , CMBandFname , FigureBandFName 
                             index=[0])
     df = df.append(df_bands)
     df.to_csv( CMBandFname , header=True , index = False)
+
+    
     print_filename( CMBandFname , "wrote bands around cm paramters fits to" )
     print_line()
 
+    bands = pd.read_csv( CMBandFname )
+    print "N: ",N
+    SigmaT   = linspace_parameter( bands.SigmaTBandMin[0], bands.SigmaTBandMax[0], int(N.SigmaT) )
+    SigmaZa1 = linspace_parameter( bands.SigmaZa1Min[0]  , bands.SigmaZa1Max[0]  , int(N.SigmaZa1) )
+    SigmaZa2 = linspace_parameter( bands.SigmaZa2Min[0]  , bands.SigmaZa2Max[0]  , int(N.SigmaZa2) )
+    MeanZa1  = linspace_parameter( bands.MeanZa1Min[0]   , bands.MeanZa1Max[0]   , int(N.MeanZa1) )
+    MeanZa2  = linspace_parameter( bands.MeanZa2Min[0]   , bands.MeanZa2Max[0]   , int(N.MeanZa2) )
+    StartRun = int(N.StartRun)
+    EndRun   = StartRun + len(SigmaT)*len(SigmaZa1)*len(SigmaZa2)*len(MeanZa1)*len(MeanZa2)
+    if debug>1:
+        print "SigmaT:",SigmaT , "\nSigmaZa1:",SigmaZa1 , "\nSigmaZa2:",SigmaZa2 , "\nMeanZa1:",MeanZa1, "\nMeanZa2:",MeanZa2 , "\n mean(pcmZ) = %f * p(miss) + %f"%(MeanZa1 , MeanZa2  )
+        print '\033[95m' + "runs ",StartRun , " to ", EndRun + '\033[0m'
 
-# ------------------------------------------------------------------------------- #
-# deprecated....
-#def linspace_single_core( band_min  , band_max  , NptsBand , Ncores , i_core ):
-#    tmp_min = np.min( [band_min , band_max] )
-#    band_max = np.max( [band_min , band_max] )
-#    band_min = tmp_min
-#    step = math.fabs(band_max - band_min)/NptsBand#Ncores
-#    min = band_min + (float(i_core)/Ncores)*(band_max - band_min)
-#    max = min + float(band_max - band_min)/Ncores
-#    print min , max , step
-#    res = np.arange( min , max , step )
-#    return res
+    run = StartRun
+    # write generated parameters to file
+    for sigma_transverse in SigmaT:
+        for sigma_longitudinal_a1 in SigmaZa1:
+            for sigma_longitudinal_a2 in SigmaZa2:
+                for mean_longitudinal_a1 in MeanZa1:
+                    for mean_longitudinal_a2 in MeanZa2:
+                        run = run+1
+                        generated_parameters = pd.DataFrame({'run':run
+                                                            ,'genMeanX':0                           ,'genSigmaX':sigma_transverse
+                                                            ,'genMeanY':0                           ,'genSigmaY':sigma_transverse
+                                                            ,'genMeanZa1':mean_longitudinal_a1      ,'genMeanZa2':mean_longitudinal_a2
+                                                            ,'genSigmaZa1':sigma_longitudinal_a1    ,'genSigmaZa2':sigma_longitudinal_a2
+                                                            },
+                                                            index = [run])
+                        stream_dataframe_to_file( generated_parameters, GeneParsFName  )
+    print_filename( GeneParsFName , '\033[95m' + "appended " + '\033[0m' + "generation parameters to" )
 
 
-def linspace_parameter( band_min  , band_max  , Npts ):
-    return np.linspace( band_min + (band_max - band_min) / (Npts+1) , band_max , Npts , endpoint=False)
+
+
+
+
 
 
 # ------------------------------------------------------------------------------- #
 #def generate_runs_with_different_parameters( cm_fits_parameters , cm_pars_bands ,
 def generate_runs_with_different_parameters( option,
-                                            data_fits , bands ,
-                                            start_run , debug , PmissBins , buildup_resutlsFName ,
+                                            data_fits,
+                                            generated_parameters ,
+                                            debug , PmissBins , buildup_resutlsFName ,
                                             reco_fitsFName , target ,
                                             N ,
                                             root_resutlsFName ):
     
     # the data (nominal values)
     ana_data = TAnalysisEG2( "ppSRCCut_DATA_%s"% target )
-    path = "/Users/erezcohen/Desktop/DataMining/Analysis_DATA/ppSRCcm"
+    from definitions import *
+    print 'path:',path
+    path = path + "/Analysis_DATA/ppSRCcm"
 
 
     # simulation pandas::DataFrame
@@ -413,17 +444,10 @@ def generate_runs_with_different_parameters( option,
 
 
     # the bands around data (around nominal values)
-    print "N: ",N
-    SigmaT   = linspace_parameter( bands.SigmaTBandMin[0], bands.SigmaTBandMax[0], int(N.SigmaT) )
-    SigmaZa1 = linspace_parameter( bands.SigmaZa1Min[0]  , bands.SigmaZa1Max[0]  , int(N.SigmaZa1) )
-    SigmaZa2 = linspace_parameter( bands.SigmaZa2Min[0]  , bands.SigmaZa2Max[0]  , int(N.SigmaZa2) )
-    MeanZa1  = linspace_parameter( bands.MeanZa1Min[0]   , bands.MeanZa1Max[0]   , int(N.MeanZa1) )
-    MeanZa2  = linspace_parameter( bands.MeanZa2Min[0]   , bands.MeanZa2Max[0]   , int(N.MeanZa2) )
-    if debug>1: print "SigmaT:",SigmaT , "\nSigmaZa1:",SigmaZa1 , "\nSigmaZa2:",SigmaZa2 , "\nMeanZa1:",MeanZa1, "\nMeanZa2:",MeanZa2 , "\n mean(pcmZ) = %f * p(miss) + %f"%(MeanZa1 , MeanZa2  )
-    NrunsThisCore , NrunsTotal = len(SigmaT)*len(SigmaZa1)*len(SigmaZa2)*len(MeanZa1)*len(MeanZa2) , len(SigmaT)*len(SigmaZa1)*len(SigmaZa2)*len(MeanZa1)*len(MeanZa2)
-    if debug: print '\033[95m' + 'processing %d runs'%NrunsTotal + '\033[0m'
+    if debug>2: print "generated_parameters:",generated_parameters
+    if debug: print '\033[95m' + 'processing %d runs'%len(generated_parameters)+ '\033[0m'
 
-    run = start_run
+
     
     '''
         recoil proton acceptances:
@@ -433,216 +457,218 @@ def generate_runs_with_different_parameters( option,
     if 'generate' in option:
         pAcceptacneFile = ROOT.TFile("/Users/erezcohen/Desktop/DataMining/GSIM_DATA/PrecoilAcceptance.root")
         h = pAcceptacneFile.Get("hRescaled")
-        gen_events = GenerateEvents( path , run , debug )
+        gen_events = GenerateEvents( path , 0 , debug )
         gen_events.SetNRand( int(N.NRand) )
         gen_events.Use_protonAcceptacne( True )
         gen_events.Set_protonAcceptacne( h )
         gen_events.SetInputChain_eep()
-    
+
 
     # event generation (and analysis) loop
-    for sigma_transverse in SigmaT:
-        for sigma_longitudinal_a1 in SigmaZa1:
-            for sigma_longitudinal_a2 in SigmaZa2:
-                for mean_longitudinal_a1 in MeanZa1:
-                    for mean_longitudinal_a2 in MeanZa2:
-                        run = run+1
-                        
-                        genMeanX   = genMeanY       = 0
-                        genSigmaX  = genSigmaY      = sigma_transverse
-                        genMeanZa1  , genMeanZa2    = mean_longitudinal_a1 , mean_longitudinal_a2
-                        genSigmaZa1 , genSigmaZa2   = sigma_longitudinal_a1 , sigma_longitudinal_a2
-                        
-                        # (1) generate the simulated data (the 'run')
-                        # ----------------------------
-                        if 'generate' in option:
-
-                            gen_events.Set_eep_Parameters( genMeanX , genSigmaX , genMeanY , genSigmaY , genMeanZa1 , genMeanZa2 , genSigmaZa1 , genSigmaZa2 )
-                            gen_events.DoGenerateRun_eepp( run )
+    for run in generated_parameters.run.tolist():
+        genMeanX    = genMeanY = 0
+        genSigmaX   = genSigmaY = generated_parameters[generated_parameters.run==run].genSigmaX
+        genSigmaZa1 = generated_parameters[generated_parameters.run==run].genSigmaZa1
+        genSigmaZa2 = generated_parameters[generated_parameters.run==run].genSigmaZa2
+        genMeanZa1  = generated_parameters[generated_parameters.run==run].genMeanZa1
+        genMeanZa2  = generated_parameters[generated_parameters.run==run].genMeanZa2
+        if flags.verbose>2:
+            print 'run:',run , genSigmaX , genSigmaZa1 , genSigmaZa2 , genMeanZa1 , genMeanZa2
+            
+        # (1) generate the simulated data (the 'run')
+        # ----------------------------
+        if 'generate' in option:
                             
-                            # and now scheme them to our desired pp-SRC cuts
-                            ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
-                            scheme.SchemeOnTCut( path + '/eg_rootfiles' , 'run%d.root'%run , "anaTree", 'run%d.root'%run , ana_sim.EGppSRCCut + ana_sim.PrecFiducial )
-
-                            ana_sim.CloseFile()
-                            garbage_list = [ ana_sim ]
-                            del garbage_list
-
-
-
-                        # (2) analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
-                        # ----------------------------
-                        if 'analyze' in option or 'analyse' in option:
+            gen_events.Set_eep_Parameters( genMeanX , genSigmaX , genMeanY , genSigmaY , genMeanZa1 , genMeanZa2 , genSigmaZa1 , genSigmaZa2 )
+            gen_events.DoGenerateRun_eepp( run )
+                            
+            # and now scheme them to our desired pp-SRC cuts
+            ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
+            scheme.SchemeOnTCut( path + '/eg_rootfiles' , 'run%d.root'%run , "anaTree", 'run%d.root'%run , ana_sim.EGppSRCCut + ana_sim.PrecFiducial )
+                            
+            ana_sim.CloseFile()
+            garbage_list = [ ana_sim ]
+            del garbage_list
+                    
+                    
+                    
+        # (2) analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
+        # ----------------------------
+        if 'analyze' in option or 'analyse' in option:
+                            
+                if (debug>1): print "analyzing run %d"%run
+                ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
+                            
+                # reconstruct c.m. parameters
+                reco_parameters = calc_cm_parameters( ana_sim  , PmissBins )
+                            
+                if (debug>1):
+                    print "reconstructed cm parameters"
+                    if (debug>4):
+                        reco_parameters = calc_cm_parameters( ana_sim  , PmissBins , CMRooFitsName( path + '/eg_cm_roofits/run%d_unweighted_'%run ), CMRooFitsName( path + '/eg_cm_roofits/run%d_weighted_'%run ) , True )
+                        print "reco_parameters: ",reco_parameters
                         
-                            if (debug>1): print "analyzing run %d"%run
-                            ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
+                # fit the reconstructed parameters
+                reco_fits = fit_cm_parameters( run , reco_parameters )
                             
-                            # reconstruct c.m. parameters
-                            reco_parameters = calc_cm_parameters( ana_sim  , PmissBins )
-                            
-                            if (debug>1):
-                                print "reconstructed cm parameters"
-                                if (debug>4):
-                                    reco_parameters = calc_cm_parameters( ana_sim  , PmissBins , CMRooFitsName( path + '/eg_cm_roofits/run%d_unweighted_'%run ), CMRooFitsName( path + '/eg_cm_roofits/run%d_weighted_'%run ) , True )
-                                    print "reco_parameters: ",reco_parameters
-                        
-                            # fit the reconstructed parameters
-                            reco_fits = fit_cm_parameters( run , reco_parameters )
-                            
-                            if (debug>1):
-                                print "completed fiting processes"
-                                if (debug>4):
-                                    fit_cm_parameters( run , reco_parameters , FigureFName( path + '/eg_cm_figures/run%d_'%run ) , True )
-                                    print "reco_fits: ",reco_fits
+                if (debug>1):
+                    print "completed fiting processes"
+                    if (debug>4):
+                        fit_cm_parameters( run , reco_parameters , FigureFName( path + '/eg_cm_figures/run%d_'%run ) , True )
+                        print "reco_fits: ",reco_fits
+            
+            
+                # No Mott/FF - weighting (un - weighted roofit results)
+                [NsigSigmaX_unweighted , NsigSigmaY_unweighted ,
+                 NsigMeanZa1_unweighted , NsigMeanZa2_unweighted ,
+                 NsigSigmaZa1_unweighted , NsigSigmaZa2_unweighted ] = compute_Nsigma_scores( data_fits , reco_fits , 'unweighted' )
+                if (debug>1): print "got unweighted N(sigma) results"
+                # No Mott/FF - weighting (un - weighted roofit results)
+                [PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
+                 PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ,
+                 PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] = compute_Pval_parameters( data_fits , reco_fits , 'unweighted' )
+                PvalTotal_unweighted = Fisher_combination_Pvals( [PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
+                                                                  PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ,
+                                                                  PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] )
+                if (debug>1): print "got unweighted P(value) results"
+                    
+                # With Mott/FF - weighting (weighted roofit results)
+                [NsigSigmaX_weighted , NsigSigmaY_weighted ,
+                 NsigMeanZa1_weighted , NsigMeanZa2_weighted ,
+                 NsigSigmaZa1_weighted , NsigSigmaZa2_weighted] = compute_Nsigma_scores( data_fits , reco_fits , 'weighted' )
+                # With Mott/FF - weighting (un - weighted roofit results)
+                [PvalSigmaX_weighted, PvalSigmaY_weighted ,
+                 PvalMeanZa1_weighted , PvalMeanZa2_weighted ,
+                 PvalSigmaZa1_weighted , PvalSigmaZa2_weighted ] = compute_Pval_parameters( data_fits , reco_fits , 'weighted' )
+                PvalTotal_weighted = Fisher_combination_Pvals( [PvalSigmaX_weighted, PvalSigmaY_weighted ,
+                                                                PvalMeanZa1_weighted , PvalMeanZa2_weighted ,
+                                                                PvalSigmaZa1_weighted , PvalSigmaZa2_weighted ] )
+
+                if (debug>1): print "got weighted roofit results"
+
+                # KS test for the c.m. distributions in x,y,z directions
+
+                KSpCMx , KSxPval = KStest( PmissBins ,ana_sim , ana_data , "pcmX" , ROOT.TCut('') , debug) # maybe make it 2D? with adding the pmiss magnitude as a second variable?
+                KSpCMy , KSyPval = KStest( PmissBins ,ana_sim , ana_data , "pcmY" , ROOT.TCut('') , debug)
+                KSpCMt , KStPval = KStest( PmissBins ,ana_sim , ana_data , "pcmT" , ROOT.TCut('') , debug)
+                KSpCMz , KSzPval = KStest( PmissBins ,ana_sim , ana_data , "pcmZ" , ROOT.TCut('') , debug)
+                KSxPval_avg , KSyPval_avg , KStPval_avg , KSzPval_avg = np.average(KSxPval) , np.average(KSyPval) , np.average(KStPval) , np.average(KSzPval)
+                if debug>1: print "performed KS tests"
+                if debug>3: print "KSxPval_avg, KSyPval_avg, KSzPval_avg:",KSxPval_avg, KSyPval_avg, KSzPval_avg
+                    
+                # (3) stream into file
+                # ----------------------------
+                results = pd.DataFrame({'run':int(run)
+                                       ,'time':str(datetime.datetime.now().strftime("%Y%B%d"))
+                                       ,'NentriesSimRun':ana_sim.GetEntries()
+                                       ,'NLostEvents':(9907*N.NRand - ana_sim.GetEntries())
+                                       ,'fracLostEvents':((9907*N.NRand - ana_sim.GetEntries())/9907*N.NRand)
+                                       # generated
+                                       ,'genMeanX':genMeanX     ,'genSigmaX':genSigmaX      ,'genMeanY':genMeanY        ,'genSigmaY':genSigmaY
+                                       ,'genMeanZa1':genMeanZa1 ,'genMeanZa2':genMeanZa2    ,'genSigmaZa1':genSigmaZa1  ,'genSigmaZa2':genSigmaZa2
+                                       
+                                       # reconstructed fits - unweighted
+                                       ,'recMeanX_unweighted':float(reco_fits.MeanX_unweighted)         ,'recMeanY_unweighted':float(reco_fits.MeanY_unweighted)
+                                       ,'recSigmaX_unweighted':float(reco_fits.SigmaX_unweighted)       ,'recSigmaY_unweighted':float(reco_fits.SigmaY_unweighted)
+                                       ,'recMeanZa1_unweighted':float(reco_fits.MeanZa1_unweighted)     ,'recMeanZa2_unweighted':float(reco_fits.MeanZa2_unweighted)
+                                       ,'recSigmaZa1_unweighted':float(reco_fits.SigmaZa1_unweighted)   ,'recSigmaZa2_unweighted':float(reco_fits.SigmaZa2_unweighted)
+                                       ,'NsigSigmaX_unweighted':NsigSigmaX_unweighted               ,'NsigSigmaY_unweighted':NsigSigmaY_unweighted
+                                       ,'NsigMeanZa1_unweighted':NsigMeanZa1_unweighted             ,'NsigMeanZa2_unweighted':NsigMeanZa2_unweighted
+                                       ,'NsigSigmaZa1_unweighted':NsigSigmaZa1_unweighted           ,'NsigSigmaZa2_unweighted':NsigSigmaZa2_unweighted
+                                       ,'PvalSigmaX_unweighted':PvalSigmaX_unweighted               ,'PvalSigmaY_unweighted':PvalSigmaY_unweighted
+                                       ,'PvalMeanZa1_unweighted':PvalMeanZa1_unweighted             ,'PvalMeanZa2_unweighted':PvalMeanZa2_unweighted
+                                       ,'PvalSigmaZa1_unweighted':PvalSigmaZa1_unweighted           ,'PvalSigmaZa2_unweighted':PvalSigmaZa2_unweighted
+                                       ,'PvalTotal_unweighted':PvalTotal_unweighted
+                                       # reconstructed fits - weighted by Mott+FF cross section
+                                       ,'recMeanX_weighted':float(reco_fits.MeanX_weighted)         ,'recMeanY_weighted':float(reco_fits.MeanY_weighted)
+                                       ,'recSigmaX_weighted':float(reco_fits.SigmaX_weighted)       ,'recSigmaY_weighted':float(reco_fits.SigmaY_weighted)
+                                       ,'recMeanZa1_weighted':float(reco_fits.MeanZa1_weighted)     ,'recMeanZa2_weighted':float(reco_fits.MeanZa2_weighted)
+                                       ,'recSigmaZa1_weighted':float(reco_fits.SigmaZa1_weighted)   ,'recSigmaZa2_weighted':float(reco_fits.SigmaZa2_weighted)
+                                       ,'NsigSigmaX_weighted':NsigSigmaX_weighted                   ,'NsigSigmaY_weighted':NsigSigmaY_weighted
+                                       ,'NsigMeanZa1_weighted':NsigMeanZa1_weighted                 ,'NsigMeanZa2_weighted':NsigMeanZa2_weighted
+                                       ,'NsigSigmaZa1_weighted':NsigSigmaZa1_weighted               ,'NsigSigmaZa2_weighted':NsigSigmaZa2_weighted
+                                       ,'PvalSigmaX_weighted':PvalSigmaX_weighted               ,'PvalSigmaY_weighted':PvalSigmaY_weighted
+                                       ,'PvalMeanZa1_weighted':PvalMeanZa1_weighted             ,'PvalMeanZa2_weighted':PvalMeanZa2_weighted
+                                       ,'PvalSigmaZa1_weighted':PvalSigmaZa1_weighted           ,'PvalSigmaZa2_weighted':PvalSigmaZa2_weighted
+                                       ,'PvalTotal_weighted':PvalTotal_weighted
+                                                                                                     
+                                       # per 5 p(miss) bins
+                                       ,'KSxPval_PmBin0':KSxPval[0], 'KSxPval_PmBin1':KSxPval[1], 'KSxPval_PmBin2':KSxPval[2]
+                                       , 'KSxPval_PmBin3':KSxPval[3], 'KSxPval_PmBin4':KSxPval[4]
+                                       ,'KSxPval_avg':KSxPval_avg
+                                       ,'KSyPval_PmBin0':KSyPval[0], 'KSyPval_PmBin1':KSyPval[1], 'KSyPval_PmBin2':KSyPval[2]
+                                       , 'KSyPval_PmBin3':KSxPval[3], 'KSyPval_PmBin4':KSyPval[4]
+                                       ,'KSyPval_avg':KSyPval_avg
+                                       ,'KStPval_PmBin0':KStPval[0], 'KStPval_PmBin1':KStPval[1], 'KStPval_PmBin2':KStPval[2]
+                                       , 'KStPval_PmBin3':KSxPval[3], 'KStPval_PmBin4':KStPval[4]
+                                       ,'KStPval_avg':KStPval_avg
+                                       ,'KSzPval_PmBin0':KSzPval[0], 'KSzPval_PmBin1':KSzPval[1], 'KSzPval_PmBin2':KSzPval[2]
+                                       , 'KSzPval_PmBin3':KSxPval[3], 'KSzPval_PmBin4':KSzPval[4]
+                                       ,'KSzPval_avg':KSzPval_avg
+                                       # reconstructed parameters in p(miss) bins
+                                       ,'PmissMin_PmBin0':reco_parameters.get_value(0,'pMiss_min') ,'PmissMax_PmBin0':reco_parameters.get_value(0,'pMiss_max')
+                                       ,'PmissMin_PmBin1':reco_parameters.get_value(1,'pMiss_min') ,'PmissMax_PmBin1':reco_parameters.get_value(1,'pMiss_max')
+                                       ,'PmissMin_PmBin2':reco_parameters.get_value(2,'pMiss_min') ,'PmissMax_PmBin2':reco_parameters.get_value(2,'pMiss_max')
+                                       ,'PmissMin_PmBin3':reco_parameters.get_value(3,'pMiss_min') ,'PmissMax_PmBin3':reco_parameters.get_value(3,'pMiss_max')
+                                       ,'PmissMin_PmBin4':reco_parameters.get_value(4,'pMiss_min') ,'PmissMax_PmBin4':reco_parameters.get_value(4,'pMiss_max')
+                                       # x
+                                       ,'recMeanX_unweighted_PmBin0':reco_parameters.get_value(0,'mean_x_unweighted')
+                                       ,'recSigmaX_unweighted_PmBin0':reco_parameters.get_value(0,'sigma_x_unweighted')
+                                       ,'recMeanX_unweighted_PmBin1':reco_parameters.get_value(1,'mean_x_unweighted')
+                                       ,'recSigmaX_unweighted_PmBin1':reco_parameters.get_value(1,'sigma_x_unweighted')
+                                       ,'recMeanX_unweighted_PmBin2':reco_parameters.get_value(2,'mean_x_unweighted')
+                                       ,'recSigmaX_unweighted_PmBin2':reco_parameters.get_value(2,'sigma_x_unweighted')
+                                       ,'recMeanX_unweighted_PmBin3':reco_parameters.get_value(3,'mean_x_unweighted')
+                                       ,'recSigmaX_unweighted_PmBin3':reco_parameters.get_value(3,'sigma_x_unweighted')
+                                       ,'recMeanX_unweighted_PmBin4':reco_parameters.get_value(4,'mean_x_unweighted')
+                                       ,'recSigmaX_unweighted_PmBin4':reco_parameters.get_value(4,'sigma_x_unweighted')
+                                       # y
+                                       ,'recMeanY_unweighted_PmBin0':reco_parameters.get_value(0,'mean_y_unweighted')
+                                       ,'recSigmaY_unweighted_PmBin0':reco_parameters.get_value(0,'sigma_y_unweighted')
+                                       ,'recMeanY_unweighted_PmBin1':reco_parameters.get_value(1,'mean_y_unweighted')
+                                       ,'recSigmaY_unweighted_PmBin1':reco_parameters.get_value(1,'sigma_y_unweighted')
+                                       ,'recMeanY_unweighted_PmBin2':reco_parameters.get_value(2,'mean_y_unweighted')
+                                       ,'recSigmaY_unweighted_PmBin2':reco_parameters.get_value(2,'sigma_y_unweighted')
+                                       ,'recMeanY_unweighted_PmBin3':reco_parameters.get_value(3,'mean_y_unweighted')
+                                       ,'recSigmaY_unweighted_PmBin3':reco_parameters.get_value(3,'sigma_y_unweighted')
+                                       ,'recMeanY_unweighted_PmBin4':reco_parameters.get_value(4,'mean_y_unweighted')
+                                       ,'recSigmaY_unweighted_PmBin4':reco_parameters.get_value(4,'sigma_y_unweighted')
+                                       # z
+                                       ,'recMeanZ_unweighted_PmBin0':reco_parameters.get_value(0,'mean_z_unweighted')
+                                       ,'recSigmaZ_unweighted_PmBin0':reco_parameters.get_value(0,'sigma_z_unweighted')
+                                       ,'recMeanZ_unweighted_PmBin1':reco_parameters.get_value(1,'mean_z_unweighted')
+                                       ,'recSigmaZ_unweighted_PmBin1':reco_parameters.get_value(1,'sigma_z_unweighted')
+                                       ,'recMeanZ_unweighted_PmBin2':reco_parameters.get_value(2,'mean_z_unweighted')
+                                       ,'recSigmaZ_unweighted_PmBin2':reco_parameters.get_value(2,'sigma_z_unweighted')
+                                       ,'recMeanZ_unweighted_PmBin3':reco_parameters.get_value(3,'mean_z_unweighted')
+                                       ,'recSigmaZ_unweighted_PmBin3':reco_parameters.get_value(3,'sigma_z_unweighted')
+                                       ,'recMeanZ_unweighted_PmBin4':reco_parameters.get_value(4,'mean_z_unweighted')
+                                       ,'recSigmaZ_unweighted_PmBin4':reco_parameters.get_value(4,'sigma_z_unweighted')
+                                       } , index = [int(run)])
+                # ----------------------------
 
 
-                            # No Mott/FF - weighting (un - weighted roofit results)
-                            [NsigSigmaX_unweighted , NsigSigmaY_unweighted ,
-                             NsigMeanZa1_unweighted , NsigMeanZa2_unweighted ,
-                             NsigSigmaZa1_unweighted , NsigSigmaZa2_unweighted ] = compute_Nsigma_scores( data_fits , reco_fits , 'unweighted' )
-                            if (debug>1): print "got unweighted N(sigma) results"
-                            # No Mott/FF - weighting (un - weighted roofit results)
-                            [PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
-                             PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ,
-                             PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] = compute_Pval_parameters( data_fits , reco_fits , 'unweighted' )
-                            PvalTotal_unweighted = Fisher_combination_Pvals( [PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
-                                                                               PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ,
-                                                                               PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] )
-                            if (debug>1): print "got unweighted P(value) results"
-                       
-                            # With Mott/FF - weighting (weighted roofit results)
-                            [NsigSigmaX_weighted , NsigSigmaY_weighted ,
-                             NsigMeanZa1_weighted , NsigMeanZa2_weighted ,
-                             NsigSigmaZa1_weighted , NsigSigmaZa2_weighted] = compute_Nsigma_scores( data_fits , reco_fits , 'weighted' )
-                             # With Mott/FF - weighting (un - weighted roofit results)
-                            [PvalSigmaX_weighted, PvalSigmaY_weighted ,
-                              PvalMeanZa1_weighted , PvalMeanZa2_weighted ,
-                              PvalSigmaZa1_weighted , PvalSigmaZa2_weighted ] = compute_Pval_parameters( data_fits , reco_fits , 'weighted' )
-                            PvalTotal_weighted = Fisher_combination_Pvals( [PvalSigmaX_weighted, PvalSigmaY_weighted ,
-                                                                            PvalMeanZa1_weighted , PvalMeanZa2_weighted ,
-                                                                            PvalSigmaZa1_weighted , PvalSigmaZa2_weighted ] )
+                    
+                if (debug>4): print "results: ",results
+                stream_dataframe_to_file( reco_fits, reco_fitsFName  )
+                stream_dataframe_to_file( results, buildup_resutlsFName  )
+                stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
+                ana_sim.CloseFile()
+                if debug>1:
+                    print "appended into pandas.DataFrames"
+                    if (debug>2): print "resutls: ",df_results
 
-                            if (debug>1): print "got weighted roofit results"
+                garbage_list = [ ana_sim , reco_parameters , reco_fits  , results ]
+                del garbage_list
+                    
+        print_important( "completed run %d"%run )
+        print_line()
 
-                            # KS test for the c.m. distributions in x,y,z directions
-                            KSpCMx , KSxPval = KStest( PmissBins ,ana_sim , ana_data , "pcmX" , ROOT.TCut('') , debug) # maybe make it 2D? with adding the pmiss magnitude as a second variable?
-                            KSpCMy , KSyPval = KStest( PmissBins ,ana_sim , ana_data , "pcmY" , ROOT.TCut('') , debug)
-                            KSpCMt , KStPval = KStest( PmissBins ,ana_sim , ana_data , "pcmT" , ROOT.TCut('') , debug)
-                            KSpCMz , KSzPval = KStest( PmissBins ,ana_sim , ana_data , "pcmZ" , ROOT.TCut('') , debug)
-                            KSxPval_avg , KSyPval_avg , KStPval_avg , KSzPval_avg = np.average(KSxPval) , np.average(KSyPval) , np.average(KStPval) , np.average(KSzPval)
-                            if (debug>1): print "performed KS tests"
-                            if debug>3: print "KSxPval_avg, KSyPval_avg, KSzPval_avg:",KSxPval_avg, KSyPval_avg, KSzPval_avg
-
-
-                            # (3) stream into file
-                            # ----------------------------
-                            results = pd.DataFrame({'run':int(run)
-                                                   ,'time':str(datetime.datetime.now().strftime("%Y%B%d"))
-                                                   ,'NentriesSimRun':ana_sim.GetEntries()
-                                                   
-                                                   # generated
-                                                   ,'genMeanX':genMeanX     ,'genSigmaX':genSigmaX      ,'genMeanY':genMeanY        ,'genSigmaY':genSigmaY
-                                                   ,'genMeanZa1':genMeanZa1 ,'genMeanZa2':genMeanZa2    ,'genSigmaZa1':genSigmaZa1  ,'genSigmaZa2':genSigmaZa2
-                                                   
-                                                   # reconstructed fits - unweighted
-                                                   ,'recMeanX_unweighted':float(reco_fits.MeanX_unweighted)         ,'recMeanY_unweighted':float(reco_fits.MeanY_unweighted)
-                                                   ,'recSigmaX_unweighted':float(reco_fits.SigmaX_unweighted)       ,'recSigmaY_unweighted':float(reco_fits.SigmaY_unweighted)
-                                                   ,'recMeanZa1_unweighted':float(reco_fits.MeanZa1_unweighted)     ,'recMeanZa2_unweighted':float(reco_fits.MeanZa2_unweighted)
-                                                   ,'recSigmaZa1_unweighted':float(reco_fits.SigmaZa1_unweighted)   ,'recSigmaZa2_unweighted':float(reco_fits.SigmaZa2_unweighted)
-                                                   ,'NsigSigmaX_unweighted':NsigSigmaX_unweighted               ,'NsigSigmaY_unweighted':NsigSigmaY_unweighted
-                                                   ,'NsigMeanZa1_unweighted':NsigMeanZa1_unweighted             ,'NsigMeanZa2_unweighted':NsigMeanZa2_unweighted
-                                                   ,'NsigSigmaZa1_unweighted':NsigSigmaZa1_unweighted           ,'NsigSigmaZa2_unweighted':NsigSigmaZa2_unweighted
-                                                   ,'PvalSigmaX_unweighted':PvalSigmaX_unweighted               ,'PvalSigmaY_unweighted':PvalSigmaY_unweighted
-                                                   ,'PvalMeanZa1_unweighted':PvalMeanZa1_unweighted             ,'PvalMeanZa2_unweighted':PvalMeanZa2_unweighted
-                                                   ,'PvalSigmaZa1_unweighted':PvalSigmaZa1_unweighted           ,'PvalSigmaZa2_unweighted':PvalSigmaZa2_unweighted
-                                                   ,'PvalTotal_unweighted':PvalTotal_unweighted
-                                                   
-                                                   # reconstructed fits - weighted by Mott+FF cross section
-                                                   ,'recMeanX_weighted':float(reco_fits.MeanX_weighted)         ,'recMeanY_weighted':float(reco_fits.MeanY_weighted)
-                                                   ,'recSigmaX_weighted':float(reco_fits.SigmaX_weighted)       ,'recSigmaY_weighted':float(reco_fits.SigmaY_weighted)
-                                                   ,'recMeanZa1_weighted':float(reco_fits.MeanZa1_weighted)     ,'recMeanZa2_weighted':float(reco_fits.MeanZa2_weighted)
-                                                   ,'recSigmaZa1_weighted':float(reco_fits.SigmaZa1_weighted)   ,'recSigmaZa2_weighted':float(reco_fits.SigmaZa2_weighted)
-                                                   ,'NsigSigmaX_weighted':NsigSigmaX_weighted                   ,'NsigSigmaY_weighted':NsigSigmaY_weighted
-                                                   ,'NsigMeanZa1_weighted':NsigMeanZa1_weighted                 ,'NsigMeanZa2_weighted':NsigMeanZa2_weighted
-                                                   ,'NsigSigmaZa1_weighted':NsigSigmaZa1_weighted               ,'NsigSigmaZa2_weighted':NsigSigmaZa2_weighted
-                                                   ,'PvalSigmaX_weighted':PvalSigmaX_weighted               ,'PvalSigmaY_weighted':PvalSigmaY_weighted
-                                                   ,'PvalMeanZa1_weighted':PvalMeanZa1_weighted             ,'PvalMeanZa2_weighted':PvalMeanZa2_weighted
-                                                   ,'PvalSigmaZa1_weighted':PvalSigmaZa1_weighted           ,'PvalSigmaZa2_weighted':PvalSigmaZa2_weighted
-                                                   ,'PvalTotal_weighted':PvalTotal_weighted
-
-                                                   # per 5 p(miss) bins
-                                                   ,'KSxPval_PmBin0':KSxPval[0], 'KSxPval_PmBin1':KSxPval[1], 'KSxPval_PmBin2':KSxPval[2]
-                                                   , 'KSxPval_PmBin3':KSxPval[3], 'KSxPval_PmBin4':KSxPval[4]
-                                                   ,'KSxPval_avg':KSxPval_avg
-                                                   ,'KSyPval_PmBin0':KSyPval[0], 'KSyPval_PmBin1':KSyPval[1], 'KSyPval_PmBin2':KSyPval[2]
-                                                   , 'KSyPval_PmBin3':KSxPval[3], 'KSyPval_PmBin4':KSyPval[4]
-                                                   ,'KSyPval_avg':KSyPval_avg
-                                                   ,'KStPval_PmBin0':KStPval[0], 'KStPval_PmBin1':KStPval[1], 'KStPval_PmBin2':KStPval[2]
-                                                   , 'KStPval_PmBin3':KSxPval[3], 'KStPval_PmBin4':KStPval[4]
-                                                   ,'KStPval_avg':KStPval_avg
-                                                   ,'KSzPval_PmBin0':KSzPval[0], 'KSzPval_PmBin1':KSzPval[1], 'KSzPval_PmBin2':KSzPval[2]
-                                                   , 'KSzPval_PmBin3':KSxPval[3], 'KSzPval_PmBin4':KSzPval[4]
-                                                   ,'KSzPval_avg':KSzPval_avg
-                                                   # reconstructed parameters in p(miss) bins
-                                                   ,'PmissMin_PmBin0':reco_parameters.get_value(0,'pMiss_min') ,'PmissMax_PmBin0':reco_parameters.get_value(0,'pMiss_max')
-                                                   ,'PmissMin_PmBin1':reco_parameters.get_value(1,'pMiss_min') ,'PmissMax_PmBin1':reco_parameters.get_value(1,'pMiss_max')
-                                                   ,'PmissMin_PmBin2':reco_parameters.get_value(2,'pMiss_min') ,'PmissMax_PmBin2':reco_parameters.get_value(2,'pMiss_max')
-                                                   ,'PmissMin_PmBin3':reco_parameters.get_value(3,'pMiss_min') ,'PmissMax_PmBin3':reco_parameters.get_value(3,'pMiss_max')
-                                                   ,'PmissMin_PmBin4':reco_parameters.get_value(4,'pMiss_min') ,'PmissMax_PmBin4':reco_parameters.get_value(4,'pMiss_max')
-                                                   # x
-                                                   ,'recMeanX_unweighted_PmBin0':reco_parameters.get_value(0,'mean_x_unweighted')
-                                                   ,'recSigmaX_unweighted_PmBin0':reco_parameters.get_value(0,'sigma_x_unweighted')
-                                                   ,'recMeanX_unweighted_PmBin1':reco_parameters.get_value(1,'mean_x_unweighted')
-                                                   ,'recSigmaX_unweighted_PmBin1':reco_parameters.get_value(1,'sigma_x_unweighted')
-                                                   ,'recMeanX_unweighted_PmBin2':reco_parameters.get_value(2,'mean_x_unweighted')
-                                                   ,'recSigmaX_unweighted_PmBin2':reco_parameters.get_value(2,'sigma_x_unweighted')
-                                                   ,'recMeanX_unweighted_PmBin3':reco_parameters.get_value(3,'mean_x_unweighted')
-                                                   ,'recSigmaX_unweighted_PmBin3':reco_parameters.get_value(3,'sigma_x_unweighted')
-                                                   ,'recMeanX_unweighted_PmBin4':reco_parameters.get_value(4,'mean_x_unweighted')
-                                                   ,'recSigmaX_unweighted_PmBin4':reco_parameters.get_value(4,'sigma_x_unweighted')
-                                                   # y
-                                                   ,'recMeanY_unweighted_PmBin0':reco_parameters.get_value(0,'mean_y_unweighted')
-                                                   ,'recSigmaY_unweighted_PmBin0':reco_parameters.get_value(0,'sigma_y_unweighted')
-                                                   ,'recMeanY_unweighted_PmBin1':reco_parameters.get_value(1,'mean_y_unweighted')
-                                                   ,'recSigmaY_unweighted_PmBin1':reco_parameters.get_value(1,'sigma_y_unweighted')
-                                                   ,'recMeanY_unweighted_PmBin2':reco_parameters.get_value(2,'mean_y_unweighted')
-                                                   ,'recSigmaY_unweighted_PmBin2':reco_parameters.get_value(2,'sigma_y_unweighted')
-                                                   ,'recMeanY_unweighted_PmBin3':reco_parameters.get_value(3,'mean_y_unweighted')
-                                                   ,'recSigmaY_unweighted_PmBin3':reco_parameters.get_value(3,'sigma_y_unweighted')
-                                                   ,'recMeanY_unweighted_PmBin4':reco_parameters.get_value(4,'mean_y_unweighted')
-                                                   ,'recSigmaY_unweighted_PmBin4':reco_parameters.get_value(4,'sigma_y_unweighted')
-                                                   # z
-                                                   ,'recMeanZ_unweighted_PmBin0':reco_parameters.get_value(0,'mean_z_unweighted')
-                                                   ,'recSigmaZ_unweighted_PmBin0':reco_parameters.get_value(0,'sigma_z_unweighted')
-                                                   ,'recMeanZ_unweighted_PmBin1':reco_parameters.get_value(1,'mean_z_unweighted')
-                                                   ,'recSigmaZ_unweighted_PmBin1':reco_parameters.get_value(1,'sigma_z_unweighted')
-                                                   ,'recMeanZ_unweighted_PmBin2':reco_parameters.get_value(2,'mean_z_unweighted')
-                                                   ,'recSigmaZ_unweighted_PmBin2':reco_parameters.get_value(2,'sigma_z_unweighted')
-                                                   ,'recMeanZ_unweighted_PmBin3':reco_parameters.get_value(3,'mean_z_unweighted')
-                                                   ,'recSigmaZ_unweighted_PmBin3':reco_parameters.get_value(3,'sigma_z_unweighted')
-                                                   ,'recMeanZ_unweighted_PmBin4':reco_parameters.get_value(4,'mean_z_unweighted')
-                                                   ,'recSigmaZ_unweighted_PmBin4':reco_parameters.get_value(4,'sigma_z_unweighted')
-                                                   } , index = [int(run)])
- 
-
-
-                            if (debug>4): print "results: ",results
-                            stream_dataframe_to_file( reco_fits, reco_fitsFName  )
-                            stream_dataframe_to_file( results, buildup_resutlsFName  )
-                            stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
-                            ana_sim.CloseFile()
-                            if (debug>1): print "appended into pandas.DataFrames"
-                            if (debug>2): print "resutls: ",df_results
-                            garbage_list = [ ana_sim , reco_parameters , reco_fits  , results ]
-                            del garbage_list
-
-                        print_important( "completed run %d"%run ) ; print_line()
-    
 
 
     if 'generate' in option:
         gen_events.ReleaseInputChain_eep()
-
+    
     if 'analyze' in option:
         print_filename( reco_fitsFName , "reconstructed parameters fits wrote to" )
         print_filename( buildup_resutlsFName , "results wrote to " )
@@ -651,6 +677,220 @@ def generate_runs_with_different_parameters( option,
     print_important("done...") ; print_line()
 
 
+
+
+#
+#    # event generation (and analysis) loop
+#    for sigma_transverse in SigmaT:
+#        for sigma_longitudinal_a1 in SigmaZa1:
+#            for sigma_longitudinal_a2 in SigmaZa2:
+#                for mean_longitudinal_a1 in MeanZa1:
+#                    for mean_longitudinal_a2 in MeanZa2:
+#                        run = run+1
+#
+#                        genMeanX   = genMeanY       = 0
+#                        genSigmaX  = genSigmaY      = sigma_transverse
+#                        genMeanZa1  , genMeanZa2    = mean_longitudinal_a1 , mean_longitudinal_a2
+#                        genSigmaZa1 , genSigmaZa2   = sigma_longitudinal_a1 , sigma_longitudinal_a2
+#
+#                        # (1) generate the simulated data (the 'run')
+#                        # ----------------------------
+#                        if 'generate' in option:
+#
+#                            gen_events.Set_eep_Parameters( genMeanX , genSigmaX , genMeanY , genSigmaY , genMeanZa1 , genMeanZa2 , genSigmaZa1 , genSigmaZa2 )
+#                            gen_events.DoGenerateRun_eepp( run )
+#
+#                            # and now scheme them to our desired pp-SRC cuts
+#                            ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
+#                            scheme.SchemeOnTCut( path + '/eg_rootfiles' , 'run%d.root'%run , "anaTree", 'run%d.root'%run , ana_sim.EGppSRCCut + ana_sim.PrecFiducial )
+#
+#                            ana_sim.CloseFile()
+#                            garbage_list = [ ana_sim ]
+#                            del garbage_list
+#
+#
+#
+#                        # (2) analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
+#                        # ----------------------------
+#                        if 'analyze' in option or 'analyse' in option:
+#                        
+#                            if (debug>1): print "analyzing run %d"%run
+#                            ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
+#                            
+#                            # reconstruct c.m. parameters
+#                            reco_parameters = calc_cm_parameters( ana_sim  , PmissBins )
+#                            
+#                            if (debug>1):
+#                                print "reconstructed cm parameters"
+#                                if (debug>4):
+#                                    reco_parameters = calc_cm_parameters( ana_sim  , PmissBins , CMRooFitsName( path + '/eg_cm_roofits/run%d_unweighted_'%run ), CMRooFitsName( path + '/eg_cm_roofits/run%d_weighted_'%run ) , True )
+#                                    print "reco_parameters: ",reco_parameters
+#                        
+#                            # fit the reconstructed parameters
+#                            reco_fits = fit_cm_parameters( run , reco_parameters )
+#                            
+#                            if (debug>1):
+#                                print "completed fiting processes"
+#                                if (debug>4):
+#                                    fit_cm_parameters( run , reco_parameters , FigureFName( path + '/eg_cm_figures/run%d_'%run ) , True )
+#                                    print "reco_fits: ",reco_fits
+#
+#
+#                            # No Mott/FF - weighting (un - weighted roofit results)
+#                            [NsigSigmaX_unweighted , NsigSigmaY_unweighted ,
+#                             NsigMeanZa1_unweighted , NsigMeanZa2_unweighted ,
+#                             NsigSigmaZa1_unweighted , NsigSigmaZa2_unweighted ] = compute_Nsigma_scores( data_fits , reco_fits , 'unweighted' )
+#                            if (debug>1): print "got unweighted N(sigma) results"
+#                            # No Mott/FF - weighting (un - weighted roofit results)
+#                            [PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
+#                             PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ,
+#                             PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] = compute_Pval_parameters( data_fits , reco_fits , 'unweighted' )
+#                            PvalTotal_unweighted = Fisher_combination_Pvals( [PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
+#                                                                               PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ,
+#                                                                               PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] )
+#                            if (debug>1): print "got unweighted P(value) results"
+#                       
+#                            # With Mott/FF - weighting (weighted roofit results)
+#                            [NsigSigmaX_weighted , NsigSigmaY_weighted ,
+#                             NsigMeanZa1_weighted , NsigMeanZa2_weighted ,
+#                             NsigSigmaZa1_weighted , NsigSigmaZa2_weighted] = compute_Nsigma_scores( data_fits , reco_fits , 'weighted' )
+#                             # With Mott/FF - weighting (un - weighted roofit results)
+#                            [PvalSigmaX_weighted, PvalSigmaY_weighted ,
+#                              PvalMeanZa1_weighted , PvalMeanZa2_weighted ,
+#                              PvalSigmaZa1_weighted , PvalSigmaZa2_weighted ] = compute_Pval_parameters( data_fits , reco_fits , 'weighted' )
+#                            PvalTotal_weighted = Fisher_combination_Pvals( [PvalSigmaX_weighted, PvalSigmaY_weighted ,
+#                                                                            PvalMeanZa1_weighted , PvalMeanZa2_weighted ,
+#                                                                            PvalSigmaZa1_weighted , PvalSigmaZa2_weighted ] )
+#
+#                            if (debug>1): print "got weighted roofit results"
+#
+#                            # KS test for the c.m. distributions in x,y,z directions
+#                            KSpCMx , KSxPval = KStest( PmissBins ,ana_sim , ana_data , "pcmX" , ROOT.TCut('') , debug) # maybe make it 2D? with adding the pmiss magnitude as a second variable?
+#                            KSpCMy , KSyPval = KStest( PmissBins ,ana_sim , ana_data , "pcmY" , ROOT.TCut('') , debug)
+#                            KSpCMt , KStPval = KStest( PmissBins ,ana_sim , ana_data , "pcmT" , ROOT.TCut('') , debug)
+#                            KSpCMz , KSzPval = KStest( PmissBins ,ana_sim , ana_data , "pcmZ" , ROOT.TCut('') , debug)
+#                            KSxPval_avg , KSyPval_avg , KStPval_avg , KSzPval_avg = np.average(KSxPval) , np.average(KSyPval) , np.average(KStPval) , np.average(KSzPval)
+#                            if (debug>1): print "performed KS tests"
+#                            if debug>3: print "KSxPval_avg, KSyPval_avg, KSzPval_avg:",KSxPval_avg, KSyPval_avg, KSzPval_avg
+#
+#
+#                            # (3) stream into file
+#                            # ----------------------------
+#                            results = pd.DataFrame({'run':int(run)
+#                                                   ,'time':str(datetime.datetime.now().strftime("%Y%B%d"))
+#                                                   ,'NentriesSimRun':ana_sim.GetEntries()
+#                                                   
+#                                                   # generated
+#                                                   ,'genMeanX':genMeanX     ,'genSigmaX':genSigmaX      ,'genMeanY':genMeanY        ,'genSigmaY':genSigmaY
+#                                                   ,'genMeanZa1':genMeanZa1 ,'genMeanZa2':genMeanZa2    ,'genSigmaZa1':genSigmaZa1  ,'genSigmaZa2':genSigmaZa2
+#                                                   
+#                                                   # reconstructed fits - unweighted
+#                                                   ,'recMeanX_unweighted':float(reco_fits.MeanX_unweighted)         ,'recMeanY_unweighted':float(reco_fits.MeanY_unweighted)
+#                                                   ,'recSigmaX_unweighted':float(reco_fits.SigmaX_unweighted)       ,'recSigmaY_unweighted':float(reco_fits.SigmaY_unweighted)
+#                                                   ,'recMeanZa1_unweighted':float(reco_fits.MeanZa1_unweighted)     ,'recMeanZa2_unweighted':float(reco_fits.MeanZa2_unweighted)
+#                                                   ,'recSigmaZa1_unweighted':float(reco_fits.SigmaZa1_unweighted)   ,'recSigmaZa2_unweighted':float(reco_fits.SigmaZa2_unweighted)
+#                                                   ,'NsigSigmaX_unweighted':NsigSigmaX_unweighted               ,'NsigSigmaY_unweighted':NsigSigmaY_unweighted
+#                                                   ,'NsigMeanZa1_unweighted':NsigMeanZa1_unweighted             ,'NsigMeanZa2_unweighted':NsigMeanZa2_unweighted
+#                                                   ,'NsigSigmaZa1_unweighted':NsigSigmaZa1_unweighted           ,'NsigSigmaZa2_unweighted':NsigSigmaZa2_unweighted
+#                                                   ,'PvalSigmaX_unweighted':PvalSigmaX_unweighted               ,'PvalSigmaY_unweighted':PvalSigmaY_unweighted
+#                                                   ,'PvalMeanZa1_unweighted':PvalMeanZa1_unweighted             ,'PvalMeanZa2_unweighted':PvalMeanZa2_unweighted
+#                                                   ,'PvalSigmaZa1_unweighted':PvalSigmaZa1_unweighted           ,'PvalSigmaZa2_unweighted':PvalSigmaZa2_unweighted
+#                                                   ,'PvalTotal_unweighted':PvalTotal_unweighted
+#                                                   
+#                                                   # reconstructed fits - weighted by Mott+FF cross section
+#                                                   ,'recMeanX_weighted':float(reco_fits.MeanX_weighted)         ,'recMeanY_weighted':float(reco_fits.MeanY_weighted)
+#                                                   ,'recSigmaX_weighted':float(reco_fits.SigmaX_weighted)       ,'recSigmaY_weighted':float(reco_fits.SigmaY_weighted)
+#                                                   ,'recMeanZa1_weighted':float(reco_fits.MeanZa1_weighted)     ,'recMeanZa2_weighted':float(reco_fits.MeanZa2_weighted)
+#                                                   ,'recSigmaZa1_weighted':float(reco_fits.SigmaZa1_weighted)   ,'recSigmaZa2_weighted':float(reco_fits.SigmaZa2_weighted)
+#                                                   ,'NsigSigmaX_weighted':NsigSigmaX_weighted                   ,'NsigSigmaY_weighted':NsigSigmaY_weighted
+#                                                   ,'NsigMeanZa1_weighted':NsigMeanZa1_weighted                 ,'NsigMeanZa2_weighted':NsigMeanZa2_weighted
+#                                                   ,'NsigSigmaZa1_weighted':NsigSigmaZa1_weighted               ,'NsigSigmaZa2_weighted':NsigSigmaZa2_weighted
+#                                                   ,'PvalSigmaX_weighted':PvalSigmaX_weighted               ,'PvalSigmaY_weighted':PvalSigmaY_weighted
+#                                                   ,'PvalMeanZa1_weighted':PvalMeanZa1_weighted             ,'PvalMeanZa2_weighted':PvalMeanZa2_weighted
+#                                                   ,'PvalSigmaZa1_weighted':PvalSigmaZa1_weighted           ,'PvalSigmaZa2_weighted':PvalSigmaZa2_weighted
+#                                                   ,'PvalTotal_weighted':PvalTotal_weighted
+#
+#                                                   # per 5 p(miss) bins
+#                                                   ,'KSxPval_PmBin0':KSxPval[0], 'KSxPval_PmBin1':KSxPval[1], 'KSxPval_PmBin2':KSxPval[2]
+#                                                   , 'KSxPval_PmBin3':KSxPval[3], 'KSxPval_PmBin4':KSxPval[4]
+#                                                   ,'KSxPval_avg':KSxPval_avg
+#                                                   ,'KSyPval_PmBin0':KSyPval[0], 'KSyPval_PmBin1':KSyPval[1], 'KSyPval_PmBin2':KSyPval[2]
+#                                                   , 'KSyPval_PmBin3':KSxPval[3], 'KSyPval_PmBin4':KSyPval[4]
+#                                                   ,'KSyPval_avg':KSyPval_avg
+#                                                   ,'KStPval_PmBin0':KStPval[0], 'KStPval_PmBin1':KStPval[1], 'KStPval_PmBin2':KStPval[2]
+#                                                   , 'KStPval_PmBin3':KSxPval[3], 'KStPval_PmBin4':KStPval[4]
+#                                                   ,'KStPval_avg':KStPval_avg
+#                                                   ,'KSzPval_PmBin0':KSzPval[0], 'KSzPval_PmBin1':KSzPval[1], 'KSzPval_PmBin2':KSzPval[2]
+#                                                   , 'KSzPval_PmBin3':KSxPval[3], 'KSzPval_PmBin4':KSzPval[4]
+#                                                   ,'KSzPval_avg':KSzPval_avg
+#                                                   # reconstructed parameters in p(miss) bins
+#                                                   ,'PmissMin_PmBin0':reco_parameters.get_value(0,'pMiss_min') ,'PmissMax_PmBin0':reco_parameters.get_value(0,'pMiss_max')
+#                                                   ,'PmissMin_PmBin1':reco_parameters.get_value(1,'pMiss_min') ,'PmissMax_PmBin1':reco_parameters.get_value(1,'pMiss_max')
+#                                                   ,'PmissMin_PmBin2':reco_parameters.get_value(2,'pMiss_min') ,'PmissMax_PmBin2':reco_parameters.get_value(2,'pMiss_max')
+#                                                   ,'PmissMin_PmBin3':reco_parameters.get_value(3,'pMiss_min') ,'PmissMax_PmBin3':reco_parameters.get_value(3,'pMiss_max')
+#                                                   ,'PmissMin_PmBin4':reco_parameters.get_value(4,'pMiss_min') ,'PmissMax_PmBin4':reco_parameters.get_value(4,'pMiss_max')
+#                                                   # x
+#                                                   ,'recMeanX_unweighted_PmBin0':reco_parameters.get_value(0,'mean_x_unweighted')
+#                                                   ,'recSigmaX_unweighted_PmBin0':reco_parameters.get_value(0,'sigma_x_unweighted')
+#                                                   ,'recMeanX_unweighted_PmBin1':reco_parameters.get_value(1,'mean_x_unweighted')
+#                                                   ,'recSigmaX_unweighted_PmBin1':reco_parameters.get_value(1,'sigma_x_unweighted')
+#                                                   ,'recMeanX_unweighted_PmBin2':reco_parameters.get_value(2,'mean_x_unweighted')
+#                                                   ,'recSigmaX_unweighted_PmBin2':reco_parameters.get_value(2,'sigma_x_unweighted')
+#                                                   ,'recMeanX_unweighted_PmBin3':reco_parameters.get_value(3,'mean_x_unweighted')
+#                                                   ,'recSigmaX_unweighted_PmBin3':reco_parameters.get_value(3,'sigma_x_unweighted')
+#                                                   ,'recMeanX_unweighted_PmBin4':reco_parameters.get_value(4,'mean_x_unweighted')
+#                                                   ,'recSigmaX_unweighted_PmBin4':reco_parameters.get_value(4,'sigma_x_unweighted')
+#                                                   # y
+#                                                   ,'recMeanY_unweighted_PmBin0':reco_parameters.get_value(0,'mean_y_unweighted')
+#                                                   ,'recSigmaY_unweighted_PmBin0':reco_parameters.get_value(0,'sigma_y_unweighted')
+#                                                   ,'recMeanY_unweighted_PmBin1':reco_parameters.get_value(1,'mean_y_unweighted')
+#                                                   ,'recSigmaY_unweighted_PmBin1':reco_parameters.get_value(1,'sigma_y_unweighted')
+#                                                   ,'recMeanY_unweighted_PmBin2':reco_parameters.get_value(2,'mean_y_unweighted')
+#                                                   ,'recSigmaY_unweighted_PmBin2':reco_parameters.get_value(2,'sigma_y_unweighted')
+#                                                   ,'recMeanY_unweighted_PmBin3':reco_parameters.get_value(3,'mean_y_unweighted')
+#                                                   ,'recSigmaY_unweighted_PmBin3':reco_parameters.get_value(3,'sigma_y_unweighted')
+#                                                   ,'recMeanY_unweighted_PmBin4':reco_parameters.get_value(4,'mean_y_unweighted')
+#                                                   ,'recSigmaY_unweighted_PmBin4':reco_parameters.get_value(4,'sigma_y_unweighted')
+#                                                   # z
+#                                                   ,'recMeanZ_unweighted_PmBin0':reco_parameters.get_value(0,'mean_z_unweighted')
+#                                                   ,'recSigmaZ_unweighted_PmBin0':reco_parameters.get_value(0,'sigma_z_unweighted')
+#                                                   ,'recMeanZ_unweighted_PmBin1':reco_parameters.get_value(1,'mean_z_unweighted')
+#                                                   ,'recSigmaZ_unweighted_PmBin1':reco_parameters.get_value(1,'sigma_z_unweighted')
+#                                                   ,'recMeanZ_unweighted_PmBin2':reco_parameters.get_value(2,'mean_z_unweighted')
+#                                                   ,'recSigmaZ_unweighted_PmBin2':reco_parameters.get_value(2,'sigma_z_unweighted')
+#                                                   ,'recMeanZ_unweighted_PmBin3':reco_parameters.get_value(3,'mean_z_unweighted')
+#                                                   ,'recSigmaZ_unweighted_PmBin3':reco_parameters.get_value(3,'sigma_z_unweighted')
+#                                                   ,'recMeanZ_unweighted_PmBin4':reco_parameters.get_value(4,'mean_z_unweighted')
+#                                                   ,'recSigmaZ_unweighted_PmBin4':reco_parameters.get_value(4,'sigma_z_unweighted')
+#                                                   } , index = [int(run)])
+# 
+#
+#
+#                            if (debug>4): print "results: ",results
+#                            stream_dataframe_to_file( reco_fits, reco_fitsFName  )
+#                            stream_dataframe_to_file( results, buildup_resutlsFName  )
+#                            stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
+#                            ana_sim.CloseFile()
+#                            if (debug>1): print "appended into pandas.DataFrames"
+#                            if (debug>2): print "resutls: ",df_results
+#                            garbage_list = [ ana_sim , reco_parameters , reco_fits  , results ]
+#                            del garbage_list
+#
+#                        print_important( "completed run %d"%run ) ; print_line()
+#    
+#
+#
+#    if 'generate' in option:
+#        gen_events.ReleaseInputChain_eep()
+#
+#    if 'analyze' in option:
+#        print_filename( reco_fitsFName , "reconstructed parameters fits wrote to" )
+#        print_filename( buildup_resutlsFName , "results wrote to " )
+#
+#    print_filename( root_resutlsFName , "results converted also to root format " )
+#    print_important("done...") ; print_line()
+#
+#
 
 
 # ------------------------------------------------------------------------------- #

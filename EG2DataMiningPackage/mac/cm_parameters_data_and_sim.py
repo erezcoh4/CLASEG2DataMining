@@ -16,8 +16,13 @@ from cm_tools import *
     
 '''
 
+start_run , Nruns = 30000 , 5000
+splitjobs_runs = 1
 
 PmissBins = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65] , [0.65,0.75] , [0.75,1.0]]
+N = pd.DataFrame({'SigmaT':15,'SigmaZa1':5 ,'SigmaZa2':5 ,'MeanZa1':5 ,'MeanZa2':5 ,'StartRun':30000 , 'NRand':10 }, index=[0])
+#N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1 ,'StartRun':0 , 'NRand':1}, index=[0]) # for debugging
+
 
 
 # proton acceptance plot
@@ -104,33 +109,37 @@ if 'plot all parameters for all targets' in flags.option or 'AllTragets' in flag
 
 
 
-
-
-
 # (4) create bands for Event-Generation
 # ----------------------------------------------------------
 if 'create bands for EG' in flags.option or 'bands' in flags.option:
 
     cm_parameters = pd.read_csv( CMParsFname(ppPath+'/DATA/data') )
     fits = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' ) )
-    generate_cm_bands( cm_parameters , fits , CMBandFname( ppPath+'/DATA/data' ) , FigureBandFName( ppPath+'/DATA/data' ) , DoSaveCanvas = True)
+
+    generate_cm_bands( cm_parameters , fits , N ,
+                      flags.verbose ,
+                      CMBandFname( ppPath+'/DATA/data' ) , FigureBandFName( ppPath+'/DATA/data' ) , GeneParsFName ( ppPath+'/simulation/' ) ,
+                      DoSaveCanvas = True)
+
+
 
 
 # (5) generate runs with different parameters
 # ----------------------------------------------------------
 if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 'analyze' in flags.option or 'analyse' in flags.option:
-    
-    cm_pars_bands = pd.read_csv( CMBandFname(ppPath+'/DATA/data') )
-    cm_fits_parameters = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' ) )
-    
-    start_run = 0 # 20000
-#    N = pd.DataFrame({'SigmaT':10,'SigmaZa1':5 ,'SigmaZa2':8 ,'MeanZa1':5 ,'MeanZa2':5 , 'NRand':10}, index=[0])
-    N = pd.DataFrame({'SigmaT':10,'SigmaZa1':2 ,'SigmaZa2':4 ,'MeanZa1':2 ,'MeanZa2':4 , 'NRand':10}, index=[0]) # for debugging
-    test_name = 'runs%dto%d_NsigmaT_%d_NSigmaZa1_%d_NSigmaZa2_%d_NMeanZa1_%d_NMeanZa2_%d_NRand_%d'%(start_run,start_run+(N.SigmaT*N.SigmaZa1*N.SigmaZa2*N.MeanZa1*N.MeanZa2),N.SigmaT,N.SigmaZa1,N.SigmaZa2,N.MeanZa1,N.MeanZa2,N.NRand)
+
+
+    fits = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' ) )
+    generated_parameters = pd.read_csv( GeneParsFName ( ppPath+'/simulation/' ) )
+    generated_parameters = generated_parameters[(start_run <= generated_parameters.run) & (generated_parameters.run <= start_run + Nruns)]
+    print 'running on: ',generated_parameters.run.tolist()
+
+    test_name = 'runs%dto%d_NsigmaT_%d_NSigmaZa1_%d_NSigmaZa2_%d_NMeanZa1_%d_NMeanZa2_%d_NRand_%d'%( start_run , start_run+Nruns , N.SigmaT , N.SigmaZa1 , N.SigmaZa2 , N.MeanZa1 , N.MeanZa2 , N.NRand )
     full_path = ppPath+'/simulation/'+test_name+'_simulation'
     generate_runs_with_different_parameters( flags.option ,
-                                            cm_fits_parameters , cm_pars_bands ,
-                                            start_run , flags.verbose , PmissBins ,
+                                            fits,
+                                            generated_parameters ,
+                                            flags.verbose , PmissBins ,
                                             buildup_resutlsFName( full_path ) ,
                                             CMfitsFname( full_path ) ,
                                             dm.Target(A) ,
