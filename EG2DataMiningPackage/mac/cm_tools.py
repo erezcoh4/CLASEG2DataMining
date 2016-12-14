@@ -16,11 +16,6 @@ cm_pars_columns = ['pMiss_min','pMiss_max'
                    ,'mean_t_weighted','mean_tErr_weighted','sigma_t_weighted','sigma_tErr_weighted'
                    ,'mean_z_weighted','mean_zErr_weighted','sigma_z_weighted','sigma_zErr_weighted']
 
-bands_columns = ['sTBandMin','sTBandMax'
-                 ,'SigmaZa1Min','SigmaZa1Max'
-                 ,'SigmaZa2Min','SigmaZa2Max'
-                 ,'MeanZa1Min','MeanZa1Max'
-                 ,'MeanZa2Min','MeanZa2Max']
 
 
 # file names
@@ -339,34 +334,52 @@ def linspace_parameter( band_min  , band_max  , Npts ):
 def generate_cm_bands( cm_parameters , fit_pars , N ,
                       debug ,
                       CMBandFname , FigureBandFName , GeneParsFName , DoSaveCanvas = False ,
-                      SigmaTBandRange = None,
+                      SigmaTBandRange   = None,
                       SigmaZa1BandRange = None,
-                      SigmaZa2BandRange = None):
+                      SigmaZa2BandRange = None,
+                      MeanZa1BandRange  = None,
+                      MeanZa2BandRange  = None ):
  
-    df = pd.DataFrame(columns=bands_columns)
     Pmiss = (cm_parameters.pMiss_max + cm_parameters.pMiss_min)/2.
 
-    #    sTBand = np.ones(len(Pmiss))*[fit_pars.sT_unweighted*0.9,fit_pars.sT_unweighted*1.1]
-    min_SigmaXY , max_SigmaXY = 0.7*np.min( [fit_pars.SigmaX_unweighted , fit_pars.SigmaY_unweighted] ) , 1.2*np.max( [fit_pars.SigmaX_unweighted,fit_pars.SigmaY_unweighted] )
+    # ----------------------------------------------------------------------------------------------------------------------------------
+    # width
+    print "N: ",N
+
     if SigmaTBandRange is None:
-        SigmaTBandMin   , SigmaTBandMax     = min_SigmaXY , max_SigmaXY
-    #ToDo:complete this Nonesense here for all
+        SigmaTBandMin   , SigmaTBandMax     = 0.7*np.min( [fit_pars.SigmaX_unweighted , fit_pars.SigmaY_unweighted] ) , 1.2*np.max( [fit_pars.SigmaX_unweighted,fit_pars.SigmaY_unweighted] )
+    else:
+        SigmaTBandMin   , SigmaTBandMax     = SigmaTBandRange[0] , SigmaTBandRange[1]
+
     if SigmaZa1BandRange is None:
         SigmaZa1BandMin , SigmaZa1BandMax   = fit_pars.SigmaZa1_unweighted*0.6,fit_pars.SigmaZa1_unweighted*1.3 # 0.9 , 1.1
     else:
-        SigmaZa1BandMin , SigmaZa1BandMax = SigmaZa1BandRange[0] , SigmaZa1BandRange[1]
+        SigmaZa1BandMin , SigmaZa1BandMax   = SigmaZa1BandRange[0] , SigmaZa1BandRange[1]
 
     if SigmaZa2BandRange is None:
         SigmaZa2BandMin , SigmaZa2BandMax   = fit_pars.SigmaZa2_unweighted*0.0,fit_pars.SigmaZa2_unweighted*3
+    else:
+        SigmaZa2BandMin , SigmaZa2BandMax   = SigmaZa2BandRange[0] , SigmaZa2BandRange[1]
 
     SigmaZBandMin = float(SigmaZa1BandMin)*(Pmiss)+float(SigmaZa2BandMin)
     SigmaZBandMax = float(SigmaZa1BandMax)*(Pmiss)+float(SigmaZa2BandMax)
-    
-    MeanTBandMin   , MeanTBandMax     = np.zeros(len(Pmiss)) , np.zeros(len(Pmiss))
-    MeanZa1BandMin , MeanZa1BandMax   = fit_pars.MeanZa1_unweighted*0.5,fit_pars.MeanZa1_unweighted*1.5 # 0.7 , 1.3
-    MeanZa2BandMin , MeanZa2BandMax   = np.min([fit_pars.MeanZa2_unweighted*0.2,fit_pars.MeanZa2_unweighted*2]) , np.max([fit_pars.MeanZa2_unweighted*0.2,fit_pars.MeanZa2_unweighted*2])
+
+    # mean
+    MeanTBandMin   , MeanTBandMax       = np.zeros(len(Pmiss)) , np.zeros(len(Pmiss))
+    if MeanZa1BandRange is None:
+        MeanZa1BandMin , MeanZa1BandMax   = fit_pars.MeanZa1_unweighted*0.5,fit_pars.MeanZa1_unweighted*1.5 # 0.7 , 1.3
+    else:
+        MeanZa1BandMin , MeanZa1BandMax   = MeanZa1BandRange[0] , MeanZa1BandRange[1]
+
+    if MeanZa2BandRange is None:
+        MeanZa2BandMin , MeanZa2BandMax   = np.min([fit_pars.MeanZa2_unweighted*0.2,fit_pars.MeanZa2_unweighted*2]) , np.max([fit_pars.MeanZa2_unweighted*0.2,fit_pars.MeanZa2_unweighted*2])
+    else:
+        MeanZa2BandMin , MeanZa2BandMax   = MeanZa2BandRange[0] , MeanZa2BandRange[1]
+
     MeanZBandMax = np.max([float(MeanZa1BandMax),float(MeanZa1BandMin)])*(Pmiss) + np.max([float(MeanZa2BandMax),float(MeanZa2BandMin)])
     MeanZBandMin = np.min([float(MeanZa1BandMax),float(MeanZa1BandMin)])*(Pmiss) + np.min([float(MeanZa2BandMax),float(MeanZa2BandMin)])
+
+    # ----------------------------------------------------------------------------------------------------------------------------------
 
     if DoSaveCanvas:
         fig = plt.figure(figsize=(40,20))
@@ -382,26 +395,18 @@ def generate_cm_bands( cm_parameters , fit_pars , N ,
         plt.savefig(FigureBandFName)
         print_filename( FigureBandFName , "plots to file" )
 
-    df_bands = pd.DataFrame({'SigmaTBandMin':SigmaTBandMin,'SigmaTBandMax':SigmaTBandMax
+
+    bands = pd.DataFrame({'SigmaTBandMin':SigmaTBandMin,'SigmaTBandMax':SigmaTBandMax
                             ,'SigmaZa1Min':SigmaZa1BandMin,'SigmaZa1Max':SigmaZa1BandMax
                             ,'SigmaZa2Min':SigmaZa2BandMin,'SigmaZa2Max':SigmaZa2BandMax
                             ,'MeanZa1Min':MeanZa1BandMin,'MeanZa1Max':MeanZa1BandMax
                             ,'MeanZa2Min':MeanZa2BandMin,'MeanZa2Max':MeanZa2BandMax},
                             index=[0])
-    df = df.append(df_bands)
-    df.to_csv( CMBandFname , header=True , index = False)
-
-    
-    print_filename( CMBandFname , "wrote bands around cm paramters fits to" )
-    print_line()
-
-    bands = pd.read_csv( CMBandFname )
-    print "N: ",N
-    SigmaT   = linspace_parameter( bands.SigmaTBandMin[0], bands.SigmaTBandMax[0], int(N.SigmaT) )
-    SigmaZa1 = linspace_parameter( bands.SigmaZa1Min[0]  , bands.SigmaZa1Max[0]  , int(N.SigmaZa1) )
-    SigmaZa2 = linspace_parameter( bands.SigmaZa2Min[0]  , bands.SigmaZa2Max[0]  , int(N.SigmaZa2) )
-    MeanZa1  = linspace_parameter( bands.MeanZa1Min[0]   , bands.MeanZa1Max[0]   , int(N.MeanZa1) )
-    MeanZa2  = linspace_parameter( bands.MeanZa2Min[0]   , bands.MeanZa2Max[0]   , int(N.MeanZa2) )
+    SigmaT   = linspace_parameter( float(SigmaTBandMin)    , float(SigmaTBandMax)   , int(N.SigmaT) )
+    SigmaZa1 = linspace_parameter( float(SigmaZa1BandMin)  , float(SigmaZa1BandMax) , int(N.SigmaZa1) )
+    SigmaZa2 = linspace_parameter( float(SigmaZa2BandMin)  , float(SigmaZa2BandMax) , int(N.SigmaZa2) )
+    MeanZa1  = linspace_parameter( float(MeanZa1BandMin)   , float(MeanZa1BandMax)  , int(N.MeanZa1) )
+    MeanZa2  = linspace_parameter( float(MeanZa2BandMin)   , float(MeanZa2BandMax)  , int(N.MeanZa2) )
     StartRun = int(N.StartRun)
     EndRun   = StartRun + len(SigmaT)*len(SigmaZa1)*len(SigmaZa2)*len(MeanZa1)*len(MeanZa2)
     if debug>1:
@@ -424,7 +429,12 @@ def generate_cm_bands( cm_parameters , fit_pars , N ,
                                                             },
                                                             index = [run])
                         stream_dataframe_to_file( generated_parameters, GeneParsFName  )
+
+
+    bands.to_csv( CMBandFname , header=True , index = False)
+    print_filename( CMBandFname , "wrote bands around cm paramters fits to" )
     print_filename( GeneParsFName , '\033[95m' + "appended " + '\033[0m' + "generation parameters to" )
+    print_line()
 
 
 
