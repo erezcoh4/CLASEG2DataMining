@@ -478,11 +478,11 @@ def generate_runs_with_different_parameters( option,
     # event generation (and analysis) loop
     for run in generated_parameters.run.tolist():
         genMeanX    = genMeanY = 0
-        genSigmaX   = genSigmaY = generated_parameters[generated_parameters.run==run].genSigmaX
-        genSigmaZa1 = generated_parameters[generated_parameters.run==run].genSigmaZa1
-        genSigmaZa2 = generated_parameters[generated_parameters.run==run].genSigmaZa2
-        genMeanZa1  = generated_parameters[generated_parameters.run==run].genMeanZa1
-        genMeanZa2  = generated_parameters[generated_parameters.run==run].genMeanZa2
+        genSigmaX   = genSigmaY = float(generated_parameters[generated_parameters.run==run].genSigmaX)
+        genSigmaZa1 = float(generated_parameters[generated_parameters.run==run].genSigmaZa1)
+        genSigmaZa2 = float(generated_parameters[generated_parameters.run==run].genSigmaZa2)
+        genMeanZa1  = float(generated_parameters[generated_parameters.run==run].genMeanZa1)
+        genMeanZa2  = float(generated_parameters[generated_parameters.run==run].genMeanZa2)
         if flags.verbose>2:
             print 'run:',run , genSigmaX , genSigmaZa1 , genSigmaZa2 , genMeanZa1 , genMeanZa2
             
@@ -572,8 +572,9 @@ def generate_runs_with_different_parameters( option,
                 results = pd.DataFrame({'run':int(run)
                                        ,'time':str(datetime.datetime.now().strftime("%Y%B%d"))
                                        ,'NentriesSimRun':ana_sim.GetEntries()
-                                       ,'NLostEvents':(9907*N.NRand - ana_sim.GetEntries())
-                                       ,'fracLostEvents':((9907*N.NRand - ana_sim.GetEntries())/9907*N.NRand)
+                                       ,'NLostEvents':(9907*float(N.NRand) - ana_sim.GetEntries())
+                                       ,'fracLostEvents':(float((9907.0*float(N.NRand)) - ana_sim.GetEntries())/(9907.0*float(N.NRand)))
+                                       
                                        # generated
                                        ,'genMeanX':genMeanX     ,'genSigmaX':genSigmaX      ,'genMeanY':genMeanY        ,'genSigmaY':genSigmaY
                                        ,'genMeanZa1':genMeanZa1 ,'genMeanZa2':genMeanZa2    ,'genSigmaZa1':genSigmaZa1  ,'genSigmaZa2':genSigmaZa2
@@ -667,7 +668,7 @@ def generate_runs_with_different_parameters( option,
                 ana_sim.CloseFile()
                 if debug>1:
                     print "appended into pandas.DataFrames"
-                    if (debug>2): print "resutls: ",df_results
+                    if (debug>2): print "resutls: ",results
 
                 garbage_list = [ ana_sim , reco_parameters , reco_fits  , results ]
                 del garbage_list

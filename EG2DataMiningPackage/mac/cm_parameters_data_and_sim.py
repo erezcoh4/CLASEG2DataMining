@@ -16,7 +16,7 @@ from cm_tools import *
     
 '''
 
-start_run , Nruns = 1000 , 1600
+start_run , Nruns = 1000 , 800
 splitjobs_runs = 1
 
 PmissBins = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65] , [0.65,0.75] , [0.75,1.0]]
