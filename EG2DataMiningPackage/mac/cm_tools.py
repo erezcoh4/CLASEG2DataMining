@@ -338,16 +338,27 @@ def linspace_parameter( band_min  , band_max  , Npts ):
 # ------------------------------------------------------------------------------- #
 def generate_cm_bands( cm_parameters , fit_pars , N ,
                       debug ,
-                      CMBandFname , FigureBandFName , GeneParsFName , DoSaveCanvas = False ):
+                      CMBandFname , FigureBandFName , GeneParsFName , DoSaveCanvas = False ,
+                      SigmaTBandRange = None,
+                      SigmaZa1BandRange = None,
+                      SigmaZa2BandRange = None):
  
     df = pd.DataFrame(columns=bands_columns)
     Pmiss = (cm_parameters.pMiss_max + cm_parameters.pMiss_min)/2.
 
     #    sTBand = np.ones(len(Pmiss))*[fit_pars.sT_unweighted*0.9,fit_pars.sT_unweighted*1.1]
     min_SigmaXY , max_SigmaXY = 0.7*np.min( [fit_pars.SigmaX_unweighted , fit_pars.SigmaY_unweighted] ) , 1.2*np.max( [fit_pars.SigmaX_unweighted,fit_pars.SigmaY_unweighted] )
-    SigmaTBandMin   , SigmaTBandMax     = min_SigmaXY , max_SigmaXY
-    SigmaZa1BandMin , SigmaZa1BandMax   = fit_pars.SigmaZa1_unweighted*0.6,fit_pars.SigmaZa1_unweighted*1.3 # 0.9 , 1.1
-    SigmaZa2BandMin , SigmaZa2BandMax   = fit_pars.SigmaZa2_unweighted*0.0,fit_pars.SigmaZa2_unweighted*3
+    if SigmaTBandRange is None:
+        SigmaTBandMin   , SigmaTBandMax     = min_SigmaXY , max_SigmaXY
+    #ToDo:complete this Nonesense here for all
+    if SigmaZa1BandRange is None:
+        SigmaZa1BandMin , SigmaZa1BandMax   = fit_pars.SigmaZa1_unweighted*0.6,fit_pars.SigmaZa1_unweighted*1.3 # 0.9 , 1.1
+    else:
+        SigmaZa1BandMin , SigmaZa1BandMax = SigmaZa1BandRange[0] , SigmaZa1BandRange[1]
+
+    if SigmaZa2BandRange is None:
+        SigmaZa2BandMin , SigmaZa2BandMax   = fit_pars.SigmaZa2_unweighted*0.0,fit_pars.SigmaZa2_unweighted*3
+
     SigmaZBandMin = float(SigmaZa1BandMin)*(Pmiss)+float(SigmaZa2BandMin)
     SigmaZBandMax = float(SigmaZa1BandMax)*(Pmiss)+float(SigmaZa2BandMax)
     
