@@ -363,7 +363,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
     
     // α-s
-    alpha_q     = LCfraction(q , A_over_mA);
+    alpha_q     = LCfraction(q , q , A_over_mA);
     sum_alpha   = -alpha_q;
     
 
