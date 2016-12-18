@@ -457,9 +457,10 @@ def generate_runs_with_different_parameters( option,
                                             root_resutlsFName ):
     
     # the data (nominal values)
-    ana_data = TAnalysisEG2( path+"/AnaFiles" ,"ppSRCCut_DATA_%s"% target )
+
     from definitions import *
     print 'path:',path
+    ana_data = TAnalysisEG2( path+"/AnaFiles" ,"Ana_ppSRCCut_DATA_%s"% target )
     path = path + "/Analysis_DATA/ppSRCcm"
 
 
