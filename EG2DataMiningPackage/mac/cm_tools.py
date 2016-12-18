@@ -581,6 +581,7 @@ def generate_runs_with_different_parameters( option,
                 KSpCMz , KSzPval = KStest( PmissBins ,ana_sim , ana_data , "pcmZ" , ROOT.TCut('') , debug)
                 KSxPval_avg = Fisher_combination_Pvals( KSxPval )
                 KSyPval_avg = Fisher_combination_Pvals( KSyPval )
+                KStPval_avg = Fisher_combination_Pvals( KStPval )
                 KSzPval_avg = Fisher_combination_Pvals( KSzPval )
                 KSPval_tot = Fisher_combination_Pvals([KSxPval_avg , KSyPval_avg , KSzPval_avg])
 
@@ -630,13 +631,13 @@ def generate_runs_with_different_parameters( option,
                                        , 'KSxPval_PmBin3':KSxPval[3], 'KSxPval_PmBin4':KSxPval[4]
                                        ,'KSxPval_avg':KSxPval_avg
                                        ,'KSyPval_PmBin0':KSyPval[0], 'KSyPval_PmBin1':KSyPval[1], 'KSyPval_PmBin2':KSyPval[2]
-                                       , 'KSyPval_PmBin3':KSxPval[3], 'KSyPval_PmBin4':KSyPval[4]
+                                       , 'KSyPval_PmBin3':KSyPval[3], 'KSyPval_PmBin4':KSyPval[4]
                                        ,'KSyPval_avg':KSyPval_avg
                                        ,'KStPval_PmBin0':KStPval[0], 'KStPval_PmBin1':KStPval[1], 'KStPval_PmBin2':KStPval[2]
-                                       , 'KStPval_PmBin3':KSxPval[3], 'KStPval_PmBin4':KStPval[4]
+                                       , 'KStPval_PmBin3':KStPval[3], 'KStPval_PmBin4':KStPval[4]
                                        ,'KStPval_avg':KStPval_avg
                                        ,'KSzPval_PmBin0':KSzPval[0], 'KSzPval_PmBin1':KSzPval[1], 'KSzPval_PmBin2':KSzPval[2]
-                                       , 'KSzPval_PmBin3':KSxPval[3], 'KSzPval_PmBin4':KSzPval[4]
+                                       , 'KSzPval_PmBin3':KSzPval[3], 'KSzPval_PmBin4':KSzPval[4]
                                        ,'KSzPval_avg':KSzPval_avg
                                        ,'KSPval_tot':KSPval_tot
                                        
