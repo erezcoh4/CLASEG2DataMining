@@ -128,7 +128,7 @@ if 'create bands for EG' in flags.option or 'bands' in flags.option:
                       SigmaTBandRange = [0.1,0.22],
                       SigmaZa1BandRange = [-0.9,2.4],
                       SigmaZa2BandRange = [-0.3,0.2],
-                      MeanZa2BandRange  = [-0.3,1.2],
+                      MeanZa1BandRange  = [-0.3,1.2],
                       MeanZa2BandRange = [-0.5,0.2],
                       )
 
