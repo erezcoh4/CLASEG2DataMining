@@ -461,6 +461,8 @@ def generate_runs_with_different_parameters( option,
     from definitions import *
     print 'path:',path
     ana_data = TAnalysisEG2( path+"/AnaFiles" ,"Ana_ppSRCCut_DATA_%s"% target )
+    pAcceptacneFile = ROOT.TFile(path+"/GSIM_DATA/PrecoilAcceptance.root")
+    print 'path+/GSIM_DATA/PrecoilAcceptance.root:',path+"/GSIM_DATA/PrecoilAcceptance.root"
     path = path + "/Analysis_DATA/ppSRCcm"
 
 
@@ -480,8 +482,8 @@ def generate_runs_with_different_parameters( option,
         (b) proton fiducial cuts (coded inside the event generator class)
     '''
     if 'generate' in option:
-        pAcceptacneFile = ROOT.TFile("/Users/erezcohen/Desktop/DataMining/GSIM_DATA/PrecoilAcceptance.root")
         h = pAcceptacneFile.Get("hRescaled")
+        h.Print()
         gen_events = GenerateEvents( path , 0 , debug )
         gen_events.SetNRand( int(N.NRand) )
         gen_events.Use_protonAcceptacne( True )
