@@ -440,10 +440,10 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     ComputeWeights();
     if (debug > 2) Printf("got roofit c.m. ");
     
-//    // finally, fill the TTree output
-//    // problem with plugging std::vector<TLorentzVector> into the root file is solved by pushing back into the protons vector only before filling...
-//    std::vector <TLorentzVector> protons_vector = protons;    protons.clear();
-//    for (auto & proton:protons_vector)  protons.push_back( proton );
+    // finally, fill the TTree output
+    // problem with plugging std::vector<TLorentzVector> into the root file is solved by pushing back into the protons vector only before filling...
+    std::vector <TLorentzVector> protons_vector = protons;    protons.clear();
+    for (auto & proton:protons_vector)  protons.push_back( proton );
     
     SetCuts();
     
