@@ -86,14 +86,14 @@ def compute_Pval_parameters( data_fits , reco_fits , weighting ):
 def KStest( PmissBins , ana_sim , ana_data , var , cut=ROOT.TCut() , debug=2 , Nbins=20):
     # [http://docs.scipy.org/doc/scipy-0.15.1/reference/generated/scipy.stats.ks_2samp.html]
     KS_distances , Pval_KS = [] , []
-    figure = plt.figure(figsize=[60,20])
+    if debug>4 : figure = plt.figure(figsize=[60,20])
     for i in range(len(PmissBins)):
         pMiss_min , pMiss_max = PmissBins[i][0] , PmissBins[i][1]
         reduced_data = tree2array(ana_data.GetTree(),branches=var , selection = '%f < Pmiss3Mag && Pmiss3Mag < %f'%(pMiss_min , pMiss_max) )
         reduced_sim = tree2array(ana_sim.GetTree(),branches=var , selection = '%f < Pmiss3Mag && Pmiss3Mag < %f'%(pMiss_min , pMiss_max))
         D , Pvalue = ks_2samp( reduced_sim , reduced_data )
 
-        if ( debug > 1 ):
+        if debug>4 :
             ax = figure.add_subplot(len(PmissBins)/2,3,i+1)
             for array,col in zip([reduced_sim , reduced_data],['black','red']):
                 g=sns.distplot( array, bins=np.linspace(-1, 2 , Nbins), ax=ax, color=col , axlabel=var )
@@ -103,7 +103,7 @@ def KStest( PmissBins , ana_sim , ana_data , var , cut=ROOT.TCut() , debug=2 , N
         KS_distances.append(D)
         Pval_KS.append(Pvalue)
 
-    figure.savefig("/Users/erezcohen/Desktop/cmHistos_%s.pdf"%var)
+    if debug>4 : figure.savefig( path + "/cmHistos_%s.pdf"%var)
 
     return KS_distances , Pval_KS
 
@@ -579,7 +579,11 @@ def generate_runs_with_different_parameters( option,
                 KSpCMy , KSyPval = KStest( PmissBins ,ana_sim , ana_data , "pcmY" , ROOT.TCut('') , debug)
                 KSpCMt , KStPval = KStest( PmissBins ,ana_sim , ana_data , "pcmT" , ROOT.TCut('') , debug)
                 KSpCMz , KSzPval = KStest( PmissBins ,ana_sim , ana_data , "pcmZ" , ROOT.TCut('') , debug)
-                KSxPval_avg , KSyPval_avg , KStPval_avg , KSzPval_avg = np.average(KSxPval) , np.average(KSyPval) , np.average(KStPval) , np.average(KSzPval)
+                KSxPval_avg = Fisher_combination_Pvals( KSxPval )
+                KSyPval_avg = Fisher_combination_Pvals( KSyPval )
+                KSzPval_avg = Fisher_combination_Pvals( KSzPval )
+                KSPval_tot = Fisher_combination_Pvals([KSxPval_avg , KSyPval_avg , KSzPval_avg])
+
                 if debug>1: print "performed KS tests"
                 if debug>3: print "KSxPval_avg, KSyPval_avg, KSzPval_avg:",KSxPval_avg, KSyPval_avg, KSzPval_avg
                     
@@ -634,6 +638,8 @@ def generate_runs_with_different_parameters( option,
                                        ,'KSzPval_PmBin0':KSzPval[0], 'KSzPval_PmBin1':KSzPval[1], 'KSzPval_PmBin2':KSzPval[2]
                                        , 'KSzPval_PmBin3':KSxPval[3], 'KSzPval_PmBin4':KSzPval[4]
                                        ,'KSzPval_avg':KSzPval_avg
+                                       ,'KSPval_tot':KSPval_tot
+                                       
                                        # reconstructed parameters in p(miss) bins
                                        ,'PmissMin_PmBin0':reco_parameters.get_value(0,'pMiss_min') ,'PmissMax_PmBin0':reco_parameters.get_value(0,'pMiss_max')
                                        ,'PmissMin_PmBin1':reco_parameters.get_value(1,'pMiss_min') ,'PmissMax_PmBin1':reco_parameters.get_value(1,'pMiss_max')
