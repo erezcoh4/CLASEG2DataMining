@@ -19,7 +19,7 @@ from cm_tools import *
 
 splitjobs_runs = 2
 start_run , Nruns = 100000 , 2
-if flags.run!=0
+if flags.run > 0:
     start_run = flags.run
 
 
