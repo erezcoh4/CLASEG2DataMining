@@ -20,7 +20,7 @@ from cm_tools import *
 splitjobs_runs = 2
 start_run , Nruns = 100000 , 2
 if flags.run > 0:
-    start_run = flags.run
+    start_run = flags.run + 1
 
 
 PmissBins = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65] , [0.65,0.75] , [0.75,1.0]]
