@@ -333,7 +333,8 @@ def linspace_parameter( band_min  , band_max  , Npts ):
 # ------------------------------------------------------------------------------- #
 def generate_cm_bands( cm_parameters , fit_pars , N ,
                       debug ,
-                      CMBandFname , FigureBandFName , GeneParsFName , DoSaveCanvas = False ,
+                      CMBandFname , FigureBandFName , GeneParsFName ,
+                      DoSaveCanvas = False , do_add_text = False,
                       SigmaTBandRange   = None,
                       SigmaZa1BandRange = None,
                       SigmaZa2BandRange = None,
@@ -384,13 +385,15 @@ def generate_cm_bands( cm_parameters , fit_pars , N ,
     if DoSaveCanvas:
         fig = plt.figure(figsize=(40,20))
         ax = plot_band_around_cm_parameter_fits( fig , 221, cm_parameters , 'sigma', 'unweighted' , '\sigma' , SigmaTBandMin , SigmaTBandMax , SigmaZBandMin , SigmaZBandMax  )
-#        ax.text(0.7, 0.06, r'$%.2f<\sigma(x,y)<%.2f$'%(min_SigmaXY , max_SigmaXY), fontsize=35 , color='#FF9848')
-#        ax.text(0.7, 0.04, r'$%.2f<\sigma(z): a_{1}<%.2f$'%(SigmaZa1BandMin , SigmaZa1BandMax), fontsize=35, color='#1122CC')
-#        ax.text(0.7, 0.02, r'$%.2f<\sigma(z): a_{2}<%.2f$'%(SigmaZa2BandMin , SigmaZa2BandMax), fontsize=35, color='#1122CC')
+        if do_add_text:
+            ax.text(0.7, 0.06, r'$%.2f<\sigma(x,y)<%.2f$'%(min_SigmaXY , max_SigmaXY), fontsize=35 , color='#FF9848')
+            ax.text(0.7, 0.04, r'$%.2f<\sigma(z): a_{1}<%.2f$'%(SigmaZa1BandMin , SigmaZa1BandMax), fontsize=35, color='#1122CC')
+            ax.text(0.7, 0.02, r'$%.2f<\sigma(z): a_{2}<%.2f$'%(SigmaZa2BandMin , SigmaZa2BandMax), fontsize=35, color='#1122CC')
         ax.set_xlim(0.3,1)
         ax = plot_band_around_cm_parameter_fits( fig , 222, cm_parameters , 'mean', 'unweighted' , 'mean' , MeanTBandMin , MeanTBandMax , MeanZBandMin , MeanZBandMax  )
-#        ax.text(0.71, -0.24, r'$%.2f<\mu(z): a_{1}<%.2f$'%(MeanZa1BandMin , MeanZa1BandMax), fontsize=35, color='#1122CC')
-#        ax.text(0.68, -0.32, r'$%.2f<\mu(z): a_{2}<%.2f$'%(MeanZa2BandMin , MeanZa2BandMax), fontsize=35, color='#1122CC')
+        if do_add_text:
+            ax.text(0.71, -0.24, r'$%.2f<\mu(z): a_{1}<%.2f$'%(MeanZa1BandMin , MeanZa1BandMax), fontsize=35, color='#1122CC')
+            ax.text(0.68, -0.32, r'$%.2f<\mu(z): a_{2}<%.2f$'%(MeanZa2BandMin , MeanZa2BandMax), fontsize=35, color='#1122CC')
         ax.set_xlim(0.3,1)
         plt.savefig(FigureBandFName)
         print_filename( FigureBandFName , "plots to file" )

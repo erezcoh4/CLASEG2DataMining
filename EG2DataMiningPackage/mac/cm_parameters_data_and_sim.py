@@ -16,12 +16,16 @@ from cm_tools import *
     
 '''
 
-start_run , Nruns = 1000 , 800
-splitjobs_runs = 1
+
+splitjobs_runs = 2
+start_run , Nruns = 100000 , 2
+if flags.run!=0
+    start_run = flags.run
+
 
 PmissBins = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65] , [0.65,0.75] , [0.75,1.0]]
-#N = pd.DataFrame({'SigmaT':15,'SigmaZa1':5 ,'SigmaZa2':5 ,'MeanZa1':5 ,'MeanZa2':5 ,'StartRun':30000 , 'NRand':10 }, index=[0])
-N = pd.DataFrame({'SigmaT':1,'SigmaZa1':100,'SigmaZa2':2 ,'MeanZa1':2 ,'MeanZa2':2 ,'StartRun':1000 , 'NRand':10 }, index=[0])
+N = pd.DataFrame({'SigmaT':30,'SigmaZa1':15 ,'SigmaZa2':15 ,'MeanZa1':15 ,'MeanZa2':15 ,'StartRun':100000 , 'NRand':10 }, index=[0])
+#N = pd.DataFrame({'SigmaT':1,'SigmaZa1':100,'SigmaZa2':2 ,'MeanZa1':2 ,'MeanZa2':2 ,'StartRun':1000 , 'NRand':10 }, index=[0])
 #N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1 ,'StartRun':0 , 'NRand':1}, index=[0]) # for debugging
 
 
@@ -121,7 +125,12 @@ if 'create bands for EG' in flags.option or 'bands' in flags.option:
                       flags.verbose ,
                       CMBandFname( ppPath+'/DATA/data' ) , FigureBandFName( ppPath+'/DATA/data' ) , GeneParsFName ( ppPath+'/simulation/' ) ,
                       DoSaveCanvas = True,
-                      SigmaZa1BandRange = [-0.9,2.4])
+                      SigmaTBandRange = [0.1,0.22],
+                      SigmaZa1BandRange = [-0.9,2.4],
+                      SigmaZa2BandRange = [-0.3,0.2],
+                      MeanZa2BandRange  = [-0.3,1.2],
+                      MeanZa2BandRange = [-0.5,0.2],
+                      )
 
 
 
