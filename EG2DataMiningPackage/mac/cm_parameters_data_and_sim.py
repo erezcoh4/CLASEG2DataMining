@@ -22,8 +22,8 @@ if flags.run > 0:
 else:
     start_run = 100000
 
-if flags.Nruns > 0:
-    Nruns = flags.Nruns
+if flags.NumberOfRuns > 0:
+    Nruns = flags.NumberOfRuns
 else:
     Nruns = 2
 
