@@ -86,7 +86,8 @@ def compute_Pval_parameters( data_fits , reco_fits , weighting ):
 def KStest( PmissBins , ana_sim , ana_data , var , cut=ROOT.TCut() , debug=2 , Nbins=20):
     # [http://docs.scipy.org/doc/scipy-0.15.1/reference/generated/scipy.stats.ks_2samp.html]
     KS_distances , Pval_KS = [] , []
-    if debug>4 : figure = plt.figure(figsize=[60,20])
+    if debug>4 :
+        figure = plt.figure(figsize=[60,20])
     for i in range(len(PmissBins)):
         pMiss_min , pMiss_max = PmissBins[i][0] , PmissBins[i][1]
         reduced_data = tree2array(ana_data.GetTree(),branches=var , selection = '%f < Pmiss3Mag && Pmiss3Mag < %f'%(pMiss_min , pMiss_max) )
@@ -103,7 +104,8 @@ def KStest( PmissBins , ana_sim , ana_data , var , cut=ROOT.TCut() , debug=2 , N
         KS_distances.append(D)
         Pval_KS.append(Pvalue)
 
-    if debug>4 : figure.savefig( path + "/cmHistos_%s.pdf"%var)
+    if debug>4 :
+        figure.savefig( path + "/cmHistos_%s.pdf"%var)
 
     return KS_distances , Pval_KS
 
@@ -571,7 +573,7 @@ def generate_runs_with_different_parameters( option,
                                                                 PvalMeanZa1_weighted , PvalMeanZa2_weighted ,
                                                                 PvalSigmaZa1_weighted , PvalSigmaZa2_weighted ] )
 
-                if (debug>1): print "got weighted roofit results"
+                if debug>1: print "got weighted roofit results"
 
                 # KS test for the c.m. distributions in x,y,z directions
 

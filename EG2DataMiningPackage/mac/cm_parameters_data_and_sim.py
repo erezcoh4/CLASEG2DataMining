@@ -17,11 +17,15 @@ from cm_tools import *
 '''
 
 
-splitjobs_runs = 2
-start_run , Nruns = 100000 , 2
 if flags.run > 0:
     start_run = flags.run
+else:
+    start_run = 100000
 
+if flags.Nruns > 0:
+    Nruns = flags.Nruns
+else:
+    Nruns = 2
 
 PmissBins = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65] , [0.65,0.75] , [0.75,1.0]]
 N = pd.DataFrame({'SigmaT':10,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':100000 , 'NRand':10 }, index=[0])
