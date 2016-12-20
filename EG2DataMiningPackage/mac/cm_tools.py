@@ -466,7 +466,7 @@ def generate_runs_with_different_parameters( option,
     pAcceptacneFile = ROOT.TFile(path+"/GSIM_DATA/PrecoilAcceptance.root")
     print 'path+/GSIM_DATA/PrecoilAcceptance.root:',path+"/GSIM_DATA/PrecoilAcceptance.root"
     path = path + "/Analysis_DATA/ppSRCcm"
-    if 'helion' in worker:
+    if 'helion' in flags.worker:
         path = "/extra/Erez/DataMining"
 
     # simulation pandas::DataFrame
