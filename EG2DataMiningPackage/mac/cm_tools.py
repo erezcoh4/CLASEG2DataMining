@@ -467,7 +467,7 @@ def generate_runs_with_different_parameters( option,
     print 'path+/GSIM_DATA/PrecoilAcceptance.root:',path+"/GSIM_DATA/PrecoilAcceptance.root"
     path = path + "/Analysis_DATA/ppSRCcm"
     if 'helion' in flags.worker:
-        path = "/extra/Erez/DataMining"
+        path = "/extra/Erez/DataMining/Analysis_DATA/ppSRCcm"
 
     # simulation pandas::DataFrame
     df_reco_parameters = pd.DataFrame(columns=cm_pars_columns)
