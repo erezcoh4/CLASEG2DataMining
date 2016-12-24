@@ -6,6 +6,7 @@ sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackag
 sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/CLASEG2DataMining/EG2DataMiningPackage/mac')
 import GeneralPlot as gp , Initiation as init, plot_tools as pt
 from plot_tools import *
+from calc_tools import *
 from root_numpy import tree2array
 from ROOT import TPlots, TAnalysis, TAnalysisEG2 , TEG2dm , TCalcPhysVarsEG2 , TSchemeDATA
 dirname = init.createnewdir()

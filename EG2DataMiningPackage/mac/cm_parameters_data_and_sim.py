@@ -170,13 +170,13 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
 
 
 
-# (6) find the best-correspondance from the generated runs, to estimate nature's parameteres
-# ----------------------------------------------------------
-if 'find the best paramteres' in flags.option:
-
-    print_filename(SimParametersFileName( ppPath+'/simulation/' ),'reading file ')
-    simulation_results = pd.read_csv( SimParametersFileName( ppPath+'/simulation/' ) )
-    plot( simulation_results , 'genSigmaL_a1' , 'NsigSL_a1_unweighted' , 'generated a$_1$ ($\sigma_z$) [GeV/c]' , 'unweighted N$\sigma$ (a$_1$ ($\sigma_z$))' )
+## (6) find the best-correspondance from the generated runs, to estimate nature's parameteres
+## ----------------------------------------------------------
+#if 'find the best paramteres' in flags.option:
+#
+#    print_filename(SimParametersFileName( ppPath+'/simulation/' ),'reading file ')
+#    simulation_results = pd.read_csv( SimParametersFileName( ppPath+'/simulation/' ) )
+#    plot( simulation_results , 'genSigmaL_a1' , 'NsigSL_a1_unweighted' , 'generated a$_1$ ($\sigma_z$) [GeV/c]' , 'unweighted N$\sigma$ (a$_1$ ($\sigma_z$))' )
 
 
 

@@ -327,10 +327,12 @@ def plot_band_around_cm_parameter_fits( fig , i_subplot , data , var , weight , 
     plt.fill_between(Pmiss, TBandMin , TBandMax ,alpha=0.5, edgecolor='#CC4F1B', facecolor='#FF9848')
     plt.fill_between(Pmiss, ZBandMin , ZBandMax ,alpha=0.5, edgecolor='#C14F1B', facecolor='#1122CC')
     return ax
+# ------------------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------------------- #
 def linspace_parameter( band_min  , band_max  , Npts ):
     return np.linspace( band_min + (band_max - band_min) / (Npts+1) , band_max , Npts , endpoint=False)
+# ------------------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------------------- #
 def generate_cm_bands( cm_parameters , fit_pars , N ,
@@ -440,16 +442,55 @@ def generate_cm_bands( cm_parameters , fit_pars , N ,
     print_filename( CMBandFname , "wrote bands around cm paramters fits to" )
     print_filename( GeneParsFName , '\033[95m' + "appended " + '\033[0m' + "generation parameters to" )
     print_line()
+# ------------------------------------------------------------------------------- #
+
+# ------------------------------------------------------------------------------- #
+def get_pmiss_multiples_bins( PmissBins , path , NRand ): # for pp/p analysis
+
+    # define the bins - 4 bins in each large p(miss) bin that we have in the analysis
+    pmiss_multiples_bins = []
+
+    for i in range(len(PmissBins)):
+        pmin , pmax = PmissBins[i][0] , PmissBins[i][1]
+        for j in range(4):
+            pmiss_multiples_bins.append( [ pmin + float(j*(pmax-pmin))/4 , pmin + float((j+1)*(pmax-pmin))/4 ])
+
+    # get the number of generated events per bin
+    evts_gen_in_pmiss_multiples_bins = []
+
+    p1 = TPlots(path + '/DATA/SRC_e1_C.root' , 'T')
+    p2 = TPlots(path + '/DATA/SRC_e2_C.root' , 'T')
+
+    for i in range( len(pmiss_multiples_bins) ):
+        pmin , pmax = pmiss_multiples_bins[i][0] , pmiss_multiples_bins[i][1]
+        evts_gen_in_pmiss_multiples_bins.append( NRand * (p1.GetEntries(ROOT.TCut("%f<Pmiss_size && Pmiss_size<%f"%(pmin , pmax))) + p2.GetEntries(ROOT.TCut("%f<Pmiss_size && Pmiss_size<%f"%(pmin , pmax)))) )
+
+    p1.Close()
+    p2.Close()
+
+    return pmiss_multiples_bins , evts_gen_in_pmiss_multiples_bins
+# ------------------------------------------------------------------------------- #
 
 
+# ------------------------------------------------------------------------------- #
+def get_evnt_loss_in_pmiss_bins( pmiss_multiples_bins , evts_gen_in_pmiss_multiples_bins , ana_sim ):
 
+    evnt_loss_in_pmiss_multiples_bins = []
+    
+    for i in range( len(pmiss_multiples_bins) ):
+        pmin , pmax = pmiss_multiples_bins[i][0] , pmiss_multiples_bins[i][1]
+        evts_gen = evts_gen_in_pmiss_multiples_bins[i]
+        evts_acc = ana_sim.GetEntries(ROOT.TCut("%f<Pmiss3Mag && Pmiss3Mag<%f"%(pmin , pmax)))
+        evnt_loss_in_pmiss_multiples_bins.append( float(evts_gen-evts_acc)/evts_gen )
+    
+    return evnt_loss_in_pmiss_multiples_bins , pmiss_multiples_bins
 
+# ------------------------------------------------------------------------------- #
 
 
 
 
 # ------------------------------------------------------------------------------- #
-#def generate_runs_with_different_parameters( cm_fits_parameters , cm_pars_bands ,
 def generate_runs_with_different_parameters( option,
                                             data_fits,
                                             generated_parameters ,
@@ -477,8 +518,10 @@ def generate_runs_with_different_parameters( option,
     if debug>2: print "generated_parameters:",generated_parameters
     if debug: print '\033[95m' + 'processing %d runs'%len(generated_parameters)+ '\033[0m'
 
+    # multiple bins for pp/p ratio
+    pmiss_multiples_bins , evts_gen_in_pmiss_multiples_bins = get_pmiss_multiples_bins( PmissBins , path , int(N.NRand) )
 
-    
+
     '''
         recoil proton acceptances:
         (a) efficiency and acceptacne from the 'uniform' map i've generated using virtual CLAS
@@ -528,7 +571,11 @@ def generate_runs_with_different_parameters( option,
                             
                 if (debug>1): print "analyzing run %d"%run
                 ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
-                            
+                
+                evnt_loss_in_pmiss_multiples_bins = get_evnt_loss_in_pmiss_bins( pmiss_multiples_bins , evts_gen_in_pmiss_multiples_bins , ana_sim )
+                
+                
+                
                 # reconstruct c.m. parameters
                 reco_parameters = calc_cm_parameters( ana_sim  , PmissBins )
                             
@@ -574,6 +621,16 @@ def generate_runs_with_different_parameters( option,
                                                                 PvalMeanZa1_weighted , PvalMeanZa2_weighted ,
                                                                 PvalSigmaZa1_weighted , PvalSigmaZa2_weighted ] )
 
+                PvalSigmaZa1SigmaZa2 = Fisher_combination_Pvals( [ PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] )
+                PvalMeanZa1MeanZa2 = Fisher_combination_Pvals( [ PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ] )
+    
+                PvalSigmaZa1MeanZa1 = Fisher_combination_Pvals( [ PvalSigmaZa1_unweighted , PvalMeanZa1_unweighted ] )
+                PvalSigmaZa1MeanZa2 = Fisher_combination_Pvals( [ PvalSigmaZa1_unweighted , PvalMeanZa2_unweighted ] )
+    
+                PvalSigmaZa2MeanZa1 = Fisher_combination_Pvals( [ PvalSigmaZa2_unweighted , PvalMeanZa1_unweighted ] )
+                PvalSigmaZa2MeanZa2 = Fisher_combination_Pvals( [ PvalSigmaZa2_unweighted , PvalMeanZa2_unweighted ] )
+        
+
                 if debug>1: print "got weighted roofit results"
 
                 # KS test for the c.m. distributions in x,y,z directions
@@ -598,7 +655,10 @@ def generate_runs_with_different_parameters( option,
                                        ,'NentriesSimRun':ana_sim.GetEntries()
                                        ,'NLostEvents':(9907*float(N.NRand) - ana_sim.GetEntries())
                                        ,'fracLostEvents':(float((9907.0*float(N.NRand)) - ana_sim.GetEntries())/(9907.0*float(N.NRand)))
-                                       
+                                       # events loss in 20 p(miss) bins
+                                       ,'pmiss_multiples_bins':[pmiss_multiples_bins]
+                                       ,'evnt_loss_in_pmiss_multiples_bins':[evnt_loss_in_pmiss_multiples_bins]
+
                                        # generated
                                        ,'genMeanX':genMeanX     ,'genSigmaX':genSigmaX      ,'genMeanY':genMeanY        ,'genSigmaY':genSigmaY
                                        ,'genMeanZa1':genMeanZa1 ,'genMeanZa2':genMeanZa2    ,'genSigmaZa1':genSigmaZa1  ,'genSigmaZa2':genSigmaZa2
@@ -628,19 +688,26 @@ def generate_runs_with_different_parameters( option,
                                        ,'PvalMeanZa1_weighted':PvalMeanZa1_weighted             ,'PvalMeanZa2_weighted':PvalMeanZa2_weighted
                                        ,'PvalSigmaZa1_weighted':PvalSigmaZa1_weighted           ,'PvalSigmaZa2_weighted':PvalSigmaZa2_weighted
                                        ,'PvalTotal_weighted':PvalTotal_weighted
+                                       ,'PvalSigmaZa1SigmaZa2':PvalSigmaZa1SigmaZa2
+                                       ,'PvalMeanZa1MeanZa2':PvalMeanZa1MeanZa2
+                                       ,'PvalSigmaZa1MeanZa1':PvalSigmaZa1MeanZa1
+                                       ,'PvalSigmaZa1MeanZa2':PvalSigmaZa1MeanZa2
+                                       ,'PvalSigmaZa2MeanZa1':PvalSigmaZa2MeanZa1
+                                       ,'PvalSigmaZa2MeanZa2':PvalSigmaZa2MeanZa2
+
                                                                                                      
                                        # per 5 p(miss) bins
                                        ,'KSxPval_PmBin0':KSxPval[0], 'KSxPval_PmBin1':KSxPval[1], 'KSxPval_PmBin2':KSxPval[2]
-                                       , 'KSxPval_PmBin3':KSxPval[3], 'KSxPval_PmBin4':KSxPval[4]
+                                       ,'KSxPval_PmBin3':KSxPval[3], 'KSxPval_PmBin4':KSxPval[4]
                                        ,'KSxPval_avg':KSxPval_avg
                                        ,'KSyPval_PmBin0':KSyPval[0], 'KSyPval_PmBin1':KSyPval[1], 'KSyPval_PmBin2':KSyPval[2]
-                                       , 'KSyPval_PmBin3':KSyPval[3], 'KSyPval_PmBin4':KSyPval[4]
+                                       ,'KSyPval_PmBin3':KSyPval[3], 'KSyPval_PmBin4':KSyPval[4]
                                        ,'KSyPval_avg':KSyPval_avg
                                        ,'KStPval_PmBin0':KStPval[0], 'KStPval_PmBin1':KStPval[1], 'KStPval_PmBin2':KStPval[2]
-                                       , 'KStPval_PmBin3':KStPval[3], 'KStPval_PmBin4':KStPval[4]
+                                       ,'KStPval_PmBin3':KStPval[3], 'KStPval_PmBin4':KStPval[4]
                                        ,'KStPval_avg':KStPval_avg
                                        ,'KSzPval_PmBin0':KSzPval[0], 'KSzPval_PmBin1':KSzPval[1], 'KSzPval_PmBin2':KSzPval[2]
-                                       , 'KSzPval_PmBin3':KSzPval[3], 'KSzPval_PmBin4':KSzPval[4]
+                                       ,'KSzPval_PmBin3':KSzPval[3], 'KSzPval_PmBin4':KSzPval[4]
                                        ,'KSzPval_avg':KSzPval_avg
                                        ,'KSPval_tot':KSPval_tot
                                        
@@ -714,6 +781,7 @@ def generate_runs_with_different_parameters( option,
 
     print_filename( root_resutlsFName , "results converted also to root format " )
     print_important("done...") ; print_line()
+# ------------------------------------------------------------------------------- #
 
 
 
