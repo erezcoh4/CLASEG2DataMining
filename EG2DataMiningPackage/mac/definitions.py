@@ -47,7 +47,7 @@ scheme = TSchemeDATA()
 
 # flags
 A = flags.atomic_mass
-
+debug = flags.verbose
 
 
 

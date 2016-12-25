@@ -1,18 +1,23 @@
 from definitions import *
 from cm_tools import *
 '''
-    usage:
-    ---------
+    example usages:
+    ---------------
+    
     python mac/cm_parameters_data_and_sim.py --option=scheme
+    python mac/cm_parameters_data_and_sim.py --option=analyze -v3 -r0 -nruns=2
+    
     
     options (can be ran simultaneously):
     ------------------------------------
-    acceptance  {"recoil proton acceptance"}
-    calc        {"calc. phys. vars."}
-    scheme      {"scheme pp-SRC"}
-    extract     {"extract data cm-parameters"}
-    bends       {"create bands for EG"}
-    generate    {"generate and analyze runs"}
+    acceptance          {"recoil proton acceptance"}
+    calc                {"calc. phys. vars."}
+    scheme              {"scheme pp-SRC"}
+    extract             {"extract data cm-parameters"}
+    bends               {"create bands for EG"}
+    generate            {"generate runs"}
+    analyze             {"analyze runs"}
+    generate_analyze    {"generate and analyze runs"}
     
 '''
 
@@ -20,7 +25,7 @@ from cm_tools import *
 if flags.run > 0:
     start_run = flags.run
 else:
-    start_run = 300000
+    start_run = 0 # 300000
 
 if flags.NumberOfRuns > 0:
     Nruns = flags.NumberOfRuns
@@ -28,14 +33,14 @@ else:
     Nruns = 2
 
 PmissBins = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65] , [0.65,0.75] , [0.75,1.0]]
-N = pd.DataFrame({'SigmaT':1,'SigmaZa1':20 ,'SigmaZa2':20 ,'MeanZa1':20 ,'MeanZa2':20 ,'StartRun':300000 , 'NRand':10 }, index=[0])
+#N = pd.DataFrame({'SigmaT':1,'SigmaZa1':20 ,'SigmaZa2':20 ,'MeanZa1':20 ,'MeanZa2':20 ,'StartRun':300000 , 'NRand':10 }, index=[0])
 SigmaTBandRange = [0.15,0.16]
 SigmaZa1BandRange = [0,2.4]
 SigmaZa2BandRange = [-0.5,0.5]
 MeanZa1BandRange  = [0,1.2]
 MeanZa2BandRange = [-0.5,0.5]
 #N = pd.DataFrame({'SigmaT':1,'SigmaZa1':100,'SigmaZa2':2 ,'MeanZa1':2 ,'MeanZa2':2 ,'StartRun':1000 , 'NRand':10 }, index=[0])
-#N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1 ,'StartRun':0 , 'NRand':1}, index=[0]) # for debugging
+N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1 ,'StartRun':0 , 'NRand':1}, index=[0]) # for debugging
 
 
 
@@ -148,11 +153,10 @@ if 'create bands for EG' in flags.option or 'bands' in flags.option:
 # ----------------------------------------------------------
 if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 'analyze' in flags.option or 'analyse' in flags.option:
 
-
     fits = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' ) )
     generated_parameters = pd.read_csv( GeneParsFName ( ppPath+'/simulation/' ) )
     generated_parameters = generated_parameters[(start_run <= generated_parameters.run) & (generated_parameters.run < start_run + Nruns)]
-    print 'running on: ',generated_parameters.run.tolist()
+    print 'generated_parameters runs: ',generated_parameters.run.tolist()
 
     test_name = 'runs%dto%d_NsigmaT_%d_NSigmaZa1_%d_NSigmaZa2_%d_NMeanZa1_%d_NMeanZa2_%d_NRand_%d'%( start_run , start_run+Nruns-1 , N.SigmaT , N.SigmaZa1 , N.SigmaZa2 , N.MeanZa1 , N.MeanZa2 , N.NRand )
     full_path = ppPath+'/simulation/'+test_name+'_simulation'
@@ -167,16 +171,6 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
                                             root_resutlsFName( full_path ) )
 
 
-
-
-
-## (6) find the best-correspondance from the generated runs, to estimate nature's parameteres
-## ----------------------------------------------------------
-#if 'find the best paramteres' in flags.option:
-#
-#    print_filename(SimParametersFileName( ppPath+'/simulation/' ),'reading file ')
-#    simulation_results = pd.read_csv( SimParametersFileName( ppPath+'/simulation/' ) )
-#    plot( simulation_results , 'genSigmaL_a1' , 'NsigSL_a1_unweighted' , 'generated a$_1$ ($\sigma_z$) [GeV/c]' , 'unweighted N$\sigma$ (a$_1$ ($\sigma_z$))' )
 
 
 
