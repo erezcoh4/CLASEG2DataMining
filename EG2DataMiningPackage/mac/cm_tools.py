@@ -704,71 +704,6 @@ def generate_runs_with_different_parameters( option,
             KS_scores = get_KS_scores( PmissBins ,ana_sim , ana_data , h3_pcm_data )
           
 
-
-#                # No Mott/FF - weighting (un - weighted roofit results)
-#                [NsigSigmaX_unweighted , NsigSigmaY_unweighted ,
-#                 NsigMeanZa1_unweighted , NsigMeanZa2_unweighted ,
-#                 NsigSigmaZa1_unweighted , NsigSigmaZa2_unweighted ] = compute_Nsigma_scores( data_fits , reco_fits , 'unweighted' )
-#                if (debug>1): print "got unweighted N(sigma) results"
-#
-#                # No Mott/FF - weighting (un - weighted roofit results)
-#                [PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
-#                 PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ,
-#                 PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] = compute_Pval_parameters( data_fits , reco_fits , 'unweighted' )
-#                PvalTotal_unweighted = Fisher_combination_Pvals( [PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
-#                                                                  PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ,
-#                                                                  PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] )
-#                if (debug>1): print "got unweighted P(value) results"
-#                    
-##                # With Mott/FF - weighting (weighted roofit results)
-##                [NsigSigmaX_weighted , NsigSigmaY_weighted ,
-##                 NsigMeanZa1_weighted , NsigMeanZa2_weighted ,
-##                 NsigSigmaZa1_weighted , NsigSigmaZa2_weighted] = compute_Nsigma_scores( data_fits , reco_fits , 'weighted' )
-#
-#                # With Mott/FF - weighting (un - weighted roofit results)
-#                [PvalSigmaX_weighted, PvalSigmaY_weighted ,
-#                 PvalMeanZa1_weighted , PvalMeanZa2_weighted ,
-#                 PvalSigmaZa1_weighted , PvalSigmaZa2_weighted ] = compute_Pval_parameters( data_fits , reco_fits , 'weighted' )
-#                PvalTotal_weighted = Fisher_combination_Pvals( [PvalSigmaX_weighted, PvalSigmaY_weighted ,
-#                                                                PvalMeanZa1_weighted , PvalMeanZa2_weighted ,
-#                                                                PvalSigmaZa1_weighted , PvalSigmaZa2_weighted ] )
-#
-#                PvalSigmaZa1SigmaZa2 = Fisher_combination_Pvals( [ PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] )
-#                PvalMeanZa1MeanZa2 = Fisher_combination_Pvals( [ PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ] )
-#    
-#                PvalSigmaZa1MeanZa1 = Fisher_combination_Pvals( [ PvalSigmaZa1_unweighted , PvalMeanZa1_unweighted ] )
-#                PvalSigmaZa1MeanZa2 = Fisher_combination_Pvals( [ PvalSigmaZa1_unweighted , PvalMeanZa2_unweighted ] )
-#    
-#                PvalSigmaZa2MeanZa1 = Fisher_combination_Pvals( [ PvalSigmaZa2_unweighted , PvalMeanZa1_unweighted ] )
-#                PvalSigmaZa2MeanZa2 = Fisher_combination_Pvals( [ PvalSigmaZa2_unweighted , PvalMeanZa2_unweighted ] )
-#        
-#
-#                if debug>1: print "got weighted roofit results"
-#
-#
-#                if debug>1: print "got Pval scores"
-#
-                # KS test for the c.m. distributions in x,y,z directions
-#                KSpCMx , KSxPval = KStest( PmissBins ,ana_sim , ana_data , "pcmX" , ROOT.TCut('') , debug) # maybe make it 2D? with adding the pmiss magnitude as a second variable?
-#                KSpCMy , KSyPval = KStest( PmissBins ,ana_sim , ana_data , "pcmY" , ROOT.TCut('') , debug)
-#                KSpCMt , KStPval = KStest( PmissBins ,ana_sim , ana_data , "pcmT" , ROOT.TCut('') , debug)
-#                KSpCMz , KSzPval = KStest( PmissBins ,ana_sim , ana_data , "pcmZ" , ROOT.TCut('') , debug)
-#                KSxPval_avg = Fisher_combination_Pvals( KSxPval )
-#                KSyPval_avg = Fisher_combination_Pvals( KSyPval )
-#                KStPval_avg = Fisher_combination_Pvals( KStPval )
-#                KSzPval_avg = Fisher_combination_Pvals( KSzPval )
-#                KSPval_tot = Fisher_combination_Pvals([KSxPval_avg , KSyPval_avg , KSzPval_avg])
-#                # 3-dimensional KS test
-#                h3_pcm_sim = ana_sim.H3("pcmX","pcmY","pcmZ",ROOT.TCut(),"goff",100,-1,1,100,-1,1,100,-1,1)
-#                KS3dHistPval = h3_pcm_sim.KolmogorovTest(h3_pcm_data)
-#
-#                if debug>1: print "performed KS tests"
-#                if debug>3: print "KSxPval_avg, KSyPval_avg, KSzPval_avg:",KSxPval_avg, KSyPval_avg, KSzPval_avg
-
-                # (3) stream into file
-                # ----------------------------
-
-            
             results = pd.DataFrame({'run':int(run)
                                    ,'time':str(datetime.datetime.now().strftime("%Y%B%d"))
                                    ,'NentriesSimRun':ana_sim.GetEntries()
@@ -787,9 +722,7 @@ def generate_runs_with_different_parameters( option,
                                    ,'recSigmaX_unweighted':float(reco_fits.SigmaX_unweighted)       ,'recSigmaY_unweighted':float(reco_fits.SigmaY_unweighted)
                                    ,'recMeanZa1_unweighted':float(reco_fits.MeanZa1_unweighted)     ,'recMeanZa2_unweighted':float(reco_fits.MeanZa2_unweighted)
                                    ,'recSigmaZa1_unweighted':float(reco_fits.SigmaZa1_unweighted)   ,'recSigmaZa2_unweighted':float(reco_fits.SigmaZa2_unweighted)
-                                   #                                       ,'NsigSigmaX_unweighted':NsigSigmaX_unweighted               ,'NsigSigmaY_unweighted':NsigSigmaY_unweighted
-                                   #                                       ,'NsigMeanZa1_unweighted':NsigMeanZa1_unweighted             ,'NsigMeanZa2_unweighted':NsigMeanZa2_unweighted
-                                   #                                       ,'NsigSigmaZa1_unweighted':NsigSigmaZa1_unweighted           ,'NsigSigmaZa2_unweighted':NsigSigmaZa2_unweighted
+                                   
                                    ,'PvalSigmaX_unweighted':float(Pval_scores.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted':float(Pval_scores.PvalSigmaY_unweighted)
                                    ,'PvalMeanZa1_unweighted':float(Pval_scores.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted':float(Pval_scores.PvalMeanZa2_unweighted)
                                    ,'PvalSigmaZa1_unweighted':float(Pval_scores.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted':float(Pval_scores.PvalSigmaZa2_unweighted)
@@ -800,9 +733,7 @@ def generate_runs_with_different_parameters( option,
                                    ,'recSigmaX_weighted':float(reco_fits.SigmaX_weighted)       ,'recSigmaY_weighted':float(reco_fits.SigmaY_weighted)
                                    ,'recMeanZa1_weighted':float(reco_fits.MeanZa1_weighted)     ,'recMeanZa2_weighted':float(reco_fits.MeanZa2_weighted)
                                    ,'recSigmaZa1_weighted':float(reco_fits.SigmaZa1_weighted)   ,'recSigmaZa2_weighted':float(reco_fits.SigmaZa2_weighted)
-                                   #                                       ,'NsigSigmaX_weighted':NsigSigmaX_weighted                   ,'NsigSigmaY_weighted':NsigSigmaY_weighted
-                                   #                                       ,'NsigMeanZa1_weighted':NsigMeanZa1_weighted                 ,'NsigMeanZa2_weighted':NsigMeanZa2_weighted
-                                   #                                       ,'NsigSigmaZa1_weighted':NsigSigmaZa1_weighted               ,'NsigSigmaZa2_weighted':NsigSigmaZa2_weighted
+                                   
                                    ,'PvalSigmaX_weighted':float(Pval_scores.PvalSigmaX_weighted)               ,'PvalSigmaY_weighted':float(Pval_scores.PvalSigmaY_weighted)
                                    ,'PvalMeanZa1_weighted':float(Pval_scores.PvalMeanZa1_weighted)             ,'PvalMeanZa2_weighted':float(Pval_scores.PvalMeanZa2_weighted)
                                    ,'PvalSigmaZa1_weighted':float(Pval_scores.PvalSigmaZa1_weighted)           ,'PvalSigmaZa2_weighted':float(Pval_scores.PvalSigmaZa2_weighted)
@@ -816,17 +747,7 @@ def generate_runs_with_different_parameters( option,
                                    
                                    
                                    # per 5 p(miss) bins
-                                   #                                       ,'KSxPval_PmBin0':KSxPval[0], 'KSxPval_PmBin1':KSxPval[1], 'KSxPval_PmBin2':KSxPval[2]
-                                   #                                       ,'KSxPval_PmBin3':KSxPval[3], 'KSxPval_PmBin4':KSxPval[4]
-                                   #                                       ,'KSxPval_avg':KSxPval_avg
-                                   #                                       ,'KSyPval_PmBin0':KSyPval[0], 'KSyPval_PmBin1':KSyPval[1], 'KSyPval_PmBin2':KSyPval[2]
-                                   #                                       ,'KSyPval_PmBin3':KSyPval[3], 'KSyPval_PmBin4':KSyPval[4]
-                                   #                                       ,'KSyPval_avg':KSyPval_avg
-                                   #                                       ,'KStPval_PmBin0':KStPval[0], 'KStPval_PmBin1':KStPval[1], 'KStPval_PmBin2':KStPval[2]
-                                   #                                       ,'KStPval_PmBin3':KStPval[3], 'KStPval_PmBin4':KStPval[4]
-                                   #                                       ,'KStPval_avg':KStPval_avg
-                                   #                                       ,'KSzPval_PmBin0':KSzPval[0], 'KSzPval_PmBin1':KSzPval[1], 'KSzPval_PmBin2':KSzPval[2]
-                                   #                                       ,'KSzPval_PmBin3':KSzPval[3], 'KSzPval_PmBin4':KSzPval[4]
+                                   
                                    ,'KSxPval_tot':float(KS_scores.KSxPval_tot)
                                    ,'KSzPval_tot':float(KS_scores.KSyPval_tot)
                                    ,'KSzPval_tot':float(KS_scores.KSzPval_tot)
