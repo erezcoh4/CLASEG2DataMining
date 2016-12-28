@@ -96,7 +96,7 @@ if 'extract data cm-parameters' in flags.option or 'extract' in flags.option: # 
 
 # (3).1 plot all parameters together
 # ----------------------------------------------------------
-if 'plot all parameters for all targets' in flags.option or 'AllTragets' in flags.option: # DATA
+if 'plot all parameters for all targets' in flags.option or 'AllTargets' in flags.option: # DATA
     
     # (A) compute width and mean for all nuclei
     targets = ['C12'        , 'Al27'        , 'Fe56'        , 'Pb208'       ]
