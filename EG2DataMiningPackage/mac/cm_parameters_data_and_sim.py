@@ -6,7 +6,7 @@ from cm_tools import *
     
     python mac/cm_parameters_data_and_sim.py --option=scheme
     python mac/cm_parameters_data_and_sim.py --option=bands
-    python mac/cm_parameters_data_and_sim.py --option=extractionAllTragets
+    python mac/cm_parameters_data_and_sim.py --option=AllTragets
     python mac/cm_parameters_data_and_sim.py --option=generate_analyze -v3 -r0 -nruns=2
     
     
@@ -105,7 +105,7 @@ if 'plot all parameters for all targets' in flags.option or 'AllTragets' in flag
     
     ana , cm_pars , cm_fits = [] , [] , []
     for target in targets:
-        ana.append( TAnalysisEG2( "ppSRCCut_DATA_%s"%target ) )
+        ana.append( TAnalysisEG2( path+"/AnaFiles" ,  "Ana_ppSRCCut_DATA_%s"%target ) )
         cm_parameters = calc_cm_parameters( ana[-1]  , PmissBins ,
                                             CMRooFitsName( ppPath + '/DATA/%s_unweighted'%target ) ,
                                             CMRooFitsName( ppPath + '/DATA/%s_weighted'%target ) ,
