@@ -5,7 +5,9 @@ from cm_tools import *
     ---------------
     
     python mac/cm_parameters_data_and_sim.py --option=scheme
-    python mac/cm_parameters_data_and_sim.py --option=analyze -v3 -r0 -nruns=2
+    python mac/cm_parameters_data_and_sim.py --option=bands
+    python mac/cm_parameters_data_and_sim.py --option=extractionAllTragets
+    python mac/cm_parameters_data_and_sim.py --option=generate_analyze -v3 -r0 -nruns=2
     
     
     options (can be ran simultaneously):
@@ -102,26 +104,25 @@ if 'plot all parameters for all targets' in flags.option or 'AllTragets' in flag
     labels  = ['$^{12}$C'   , '$^{27}$Al'   , '$^{56}$Fe'   , '$^{208}$Pb'  ]
     
     ana , cm_pars , cm_fits = [] , [] , []
-    if 'extraction' in flags.option:
-        for target in targets:
-            ana.append( TAnalysisEG2( "ppSRCCut_DATA_%s"%target ) )
-            cm_parameters = calc_cm_parameters( ana[-1]  , PmissBins ,
-                                               CMRooFitsName( ppPath + '/DATA/%s_unweighted'%target ) ,
-                                               CMRooFitsName( ppPath + '/DATA/%s_weighted'%target ) ,
-                                               DoSaveCanvas = True )
-            cm_parameters.to_csv( CMParsFname(ppPath+'/DATA/%s_data'%target) , header=True , index = False)
-            cm_pars.append( cm_parameters )
-            fits = fit_cm_parameters( target + ' data' , cm_parameters , FigureFName(ppPath+'/DATA/data') , DoPlot = True )
-            fits.to_csv( CMfitsFname( ppPath+'/DATA/data' , target ) , header=True , index=False)
-            print_filename( CMfitsFname(ppPath+'/DATA/data' , target )  , target + " data c.m. fits at")
-            cm_fits.append( fits )
+    for target in targets:
+        ana.append( TAnalysisEG2( "ppSRCCut_DATA_%s"%target ) )
+        cm_parameters = calc_cm_parameters( ana[-1]  , PmissBins ,
+                                            CMRooFitsName( ppPath + '/DATA/%s_unweighted'%target ) ,
+                                            CMRooFitsName( ppPath + '/DATA/%s_weighted'%target ) ,
+                                            DoSaveCanvas = True )
+        cm_parameters.to_csv( CMParsFname(ppPath+'/DATA/%s_data'%target) , header=True , index = False)
+        cm_pars.append( cm_parameters )
+        fits = fit_cm_parameters( target + ' data' , cm_parameters , FigureFName(ppPath+'/DATA/data') , DoPlot = True )
+        fits.to_csv( CMfitsFname( ppPath+'/DATA/data' , target ) , header=True , index=False)
+        print_filename( CMfitsFname(ppPath+'/DATA/data' , target )  , target + " data c.m. fits at")
+        cm_fits.append( fits )
 
 
-    else:
-        for target in targets:
-            cm_parameters = pd.read_csv( CMParsFname(ppPath+'/DATA/%s_data'%target) )
-            print 'read ',ppPath+'/DATA/%s_data'%target
-            cm_pars.append( cm_parameters )
+
+    for target in targets:
+        cm_parameters = pd.read_csv( CMParsFname(ppPath+'/DATA/%s_data'%target) )
+        print 'read ',ppPath+'/DATA/%s_data'%target
+        cm_pars.append( cm_parameters )
 
 
 
