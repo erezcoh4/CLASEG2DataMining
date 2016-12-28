@@ -565,7 +565,7 @@ def get_evnt_loss_in_pmiss_bins( pmiss_multiples_bins , evts_gen_in_pmiss_multip
         evts_acc = ana_sim.GetEntries(ROOT.TCut("%f<Pmiss3Mag && Pmiss3Mag<%f"%(pmin , pmax)))
         evnt_loss_in_pmiss_multiples_bins.append( float(evts_gen-evts_acc)/evts_gen )
     
-    return evnt_loss_in_pmiss_multiples_bins , pmiss_multiples_bins
+    return evnt_loss_in_pmiss_multiples_bins
 # ------------------------------------------------------------------------------- #
 
 
@@ -627,7 +627,6 @@ def get_Pval_scores( data_fits , reco_fits , name='' ):
 
     return Pval_scores
 # ------------------------------------------------------------------------------- #
-
 
 
 
@@ -713,7 +712,7 @@ def generate_runs_with_different_parameters( option,
             ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
                 
             evnt_loss_in_pmiss_multiples_bins = get_evnt_loss_in_pmiss_bins( pmiss_multiples_bins , evts_gen_in_pmiss_multiples_bins , ana_sim )
-                
+
             if debug>4:
                 reco_parameters = calc_cm_parameters( ana_sim  , PmissBins , CMRooFitsName( path + '/eg_cm_roofits/run%d_unweighted_'%run ), CMRooFitsName( path + '/eg_cm_roofits/run%d_weighted_'%run ) , True )
                 fit_cm_parameters( run , reco_parameters , FigureFName( path + '/eg_cm_figures/run%d_'%run ) , True )
@@ -874,26 +873,26 @@ def generate_runs_with_different_parameters( option,
                                    ,'NLostEvents':(9907*float(N.NRand) - ana_sim.GetEntries())
                                    ,'fracLostEvents':(float((9907.0*float(N.NRand)) - ana_sim.GetEntries())/(9907.0*float(N.NRand)))
                                    # events loss in 20 p(miss) bins, for pp/p analysis
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[0][0],pmiss_multiples_bins[0],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(0))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[1][0],pmiss_multiples_bins[1],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(1))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[2][0],pmiss_multiples_bins[2],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(2))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[3][0],pmiss_multiples_bins[3],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(3))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[4][0],pmiss_multiples_bins[4],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(4))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[5][0],pmiss_multiples_bins[5],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(5))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[6][0],pmiss_multiples_bins[6],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(6))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[7][0],pmiss_multiples_bins[7],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(7))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[8][0],pmiss_multiples_bins[8],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(8))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[9][0],pmiss_multiples_bins[9],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(9))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[10][0],pmiss_multiples_bins[10],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(10))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[11][0],pmiss_multiples_bins[11],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(11))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[12][0],pmiss_multiples_bins[12],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(12))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[13][0],pmiss_multiples_bins[13],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(13))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[14][0],pmiss_multiples_bins[14],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(14))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[15][0],pmiss_multiples_bins[15],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(15))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[16][0],pmiss_multiples_bins[16],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(16))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[17][0],pmiss_multiples_bins[17],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(17))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[18][0],pmiss_multiples_bins[18],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(18))
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[19][0],pmiss_multiples_bins[19],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(19))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[0][0],pmiss_multiples_bins[0][1]):evnt_loss_in_pmiss_multiples_bins[0]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[1][0],pmiss_multiples_bins[1][1]):evnt_loss_in_pmiss_multiples_bins[1]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[2][0],pmiss_multiples_bins[2][1]):evnt_loss_in_pmiss_multiples_bins[2]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[3][0],pmiss_multiples_bins[3][1]):evnt_loss_in_pmiss_multiples_bins[3]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[4][0],pmiss_multiples_bins[4][1]):evnt_loss_in_pmiss_multiples_bins[4]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[5][0],pmiss_multiples_bins[5][1]):evnt_loss_in_pmiss_multiples_bins[5]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[6][0],pmiss_multiples_bins[6][1]):evnt_loss_in_pmiss_multiples_bins[6]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[7][0],pmiss_multiples_bins[7][1]):evnt_loss_in_pmiss_multiples_bins[7]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[8][0],pmiss_multiples_bins[8][1]):evnt_loss_in_pmiss_multiples_bins[8]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[9][0],pmiss_multiples_bins[9][1]):evnt_loss_in_pmiss_multiples_bins[9]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[10][0],pmiss_multiples_bins[10][1]):evnt_loss_in_pmiss_multiples_bins[10]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[11][0],pmiss_multiples_bins[11][1]):evnt_loss_in_pmiss_multiples_bins[11]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[12][0],pmiss_multiples_bins[12][1]):evnt_loss_in_pmiss_multiples_bins[12]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[13][0],pmiss_multiples_bins[13][1]):evnt_loss_in_pmiss_multiples_bins[13]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[14][0],pmiss_multiples_bins[14][1]):evnt_loss_in_pmiss_multiples_bins[14]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[15][0],pmiss_multiples_bins[15][1]):evnt_loss_in_pmiss_multiples_bins[15]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[16][0],pmiss_multiples_bins[16][1]):evnt_loss_in_pmiss_multiples_bins[16]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[17][0],pmiss_multiples_bins[17][1]):evnt_loss_in_pmiss_multiples_bins[17]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[18][0],pmiss_multiples_bins[18][1]):evnt_loss_in_pmiss_multiples_bins[18]
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[19][0],pmiss_multiples_bins[19][1]):evnt_loss_in_pmiss_multiples_bins[19]
 
                                    }
                                    , index = [int(run)])
@@ -902,7 +901,7 @@ def generate_runs_with_different_parameters( option,
 
 
             if do_reco_fits_file:   stream_dataframe_to_file( reco_fits, reco_fitsFName  )
-            if do_resutls_file:     stream_dataframe_to_file( results, buildup_resutlsFName  )
+            if do_resutls_file:     stream_dataframe_to_file( results, buildup_resutlsFName , float_format='%.4f' )
             if do_root_file:        stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
 
             ana_sim.CloseFile()
@@ -925,20 +924,11 @@ def generate_runs_with_different_parameters( option,
         if do_reco_fits_file:   print_filename( reco_fitsFName , "reconstructed parameters fits wrote to" )
         if do_resutls_file:     print_filename( buildup_resutlsFName , "results wrote to " )
 
-    if do_resutls_file:     print_filename( root_resutlsFName , "results converted also to root format " )
+    if do_root_file:     print_filename( root_resutlsFName , "results converted also to root format " )
     print_important("done...") ; print_line()
 # ------------------------------------------------------------------------------- #
 
 
-
-# ------------------------------------------------------------------------------- #
-def stream_dataframe_to_file( df , filename ):
-    # if file does not exist write header
-    if not os.path.isfile(filename):
-        df.to_csv(filename,header ='column_names' , index = False)
-    else: # else it exists so append without writing the header
-        df.to_csv(filename,mode = 'a', header=False , index = False)
-# ------------------------------------------------------------------------------- #
 
 
 
