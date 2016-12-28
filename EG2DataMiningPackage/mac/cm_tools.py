@@ -6,6 +6,7 @@ from math import sqrt
 
 # ------------------------------------------------------------------------------- #
 # definitions
+nbins_pcm_3d = 100
 cm_pars_columns = ['pMiss_min','pMiss_max'
                    ,'mean_x_unweighted','mean_xErr_unweighted','sigma_x_unweighted','sigma_xErr_unweighted'
                    ,'mean_y_unweighted','mean_yErr_unweighted','sigma_y_unweighted','sigma_yErr_unweighted'
@@ -23,8 +24,8 @@ def CMParsFname( path ):
     return path+"CMparameters.csv"
 def CMRooFitsName( path ):
     return path+"CMRooFits.pdf"
-def CMfitsFname( path ):
-    return path+"CMfits.csv"
+def CMfitsFname( path , target='' ):
+    return path+"CMfits%s.csv"%target
 def CMBandFname( path ):
     return path+"CMparameter_Bands.csv"
 def FigureFName( path ):
@@ -90,55 +91,76 @@ def compute_Pval_parameters( data_fits , reco_fits , weighting ):
 # ------------------------------------------------------------------------------- #
 def KStest( PmissBins , ana_sim , ana_data , var , cut=ROOT.TCut() , debug=2 , Nbins=20):
     # [http://docs.scipy.org/doc/scipy-0.15.1/reference/generated/scipy.stats.ks_2samp.html]
-    KS_distances , Pval_KS = [] , []
-    if debug>4 :
-        figure = plt.figure(figsize=[60,20])
-    for i in range(len(PmissBins)):
-        pMiss_min , pMiss_max = PmissBins[i][0] , PmissBins[i][1]
-        reduced_data = tree2array(ana_data.GetTree(),branches=var , selection = '%f < Pmiss3Mag && Pmiss3Mag < %f'%(pMiss_min , pMiss_max) )
-        reduced_sim = tree2array(ana_sim.GetTree(),branches=var , selection = '%f < Pmiss3Mag && Pmiss3Mag < %f'%(pMiss_min , pMiss_max))
-        D , Pvalue = ks_2samp( reduced_sim , reduced_data )
 
-        if debug>4 :
-            ax = figure.add_subplot(len(PmissBins)/2,3,i+1)
-            for array,col in zip([reduced_sim , reduced_data],['black','red']):
-                g=sns.distplot( array, bins=np.linspace(-1, 2 , Nbins), ax=ax, color=col , axlabel=var )
-            g.axes.set_title(r'%.2f < p$_{miss}$ < %.2f GeV/c'%(pMiss_min , pMiss_max), fontsize=34,color="b")
-            print_important( "KS test of data vs. simulation for %s in p(miss) bin %d is D = %f, Pvalue = %f"%(var , i , D , Pvalue) )
-    
-        KS_distances.append(D)
-        Pval_KS.append(Pvalue)
+    #    KS_distances , Pval_KS = [] , []
+    #    if debug>4 :
+    #        figure = plt.figure(figsize=[60,20])
+    #    for i in range(len(PmissBins)):
+    #        pMiss_min , pMiss_max = PmissBins[i][0] , PmissBins[i][1]
+    #        reduced_data = tree2array(ana_data.GetTree(),branches=var , selection = '%f < Pmiss3Mag && Pmiss3Mag < %f'%(pMiss_min , pMiss_max) )
+    #        reduced_sim = tree2array(ana_sim.GetTree(),branches=var , selection = '%f < Pmiss3Mag && Pmiss3Mag < %f'%(pMiss_min , pMiss_max))
+    #        D , Pvalue = ks_2samp( reduced_sim , reduced_data )
+    #
+    #        if debug>4 :
+    #            ax = figure.add_subplot(len(PmissBins)/2,3,i+1)
+    #            for array,col in zip([reduced_sim , reduced_data],['black','red']):
+    #                g=sns.distplot( array, bins=np.linspace(-1, 2 , Nbins), ax=ax, color=col , axlabel=var )
+    #            g.axes.set_title(r'%.2f < p$_{miss}$ < %.2f GeV/c'%(pMiss_min , pMiss_max), fontsize=34,color="b")
+    #            print_important( "KS test of data vs. simulation for %s in p(miss) bin %d is D = %f, Pvalue = %f"%(var , i , D , Pvalue) )
+    #
+    #        KS_distances.append(D)
+    #        Pval_KS.append(Pvalue)
+    #
+    #    if debug>4 :
+    #        figure.savefig( path + "/cmHistos_%s.pdf"%var)
+    #
+    #    return KS_distances , Pval_KS
 
+    data = tree2array( ana_data.GetTree() , branches=var )
+    sim = tree2array( ana_sim.GetTree() , branches=var )
+    D_KS , Pval_KS = ks_2samp( sim , data )
     if debug>4 :
+        fig,ax = plt.subplots(figsize=[20,20])
+        for array,col in zip([sim , data],['black','red']):
+            g=sns.distplot( array, bins=np.linspace(-1, 2 , Nbins), ax=ax, color=col , axlabel=var )
         figure.savefig( path + "/cmHistos_%s.pdf"%var)
+        print_important( "KS test of data vs. simulation for %s is D = %f, Pvalue = %f"%(var , D_KS , Pval_KS) )
 
-    return KS_distances , Pval_KS
+    return D_KS , Pval_KS
 # ------------------------------------------------------------------------------- #
 
 
 # ------------------------------------------------------------------------------- #
 def get_KS_scores( PmissBins ,ana_sim , ana_data , h3_pcm_data ):
     
+#    # previous 1d KS tests
+#    KSpCMx , KSxPval = KStest( PmissBins ,ana_sim , ana_data , "pcmX" , ROOT.TCut('') , debug)
+#    KSpCMy , KSyPval = KStest( PmissBins ,ana_sim , ana_data , "pcmY" , ROOT.TCut('') , debug)
+#    KSpCMt , KStPval = KStest( PmissBins ,ana_sim , ana_data , "pcmT" , ROOT.TCut('') , debug)
+#    KSpCMz , KSzPval = KStest( PmissBins ,ana_sim , ana_data , "pcmZ" , ROOT.TCut('') , debug)
+#    KSxPval_tot = Fisher_combination_Pvals( KSxPval )
+#    KSyPval_tot = Fisher_combination_Pvals( KSyPval )
+#    KStPval_tot = Fisher_combination_Pvals( KStPval )
+#    KSzPval_tot = Fisher_combination_Pvals( KSzPval )
+#    KSPval_tot = Fisher_combination_Pvals([KSxPval_tot , KSyPval_tot , KSzPval_tot])
+
     # 1d KS tests
     KSpCMx , KSxPval = KStest( PmissBins ,ana_sim , ana_data , "pcmX" , ROOT.TCut('') , debug)
     KSpCMy , KSyPval = KStest( PmissBins ,ana_sim , ana_data , "pcmY" , ROOT.TCut('') , debug)
     KSpCMt , KStPval = KStest( PmissBins ,ana_sim , ana_data , "pcmT" , ROOT.TCut('') , debug)
     KSpCMz , KSzPval = KStest( PmissBins ,ana_sim , ana_data , "pcmZ" , ROOT.TCut('') , debug)
-    KSxPval_tot = Fisher_combination_Pvals( KSxPval )
-    KSyPval_tot = Fisher_combination_Pvals( KSyPval )
-    KStPval_tot = Fisher_combination_Pvals( KStPval )
-    KSzPval_tot = Fisher_combination_Pvals( KSzPval )
-    KSPval_tot = Fisher_combination_Pvals([KSxPval_tot , KSyPval_tot , KSzPval_tot])
+    KSPval_tot = Fisher_combination_Pvals([ KSxPval , KSyPval , KSzPval ])
     
-    # 3-dimensional KS test
-    h3_pcm_sim = ana_sim.H3("pcmX","pcmY","pcmZ",ROOT.TCut(),"goff",100,-1,1,100,-1,1,100,-1,1)
+    # 3d KS test
+    h3_pcm_sim = ana_sim.H3("pcmX","pcmY","pcmZ",ROOT.TCut(),"goff",nbins_pcm_3d,-1,1,nbins_pcm_3d,-1,1,nbins_pcm_3d,-1,1)
     KS3dHistPval = h3_pcm_sim.KolmogorovTest(h3_pcm_data)
     
     # make it a data-frame
-    KS_scores = pd.DataFrame({'KSxPval':[KSxPval],'KSyPval':[KSyPval],'KSzPval':[KSyPval],'KStPval':[KSyPval],
-                             'KSxPval_tot':KSxPval_tot,'KSyPval_tot':KSyPval_tot,'KSzPval_tot':KSzPval_tot,'KStPval_tot':KStPval_tot,
+    KS_scores = pd.DataFrame({'KSxPval':KSxPval,'KSyPval':KSyPval,'KSzPval':KSyPval,'KStPval':KSyPval,
+                             #                             'KSxPval_tot':KSxPval_tot,'KSyPval_tot':KSyPval_tot,'KSzPval_tot':KSzPval_tot,'KStPval_tot':KStPval_tot, # previous
                              'KSPval_tot':KSPval_tot,
-                             'KS3dHistPval':KS3dHistPval})
+                             'KS3dHistPval':KS3dHistPval},
+                             index=[0])
 
     if debug>1:
         print "performed KS tests"
@@ -329,7 +351,6 @@ def fit_cm_parameters( run , data , FigureFName = '' , DoPlot = False ): # all p
             print "df_fit_parameters: ",df_fit_parameters
 
     return df_fit_parameters
-
 # ------------------------------------------------------------------------------- #
 
 
@@ -549,7 +570,7 @@ def get_evnt_loss_in_pmiss_bins( pmiss_multiples_bins , evts_gen_in_pmiss_multip
 
 
 # ------------------------------------------------------------------------------- #
-def get_Pval_scores( data_fits , reco_fits ):
+def get_Pval_scores( data_fits , reco_fits , name='' ):
     
     # No Mott/FF - weighting (un - weighted roofit results)
     [PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
@@ -600,7 +621,7 @@ def get_Pval_scores( data_fits , reco_fits ):
                                'PvalSigmaZa2MeanZa2':PvalSigmaZa2MeanZa2},index=[0])
     
     if debug>1:
-        print "got Pval scores"
+        print "got Pval scores " + name
         if debug>4:
             print "Pval_scores:",Pval_scores
 
@@ -612,16 +633,17 @@ def get_Pval_scores( data_fits , reco_fits ):
 
 # ------------------------------------------------------------------------------- #
 def generate_runs_with_different_parameters( option,
-                                            data_fits,
+                                            data_fits_12C, data_fits_27Al, data_fits_56Fe, data_fits_208Pb,
                                             generated_parameters ,
                                             debug , PmissBins , buildup_resutlsFName ,
                                             reco_fitsFName , target ,
                                             N ,
-                                            root_resutlsFName ):
+                                            root_resutlsFName ,
+                                            do_root_file=False, do_reco_fits_file=False, do_resutls_file=True):
     
     from definitions import *
     ana_data = TAnalysisEG2( path+"/AnaFiles" ,"Ana_ppSRCCut_DATA_%s"% target )
-    h3_pcm_data = ana_data.H3("pcmX","pcmY","pcmZ",ROOT.TCut(),"goff",100,-1,1,100,-1,1,100,-1,1) # for binned 3d-KS test
+    h3_pcm_data = ana_data.H3("pcmX","pcmY","pcmZ",ROOT.TCut(),"goff",nbins_pcm_3d,-1,1,nbins_pcm_3d,-1,1,nbins_pcm_3d,-1,1) # for binned 3d-KS test
 
     pAcceptacneFile = ROOT.TFile(path+"/GSIM_DATA/PrecoilAcceptance.root")
     path = path + "/Analysis_DATA/ppSRCcm"
@@ -700,18 +722,16 @@ def generate_runs_with_different_parameters( option,
             reco_parameters = calc_cm_parameters( ana_sim  , PmissBins )
             reco_fits = fit_cm_parameters( run , reco_parameters )
 
-            Pval_scores = get_Pval_scores( data_fits , reco_fits )
+            Pval_scores_12C  = get_Pval_scores( data_fits_12C , reco_fits , '12C' )
+            Pval_scores_27Al = get_Pval_scores( data_fits_27Al , reco_fits , '27Al' )
+            Pval_scores_56Fe = get_Pval_scores( data_fits_56Fe , reco_fits , '56Fe' )
+            Pval_scores_208Pb = get_Pval_scores( data_fits_208Pb , reco_fits , '208Pb' )
+
             KS_scores = get_KS_scores( PmissBins ,ana_sim , ana_data , h3_pcm_data )
-          
 
             results = pd.DataFrame({'run':int(run)
                                    ,'time':str(datetime.datetime.now().strftime("%Y%B%d"))
                                    ,'NentriesSimRun':ana_sim.GetEntries()
-                                   ,'NLostEvents':(9907*float(N.NRand) - ana_sim.GetEntries())
-                                   ,'fracLostEvents':(float((9907.0*float(N.NRand)) - ana_sim.GetEntries())/(9907.0*float(N.NRand)))
-                                   # events loss in 20 p(miss) bins
-                                   ,'pmiss_multiples_bins':[pmiss_multiples_bins]
-                                   ,'evnt_loss_in_pmiss_multiples_bins':[evnt_loss_in_pmiss_multiples_bins]
                                    
                                    # generated
                                    ,'genMeanX':float(genMeanX)     ,'genSigmaX':float(genSigmaX)      ,'genMeanY':float(genMeanY)        ,'genSigmaY':float(genSigmaY)
@@ -723,35 +743,89 @@ def generate_runs_with_different_parameters( option,
                                    ,'recMeanZa1_unweighted':float(reco_fits.MeanZa1_unweighted)     ,'recMeanZa2_unweighted':float(reco_fits.MeanZa2_unweighted)
                                    ,'recSigmaZa1_unweighted':float(reco_fits.SigmaZa1_unweighted)   ,'recSigmaZa2_unweighted':float(reco_fits.SigmaZa2_unweighted)
                                    
-                                   ,'PvalSigmaX_unweighted':float(Pval_scores.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted':float(Pval_scores.PvalSigmaY_unweighted)
-                                   ,'PvalMeanZa1_unweighted':float(Pval_scores.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted':float(Pval_scores.PvalMeanZa2_unweighted)
-                                   ,'PvalSigmaZa1_unweighted':float(Pval_scores.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted':float(Pval_scores.PvalSigmaZa2_unweighted)
-                                   ,'PvalTotal_unweighted':float(Pval_scores.PvalTotal_unweighted)
-                                   
+                                   ,'PvalSigmaX_unweighted_12C':float(Pval_scores_12C.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted':float(Pval_scores_12C.PvalSigmaY_unweighted)
+                                   ,'PvalMeanZa1_unweighted_12C':float(Pval_scores_12C.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted':float(Pval_scores_12C.PvalMeanZa2_unweighted)
+                                   ,'PvalSigmaZa1_unweighted_12C':float(Pval_scores_12C.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted':float(Pval_scores_12C.PvalSigmaZa2_unweighted)
+                                   ,'PvalTotal_unweighted_12C':float(Pval_scores_12C.PvalTotal_unweighted)
+
+                                   ,'PvalSigmaX_unweighted_27Al':float(Pval_scores_27Al.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted':float(Pval_scores_27Al.PvalSigmaY_unweighted)
+                                   ,'PvalMeanZa1_unweighted_27Al':float(Pval_scores_27Al.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted':float(Pval_scores_27Al.PvalMeanZa2_unweighted)
+                                   ,'PvalSigmaZa1_unweighted_27Al':float(Pval_scores_27Al.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted':float(Pval_scores_27Al.PvalSigmaZa2_unweighted)
+                                   ,'PvalTotal_unweighted_27Al':float(Pval_scores_27Al.PvalTotal_unweighted)
+
+                                   ,'PvalSigmaX_unweighted_56Fe':float(Pval_scores_56Fe.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted':float(Pval_scores_56Fe.PvalSigmaY_unweighted)
+                                   ,'PvalMeanZa1_unweighted_56Fe':float(Pval_scores_56Fe.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted':float(Pval_scores_56Fe.PvalMeanZa2_unweighted)
+                                   ,'PvalSigmaZa1_unweighted_56Fe':float(Pval_scores_56Fe.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted':float(Pval_scores_56Fe.PvalSigmaZa2_unweighted)
+                                   ,'PvalTotal_unweighted_56Fe':float(Pval_scores_56Fe.PvalTotal_unweighted)
+
+                                   ,'PvalSigmaX_unweighted_208Pb':float(Pval_scores_208Pb.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted':float(Pval_scores_208Pb.PvalSigmaY_unweighted)
+                                   ,'PvalMeanZa1_unweighted_208Pb':float(Pval_scores_208Pb.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted':float(Pval_scores_208Pb.PvalMeanZa2_unweighted)
+                                   ,'PvalSigmaZa1_unweighted_208Pb':float(Pval_scores_208Pb.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted':float(Pval_scores_208Pb.PvalSigmaZa2_unweighted)
+                                   ,'PvalTotal_unweighted_208Pb':float(Pval_scores_208Pb.PvalTotal_unweighted)
+
                                    # reconstructed fits - weighted by Mott+FF cross section
                                    ,'recMeanX_weighted':float(reco_fits.MeanX_weighted)         ,'recMeanY_weighted':float(reco_fits.MeanY_weighted)
                                    ,'recSigmaX_weighted':float(reco_fits.SigmaX_weighted)       ,'recSigmaY_weighted':float(reco_fits.SigmaY_weighted)
                                    ,'recMeanZa1_weighted':float(reco_fits.MeanZa1_weighted)     ,'recMeanZa2_weighted':float(reco_fits.MeanZa2_weighted)
                                    ,'recSigmaZa1_weighted':float(reco_fits.SigmaZa1_weighted)   ,'recSigmaZa2_weighted':float(reco_fits.SigmaZa2_weighted)
                                    
-                                   ,'PvalSigmaX_weighted':float(Pval_scores.PvalSigmaX_weighted)               ,'PvalSigmaY_weighted':float(Pval_scores.PvalSigmaY_weighted)
-                                   ,'PvalMeanZa1_weighted':float(Pval_scores.PvalMeanZa1_weighted)             ,'PvalMeanZa2_weighted':float(Pval_scores.PvalMeanZa2_weighted)
-                                   ,'PvalSigmaZa1_weighted':float(Pval_scores.PvalSigmaZa1_weighted)           ,'PvalSigmaZa2_weighted':float(Pval_scores.PvalSigmaZa2_weighted)
-                                   ,'PvalTotal_weighted':float(Pval_scores.PvalTotal_weighted)
-                                   ,'PvalSigmaZa1SigmaZa2':float(Pval_scores.PvalSigmaZa1SigmaZa2)
-                                   ,'PvalMeanZa1MeanZa2':float(Pval_scores.PvalMeanZa1MeanZa2)
-                                   ,'PvalSigmaZa1MeanZa1':float(Pval_scores.PvalSigmaZa1MeanZa1)
-                                   ,'PvalSigmaZa1MeanZa2':float(Pval_scores.PvalSigmaZa1MeanZa2)
-                                   ,'PvalSigmaZa2MeanZa1':float(Pval_scores.PvalSigmaZa2MeanZa1)
-                                   ,'PvalSigmaZa2MeanZa2':float(Pval_scores.PvalSigmaZa2MeanZa2)
+                                   ,'PvalSigmaX_weighted_12C':float(Pval_scores_12C.PvalSigmaX_weighted)               ,'PvalSigmaY_weighted_12C':float(Pval_scores_12C.PvalSigmaY_weighted)
+                                   ,'PvalMeanZa1_weighted_12C':float(Pval_scores_12C.PvalMeanZa1_weighted)             ,'PvalMeanZa2_weighted_12C':float(Pval_scores_12C.PvalMeanZa2_weighted)
+                                   ,'PvalSigmaZa1_weighted_12C':float(Pval_scores_12C.PvalSigmaZa1_weighted)           ,'PvalSigmaZa2_weighted_12C':float(Pval_scores_12C.PvalSigmaZa2_weighted)
+                                   ,'PvalTotal_weighted_12C':float(Pval_scores_12C.PvalTotal_weighted)
+                                   ,'PvalSigmaZa1SigmaZa2_12C':float(Pval_scores_12C.PvalSigmaZa1SigmaZa2)
+                                   ,'PvalMeanZa1MeanZa2_12C':float(Pval_scores_12C.PvalMeanZa1MeanZa2)
+                                   ,'PvalSigmaZa1MeanZa1_12C':float(Pval_scores_12C.PvalSigmaZa1MeanZa1)
+                                   ,'PvalSigmaZa1MeanZa2_12C':float(Pval_scores_12C.PvalSigmaZa1MeanZa2)
+                                   ,'PvalSigmaZa2MeanZa1_12C':float(Pval_scores_12C.PvalSigmaZa2MeanZa1)
+                                   ,'PvalSigmaZa2MeanZa2_12C':float(Pval_scores_12C.PvalSigmaZa2MeanZa2)
                                    
                                    
+                                   ,'PvalSigmaX_weighted_27Al':float(Pval_scores_27Al.PvalSigmaX_weighted)               ,'PvalSigmaY_weighted_27Al':float(Pval_scores_27Al.PvalSigmaY_weighted)
+                                   ,'PvalMeanZa1_weighted_27Al':float(Pval_scores_27Al.PvalMeanZa1_weighted)             ,'PvalMeanZa2_weighted_27Al':float(Pval_scores_27Al.PvalMeanZa2_weighted)
+                                   ,'PvalSigmaZa1_weighted_27Al':float(Pval_scores_27Al.PvalSigmaZa1_weighted)           ,'PvalSigmaZa2_weighted_27Al':float(Pval_scores_27Al.PvalSigmaZa2_weighted)
+                                   ,'PvalTotal_weighted_27Al':float(Pval_scores_27Al.PvalTotal_weighted)
+                                   ,'PvalSigmaZa1SigmaZa2_27Al':float(Pval_scores_27Al.PvalSigmaZa1SigmaZa2)
+                                   ,'PvalMeanZa1MeanZa2_27Al':float(Pval_scores_27Al.PvalMeanZa1MeanZa2)
+                                   ,'PvalSigmaZa1MeanZa1_27Al':float(Pval_scores_27Al.PvalSigmaZa1MeanZa1)
+                                   ,'PvalSigmaZa1MeanZa2_27Al':float(Pval_scores_27Al.PvalSigmaZa1MeanZa2)
+                                   ,'PvalSigmaZa2MeanZa1_27Al':float(Pval_scores_27Al.PvalSigmaZa2MeanZa1)
+                                   ,'PvalSigmaZa2MeanZa2_27Al':float(Pval_scores_27Al.PvalSigmaZa2MeanZa2)
+                                   
+                                   
+                                   
+                                   ,'PvalSigmaX_weighted_56Fe':float(Pval_scores_56Fe.PvalSigmaX_weighted)               ,'PvalSigmaY_weighted_56Fe':float(Pval_scores_56Fe.PvalSigmaY_weighted)
+                                   ,'PvalMeanZa1_weighted_56Fe':float(Pval_scores_56Fe.PvalMeanZa1_weighted)             ,'PvalMeanZa2_weighted_56Fe':float(Pval_scores_56Fe.PvalMeanZa2_weighted)
+                                   ,'PvalSigmaZa1_weighted_56Fe':float(Pval_scores_56Fe.PvalSigmaZa1_weighted)           ,'PvalSigmaZa2_weighted_56Fe':float(Pval_scores_56Fe.PvalSigmaZa2_weighted)
+                                   ,'PvalTotal_weighted_56Fe':float(Pval_scores_56Fe.PvalTotal_weighted)
+                                   ,'PvalSigmaZa1SigmaZa2_56Fe':float(Pval_scores_56Fe.PvalSigmaZa1SigmaZa2)
+                                   ,'PvalMeanZa1MeanZa2_56Fe':float(Pval_scores_56Fe.PvalMeanZa1MeanZa2)
+                                   ,'PvalSigmaZa1MeanZa1_56Fe':float(Pval_scores_56Fe.PvalSigmaZa1MeanZa1)
+                                   ,'PvalSigmaZa1MeanZa2_56Fe':float(Pval_scores_56Fe.PvalSigmaZa1MeanZa2)
+                                   ,'PvalSigmaZa2MeanZa1_56Fe':float(Pval_scores_56Fe.PvalSigmaZa2MeanZa1)
+                                   ,'PvalSigmaZa2MeanZa2_56Fe':float(Pval_scores_56Fe.PvalSigmaZa2MeanZa2)
+                                   
+                                   
+                                   
+                                   ,'PvalSigmaX_weighted_208Pb':float(Pval_scores_208Pb.PvalSigmaX_weighted)               ,'PvalSigmaY_weighted_208Pb':float(Pval_scores_208Pb.PvalSigmaY_weighted)
+                                   ,'PvalMeanZa1_weighted_208Pb':float(Pval_scores_208Pb.PvalMeanZa1_weighted)             ,'PvalMeanZa2_weighted_208Pb':float(Pval_scores_208Pb.PvalMeanZa2_weighted)
+                                   ,'PvalSigmaZa1_weighted_208Pb':float(Pval_scores_208Pb.PvalSigmaZa1_weighted)           ,'PvalSigmaZa2_weighted_208Pb':float(Pval_scores_208Pb.PvalSigmaZa2_weighted)
+                                   ,'PvalTotal_weighted_208Pb':float(Pval_scores_208Pb.PvalTotal_weighted)
+                                   ,'PvalSigmaZa1SigmaZa2_208Pb':float(Pval_scores_208Pb.PvalSigmaZa1SigmaZa2)
+                                   ,'PvalMeanZa1MeanZa2_208Pb':float(Pval_scores_208Pb.PvalMeanZa1MeanZa2)
+                                   ,'PvalSigmaZa1MeanZa1_208Pb':float(Pval_scores_208Pb.PvalSigmaZa1MeanZa1)
+                                   ,'PvalSigmaZa1MeanZa2_208Pb':float(Pval_scores_208Pb.PvalSigmaZa1MeanZa2)
+                                   ,'PvalSigmaZa2MeanZa1_208Pb':float(Pval_scores_208Pb.PvalSigmaZa2MeanZa1)
+                                   ,'PvalSigmaZa2MeanZa2_208Pb':float(Pval_scores_208Pb.PvalSigmaZa2MeanZa2)
+                                   
+                                   
+                                  
                                    # per 5 p(miss) bins
                                    
-                                   ,'KSxPval_tot':float(KS_scores.KSxPval_tot)
-                                   ,'KSzPval_tot':float(KS_scores.KSyPval_tot)
-                                   ,'KSzPval_tot':float(KS_scores.KSzPval_tot)
-                                   ,'KStPval_tot':float(KS_scores.KStPval_tot)
+                                   ,'KSxPval':float(KS_scores.KSxPval)
+                                   ,'KSyPval':float(KS_scores.KSyPval)
+                                   ,'KSzPval':float(KS_scores.KSzPval)
+                                   ,'KStPval':float(KS_scores.KStPval)
                                    ,'KSPval_tot':float(KS_scores.KSPval_tot)
                                    ,'KS3dHistPval':float(KS_scores.KS3dHistPval)
                                    
@@ -793,20 +867,48 @@ def generate_runs_with_different_parameters( option,
                                    ,'recMeanZ_unweighted_PmBin3':float(reco_parameters.get_value(3,'mean_z_unweighted')) 
                                    ,'recSigmaZ_unweighted_PmBin3':float(reco_parameters.get_value(3,'sigma_z_unweighted')) 
                                    ,'recMeanZ_unweighted_PmBin4':float(reco_parameters.get_value(4,'mean_z_unweighted')) 
-                                   ,'recSigmaZ_unweighted_PmBin4':float(reco_parameters.get_value(4,'sigma_z_unweighted')) 
+                                   ,'recSigmaZ_unweighted_PmBin4':float(reco_parameters.get_value(4,'sigma_z_unweighted'))
+                                   
+                                   
+                                   # events loss
+                                   ,'NLostEvents':(9907*float(N.NRand) - ana_sim.GetEntries())
+                                   ,'fracLostEvents':(float((9907.0*float(N.NRand)) - ana_sim.GetEntries())/(9907.0*float(N.NRand)))
+                                   # events loss in 20 p(miss) bins, for pp/p analysis
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[0][0],pmiss_multiples_bins[0],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(0))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[1][0],pmiss_multiples_bins[1],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(1))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[2][0],pmiss_multiples_bins[2],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(2))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[3][0],pmiss_multiples_bins[3],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(3))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[4][0],pmiss_multiples_bins[4],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(4))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[5][0],pmiss_multiples_bins[5],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(5))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[6][0],pmiss_multiples_bins[6],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(6))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[7][0],pmiss_multiples_bins[7],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(7))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[8][0],pmiss_multiples_bins[8],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(8))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[9][0],pmiss_multiples_bins[9],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(9))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[10][0],pmiss_multiples_bins[10],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(10))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[11][0],pmiss_multiples_bins[11],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(11))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[12][0],pmiss_multiples_bins[12],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(12))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[13][0],pmiss_multiples_bins[13],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(13))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[14][0],pmiss_multiples_bins[14],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(14))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[15][0],pmiss_multiples_bins[15],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(15))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[16][0],pmiss_multiples_bins[16],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(16))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[17][0],pmiss_multiples_bins[17],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(17))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[18][0],pmiss_multiples_bins[18],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(18))
+                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[19][0],pmiss_multiples_bins[19],[1]):float(evnt_loss_in_pmiss_multiples_bins.get_value(19))
+
                                    }
                                    , index = [int(run)])
                 # ----------------------------
                 
 
 
-            stream_dataframe_to_file( reco_fits, reco_fitsFName  )
-            stream_dataframe_to_file( results, buildup_resutlsFName  )
-            stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
+            if do_reco_fits_file:   stream_dataframe_to_file( reco_fits, reco_fitsFName  )
+            if do_resutls_file:     stream_dataframe_to_file( results, buildup_resutlsFName  )
+            if do_root_file:        stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
+
             ana_sim.CloseFile()
             if debug>1:
                 print "appended into pandas.DataFrames"
-                if debug>4: print "resutls: ",results
+                if debug>4: print "results: ",results
 
             garbage_list = [ ana_sim , reco_parameters , reco_fits  , results ]
             del garbage_list
@@ -820,10 +922,10 @@ def generate_runs_with_different_parameters( option,
         gen_events.ReleaseInputChain_eep()
     
     if 'analyze' in option:
-        print_filename( reco_fitsFName , "reconstructed parameters fits wrote to" )
-        print_filename( buildup_resutlsFName , "results wrote to " )
+        if do_reco_fits_file:   print_filename( reco_fitsFName , "reconstructed parameters fits wrote to" )
+        if do_resutls_file:     print_filename( buildup_resutlsFName , "results wrote to " )
 
-    print_filename( root_resutlsFName , "results converted also to root format " )
+    if do_resutls_file:     print_filename( root_resutlsFName , "results converted also to root format " )
     print_important("done...") ; print_line()
 # ------------------------------------------------------------------------------- #
 

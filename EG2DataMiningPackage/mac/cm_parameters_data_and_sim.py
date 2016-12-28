@@ -14,6 +14,7 @@ from cm_tools import *
     calc                {"calc. phys. vars."}
     scheme              {"scheme pp-SRC"}
     extract             {"extract data cm-parameters"}
+    extractionAllTragets{"plot all parameters for all targets"}
     bends               {"create bands for EG"}
     generate            {"generate runs"}
     analyze             {"analyze runs"}
@@ -25,7 +26,7 @@ from cm_tools import *
 if flags.run > 0:
     start_run = flags.run
 else:
-    start_run = 100000
+    start_run = 500000
 
 if flags.NumberOfRuns > 0:
     Nruns = flags.NumberOfRuns
@@ -33,14 +34,15 @@ else:
     Nruns = 2
 
 PmissBins = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65] , [0.65,0.75] , [0.75,1.0]]
-N = pd.DataFrame({'SigmaT':10,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':100000 , 'NRand':10 }, index=[0])
-SigmaTBandRange = [0.15,0.16]
+#N = pd.DataFrame({'SigmaT':30,'SigmaZa1':5 ,'SigmaZa2':5 ,'MeanZa1':5 ,'MeanZa2':5 ,'StartRun':500000 , 'NRand':10 }, index=[0])
+SigmaTBandRange = [0.11,0.22]
 SigmaZa1BandRange = [0,2.4]
 SigmaZa2BandRange = [-0.5,0.5]
 MeanZa1BandRange  = [0,1.2]
 MeanZa2BandRange = [-0.5,0.5]
+#N = pd.DataFrame({'SigmaT':10,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':100000 , 'NRand':10 }, index=[0])
 #N = pd.DataFrame({'SigmaT':1,'SigmaZa1':20 ,'SigmaZa2':20 ,'MeanZa1':20 ,'MeanZa2':20 ,'StartRun':300000 , 'NRand':10 }, index=[0])
-#N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1 ,'StartRun':0 , 'NRand':1}, index=[0]) # for debugging
+N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1 ,'StartRun':0 , 'NRand':1}, index=[0]) # for debugging
 
 
 
@@ -99,7 +101,7 @@ if 'plot all parameters for all targets' in flags.option or 'AllTragets' in flag
     colors  = ['black'      , 'red'         , 'green'       , 'blue'        ]
     labels  = ['$^{12}$C'   , '$^{27}$Al'   , '$^{56}$Fe'   , '$^{208}$Pb'  ]
     
-    ana , cm_pars = [] , []
+    ana , cm_pars , cm_fits = [] , [] , []
     if 'extraction' in flags.option:
         for target in targets:
             ana.append( TAnalysisEG2( "ppSRCCut_DATA_%s"%target ) )
@@ -109,6 +111,12 @@ if 'plot all parameters for all targets' in flags.option or 'AllTragets' in flag
                                                DoSaveCanvas = True )
             cm_parameters.to_csv( CMParsFname(ppPath+'/DATA/%s_data'%target) , header=True , index = False)
             cm_pars.append( cm_parameters )
+            fits = fit_cm_parameters( target + ' data' , cm_parameters , FigureFName(ppPath+'/DATA/data') , DoPlot = True )
+            fits.to_csv( CMfitsFname( ppPath+'/DATA/data' , target ) , header=True , index=False)
+            print_filename( CMfitsFname(ppPath+'/DATA/data' , target )  , target + " data c.m. fits at")
+            cm_fits.append( fits )
+
+
     else:
         for target in targets:
             cm_parameters = pd.read_csv( CMParsFname(ppPath+'/DATA/%s_data'%target) )
@@ -153,7 +161,10 @@ if 'create bands for EG' in flags.option or 'bands' in flags.option:
 # ----------------------------------------------------------
 if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 'analyze' in flags.option or 'analyse' in flags.option:
 
-    fits = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' ) )
+    fits_12C = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' , 'C12' ) )
+    fits_27Al = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' , 'Al27' ) )
+    fits_56Fe = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' , 'Fe56' ) )
+    fits_208Pb = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' , 'Pb208' ) )
     generated_parameters = pd.read_csv( GeneParsFName ( ppPath+'/simulation/' ) )
     generated_parameters = generated_parameters[(start_run <= generated_parameters.run) & (generated_parameters.run < start_run + Nruns)]
     print 'generated_parameters runs: ',generated_parameters.run.tolist()
@@ -161,7 +172,7 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
     test_name = 'runs%dto%d_NsigmaT_%d_NSigmaZa1_%d_NSigmaZa2_%d_NMeanZa1_%d_NMeanZa2_%d_NRand_%d'%( start_run , start_run+Nruns-1 , N.SigmaT , N.SigmaZa1 , N.SigmaZa2 , N.MeanZa1 , N.MeanZa2 , N.NRand )
     full_path = ppPath+'/simulation/'+test_name+'_simulation'
     generate_runs_with_different_parameters( flags.option ,
-                                            fits,
+                                            fits_12C, fits_27Al, fits_56Fe, fits_208Pb,
                                             generated_parameters ,
                                             flags.verbose , PmissBins ,
                                             buildup_resutlsFName( full_path ) ,
