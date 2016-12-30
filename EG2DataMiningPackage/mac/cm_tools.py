@@ -180,12 +180,14 @@ def plot_errorbar_and_fit( ax , x , y , xerr , yerr , color , marker , lstyle , 
         const_fit , const_fitErr = fit_as_a_function_of_pmiss( x , y , fit_type )
         if do_plot_fit_pars: label=label + "$=%.3f\pm%.3f$"%(const_fit,const_fitErr)
         ax.plot(x, np.ones(len(x))*const_fit , color=color , linestyle='--', label=label,linewidth = 2 , )
+        if debug>1: print 'const fit of ' + label + " : $=%.3f\pm%.3f$"%(const_fit,const_fitErr)
         return [ const_fit , const_fitErr ]
     
     elif fit_type=='linear':
         a1 , a1err , a2 , a2err  = fit_as_a_function_of_pmiss( x , y , fit_type )
         if do_plot_fit_pars: label=label + "$=(%.3f)p_{miss}+(%.3f)$"%( a1 , a2 )
         ax.plot( x , a1 * x + a2 , color = color ,label=label )
+        if debug>1: print 'linear fit of ' + label + " : $=(%.3f)p_{miss}+(%.3f)$"%( a1 , a2 )
         return [ a1 , a1err] , [ a2 , a2err ]
 # ------------------------------------------------------------------------------- #
 
@@ -247,7 +249,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
 # ------------------------------------------------------------------------------- #
 def set_frame( ax , title , xlabel , ylabel , legend_location="upper left" , ncol=1):
 
-    plt.title( title ,fontsize=25)
+    plt.title( title ,fontsize=35)
     plt.xlabel( xlabel,fontsize=35)
     plt.ylabel( ylabel,fontsize=35)
     ax.tick_params(axis='both', which='major', labelsize=35)
@@ -256,7 +258,7 @@ def set_frame( ax , title , xlabel , ylabel , legend_location="upper left" , nco
 
 
 # ------------------------------------------------------------------------------- #
-def fit_par_plot( fig , i_subplot , data , var , weight , title , do_plot_fit_pars=True): # a sub-routine to fit a single parameter
+def fit_par_plot( fig , i_subplot , data , var , weight , title , do_plot_fit_pars=False): # a sub-routine to fit a single parameter
 
     Pmiss = (data.pMiss_max + data.pMiss_min)/2.
     pMissUpErr , pMissLowErr = data.pMiss_max - Pmiss , Pmiss - data.pMiss_min
@@ -268,7 +270,8 @@ def fit_par_plot( fig , i_subplot , data , var , weight , title , do_plot_fit_pa
     #    [Tfit,TfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_t_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_tErr_' + weight ],data[ var + '_tErr_' + weight ]], 'green','^','none',r'$%s_{\perp}$'%title ,'const')
     #    Tfit , TfitErr = 0.5*(Xfit + Yfit) ,  math.sqrt(XfitErr*XfitErr + YfitErr*YfitErr)
     [Za1,Za1err],[Za2,Za2err] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_zErr_' + weight ],data[ var + '_zErr_' + weight ]], 'blue' ,'s','none',r'$%s_{\vec{p}_{miss}}$'%title ,'linear',do_plot_fit_pars=do_plot_fit_pars)
-    set_frame( ax , r'%s $%s$'%(weight,title) , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left",ncol=2)
+#    set_frame( ax , r'%s $%s$'%(weight,title) , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left",ncol=2)
+    set_frame( ax , '' , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left",ncol=2)
     return [Xfit , XfitErr , Yfit , YfitErr , Tfit , TfitErr, Za1 , Za1err , Za2 , Za2err , ax]
 # ------------------------------------------------------------------------------- #
 
@@ -742,24 +745,24 @@ def generate_runs_with_different_parameters( option,
                                    ,'recMeanZa1_unweighted':float(reco_fits.MeanZa1_unweighted)     ,'recMeanZa2_unweighted':float(reco_fits.MeanZa2_unweighted)
                                    ,'recSigmaZa1_unweighted':float(reco_fits.SigmaZa1_unweighted)   ,'recSigmaZa2_unweighted':float(reco_fits.SigmaZa2_unweighted)
                                    
-                                   ,'PvalSigmaX_unweighted_12C':float(Pval_scores_12C.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted':float(Pval_scores_12C.PvalSigmaY_unweighted)
-                                   ,'PvalMeanZa1_unweighted_12C':float(Pval_scores_12C.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted':float(Pval_scores_12C.PvalMeanZa2_unweighted)
-                                   ,'PvalSigmaZa1_unweighted_12C':float(Pval_scores_12C.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted':float(Pval_scores_12C.PvalSigmaZa2_unweighted)
+                                   ,'PvalSigmaX_unweighted_12C':float(Pval_scores_12C.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted_12C':float(Pval_scores_12C.PvalSigmaY_unweighted)
+                                   ,'PvalMeanZa1_unweighted_12C':float(Pval_scores_12C.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted_12C':float(Pval_scores_12C.PvalMeanZa2_unweighted)
+                                   ,'PvalSigmaZa1_unweighted_12C':float(Pval_scores_12C.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted_12C':float(Pval_scores_12C.PvalSigmaZa2_unweighted)
                                    ,'PvalTotal_unweighted_12C':float(Pval_scores_12C.PvalTotal_unweighted)
 
-                                   ,'PvalSigmaX_unweighted_27Al':float(Pval_scores_27Al.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted':float(Pval_scores_27Al.PvalSigmaY_unweighted)
-                                   ,'PvalMeanZa1_unweighted_27Al':float(Pval_scores_27Al.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted':float(Pval_scores_27Al.PvalMeanZa2_unweighted)
-                                   ,'PvalSigmaZa1_unweighted_27Al':float(Pval_scores_27Al.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted':float(Pval_scores_27Al.PvalSigmaZa2_unweighted)
+                                   ,'PvalSigmaX_unweighted_27Al':float(Pval_scores_27Al.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted_27Al':float(Pval_scores_27Al.PvalSigmaY_unweighted)
+                                   ,'PvalMeanZa1_unweighted_27Al':float(Pval_scores_27Al.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted_27Al':float(Pval_scores_27Al.PvalMeanZa2_unweighted)
+                                   ,'PvalSigmaZa1_unweighted_27Al':float(Pval_scores_27Al.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted_27Al':float(Pval_scores_27Al.PvalSigmaZa2_unweighted)
                                    ,'PvalTotal_unweighted_27Al':float(Pval_scores_27Al.PvalTotal_unweighted)
 
-                                   ,'PvalSigmaX_unweighted_56Fe':float(Pval_scores_56Fe.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted':float(Pval_scores_56Fe.PvalSigmaY_unweighted)
-                                   ,'PvalMeanZa1_unweighted_56Fe':float(Pval_scores_56Fe.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted':float(Pval_scores_56Fe.PvalMeanZa2_unweighted)
-                                   ,'PvalSigmaZa1_unweighted_56Fe':float(Pval_scores_56Fe.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted':float(Pval_scores_56Fe.PvalSigmaZa2_unweighted)
+                                   ,'PvalSigmaX_unweighted_56Fe':float(Pval_scores_56Fe.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted_56Fe':float(Pval_scores_56Fe.PvalSigmaY_unweighted)
+                                   ,'PvalMeanZa1_unweighted_56Fe':float(Pval_scores_56Fe.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted_56Fe':float(Pval_scores_56Fe.PvalMeanZa2_unweighted)
+                                   ,'PvalSigmaZa1_unweighted_56Fe':float(Pval_scores_56Fe.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted_56Fe':float(Pval_scores_56Fe.PvalSigmaZa2_unweighted)
                                    ,'PvalTotal_unweighted_56Fe':float(Pval_scores_56Fe.PvalTotal_unweighted)
 
-                                   ,'PvalSigmaX_unweighted_208Pb':float(Pval_scores_208Pb.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted':float(Pval_scores_208Pb.PvalSigmaY_unweighted)
-                                   ,'PvalMeanZa1_unweighted_208Pb':float(Pval_scores_208Pb.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted':float(Pval_scores_208Pb.PvalMeanZa2_unweighted)
-                                   ,'PvalSigmaZa1_unweighted_208Pb':float(Pval_scores_208Pb.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted':float(Pval_scores_208Pb.PvalSigmaZa2_unweighted)
+                                   ,'PvalSigmaX_unweighted_208Pb':float(Pval_scores_208Pb.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted_208Pb':float(Pval_scores_208Pb.PvalSigmaY_unweighted)
+                                   ,'PvalMeanZa1_unweighted_208Pb':float(Pval_scores_208Pb.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted_208Pb':float(Pval_scores_208Pb.PvalMeanZa2_unweighted)
+                                   ,'PvalSigmaZa1_unweighted_208Pb':float(Pval_scores_208Pb.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted_208Pb':float(Pval_scores_208Pb.PvalSigmaZa2_unweighted)
                                    ,'PvalTotal_unweighted_208Pb':float(Pval_scores_208Pb.PvalTotal_unweighted)
 
                                    # reconstructed fits - weighted by Mott+FF cross section

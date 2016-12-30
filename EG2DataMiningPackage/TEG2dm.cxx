@@ -194,13 +194,6 @@ Int_t TEG2dm::protonFiducial( TVector3 pMomentum , int debug ){
         Double_t Delta_phi[2];
         for(int k=0; k<2; k++){
             
-            // delete (obselete)
-            //            Double_t a = P0_a[sector][k] + P1_a[sector][k]*exp(P2_a[sector][k]*(mag-P3_a[sector][k])   )    ;
-            //            Double_t b = P0_b[sector][k] + P1_b[sector][k]*exp( pow( P2_b[sector][k]*(mag-P3_b[sector][k]) , 2 ) )*mag;
-            //            Double_t b = P0_b[sector][k] + P1_b[sector][k]*exp( pow( P2_b[sector][k]*(mag-P3_b[sector][k]) , 2 ) )*mag;
-            //            Delta_phi[k] = a*(1 - 1./((theta - theta_min)/b+1) );
-
-            
             P0 = P0_a[sector][k];
             P1 = P1_a[sector][k];
             P2 = P2_a[sector][k];

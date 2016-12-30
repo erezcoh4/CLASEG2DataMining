@@ -159,6 +159,8 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("q_phi"               ,&q_phi                 , "q_phi/F");
     OutTree -> Branch("q_theta"             ,&q_theta               , "q_theta/F");
     OutTree -> Branch("Pmiss_phi"           ,&Pmiss_phi             , "Pmiss_phi/F");
+    OutTree -> Branch("pLab_phi"            ,&pLab_phi              , "pLab_phi/F");
+    OutTree -> Branch("pLab_theta"          ,&pLab_theta            , "pLab_theta/F");
 
 
     
@@ -182,7 +184,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("WmissWithCm"         ,"TLorentzVector"       ,&WmissWithCm);
     OutTree -> Branch("WmissCmEps"          ,"TLorentzVector"       ,&WmissCmEps);
     OutTree -> Branch("protons"             ,&protons);             // std::vector<TLorentzVector>
-//    OutTree -> Branch("protonsLab"          ,&protonsLab);          // std::vector<TLorentzVector>
+    OutTree -> Branch("protonsLab"          ,&protonsLab);          // std::vector<TLorentzVector>
     
     
     if(DataType == "GSIM") {
@@ -444,6 +446,8 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     // problem with plugging std::vector<TLorentzVector> into the root file is solved by pushing back into the protons vector only before filling...
     std::vector <TLorentzVector> protons_vector = protons;    protons.clear();
     for (auto & proton:protons_vector)  protons.push_back( proton );
+    std::vector <TLorentzVector> protonsLab_vector = protonsLab;    protonsLab.clear();
+    for (auto & protonLab:protonsLab_vector)  protonsLab.push_back( protonLab );
     
     SetCuts();
     
@@ -567,6 +571,9 @@ void TCalcPhysVarsEG2::loop_protons(){
     for (auto i: sort_pMag( p3vec )){
         
         protonsLab.push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
+        pLab_phi = ChangePhiToPhiLab( r2d*p3vec.at(i).Phi() ) ;
+        pLab_theta = r2d*p3vec.at(i).Theta() ;
+
         
         // proton fiducial cut is calculated in the lab frame, so it must come before we rotate the protons...
         pFiducCut.push_back( protonFiducial( p3vec.at(i) , debug ) );
@@ -737,6 +744,8 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOWTLorentzVector(q);
     if(DataType=="GSIM") SHOWvectorTLorentzVector(protons_g);
     SHOWvectorTLorentzVector(protons);
+    SHOWvectorTLorentzVector(protonsLab);
+    
     SHOWstdTVector3(pVertex);
     SHOWstdVector(alpha);
     SHOWstdVector(pCTOFCut);
