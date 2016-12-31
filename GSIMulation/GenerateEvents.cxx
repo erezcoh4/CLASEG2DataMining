@@ -234,24 +234,24 @@ Int_t GenerateEvents::DoGenerateRun_eepp( Int_t fRunNumber, bool DoGetRootFile, 
             // recoil proton fiducial cut
             pFiducCut.push_back( eg2dm->protonFiducial( Precoil , debug ) );
             
-            if ( eg2dm->protonFiducial( Precoil , debug ) == 1 ){
-                
-                
-                // #IMPORTANT: the acceptance map that i've created i given in the lab frame
-                Double_t PrecoilMag = Precoil.Mag() , PrecoilTheta = r2d*Precoil.Theta() , PrecoilPhi = r2d*Precoil.Phi();
-                PrecoilPhi =  eg2dm->ChangePhiToPhiLab( PrecoilPhi ) ; // rescale phi angle to the range [-30,330]
-                if(debug > 3) SHOW3( PrecoilMag , PrecoilTheta , PrecoilPhi );
-                
-                if (    h_protonAcceptance->GetXaxis()->GetBinCenter(1) < PrecoilMag   && PrecoilMag   < h_protonAcceptance->GetXaxis()->GetBinCenter(h_protonAcceptance->GetNbinsX())
-                    && h_protonAcceptance->GetYaxis()->GetBinCenter(1) < PrecoilTheta && PrecoilTheta < h_protonAcceptance->GetYaxis()->GetBinCenter(h_protonAcceptance->GetNbinsY())
-                    && h_protonAcceptance->GetZaxis()->GetBinCenter(1) < PrecoilPhi   && PrecoilPhi   < h_protonAcceptance->GetZaxis()->GetBinCenter(h_protonAcceptance->GetNbinsZ())    ) {
-                    Double_t PrecoilAcceptance = h_protonAcceptance -> Interpolate( PrecoilMag , PrecoilTheta , PrecoilPhi ) / 100.;
-                    if(debug > 3) SHOW( PrecoilAcceptance );
-                    if( gRandom->Uniform() < PrecoilAcceptance ){ // event is accepted in PrecoilAcceptance %
-                        AcceptEvent = true;
-                    }
+//            if ( eg2dm->protonFiducial( Precoil , debug ) == 1 ){
+            
+            
+            // #IMPORTANT: the acceptance map that i've created i given in the lab frame
+            Double_t PrecoilMag = Precoil.Mag() , PrecoilTheta = r2d*Precoil.Theta() , PrecoilPhi = r2d*Precoil.Phi();
+            PrecoilPhi =  eg2dm->ChangePhiToPhiLab( PrecoilPhi ) ; // rescale phi angle to the range [-30,330]
+            if(debug > 3) SHOW3( PrecoilMag , PrecoilTheta , PrecoilPhi );
+            if (    h_protonAcceptance->GetXaxis()->GetBinCenter(1) < PrecoilMag   && PrecoilMag   < h_protonAcceptance->GetXaxis()->GetBinCenter(h_protonAcceptance->GetNbinsX())
+                && h_protonAcceptance->GetYaxis()->GetBinCenter(1) < PrecoilTheta && PrecoilTheta < h_protonAcceptance->GetYaxis()->GetBinCenter(h_protonAcceptance->GetNbinsY())
+                && h_protonAcceptance->GetZaxis()->GetBinCenter(1) < PrecoilPhi   && PrecoilPhi   < h_protonAcceptance->GetZaxis()->GetBinCenter(h_protonAcceptance->GetNbinsZ())    ) {
+                Double_t PrecoilAcceptance = h_protonAcceptance -> Interpolate( PrecoilMag , PrecoilTheta , PrecoilPhi ) / 100.;
+                if(debug > 3) SHOW( PrecoilAcceptance );
+                if( gRandom->Uniform() <= PrecoilAcceptance ){ // event is accepted in PrecoilAcceptance %
+                    AcceptEvent = true;
                 }
+                //                }
             }
+            if ( PrecoilTheta <= 120 ) AcceptEvent=true;
             // ------------------------------------------------
             
             if (AcceptEvent){
