@@ -28,7 +28,7 @@ from cm_tools import *
 if flags.run > 0:
     start_run = flags.run
 else:
-    start_run = 0 #500000
+    start_run = 500000
 
 if flags.NumberOfRuns > 0:
     Nruns = flags.NumberOfRuns
@@ -36,15 +36,15 @@ else:
     Nruns = 2
 
 PmissBins = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65] , [0.65,0.75] , [0.75,1.0]]
-#N = pd.DataFrame({'SigmaT':30,'SigmaZa1':5 ,'SigmaZa2':5 ,'MeanZa1':5 ,'MeanZa2':5 ,'StartRun':500000 , 'NRand':10 }, index=[0])
-SigmaTBandRange     = [0.15,0.16]#[0.11,0.22]
-SigmaZa1BandRange   = [1.,1.2]#[0,2.4]
-SigmaZa2BandRange   = [0.4,0.5]#[-0.5,0.5]
-MeanZa1BandRange    = [1.,1.2]#[0,1.2]
-MeanZa2BandRange    = [0.4,0.5]#[-0.5,0.5]
+N = pd.DataFrame({'SigmaT':30,'SigmaZa1':5 ,'SigmaZa2':5 ,'MeanZa1':5 ,'MeanZa2':5 ,'StartRun':500000 , 'NRand':10 }, index=[0])
+SigmaTBandRange     = [0.11,0.22] # [0.15,0.16]#
+SigmaZa1BandRange   = [0,2.4] # [1.,1.2]#
+SigmaZa2BandRange   = [-0.5,0.5] # [0.4,0.5]#
+MeanZa1BandRange    = [0,1.2] # [1.,1.2]#
+MeanZa2BandRange    = [-0.5,0.5] # [0.4,0.5]#
 #N = pd.DataFrame({'SigmaT':10,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':100000 , 'NRand':10 }, index=[0])
 #N = pd.DataFrame({'SigmaT':1,'SigmaZa1':20 ,'SigmaZa2':20 ,'MeanZa1':20 ,'MeanZa2':20 ,'StartRun':300000 , 'NRand':10 }, index=[0])
-N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1 ,'StartRun':0 , 'NRand':1}, index=[0]) # for debugging
+#N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1 ,'StartRun':0 , 'NRand':1}, index=[0]) # for debugging
 
 
 
