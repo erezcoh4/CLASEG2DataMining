@@ -91,7 +91,7 @@ def compute_Pval_parameters( data_fits , reco_fits , weighting ):
 # ------------------------------------------------------------------------------- #
 def KStest( PmissBins , ana_sim , ana_data , var , cut=ROOT.TCut() , debug=2 , Nbins=20):
     # [http://docs.scipy.org/doc/scipy-0.15.1/reference/generated/scipy.stats.ks_2samp.html]
-
+    # delete Jan-15
     #    KS_distances , Pval_KS = [] , []
     #    if debug>4 :
     #        figure = plt.figure(figsize=[60,20])
@@ -133,6 +133,7 @@ def KStest( PmissBins , ana_sim , ana_data , var , cut=ROOT.TCut() , debug=2 , N
 # ------------------------------------------------------------------------------- #
 def get_KS_scores( PmissBins ,ana_sim , ana_data , h3_pcm_data ):
     
+    # delete Jan-15
 #    # previous 1d KS tests
 #    KSpCMx , KSxPval = KStest( PmissBins ,ana_sim , ana_data , "pcmX" , ROOT.TCut('') , debug)
 #    KSpCMy , KSyPval = KStest( PmissBins ,ana_sim , ana_data , "pcmY" , ROOT.TCut('') , debug)
@@ -724,10 +725,10 @@ def generate_runs_with_different_parameters( option,
             reco_parameters = calc_cm_parameters( ana_sim  , PmissBins )
             reco_fits = fit_cm_parameters( run , reco_parameters )
 
-            Pval_scores_12C  = get_Pval_scores( data_fits_12C , reco_fits , '12C' )
-            Pval_scores_27Al = get_Pval_scores( data_fits_27Al , reco_fits , '27Al' )
-            Pval_scores_56Fe = get_Pval_scores( data_fits_56Fe , reco_fits , '56Fe' )
-            Pval_scores_208Pb = get_Pval_scores( data_fits_208Pb , reco_fits , '208Pb' )
+            Pval_scores_12C  = get_Pval_scores( data_fits_12C   , reco_fits , '12C' )
+            Pval_scores_27Al = get_Pval_scores( data_fits_27Al  , reco_fits , '27Al' )
+            Pval_scores_56Fe = get_Pval_scores( data_fits_56Fe  , reco_fits , '56Fe' )
+            Pval_scores_208Pb = get_Pval_scores( data_fits_208Pb, reco_fits , '208Pb' )
 
             KS_scores = get_KS_scores( PmissBins ,ana_sim , ana_data , h3_pcm_data )
 

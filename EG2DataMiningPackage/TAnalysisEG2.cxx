@@ -68,7 +68,7 @@ void TAnalysisEG2::SetSRCCuts(TCut MainCut){ // last editted March-22 for pppSRC
     ppSRCCut    = cutSRC && "1.2 <= Xb" && cutMmiss2 && "2 <= Np" && cutPlead && cutPrec && ppCTOFCut;
     ppSRCCutFiducial = ppSRCCut && PrecFiducial ;
     
-    EGppSRCCut = cutPlead && cutPrec;
+    EGppSRCCut = "0.35 < Prec.P()";
 
     
     // (e,e'p) in our cuts
