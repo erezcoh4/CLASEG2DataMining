@@ -836,8 +836,8 @@ def generate_runs_with_different_parameters( option,
 
             ana_sim.CloseFile()
             if debug>1:
-                print "appended into pandas.DataFrames"
-                if debug>1: print "results: ",results
+                print "appended into results"
+                if debug>3: print "results: ",results
 
             garbage_list = [ ana_sim , reco_parameters , reco_fits  , results ]
             del garbage_list
