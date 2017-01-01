@@ -531,7 +531,7 @@ def generate_cm_bands( cm_parameters , fit_pars , N ,
 # ------------------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------------------- #
-def get_pmiss_multiples_bins( PmissBins , path , NRand ): # for pp/p analysis
+def get_pmiss_multiples_bins( PmissBins , Q2Bins , path , NRand ): # for pp/p analysis
 
     # define the bins - 4 bins in each large p(miss) bin that we have in the analysis
     pmiss_multiples_bins = []
@@ -543,33 +543,49 @@ def get_pmiss_multiples_bins( PmissBins , path , NRand ): # for pp/p analysis
 
     # get the number of generated events per bin
     evts_gen_in_pmiss_multiples_bins = []
+    evts_gen_in_pmiss_multiples_bins_Q2_bins = np.zeros( (len(pmiss_multiples_bins) , len(Q2Bins)) )
 
     p1 = TPlots(path + '/DATA/SRC_e1_C.root' , 'T')
     p2 = TPlots(path + '/DATA/SRC_e2_C.root' , 'T')
 
     for i in range( len(pmiss_multiples_bins) ):
         pmin , pmax = pmiss_multiples_bins[i][0] , pmiss_multiples_bins[i][1]
-        evts_gen_in_pmiss_multiples_bins.append( NRand * (p1.GetEntries(ROOT.TCut("%f<Pmiss_size && Pmiss_size<%f"%(pmin , pmax))) + p2.GetEntries(ROOT.TCut("%f<Pmiss_size && Pmiss_size<%f"%(pmin , pmax)))) )
+        p_cut = ROOT.TCut("%f<Pmiss_size && Pmiss_size<%f"%(pmin , pmax))
+        evts_gen_in_pmiss_multiples_bins.append( NRand * (p1.GetEntries(p_cut) + p2.GetEntries(p_cut)) )
+        
+        for j in range( len(Q2Bins) ):
+            Q2min , Q2max = Q2Bins[j][0] , Q2Bins[j][1]
+            q2_cut = ROOT.TCut("%f<Q2 && Q2<%f"%(Q2min , Q2max))
+            evts_gen_in_pmiss_multiples_bins_Q2_bins[i][j] = NRand * (p1.GetEntries(p_cut+q2_cut) + p2.GetEntries(p_cut+q2_cut))
 
     p1.Close()
     p2.Close()
 
-    return pmiss_multiples_bins , evts_gen_in_pmiss_multiples_bins
+    return pmiss_multiples_bins , evts_gen_in_pmiss_multiples_bins , evts_gen_in_pmiss_multiples_bins_Q2_bins
 # ------------------------------------------------------------------------------- #
 
 
 # ------------------------------------------------------------------------------- #
-def get_evnt_loss_in_pmiss_bins( pmiss_multiples_bins , evts_gen_in_pmiss_multiples_bins , ana_sim ):
+def get_evnt_loss_in_pmiss_bins( pmiss_multiples_bins , evts_gen_in_pmiss_multiples_bins , Q2Bins , evts_gen_in_pmiss_multiples_bins_Q2_bins , ana_sim ):
 
     evnt_loss_in_pmiss_multiples_bins = []
+    evts_acc_in_pmiss_multiples_bins_Q2_bins = np.zeros( (len(pmiss_multiples_bins) , len(Q2Bins) ))
+    evnt_loss_in_pmiss_multiples_bins_Q2_bins = np.zeros( (len(pmiss_multiples_bins) , len(Q2Bins) ))
     
     for i in range( len(pmiss_multiples_bins) ):
         pmin , pmax = pmiss_multiples_bins[i][0] , pmiss_multiples_bins[i][1]
         evts_gen = evts_gen_in_pmiss_multiples_bins[i]
-        evts_acc = ana_sim.GetEntries(ROOT.TCut("%f<Pmiss3Mag && Pmiss3Mag<%f"%(pmin , pmax)))
+        p_cut = ROOT.TCut("%f<Pmiss3Mag && Pmiss3Mag<%f"%(pmin , pmax))
+        evts_acc = ana_sim.GetEntries(p_cut)
         evnt_loss_in_pmiss_multiples_bins.append( float(evts_gen-evts_acc)/evts_gen )
-    
-    return evnt_loss_in_pmiss_multiples_bins
+        for j in range( len(Q2Bins) ):
+            Q2min , Q2max = Q2Bins[j][0] , Q2Bins[j][1]
+            q2_cut = ROOT.TCut("%f<Q2 && Q2<%f"%(Q2min , Q2max))
+            evts_acc_in_pmiss_multiples_bins_Q2_bins[i][j] = ana_sim.GetEntries( p_cut + q2_cut )
+            evnt_loss_in_pmiss_multiples_bins_Q2_bins[i][j] = float(evts_gen_in_pmiss_multiples_bins_Q2_bins[i][j] - evts_acc_in_pmiss_multiples_bins_Q2_bins[i][j])/evts_gen_in_pmiss_multiples_bins_Q2_bins[i][j]
+
+
+    return evnt_loss_in_pmiss_multiples_bins , evnt_loss_in_pmiss_multiples_bins_Q2_bins
 # ------------------------------------------------------------------------------- #
 
 
@@ -638,7 +654,8 @@ def get_Pval_scores( data_fits , reco_fits , name='' ):
 def generate_runs_with_different_parameters( option,
                                             data_fits_12C, data_fits_27Al, data_fits_56Fe, data_fits_208Pb,
                                             generated_parameters ,
-                                            debug , PmissBins , buildup_resutlsFName ,
+                                            debug , PmissBins , Q2Bins ,
+                                            buildup_resutlsFName ,
                                             reco_fitsFName , target ,
                                             N ,
                                             root_resutlsFName ,
@@ -662,7 +679,7 @@ def generate_runs_with_different_parameters( option,
     if debug: print '\033[95m' + 'processing %d runs'%len(generated_parameters)+ '\033[0m'
 
     # multiple bins for pp/p ratio
-    pmiss_multiples_bins , evts_gen_in_pmiss_multiples_bins = get_pmiss_multiples_bins( PmissBins , path , int(N.NRand) )
+    pmiss_multiples_bins , evts_gen_in_pmiss_multiples_bins , evts_gen_in_pmiss_multiples_bins_Q2_bins = get_pmiss_multiples_bins( PmissBins , Q2Bins , path , int(N.NRand) )
 
 
     '''
@@ -715,7 +732,9 @@ def generate_runs_with_different_parameters( option,
             if debug>1: print "analyzing run %d"%run
             ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
                 
-            evnt_loss_in_pmiss_multiples_bins = get_evnt_loss_in_pmiss_bins( pmiss_multiples_bins , evts_gen_in_pmiss_multiples_bins , ana_sim )
+            evnt_loss_in_pmiss_multiples_bins , evnt_loss_in_pmiss_multiples_bins_Q2_bins = get_evnt_loss_in_pmiss_bins( pmiss_multiples_bins , evts_gen_in_pmiss_multiples_bins ,
+                                                                                                                        Q2Bins , evts_gen_in_pmiss_multiples_bins_Q2_bins ,
+                                                                                                                        ana_sim )
 
             if debug>4:
                 reco_parameters = calc_cm_parameters( ana_sim  , PmissBins , CMRooFitsName( path + '/eg_cm_roofits/run%d_unweighted_'%run ), CMRooFitsName( path + '/eg_cm_roofits/run%d_weighted_'%run ) , True )
@@ -746,25 +765,25 @@ def generate_runs_with_different_parameters( option,
                                    ,'recMeanZa1_unweighted':float(reco_fits.MeanZa1_unweighted)     ,'recMeanZa2_unweighted':float(reco_fits.MeanZa2_unweighted)
                                    ,'recSigmaZa1_unweighted':float(reco_fits.SigmaZa1_unweighted)   ,'recSigmaZa2_unweighted':float(reco_fits.SigmaZa2_unweighted)
                                    
-                                   ,'PvalSigmaX_unweighted_12C':float(Pval_scores_12C.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted_12C':float(Pval_scores_12C.PvalSigmaY_unweighted)
-                                   ,'PvalMeanZa1_unweighted_12C':float(Pval_scores_12C.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted_12C':float(Pval_scores_12C.PvalMeanZa2_unweighted)
-                                   ,'PvalSigmaZa1_unweighted_12C':float(Pval_scores_12C.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted_12C':float(Pval_scores_12C.PvalSigmaZa2_unweighted)
-                                   ,'PvalTotal_unweighted_12C':float(Pval_scores_12C.PvalTotal_unweighted)
-
-                                   ,'PvalSigmaX_unweighted_27Al':float(Pval_scores_27Al.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted_27Al':float(Pval_scores_27Al.PvalSigmaY_unweighted)
-                                   ,'PvalMeanZa1_unweighted_27Al':float(Pval_scores_27Al.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted_27Al':float(Pval_scores_27Al.PvalMeanZa2_unweighted)
-                                   ,'PvalSigmaZa1_unweighted_27Al':float(Pval_scores_27Al.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted_27Al':float(Pval_scores_27Al.PvalSigmaZa2_unweighted)
-                                   ,'PvalTotal_unweighted_27Al':float(Pval_scores_27Al.PvalTotal_unweighted)
-
-                                   ,'PvalSigmaX_unweighted_56Fe':float(Pval_scores_56Fe.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted_56Fe':float(Pval_scores_56Fe.PvalSigmaY_unweighted)
-                                   ,'PvalMeanZa1_unweighted_56Fe':float(Pval_scores_56Fe.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted_56Fe':float(Pval_scores_56Fe.PvalMeanZa2_unweighted)
-                                   ,'PvalSigmaZa1_unweighted_56Fe':float(Pval_scores_56Fe.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted_56Fe':float(Pval_scores_56Fe.PvalSigmaZa2_unweighted)
-                                   ,'PvalTotal_unweighted_56Fe':float(Pval_scores_56Fe.PvalTotal_unweighted)
-
-                                   ,'PvalSigmaX_unweighted_208Pb':float(Pval_scores_208Pb.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted_208Pb':float(Pval_scores_208Pb.PvalSigmaY_unweighted)
-                                   ,'PvalMeanZa1_unweighted_208Pb':float(Pval_scores_208Pb.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted_208Pb':float(Pval_scores_208Pb.PvalMeanZa2_unweighted)
-                                   ,'PvalSigmaZa1_unweighted_208Pb':float(Pval_scores_208Pb.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted_208Pb':float(Pval_scores_208Pb.PvalSigmaZa2_unweighted)
-                                   ,'PvalTotal_unweighted_208Pb':float(Pval_scores_208Pb.PvalTotal_unweighted)
+#                                   ,'PvalSigmaX_unweighted_12C':float(Pval_scores_12C.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted_12C':float(Pval_scores_12C.PvalSigmaY_unweighted)
+#                                   ,'PvalMeanZa1_unweighted_12C':float(Pval_scores_12C.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted_12C':float(Pval_scores_12C.PvalMeanZa2_unweighted)
+#                                   ,'PvalSigmaZa1_unweighted_12C':float(Pval_scores_12C.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted_12C':float(Pval_scores_12C.PvalSigmaZa2_unweighted)
+#                                   ,'PvalTotal_unweighted_12C':float(Pval_scores_12C.PvalTotal_unweighted)
+#
+#                                   ,'PvalSigmaX_unweighted_27Al':float(Pval_scores_27Al.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted_27Al':float(Pval_scores_27Al.PvalSigmaY_unweighted)
+#                                   ,'PvalMeanZa1_unweighted_27Al':float(Pval_scores_27Al.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted_27Al':float(Pval_scores_27Al.PvalMeanZa2_unweighted)
+#                                   ,'PvalSigmaZa1_unweighted_27Al':float(Pval_scores_27Al.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted_27Al':float(Pval_scores_27Al.PvalSigmaZa2_unweighted)
+#                                   ,'PvalTotal_unweighted_27Al':float(Pval_scores_27Al.PvalTotal_unweighted)
+#
+#                                   ,'PvalSigmaX_unweighted_56Fe':float(Pval_scores_56Fe.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted_56Fe':float(Pval_scores_56Fe.PvalSigmaY_unweighted)
+#                                   ,'PvalMeanZa1_unweighted_56Fe':float(Pval_scores_56Fe.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted_56Fe':float(Pval_scores_56Fe.PvalMeanZa2_unweighted)
+#                                   ,'PvalSigmaZa1_unweighted_56Fe':float(Pval_scores_56Fe.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted_56Fe':float(Pval_scores_56Fe.PvalSigmaZa2_unweighted)
+#                                   ,'PvalTotal_unweighted_56Fe':float(Pval_scores_56Fe.PvalTotal_unweighted)
+#
+#                                   ,'PvalSigmaX_unweighted_208Pb':float(Pval_scores_208Pb.PvalSigmaX_unweighted)               ,'PvalSigmaY_unweighted_208Pb':float(Pval_scores_208Pb.PvalSigmaY_unweighted)
+#                                   ,'PvalMeanZa1_unweighted_208Pb':float(Pval_scores_208Pb.PvalMeanZa1_unweighted)             ,'PvalMeanZa2_unweighted_208Pb':float(Pval_scores_208Pb.PvalMeanZa2_unweighted)
+#                                   ,'PvalSigmaZa1_unweighted_208Pb':float(Pval_scores_208Pb.PvalSigmaZa1_unweighted)           ,'PvalSigmaZa2_unweighted_208Pb':float(Pval_scores_208Pb.PvalSigmaZa2_unweighted)
+#                                   ,'PvalTotal_unweighted_208Pb':float(Pval_scores_208Pb.PvalTotal_unweighted)
 
                                    # reconstructed fits - weighted by Mott+FF cross section
                                    ,'recMeanX_weighted':float(reco_fits.MeanX_weighted)         ,'recMeanY_weighted':float(reco_fits.MeanY_weighted)
@@ -772,58 +791,57 @@ def generate_runs_with_different_parameters( option,
                                    ,'recMeanZa1_weighted':float(reco_fits.MeanZa1_weighted)     ,'recMeanZa2_weighted':float(reco_fits.MeanZa2_weighted)
                                    ,'recSigmaZa1_weighted':float(reco_fits.SigmaZa1_weighted)   ,'recSigmaZa2_weighted':float(reco_fits.SigmaZa2_weighted)
                                    
-                                   ,'PvalSigmaX_weighted_12C':float(Pval_scores_12C.PvalSigmaX_weighted)               ,'PvalSigmaY_weighted_12C':float(Pval_scores_12C.PvalSigmaY_weighted)
-                                   ,'PvalMeanZa1_weighted_12C':float(Pval_scores_12C.PvalMeanZa1_weighted)             ,'PvalMeanZa2_weighted_12C':float(Pval_scores_12C.PvalMeanZa2_weighted)
-                                   ,'PvalSigmaZa1_weighted_12C':float(Pval_scores_12C.PvalSigmaZa1_weighted)           ,'PvalSigmaZa2_weighted_12C':float(Pval_scores_12C.PvalSigmaZa2_weighted)
-                                   ,'PvalTotal_weighted_12C':float(Pval_scores_12C.PvalTotal_weighted)
-                                   ,'PvalSigmaZa1SigmaZa2_12C':float(Pval_scores_12C.PvalSigmaZa1SigmaZa2)
-                                   ,'PvalMeanZa1MeanZa2_12C':float(Pval_scores_12C.PvalMeanZa1MeanZa2)
-                                   ,'PvalSigmaZa1MeanZa1_12C':float(Pval_scores_12C.PvalSigmaZa1MeanZa1)
-                                   ,'PvalSigmaZa1MeanZa2_12C':float(Pval_scores_12C.PvalSigmaZa1MeanZa2)
-                                   ,'PvalSigmaZa2MeanZa1_12C':float(Pval_scores_12C.PvalSigmaZa2MeanZa1)
-                                   ,'PvalSigmaZa2MeanZa2_12C':float(Pval_scores_12C.PvalSigmaZa2MeanZa2)
-                                   
-                                   
-                                   ,'PvalSigmaX_weighted_27Al':float(Pval_scores_27Al.PvalSigmaX_weighted)               ,'PvalSigmaY_weighted_27Al':float(Pval_scores_27Al.PvalSigmaY_weighted)
-                                   ,'PvalMeanZa1_weighted_27Al':float(Pval_scores_27Al.PvalMeanZa1_weighted)             ,'PvalMeanZa2_weighted_27Al':float(Pval_scores_27Al.PvalMeanZa2_weighted)
-                                   ,'PvalSigmaZa1_weighted_27Al':float(Pval_scores_27Al.PvalSigmaZa1_weighted)           ,'PvalSigmaZa2_weighted_27Al':float(Pval_scores_27Al.PvalSigmaZa2_weighted)
-                                   ,'PvalTotal_weighted_27Al':float(Pval_scores_27Al.PvalTotal_weighted)
-                                   ,'PvalSigmaZa1SigmaZa2_27Al':float(Pval_scores_27Al.PvalSigmaZa1SigmaZa2)
-                                   ,'PvalMeanZa1MeanZa2_27Al':float(Pval_scores_27Al.PvalMeanZa1MeanZa2)
-                                   ,'PvalSigmaZa1MeanZa1_27Al':float(Pval_scores_27Al.PvalSigmaZa1MeanZa1)
-                                   ,'PvalSigmaZa1MeanZa2_27Al':float(Pval_scores_27Al.PvalSigmaZa1MeanZa2)
-                                   ,'PvalSigmaZa2MeanZa1_27Al':float(Pval_scores_27Al.PvalSigmaZa2MeanZa1)
-                                   ,'PvalSigmaZa2MeanZa2_27Al':float(Pval_scores_27Al.PvalSigmaZa2MeanZa2)
-                                   
-                                   
-                                   
-                                   ,'PvalSigmaX_weighted_56Fe':float(Pval_scores_56Fe.PvalSigmaX_weighted)               ,'PvalSigmaY_weighted_56Fe':float(Pval_scores_56Fe.PvalSigmaY_weighted)
-                                   ,'PvalMeanZa1_weighted_56Fe':float(Pval_scores_56Fe.PvalMeanZa1_weighted)             ,'PvalMeanZa2_weighted_56Fe':float(Pval_scores_56Fe.PvalMeanZa2_weighted)
-                                   ,'PvalSigmaZa1_weighted_56Fe':float(Pval_scores_56Fe.PvalSigmaZa1_weighted)           ,'PvalSigmaZa2_weighted_56Fe':float(Pval_scores_56Fe.PvalSigmaZa2_weighted)
-                                   ,'PvalTotal_weighted_56Fe':float(Pval_scores_56Fe.PvalTotal_weighted)
-                                   ,'PvalSigmaZa1SigmaZa2_56Fe':float(Pval_scores_56Fe.PvalSigmaZa1SigmaZa2)
-                                   ,'PvalMeanZa1MeanZa2_56Fe':float(Pval_scores_56Fe.PvalMeanZa1MeanZa2)
-                                   ,'PvalSigmaZa1MeanZa1_56Fe':float(Pval_scores_56Fe.PvalSigmaZa1MeanZa1)
-                                   ,'PvalSigmaZa1MeanZa2_56Fe':float(Pval_scores_56Fe.PvalSigmaZa1MeanZa2)
-                                   ,'PvalSigmaZa2MeanZa1_56Fe':float(Pval_scores_56Fe.PvalSigmaZa2MeanZa1)
-                                   ,'PvalSigmaZa2MeanZa2_56Fe':float(Pval_scores_56Fe.PvalSigmaZa2MeanZa2)
-                                   
-                                   
-                                   
-                                   ,'PvalSigmaX_weighted_208Pb':float(Pval_scores_208Pb.PvalSigmaX_weighted)               ,'PvalSigmaY_weighted_208Pb':float(Pval_scores_208Pb.PvalSigmaY_weighted)
-                                   ,'PvalMeanZa1_weighted_208Pb':float(Pval_scores_208Pb.PvalMeanZa1_weighted)             ,'PvalMeanZa2_weighted_208Pb':float(Pval_scores_208Pb.PvalMeanZa2_weighted)
-                                   ,'PvalSigmaZa1_weighted_208Pb':float(Pval_scores_208Pb.PvalSigmaZa1_weighted)           ,'PvalSigmaZa2_weighted_208Pb':float(Pval_scores_208Pb.PvalSigmaZa2_weighted)
-                                   ,'PvalTotal_weighted_208Pb':float(Pval_scores_208Pb.PvalTotal_weighted)
-                                   ,'PvalSigmaZa1SigmaZa2_208Pb':float(Pval_scores_208Pb.PvalSigmaZa1SigmaZa2)
-                                   ,'PvalMeanZa1MeanZa2_208Pb':float(Pval_scores_208Pb.PvalMeanZa1MeanZa2)
-                                   ,'PvalSigmaZa1MeanZa1_208Pb':float(Pval_scores_208Pb.PvalSigmaZa1MeanZa1)
-                                   ,'PvalSigmaZa1MeanZa2_208Pb':float(Pval_scores_208Pb.PvalSigmaZa1MeanZa2)
-                                   ,'PvalSigmaZa2MeanZa1_208Pb':float(Pval_scores_208Pb.PvalSigmaZa2MeanZa1)
-                                   ,'PvalSigmaZa2MeanZa2_208Pb':float(Pval_scores_208Pb.PvalSigmaZa2MeanZa2)
+#                                   ,'PvalSigmaX_weighted_12C':float(Pval_scores_12C.PvalSigmaX_weighted)               ,'PvalSigmaY_weighted_12C':float(Pval_scores_12C.PvalSigmaY_weighted)
+#                                   ,'PvalMeanZa1_weighted_12C':float(Pval_scores_12C.PvalMeanZa1_weighted)             ,'PvalMeanZa2_weighted_12C':float(Pval_scores_12C.PvalMeanZa2_weighted)
+#                                   ,'PvalSigmaZa1_weighted_12C':float(Pval_scores_12C.PvalSigmaZa1_weighted)           ,'PvalSigmaZa2_weighted_12C':float(Pval_scores_12C.PvalSigmaZa2_weighted)
+#                                   ,'PvalTotal_weighted_12C':float(Pval_scores_12C.PvalTotal_weighted)
+#                                   ,'PvalSigmaZa1SigmaZa2_12C':float(Pval_scores_12C.PvalSigmaZa1SigmaZa2)
+#                                   ,'PvalMeanZa1MeanZa2_12C':float(Pval_scores_12C.PvalMeanZa1MeanZa2)
+#                                   ,'PvalSigmaZa1MeanZa1_12C':float(Pval_scores_12C.PvalSigmaZa1MeanZa1)
+#                                   ,'PvalSigmaZa1MeanZa2_12C':float(Pval_scores_12C.PvalSigmaZa1MeanZa2)
+#                                   ,'PvalSigmaZa2MeanZa1_12C':float(Pval_scores_12C.PvalSigmaZa2MeanZa1)
+#                                   ,'PvalSigmaZa2MeanZa2_12C':float(Pval_scores_12C.PvalSigmaZa2MeanZa2)
+#                                   
+#                                   
+#                                   ,'PvalSigmaX_weighted_27Al':float(Pval_scores_27Al.PvalSigmaX_weighted)               ,'PvalSigmaY_weighted_27Al':float(Pval_scores_27Al.PvalSigmaY_weighted)
+#                                   ,'PvalMeanZa1_weighted_27Al':float(Pval_scores_27Al.PvalMeanZa1_weighted)             ,'PvalMeanZa2_weighted_27Al':float(Pval_scores_27Al.PvalMeanZa2_weighted)
+#                                   ,'PvalSigmaZa1_weighted_27Al':float(Pval_scores_27Al.PvalSigmaZa1_weighted)           ,'PvalSigmaZa2_weighted_27Al':float(Pval_scores_27Al.PvalSigmaZa2_weighted)
+#                                   ,'PvalTotal_weighted_27Al':float(Pval_scores_27Al.PvalTotal_weighted)
+#                                   ,'PvalSigmaZa1SigmaZa2_27Al':float(Pval_scores_27Al.PvalSigmaZa1SigmaZa2)
+#                                   ,'PvalMeanZa1MeanZa2_27Al':float(Pval_scores_27Al.PvalMeanZa1MeanZa2)
+#                                   ,'PvalSigmaZa1MeanZa1_27Al':float(Pval_scores_27Al.PvalSigmaZa1MeanZa1)
+#                                   ,'PvalSigmaZa1MeanZa2_27Al':float(Pval_scores_27Al.PvalSigmaZa1MeanZa2)
+#                                   ,'PvalSigmaZa2MeanZa1_27Al':float(Pval_scores_27Al.PvalSigmaZa2MeanZa1)
+#                                   ,'PvalSigmaZa2MeanZa2_27Al':float(Pval_scores_27Al.PvalSigmaZa2MeanZa2)
+#                                   
+#                                   
+#                                   
+#                                   ,'PvalSigmaX_weighted_56Fe':float(Pval_scores_56Fe.PvalSigmaX_weighted)               ,'PvalSigmaY_weighted_56Fe':float(Pval_scores_56Fe.PvalSigmaY_weighted)
+#                                   ,'PvalMeanZa1_weighted_56Fe':float(Pval_scores_56Fe.PvalMeanZa1_weighted)             ,'PvalMeanZa2_weighted_56Fe':float(Pval_scores_56Fe.PvalMeanZa2_weighted)
+#                                   ,'PvalSigmaZa1_weighted_56Fe':float(Pval_scores_56Fe.PvalSigmaZa1_weighted)           ,'PvalSigmaZa2_weighted_56Fe':float(Pval_scores_56Fe.PvalSigmaZa2_weighted)
+#                                   ,'PvalTotal_weighted_56Fe':float(Pval_scores_56Fe.PvalTotal_weighted)
+#                                   ,'PvalSigmaZa1SigmaZa2_56Fe':float(Pval_scores_56Fe.PvalSigmaZa1SigmaZa2)
+#                                   ,'PvalMeanZa1MeanZa2_56Fe':float(Pval_scores_56Fe.PvalMeanZa1MeanZa2)
+#                                   ,'PvalSigmaZa1MeanZa1_56Fe':float(Pval_scores_56Fe.PvalSigmaZa1MeanZa1)
+#                                   ,'PvalSigmaZa1MeanZa2_56Fe':float(Pval_scores_56Fe.PvalSigmaZa1MeanZa2)
+#                                   ,'PvalSigmaZa2MeanZa1_56Fe':float(Pval_scores_56Fe.PvalSigmaZa2MeanZa1)
+#                                   ,'PvalSigmaZa2MeanZa2_56Fe':float(Pval_scores_56Fe.PvalSigmaZa2MeanZa2)
+#                                   
+#                                   
+#                                   
+#                                   ,'PvalSigmaX_weighted_208Pb':float(Pval_scores_208Pb.PvalSigmaX_weighted)               ,'PvalSigmaY_weighted_208Pb':float(Pval_scores_208Pb.PvalSigmaY_weighted)
+#                                   ,'PvalMeanZa1_weighted_208Pb':float(Pval_scores_208Pb.PvalMeanZa1_weighted)             ,'PvalMeanZa2_weighted_208Pb':float(Pval_scores_208Pb.PvalMeanZa2_weighted)
+#                                   ,'PvalSigmaZa1_weighted_208Pb':float(Pval_scores_208Pb.PvalSigmaZa1_weighted)           ,'PvalSigmaZa2_weighted_208Pb':float(Pval_scores_208Pb.PvalSigmaZa2_weighted)
+#                                   ,'PvalTotal_weighted_208Pb':float(Pval_scores_208Pb.PvalTotal_weighted)
+#                                   ,'PvalSigmaZa1SigmaZa2_208Pb':float(Pval_scores_208Pb.PvalSigmaZa1SigmaZa2)
+#                                   ,'PvalMeanZa1MeanZa2_208Pb':float(Pval_scores_208Pb.PvalMeanZa1MeanZa2)
+#                                   ,'PvalSigmaZa1MeanZa1_208Pb':float(Pval_scores_208Pb.PvalSigmaZa1MeanZa1)
+#                                   ,'PvalSigmaZa1MeanZa2_208Pb':float(Pval_scores_208Pb.PvalSigmaZa1MeanZa2)
+#                                   ,'PvalSigmaZa2MeanZa1_208Pb':float(Pval_scores_208Pb.PvalSigmaZa2MeanZa1)
+#                                   ,'PvalSigmaZa2MeanZa2_208Pb':float(Pval_scores_208Pb.PvalSigmaZa2MeanZa2)
                                    
                                    
                                   
-                                   # per 5 p(miss) bins
                                    
                                    ,'KSxPval':float(KS_scores.KSxPval)
                                    ,'KSyPval':float(KS_scores.KSyPval)
@@ -832,75 +850,120 @@ def generate_runs_with_different_parameters( option,
                                    ,'KSPval_tot':float(KS_scores.KSPval_tot)
                                    ,'KS3dHistPval':float(KS_scores.KS3dHistPval)
                                    
-                                   # reconstructed parameters in p(miss) bins
-                                   ,'PmissMin_PmBin0':float(reco_parameters.get_value(0,'pMiss_min')) ,'PmissMax_PmBin0':float(reco_parameters.get_value(0,'pMiss_max')) 
-                                   ,'PmissMin_PmBin1':float(reco_parameters.get_value(1,'pMiss_min')) ,'PmissMax_PmBin1':float(reco_parameters.get_value(1,'pMiss_max')) 
-                                   ,'PmissMin_PmBin2':float(reco_parameters.get_value(2,'pMiss_min')) ,'PmissMax_PmBin2':float(reco_parameters.get_value(2,'pMiss_max')) 
-                                   ,'PmissMin_PmBin3':float(reco_parameters.get_value(3,'pMiss_min')) ,'PmissMax_PmBin3':float(reco_parameters.get_value(3,'pMiss_max')) 
-                                   ,'PmissMin_PmBin4':float(reco_parameters.get_value(4,'pMiss_min')) ,'PmissMax_PmBin4':float(reco_parameters.get_value(4,'pMiss_max')) 
-                                   # x
-                                   ,'recMeanX_unweighted_PmBin0':float(reco_parameters.get_value(0,'mean_x_unweighted')) 
-                                   ,'recSigmaX_unweighted_PmBin0':float(reco_parameters.get_value(0,'sigma_x_unweighted')) 
-                                   ,'recMeanX_unweighted_PmBin1':float(reco_parameters.get_value(1,'mean_x_unweighted')) 
-                                   ,'recSigmaX_unweighted_PmBin1':float(reco_parameters.get_value(1,'sigma_x_unweighted')) 
-                                   ,'recMeanX_unweighted_PmBin2':float(reco_parameters.get_value(2,'mean_x_unweighted')) 
-                                   ,'recSigmaX_unweighted_PmBin2':float(reco_parameters.get_value(2,'sigma_x_unweighted')) 
-                                   ,'recMeanX_unweighted_PmBin3':float(reco_parameters.get_value(3,'mean_x_unweighted')) 
-                                   ,'recSigmaX_unweighted_PmBin3':float(reco_parameters.get_value(3,'sigma_x_unweighted')) 
-                                   ,'recMeanX_unweighted_PmBin4':float(reco_parameters.get_value(4,'mean_x_unweighted')) 
-                                   ,'recSigmaX_unweighted_PmBin4':float(reco_parameters.get_value(4,'sigma_x_unweighted')) 
-                                   # y
-                                   ,'recMeanY_unweighted_PmBin0':float(reco_parameters.get_value(0,'mean_y_unweighted')) 
-                                   ,'recSigmaY_unweighted_PmBin0':float(reco_parameters.get_value(0,'sigma_y_unweighted')) 
-                                   ,'recMeanY_unweighted_PmBin1':float(reco_parameters.get_value(1,'mean_y_unweighted')) 
-                                   ,'recSigmaY_unweighted_PmBin1':float(reco_parameters.get_value(1,'sigma_y_unweighted')) 
-                                   ,'recMeanY_unweighted_PmBin2':float(reco_parameters.get_value(2,'mean_y_unweighted')) 
-                                   ,'recSigmaY_unweighted_PmBin2':float(reco_parameters.get_value(2,'sigma_y_unweighted')) 
-                                   ,'recMeanY_unweighted_PmBin3':float(reco_parameters.get_value(3,'mean_y_unweighted')) 
-                                   ,'recSigmaY_unweighted_PmBin3':float(reco_parameters.get_value(3,'sigma_y_unweighted')) 
-                                   ,'recMeanY_unweighted_PmBin4':float(reco_parameters.get_value(4,'mean_y_unweighted')) 
-                                   ,'recSigmaY_unweighted_PmBin4':float(reco_parameters.get_value(4,'sigma_y_unweighted')) 
-                                   # z
-                                   ,'recMeanZ_unweighted_PmBin0':float(reco_parameters.get_value(0,'mean_z_unweighted')) 
-                                   ,'recSigmaZ_unweighted_PmBin0':float(reco_parameters.get_value(0,'sigma_z_unweighted')) 
-                                   ,'recMeanZ_unweighted_PmBin1':float(reco_parameters.get_value(1,'mean_z_unweighted')) 
-                                   ,'recSigmaZ_unweighted_PmBin1':float(reco_parameters.get_value(1,'sigma_z_unweighted')) 
-                                   ,'recMeanZ_unweighted_PmBin2':float(reco_parameters.get_value(2,'mean_z_unweighted')) 
-                                   ,'recSigmaZ_unweighted_PmBin2':float(reco_parameters.get_value(2,'sigma_z_unweighted')) 
-                                   ,'recMeanZ_unweighted_PmBin3':float(reco_parameters.get_value(3,'mean_z_unweighted')) 
-                                   ,'recSigmaZ_unweighted_PmBin3':float(reco_parameters.get_value(3,'sigma_z_unweighted')) 
-                                   ,'recMeanZ_unweighted_PmBin4':float(reco_parameters.get_value(4,'mean_z_unweighted')) 
-                                   ,'recSigmaZ_unweighted_PmBin4':float(reco_parameters.get_value(4,'sigma_z_unweighted'))
+#                                   # per 5 p(miss) bins
+#                                   # reconstructed parameters in p(miss) bins
+#                                   ,'PmissMin_PmBin0':float(reco_parameters.get_value(0,'pMiss_min')) ,'PmissMax_PmBin0':float(reco_parameters.get_value(0,'pMiss_max')) 
+#                                   ,'PmissMin_PmBin1':float(reco_parameters.get_value(1,'pMiss_min')) ,'PmissMax_PmBin1':float(reco_parameters.get_value(1,'pMiss_max')) 
+#                                   ,'PmissMin_PmBin2':float(reco_parameters.get_value(2,'pMiss_min')) ,'PmissMax_PmBin2':float(reco_parameters.get_value(2,'pMiss_max')) 
+#                                   ,'PmissMin_PmBin3':float(reco_parameters.get_value(3,'pMiss_min')) ,'PmissMax_PmBin3':float(reco_parameters.get_value(3,'pMiss_max')) 
+#                                   ,'PmissMin_PmBin4':float(reco_parameters.get_value(4,'pMiss_min')) ,'PmissMax_PmBin4':float(reco_parameters.get_value(4,'pMiss_max')) 
+#                                   # x
+#                                   ,'recMeanX_unweighted_PmBin0':float(reco_parameters.get_value(0,'mean_x_unweighted')) 
+#                                   ,'recSigmaX_unweighted_PmBin0':float(reco_parameters.get_value(0,'sigma_x_unweighted')) 
+#                                   ,'recMeanX_unweighted_PmBin1':float(reco_parameters.get_value(1,'mean_x_unweighted')) 
+#                                   ,'recSigmaX_unweighted_PmBin1':float(reco_parameters.get_value(1,'sigma_x_unweighted')) 
+#                                   ,'recMeanX_unweighted_PmBin2':float(reco_parameters.get_value(2,'mean_x_unweighted')) 
+#                                   ,'recSigmaX_unweighted_PmBin2':float(reco_parameters.get_value(2,'sigma_x_unweighted')) 
+#                                   ,'recMeanX_unweighted_PmBin3':float(reco_parameters.get_value(3,'mean_x_unweighted')) 
+#                                   ,'recSigmaX_unweighted_PmBin3':float(reco_parameters.get_value(3,'sigma_x_unweighted')) 
+#                                   ,'recMeanX_unweighted_PmBin4':float(reco_parameters.get_value(4,'mean_x_unweighted')) 
+#                                   ,'recSigmaX_unweighted_PmBin4':float(reco_parameters.get_value(4,'sigma_x_unweighted')) 
+#                                   # y
+#                                   ,'recMeanY_unweighted_PmBin0':float(reco_parameters.get_value(0,'mean_y_unweighted')) 
+#                                   ,'recSigmaY_unweighted_PmBin0':float(reco_parameters.get_value(0,'sigma_y_unweighted')) 
+#                                   ,'recMeanY_unweighted_PmBin1':float(reco_parameters.get_value(1,'mean_y_unweighted')) 
+#                                   ,'recSigmaY_unweighted_PmBin1':float(reco_parameters.get_value(1,'sigma_y_unweighted')) 
+#                                   ,'recMeanY_unweighted_PmBin2':float(reco_parameters.get_value(2,'mean_y_unweighted')) 
+#                                   ,'recSigmaY_unweighted_PmBin2':float(reco_parameters.get_value(2,'sigma_y_unweighted')) 
+#                                   ,'recMeanY_unweighted_PmBin3':float(reco_parameters.get_value(3,'mean_y_unweighted')) 
+#                                   ,'recSigmaY_unweighted_PmBin3':float(reco_parameters.get_value(3,'sigma_y_unweighted')) 
+#                                   ,'recMeanY_unweighted_PmBin4':float(reco_parameters.get_value(4,'mean_y_unweighted')) 
+#                                   ,'recSigmaY_unweighted_PmBin4':float(reco_parameters.get_value(4,'sigma_y_unweighted')) 
+#                                   # z
+#                                   ,'recMeanZ_unweighted_PmBin0':float(reco_parameters.get_value(0,'mean_z_unweighted')) 
+#                                   ,'recSigmaZ_unweighted_PmBin0':float(reco_parameters.get_value(0,'sigma_z_unweighted')) 
+#                                   ,'recMeanZ_unweighted_PmBin1':float(reco_parameters.get_value(1,'mean_z_unweighted')) 
+#                                   ,'recSigmaZ_unweighted_PmBin1':float(reco_parameters.get_value(1,'sigma_z_unweighted')) 
+#                                   ,'recMeanZ_unweighted_PmBin2':float(reco_parameters.get_value(2,'mean_z_unweighted')) 
+#                                   ,'recSigmaZ_unweighted_PmBin2':float(reco_parameters.get_value(2,'sigma_z_unweighted')) 
+#                                   ,'recMeanZ_unweighted_PmBin3':float(reco_parameters.get_value(3,'mean_z_unweighted')) 
+#                                   ,'recSigmaZ_unweighted_PmBin3':float(reco_parameters.get_value(3,'sigma_z_unweighted')) 
+#                                   ,'recMeanZ_unweighted_PmBin4':float(reco_parameters.get_value(4,'mean_z_unweighted')) 
+#                                   ,'recSigmaZ_unweighted_PmBin4':float(reco_parameters.get_value(4,'sigma_z_unweighted'))
                                    
                                    
                                    # events loss
                                    ,'NLostEvents':(9907*float(N.NRand) - ana_sim.GetEntries())
                                    ,'fracLostEvents':(float((9907.0*float(N.NRand)) - ana_sim.GetEntries())/(9907.0*float(N.NRand)))
-                                   # events loss in 20 p(miss) bins, for pp/p analysis
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[0][0],pmiss_multiples_bins[0][1]):evnt_loss_in_pmiss_multiples_bins[0]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[1][0],pmiss_multiples_bins[1][1]):evnt_loss_in_pmiss_multiples_bins[1]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[2][0],pmiss_multiples_bins[2][1]):evnt_loss_in_pmiss_multiples_bins[2]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[3][0],pmiss_multiples_bins[3][1]):evnt_loss_in_pmiss_multiples_bins[3]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[4][0],pmiss_multiples_bins[4][1]):evnt_loss_in_pmiss_multiples_bins[4]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[5][0],pmiss_multiples_bins[5][1]):evnt_loss_in_pmiss_multiples_bins[5]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[6][0],pmiss_multiples_bins[6][1]):evnt_loss_in_pmiss_multiples_bins[6]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[7][0],pmiss_multiples_bins[7][1]):evnt_loss_in_pmiss_multiples_bins[7]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[8][0],pmiss_multiples_bins[8][1]):evnt_loss_in_pmiss_multiples_bins[8]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[9][0],pmiss_multiples_bins[9][1]):evnt_loss_in_pmiss_multiples_bins[9]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[10][0],pmiss_multiples_bins[10][1]):evnt_loss_in_pmiss_multiples_bins[10]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[11][0],pmiss_multiples_bins[11][1]):evnt_loss_in_pmiss_multiples_bins[11]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[12][0],pmiss_multiples_bins[12][1]):evnt_loss_in_pmiss_multiples_bins[12]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[13][0],pmiss_multiples_bins[13][1]):evnt_loss_in_pmiss_multiples_bins[13]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[14][0],pmiss_multiples_bins[14][1]):evnt_loss_in_pmiss_multiples_bins[14]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[15][0],pmiss_multiples_bins[15][1]):evnt_loss_in_pmiss_multiples_bins[15]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[16][0],pmiss_multiples_bins[16][1]):evnt_loss_in_pmiss_multiples_bins[16]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[17][0],pmiss_multiples_bins[17][1]):evnt_loss_in_pmiss_multiples_bins[17]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[18][0],pmiss_multiples_bins[18][1]):evnt_loss_in_pmiss_multiples_bins[18]
-                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[19][0],pmiss_multiples_bins[19][1]):evnt_loss_in_pmiss_multiples_bins[19]
+#                                   # events loss in 20 p(miss) bins, for pp/p analysis
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[0][0],pmiss_multiples_bins[0][1]):evnt_loss_in_pmiss_multiples_bins[0]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[1][0],pmiss_multiples_bins[1][1]):evnt_loss_in_pmiss_multiples_bins[1]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[2][0],pmiss_multiples_bins[2][1]):evnt_loss_in_pmiss_multiples_bins[2]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[3][0],pmiss_multiples_bins[3][1]):evnt_loss_in_pmiss_multiples_bins[3]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[4][0],pmiss_multiples_bins[4][1]):evnt_loss_in_pmiss_multiples_bins[4]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[5][0],pmiss_multiples_bins[5][1]):evnt_loss_in_pmiss_multiples_bins[5]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[6][0],pmiss_multiples_bins[6][1]):evnt_loss_in_pmiss_multiples_bins[6]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[7][0],pmiss_multiples_bins[7][1]):evnt_loss_in_pmiss_multiples_bins[7]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[8][0],pmiss_multiples_bins[8][1]):evnt_loss_in_pmiss_multiples_bins[8]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[9][0],pmiss_multiples_bins[9][1]):evnt_loss_in_pmiss_multiples_bins[9]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[10][0],pmiss_multiples_bins[10][1]):evnt_loss_in_pmiss_multiples_bins[10]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[11][0],pmiss_multiples_bins[11][1]):evnt_loss_in_pmiss_multiples_bins[11]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[12][0],pmiss_multiples_bins[12][1]):evnt_loss_in_pmiss_multiples_bins[12]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[13][0],pmiss_multiples_bins[13][1]):evnt_loss_in_pmiss_multiples_bins[13]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[14][0],pmiss_multiples_bins[14][1]):evnt_loss_in_pmiss_multiples_bins[14]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[15][0],pmiss_multiples_bins[15][1]):evnt_loss_in_pmiss_multiples_bins[15]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[16][0],pmiss_multiples_bins[16][1]):evnt_loss_in_pmiss_multiples_bins[16]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[17][0],pmiss_multiples_bins[17][1]):evnt_loss_in_pmiss_multiples_bins[17]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[18][0],pmiss_multiples_bins[18][1]):evnt_loss_in_pmiss_multiples_bins[18]
+#                                   ,'fracLoss_pmiss_%.3f_%.3f'%(pmiss_multiples_bins[19][0],pmiss_multiples_bins[19][1]):evnt_loss_in_pmiss_multiples_bins[19]
 
                                    }
+                                   
                                    , index = [int(run)])
-                # ----------------------------
+            # all nuclei
+            for target,Pval_scores in zip(['12C','27Al','56Fe','208Pb'],[Pval_scores_12C,Pval_scores_27Al,Pval_scores_56Fe,Pval_scores_208Pb]):
+                results['PvalSigmaX_unweighted_%s'%target]  = float(Pval_scores.PvalSigmaX_unweighted)
+                results['PvalSigmaY_unweighted_%s'%target]  = float(Pval_scores.PvalSigmaY_unweighted)
+                results['PvalMeanZa1_unweighted_%s'%target] = float(Pval_scores.PvalMeanZa1_unweighted)
+                results['PvalMeanZa2_unweighted_%s'%target] = float(Pval_scores.PvalMeanZa2_unweighted)
+                results['PvalSigmaZa1_unweighted_%s'%target]= float(Pval_scores.PvalSigmaZa1_unweighted)
+                results['PvalSigmaZa2_unweighted_%s'%target]= float(Pval_scores.PvalSigmaZa2_unweighted)
+                results['PvalSigmaX_weighted_%s'%target]    = float(Pval_scores.PvalSigmaX_weighted)
+                results['PvalSigmaY_weighted_%s'%target]    = float(Pval_scores.PvalSigmaY_weighted)
+                results['PvalMeanZa1_weighted_%s'%target]   = float(Pval_scores.PvalMeanZa1_weighted)
+                results['PvalMeanZa2_weighted_%s'%target]   = float(Pval_scores.PvalMeanZa2_weighted)
+                results['PvalSigmaZa1_weighted_%s'%target]  = float(Pval_scores.PvalSigmaZa1_weighted)
+                results['PvalSigmaZa2_weighted_%s'%target]  = float(Pval_scores.PvalSigmaZa2_weighted)
+                results['PvalTotal_weighted_%s'%target]     = float(Pval_scores_12C.PvalTotal_weighted)
+                results['PvalSigmaZa1SigmaZa2_%s'%target]   = float(Pval_scores_12C.PvalSigmaZa1SigmaZa2)
+                results['PvalMeanZa1MeanZa2_%s'%target]     = float(Pval_scores_12C.PvalMeanZa1MeanZa2)
+                results['PvalSigmaZa1MeanZa1_%s'%target]    = float(Pval_scores_12C.PvalSigmaZa1MeanZa1)
+                results['PvalSigmaZa1MeanZa2_%s'%target]    = float(Pval_scores_12C.PvalSigmaZa1MeanZa2)
+                results['PvalSigmaZa2MeanZa1_%s'%target]    = float(Pval_scores_12C.PvalSigmaZa2MeanZa1)
+                results['PvalSigmaZa2MeanZa2_%s'%target]    = float(Pval_scores_12C.PvalSigmaZa2MeanZa2)
+        
+
+
+
+            # reconstructed parameters in 5 big p(miss) bins
+            for i in range(len(PmissBins)):
+                pmin , pmax = PmissBins[i][0] , PmissBins[i][1]
+                results['recMeanX_unweighted_pmiss_%.3f_%.3f'%(pmin , pmax)]    = float(reco_parameters.get_value(i,'mean_x_unweighted'))
+                results['recSigmaX_unweighted_pmiss_%.3f_%.3f'%(pmin , pmax)]   = float(reco_parameters.get_value(i,'sigma_x_unweighted'))
+                results['recMeanY_unweighted_pmiss_%.3f_%.3f'%(pmin , pmax)]    = float(reco_parameters.get_value(i,'mean_y_unweighted'))
+                results['recSigmaY_unweighted_pmiss_%.3f_%.3f'%(pmin , pmax)]   = float(reco_parameters.get_value(i,'sigma_y_unweighted'))
+                results['recMeanZ_unweighted_pmiss_%.3f_%.3f'%(pmin , pmax)]    = float(reco_parameters.get_value(i,'mean_z_unweighted'))
+                results['recSigmaZ_unweighted_pmiss_%.3f_%.3f'%(pmin , pmax)]   = float(reco_parameters.get_value(i,'sigma_z_unweighted'))
+
+            # events loss in 20 p(miss) bins, for pp/p analysis
+            for i in range( len(pmiss_multiples_bins) ):
+                pmin , pmax = pmiss_multiples_bins[i][0] , pmiss_multiples_bins[i][1]
+                results['fracLoss_pmiss_%.3f_%.3f'%(pmin , pmax)] = evnt_loss_in_pmiss_multiples_bins[i]
+                evnt_loss_in_pmiss_multiples_bins[i]
+                for j in range( len(Q2Bins) ):
+                    Q2min , Q2max = Q2Bins[j][0] , Q2Bins[j][1]
+                    results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmin , pmax , Q2min , Q2max)] = evnt_loss_in_pmiss_multiples_bins_Q2_bins[i][j]
+            # ----------------------------
                 
 
 
@@ -911,7 +974,7 @@ def generate_runs_with_different_parameters( option,
             ana_sim.CloseFile()
             if debug>1:
                 print "appended into pandas.DataFrames"
-                if debug>4: print "results: ",results
+                if debug>1: print "results: ",results
 
             garbage_list = [ ana_sim , reco_parameters , reco_fits  , results ]
             del garbage_list
