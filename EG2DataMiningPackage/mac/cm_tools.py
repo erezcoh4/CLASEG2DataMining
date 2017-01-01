@@ -268,8 +268,6 @@ def fit_par_plot( fig , i_subplot , data , var , weight , title , do_plot_fit_pa
     [Xfit,XfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_x_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_xErr_' + weight ],data[ var + '_xErr_' + weight ]], 'black','v','none',r'$%s_{x}$'%title ,'const',do_plot_fit_pars=do_plot_fit_pars)
     [Yfit,YfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_y_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_yErr_' + weight ],data[ var + '_yErr_' + weight ]], 'red'  ,'o','none',r'$%s_{y}$'%title ,'const',do_plot_fit_pars=do_plot_fit_pars)
     [Tfit,TfitErr] = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_t_' + weight],'const')
-    #    [Tfit,TfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_t_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_tErr_' + weight ],data[ var + '_tErr_' + weight ]], 'green','^','none',r'$%s_{\perp}$'%title ,'const')
-    #    Tfit , TfitErr = 0.5*(Xfit + Yfit) ,  math.sqrt(XfitErr*XfitErr + YfitErr*YfitErr)
     [Za1,Za1err],[Za2,Za2err] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_zErr_' + weight ],data[ var + '_zErr_' + weight ]], 'blue' ,'s','none',r'$%s_{\vec{p}_{miss}}$'%title ,'linear',do_plot_fit_pars=do_plot_fit_pars)
 #    set_frame( ax , r'%s $%s$'%(weight,title) , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left",ncol=2)
     set_frame( ax , '' , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left",ncol=2)
@@ -691,8 +689,7 @@ def generate_runs_with_different_parameters( option,
     '''
     if 'generate' in option:
         h = pAcceptacneFile.Get("hRescaled")
-        h.Print()
-        gen_events = GenerateEvents( path , 0 , debug )
+        gen_events = GenerateEvents( path , 0 , debug - 2 )
         gen_events.SetNRand( int(N.NRand) )
         gen_events.Use_protonAcceptacne( True )
         gen_events.Set_protonAcceptacne( h )
