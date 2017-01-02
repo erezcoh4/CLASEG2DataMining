@@ -784,26 +784,29 @@ def generate_runs_with_different_parameters( option,
                                    
                                    , index = [int(run)])
             # all nuclei
-            for target,Pval_scores in zip(['12C','27Al','56Fe','208Pb'],[Pval_scores_12C,Pval_scores_27Al,Pval_scores_56Fe,Pval_scores_208Pb]):
+            for target,Pval_scores in zip(['12C','27Al','56Fe','208Pb'],
+                                          [Pval_scores_12C,Pval_scores_27Al,Pval_scores_56Fe,Pval_scores_208Pb]):
+                
                 results['PvalSigmaX_unweighted_%s'%target]  = float(Pval_scores.PvalSigmaX_unweighted)
                 results['PvalSigmaY_unweighted_%s'%target]  = float(Pval_scores.PvalSigmaY_unweighted)
                 results['PvalMeanZa1_unweighted_%s'%target] = float(Pval_scores.PvalMeanZa1_unweighted)
                 results['PvalMeanZa2_unweighted_%s'%target] = float(Pval_scores.PvalMeanZa2_unweighted)
                 results['PvalSigmaZa1_unweighted_%s'%target]= float(Pval_scores.PvalSigmaZa1_unweighted)
                 results['PvalSigmaZa2_unweighted_%s'%target]= float(Pval_scores.PvalSigmaZa2_unweighted)
+                results['PvalTotal_unweighted_%s'%target]   = float(Pval_scores.PvalTotal_unweighted)
                 results['PvalSigmaX_weighted_%s'%target]    = float(Pval_scores.PvalSigmaX_weighted)
                 results['PvalSigmaY_weighted_%s'%target]    = float(Pval_scores.PvalSigmaY_weighted)
                 results['PvalMeanZa1_weighted_%s'%target]   = float(Pval_scores.PvalMeanZa1_weighted)
                 results['PvalMeanZa2_weighted_%s'%target]   = float(Pval_scores.PvalMeanZa2_weighted)
                 results['PvalSigmaZa1_weighted_%s'%target]  = float(Pval_scores.PvalSigmaZa1_weighted)
                 results['PvalSigmaZa2_weighted_%s'%target]  = float(Pval_scores.PvalSigmaZa2_weighted)
-                results['PvalTotal_weighted_%s'%target]     = float(Pval_scores_12C.PvalTotal_weighted)
-                results['PvalSigmaZa1SigmaZa2_%s'%target]   = float(Pval_scores_12C.PvalSigmaZa1SigmaZa2)
-                results['PvalMeanZa1MeanZa2_%s'%target]     = float(Pval_scores_12C.PvalMeanZa1MeanZa2)
-                results['PvalSigmaZa1MeanZa1_%s'%target]    = float(Pval_scores_12C.PvalSigmaZa1MeanZa1)
-                results['PvalSigmaZa1MeanZa2_%s'%target]    = float(Pval_scores_12C.PvalSigmaZa1MeanZa2)
-                results['PvalSigmaZa2MeanZa1_%s'%target]    = float(Pval_scores_12C.PvalSigmaZa2MeanZa1)
-                results['PvalSigmaZa2MeanZa2_%s'%target]    = float(Pval_scores_12C.PvalSigmaZa2MeanZa2)
+                results['PvalTotal_weighted_%s'%target]     = float(Pval_scores.PvalTotal_weighted)
+                results['PvalSigmaZa1SigmaZa2_%s'%target]   = float(Pval_scores.PvalSigmaZa1SigmaZa2)
+                results['PvalMeanZa1MeanZa2_%s'%target]     = float(Pval_scores.PvalMeanZa1MeanZa2)
+                results['PvalSigmaZa1MeanZa1_%s'%target]    = float(Pval_scores.PvalSigmaZa1MeanZa1)
+                results['PvalSigmaZa1MeanZa2_%s'%target]    = float(Pval_scores.PvalSigmaZa1MeanZa2)
+                results['PvalSigmaZa2MeanZa1_%s'%target]    = float(Pval_scores.PvalSigmaZa2MeanZa1)
+                results['PvalSigmaZa2MeanZa2_%s'%target]    = float(Pval_scores.PvalSigmaZa2MeanZa2)
         
 
 
