@@ -441,6 +441,102 @@ std::vector<Double_t> TAnalysisEG2::RooFitCM( Float_t PmissMin, Float_t PmissMax
 }
 
 
+
+//
+////....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//std::vector<Double_t> TAnalysisEG2::FastRooFitCM( Float_t PmissMin, Float_t PmissMax, bool DoWeight , bool PlotFits, int debug, TCanvas * c, Int_t start_cd ){
+//    // returns a parameter matrix: (μ-x,𝜎-x,μ-y,𝜎-y,μ-z,𝜎-z) and their uncertainties (𝚫μ-x,𝚫𝜎-x,𝚫μ-y,𝚫𝜎-y,𝚫μ-z,𝚫𝜎-z)
+//    // if PlotFits=true, it also plots the RooFits into three pads: start_cd, start_cd+1 , start_cd+2
+//    
+//    // quiet mode
+//    RooMsgService::instance().setStreamStatus(1,false);
+//    RooMsgService::instance().setSilentMode(true);
+//    RooMsgService::instance().setGlobalKillBelow(RooFit::FATAL);
+//    gErrorIgnoreLevel = kFatal;
+//    
+//    Double_t    PcmPars[2] = { 0 , 0.14 } ,   PcmParsErr[2] = { 0 , 0 };
+//    std::vector<Double_t> results;
+//    
+//    RooRealVar  var     (name       ,name           ,-1.2     ,1.2                  ) ;
+//    RooPlot     * frame = var.frame( RooFit::Bins(50), RooFit::Name(name) , RooFit::Title(Title)) ;
+//    
+//    RooRealVar  fMean   ("mean"     ,"gaussian mean",0      ,-0.8       ,0.8        ) ;
+//    RooRealVar  fSigma  ("sigma"    ,"gaussian sig.",0.15   ,0          ,0.5        ) ;
+//    RooGaussian fGauss  ("gauss"    ,"gaussian"     ,var    ,fMean      ,fSigma     ) ;
+//
+//    
+//    // first, reduce the main tree by the desired cut....
+//    TCut cut = Form("%f < Pmiss3Mag && Pmiss3Mag < %f" , PmissMin , PmissMax);
+//    Tree = Tree -> CopyTree(cut);
+//    
+//    // x direction
+//    RooFit1D( Tree , "pcmX", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(start_cd) : nullptr , Form("#bf{X} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , "rooWeight" );
+//    results.push_back(PcmPars[0]); // mean
+//    results.push_back(PcmParsErr[0]); // mean - err
+//    results.push_back(PcmPars[1]); // sigma
+//    results.push_back(PcmParsErr[1]); // sigma - err
+//    
+//    // y direction
+//    RooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(start_cd+1) : nullptr , Form("#bf{Y} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , "rooWeight"  );
+//    results.push_back(PcmPars[0]); // mean
+//    results.push_back(PcmParsErr[0]); // mean - err
+//    results.push_back(PcmPars[1]); // sigma
+//    results.push_back(PcmParsErr[1]); // sigma - err
+//    
+//    // transverse direction
+//    RooFit1D( Tree , "pcmT", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(start_cd+2) : nullptr , Form("transverse {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , "rooWeight"  );
+//    results.push_back(PcmPars[0]); // mean
+//    results.push_back(PcmParsErr[0]); // mean - err
+//    results.push_back(PcmPars[1]); // sigma
+//    results.push_back(PcmParsErr[1]); // sigma - err
+//    
+//    // longitudinal direction
+//    RooFit1D( Tree , "pcmZ", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(start_cd+3) : nullptr , Form("#bf{Z} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , "rooWeight"  );
+//    results.push_back(PcmPars[0]); // mean
+//    results.push_back(PcmParsErr[0]); // mean - err
+//    results.push_back(PcmPars[1]); // sigma
+//    results.push_back(PcmParsErr[1]); // sigma - err
+//    
+//    
+//    
+//    
+//    
+//    
+//    if(DoWeight){
+//        // get the mean weight, and divide all events by it, to normalize weighting
+//        Float_t w , SumWeights = 0;
+//        Tree -> SetBranchAddress( WeightName , &w );
+//        for (Int_t i = 0; i < Tree->GetEntries() ; i++) {
+//            Tree -> GetEntry(i);
+//            SumWeights += w;
+//        }
+//        Float_t AverageWeightValue = SumWeights / Tree->GetEntries();
+//        //        RooRealVar  weight  (Form("%s/%f",WeightName.Data(),AverageWeightValue) ,"weight"       ,-1      ,10                 ) ;
+//        RooRealVar  weight  (WeightName ,"weight"       ,0      ,10                 ) ;
+//        RooArgSet   VarSet( var , weight );
+//        RooDataSet  DataSet(Form("DataSet_%d",i_roofit),Form("temp. Data Set (%d)",i_roofit),VarSet,Import(*Tree)) ;
+//        if(PlotFit) DataSet.plotOn(frame) ;
+//        if(debug>2) {DataSet.Print();         Printf("Average Weight (%s) Value: %f",WeightName.Data(),AverageWeightValue);
+//        }
+//        fGauss.fitTo( DataSet , RooFit::PrintLevel(-1) ) ;
+//    }
+//    else{
+//        RooDataSet DataSet(Form("DataSet_%d",i_roofit),Form("temp. Data Set (%d)",i_roofit),RooArgSet(var),Import(*Tree)) ;
+//        if(PlotFit) DataSet.plotOn(frame) ;
+//        if(debug>2) DataSet.Print();
+//        fGauss.fitTo( DataSet , RooFit::PrintLevel(-1) ) ;
+//    }
+//    
+//    Par[0] = fMean.getValV();
+//    Par[1] = fSigma.getValV();
+//    ParErr[0] = fMean.getError();
+//    ParErr[1] = fSigma.getError();
+//    
+//    return results;
+//    
+//    
+//}
+
 #endif
 
 

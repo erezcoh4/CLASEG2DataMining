@@ -42,35 +42,36 @@ def root_resutlsFName( path ):
     return path+"runs_results.root"
 
 # computations
-# ------------------------------------------------------------------------------- #
-def Nsigma( v1 , v1Err , v2 , v2Err):
-    return math.fabs( v1 - v2 )/math.sqrt( v1Err*v1Err + v2Err*v2Err )
-# ------------------------------------------------------------------------------- #
+## ------------------------------------------------------------------------------- #
+#def Nsigma( v1 , v1Err , v2 , v2Err):
+#    return math.fabs( v1 - v2 )/math.sqrt( v1Err*v1Err + v2Err*v2Err )
+## ------------------------------------------------------------------------------- #
 
-# ------------------------------------------------------------------------------- #
-def NsigmaScore( dataset1 , dataset2  , var   , weighting ):
-    return Nsigma( dataset1[var+'_'+weighting] , dataset1[var+'err_'+weighting]  , dataset2[var+'_'+weighting] , dataset2[var+'err_'+weighting] )
-# ------------------------------------------------------------------------------- #
+## ------------------------------------------------------------------------------- #
+#def NsigmaScore( dataset1 , dataset2  , var   , weighting ):
+#    return Nsigma( dataset1[var+'_'+weighting] , dataset1[var+'err_'+weighting]  , dataset2[var+'_'+weighting] , dataset2[var+'err_'+weighting] )
+## ------------------------------------------------------------------------------- #
 
-# ------------------------------------------------------------------------------- #
-def compute_Nsigma_scores( data_fits , reco_fits , weighting ):
-    
-    NsigSigmaX = NsigmaScore( data_fits , reco_fits  , 'SigmaX'   , weighting )
-    NsigSigmaY = NsigmaScore( data_fits , reco_fits  , 'SigmaY'   , weighting )
-    NsigMeanZa1 = NsigmaScore( data_fits , reco_fits  , 'MeanZa1'   , weighting )
-    NsigMeanZa2 = NsigmaScore( data_fits , reco_fits  , 'MeanZa2'   , weighting )
-    NsigSigmaZa1 = NsigmaScore( data_fits , reco_fits  , 'SigmaZa1'   , weighting )
-    NsigSigmaZa2 = NsigmaScore( data_fits , reco_fits  , 'SigmaZa2'   , weighting )
-    
-    return [NsigSigmaX , NsigSigmaY , NsigMeanZa1 , NsigMeanZa2 , NsigSigmaZa1 , NsigSigmaZa2]
-# ------------------------------------------------------------------------------- #
+#
+## ------------------------------------------------------------------------------- #
+#def compute_Nsigma_scores( data_fits , reco_fits , weighting ):
+#    
+#    NsigSigmaX = NsigmaScore( data_fits , reco_fits  , 'SigmaX'   , weighting )
+#    NsigSigmaY = NsigmaScore( data_fits , reco_fits  , 'SigmaY'   , weighting )
+#    NsigMeanZa1 = NsigmaScore( data_fits , reco_fits  , 'MeanZa1'   , weighting )
+#    NsigMeanZa2 = NsigmaScore( data_fits , reco_fits  , 'MeanZa2'   , weighting )
+#    NsigSigmaZa1 = NsigmaScore( data_fits , reco_fits  , 'SigmaZa1'   , weighting )
+#    NsigSigmaZa2 = NsigmaScore( data_fits , reco_fits  , 'SigmaZa2'   , weighting )
+#    
+#    return [NsigSigmaX , NsigSigmaY , NsigMeanZa1 , NsigMeanZa2 , NsigSigmaZa1 , NsigSigmaZa2]
+## ------------------------------------------------------------------------------- #
 
 
 # ------------------------------------------------------------------------------- #
 def Pval( dataset1 , dataset2  , var   , weighting ):
     v1 , v1Err = float(dataset1[var+'_'+weighting]) , float(dataset1[var+'err_'+weighting])
     v2 , v2Err = float(dataset2[var+'_'+weighting]) , float(dataset2[var+'err_'+weighting])
-    return Pval2varsAssumeGausDist( v1 , v1Err , v2 , v2Err , flags.verbose )
+    return Pval2varsAssumeGausDist( v1 , v1Err , v2 , v2Err , flags.verbose  , name=var+' '+weighting )
 # ------------------------------------------------------------------------------- #
 
 
@@ -209,26 +210,49 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
     if DoSaveCanvas:
         canvas_unweighted , canvas_weighted = fana.CreateCanvas( "RooFit plots - unweighted" , "Divide" , 4 , len(PmissBins) ) , fana.CreateCanvas( "RooFit plots - weighted" , "Divide" , 4 , len(PmissBins) )
 
+    # Jan 2016, changing to a (weighted) average and variance using numpy
+    ana = read_root( str(fana.GetFileName()) , key='anaTree' , columns=['pcmX','pcmY','pcmZ','Pmiss3Mag','rooWeight']  )
+    if debug>4: print 'ana: ',ana
+
     for i in range(len(PmissBins)):
         pMiss_min , pMiss_max = PmissBins[i][0] , PmissBins[i][1]
-        if flags.verbose>1: print 'running p(miss) bin ',i
+        if flags.verbose>1: print 'running p(miss) bin ',i,',',pMiss_min,' to ',pMiss_max,' GeV/c'
         if DoSaveCanvas:
             unweighted = fana.RooFitCM( pMiss_min , pMiss_max , False , True, flags.verbose, canvas_unweighted, 4*i + 1 )
             weighted = fana.RooFitCM( pMiss_min , pMiss_max , True , True, flags.verbose, canvas_weighted, 4*i + 1 )
+            df_pMissBin = pd.DataFrame({'pMiss_min':pMiss_min,'pMiss_max':pMiss_max
+                                       ,'mean_x_unweighted':unweighted[0],'mean_xErr_unweighted':unweighted[1],'sigma_x_unweighted':unweighted[2],'sigma_xErr_unweighted':unweighted[3]
+                                       ,'mean_y_unweighted':unweighted[4],'mean_yErr_unweighted':unweighted[5],'sigma_y_unweighted':unweighted[6],'sigma_yErr_unweighted':unweighted[7]
+                                       ,'mean_t_unweighted':unweighted[8],'mean_tErr_unweighted':unweighted[9],'sigma_t_unweighted':unweighted[10],'sigma_tErr_unweighted':unweighted[11]
+                                       ,'mean_z_unweighted':unweighted[12],'mean_zErr_unweighted':unweighted[13],'sigma_z_unweighted':unweighted[14],'sigma_zErr_unweighted':unweighted[15]
+                                       ,'mean_x_weighted':weighted[0],'mean_xErr_weighted':weighted[1],'sigma_x_weighted':weighted[2],'sigma_xErr_weighted':weighted[3]
+                                       ,'mean_y_weighted':weighted[4],'mean_yErr_weighted':weighted[5],'sigma_y_weighted':weighted[6],'sigma_yErr_weighted':weighted[7]
+                                       ,'mean_t_weighted':weighted[8],'mean_tErr_weighted':weighted[9],'sigma_t_weighted':weighted[10],'sigma_tErr_weighted':weighted[11]
+                                       ,'mean_z_weighted':weighted[12],'mean_zErr_weighted':weighted[13],'sigma_z_weighted':weighted[14],'sigma_zErr_weighted':weighted[15]}
+                                       , index=[i])
         else:
-            unweighted = fana.RooFitCM( pMiss_min , pMiss_max , False )
-            weighted = fana.RooFitCM( pMiss_min , pMiss_max , True )
+#            unweighted = fana.RooFitCM( pMiss_min , pMiss_max , False )
+#            weighted = fana.RooFitCM( pMiss_min , pMiss_max , True )
 
-        df_pMissBin = pd.DataFrame({'pMiss_min':pMiss_min,'pMiss_max':pMiss_max
-                                   ,'mean_x_unweighted':unweighted[0],'mean_xErr_unweighted':unweighted[1],'sigma_x_unweighted':unweighted[2],'sigma_xErr_unweighted':unweighted[3]
-                                   ,'mean_y_unweighted':unweighted[4],'mean_yErr_unweighted':unweighted[5],'sigma_y_unweighted':unweighted[6],'sigma_yErr_unweighted':unweighted[7]
-                                   ,'mean_t_unweighted':unweighted[8],'mean_tErr_unweighted':unweighted[9],'sigma_t_unweighted':unweighted[10],'sigma_tErr_unweighted':unweighted[11]
-                                   ,'mean_z_unweighted':unweighted[12],'mean_zErr_unweighted':unweighted[13],'sigma_z_unweighted':unweighted[14],'sigma_zErr_unweighted':unweighted[15]
-                                   ,'mean_x_weighted':weighted[0],'mean_xErr_weighted':weighted[1],'sigma_x_weighted':weighted[2],'sigma_xErr_weighted':weighted[3]
-                                   ,'mean_y_weighted':weighted[4],'mean_yErr_weighted':weighted[5],'sigma_y_weighted':weighted[6],'sigma_yErr_weighted':weighted[7]
-                                   ,'mean_t_weighted':weighted[8],'mean_tErr_weighted':weighted[9],'sigma_t_weighted':weighted[10],'sigma_tErr_weighted':weighted[11]
-                                   ,'mean_z_weighted':weighted[12],'mean_zErr_weighted':weighted[13],'sigma_z_weighted':weighted[14],'sigma_zErr_weighted':weighted[15]}
-                                   , index=[i])
+            # Jan 2016, changing to a (weighted) average and variance using numpy
+            ana_reduced = ana[ (pMiss_min < ana.Pmiss3Mag) & (ana.Pmiss3Mag < pMiss_max) ]
+            mean_x_unweighted , mean_x_weighted     = np.average( ana_reduced.pcmX ) , np.average( ana_reduced.pcmX , weights=ana_reduced.rooWeight )
+            sigma_x_unweighted, sigma_x_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_weighted) , weights=ana_reduced.rooWeight  ))
+            mean_y_unweighted , mean_y_weighted     = np.average( ana_reduced.pcmY ) , np.average( ana_reduced.pcmY , weights=ana_reduced.rooWeight )
+            sigma_y_unweighted, sigma_y_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmY-mean_y_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmY-mean_y_weighted) , weights=ana_reduced.rooWeight  ))
+            mean_z_unweighted , mean_z_weighted     = np.average( ana_reduced.pcmZ ) , np.average( ana_reduced.pcmZ , weights=ana_reduced.rooWeight )
+            sigma_z_unweighted, sigma_z_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_weighted) , weights=ana_reduced.rooWeight  ))
+
+
+            df_pMissBin = pd.DataFrame({'pMiss_min':pMiss_min,'pMiss_max':pMiss_max
+                                       ,'mean_x_unweighted':mean_x_unweighted,'mean_xErr_unweighted':0,'sigma_x_unweighted':sigma_x_unweighted,'sigma_xErr_unweighted':0
+                                       ,'mean_y_unweighted':mean_y_unweighted,'mean_yErr_unweighted':0,'sigma_y_unweighted':sigma_y_unweighted,'sigma_yErr_unweighted':0
+                                       ,'mean_z_unweighted':mean_z_unweighted,'mean_zErr_unweighted':0,'sigma_z_unweighted':sigma_z_unweighted,'sigma_zErr_unweighted':0
+                                       ,'mean_x_weighted':mean_x_weighted,'mean_xErr_weighted':0,'sigma_x_weighted':sigma_x_weighted,'sigma_xErr_weighted':0
+                                       ,'mean_y_weighted':mean_y_weighted,'mean_yErr_weighted':0,'sigma_y_weighted':sigma_y_weighted,'sigma_yErr_weighted':0
+                                       ,'mean_z_weighted':mean_z_weighted,'mean_zErr_weighted':0,'sigma_z_weighted':sigma_z_weighted,'sigma_zErr_weighted':0}
+                                       , index=[i])
+
         df_pMissBins = df_pMissBins.append(df_pMissBin)
     if DoSaveCanvas:
         canvas_unweighted.SaveAs(unweightedRoofitsFName)
@@ -732,10 +756,9 @@ def generate_runs_with_different_parameters( option,
             ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
                 
             loss_pmiss_bins , loss_Q2pmiss_bins = get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins ,
-                                                                                                                        Q2Bins , evtsgen_Q2pmiss_bins ,
-                                                                                                                        ana_sim )
+                                                                      Q2Bins , evtsgen_Q2pmiss_bins , ana_sim )
 
-            if debug>4:
+            if debug>5:
                 reco_parameters = calc_cm_parameters( ana_sim  , PmissBins , CMRooFitsName( path + '/eg_cm_roofits/run%d_unweighted_'%run ), CMRooFitsName( path + '/eg_cm_roofits/run%d_weighted_'%run ) , True )
                 fit_cm_parameters( run , reco_parameters , FigureFName( path + '/eg_cm_figures/run%d_'%run ) , True )
             
