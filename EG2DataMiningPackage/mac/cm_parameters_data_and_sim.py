@@ -7,7 +7,7 @@ from cm_tools import *
     python mac/cm_parameters_data_and_sim.py --option=scheme
     python mac/cm_parameters_data_and_sim.py --option=bands
     python mac/cm_parameters_data_and_sim.py --option=AllTragets
-    python mac/cm_parameters_data_and_sim.py --option=generate_analyze -v3 -r1 -nruns=1
+    python mac/cm_parameters_data_and_sim.py --option=generate_analyze -v2 -r1 -nruns=1
     
     
     options (can be ran simultaneously):
