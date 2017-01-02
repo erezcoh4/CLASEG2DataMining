@@ -211,7 +211,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
         canvas_unweighted , canvas_weighted = fana.CreateCanvas( "RooFit plots - unweighted" , "Divide" , 4 , len(PmissBins) ) , fana.CreateCanvas( "RooFit plots - weighted" , "Divide" , 4 , len(PmissBins) )
 
     # Jan 2016, changing to a (weighted) average and variance using numpy
-    ana = read_root( str(fana.GetFileName()) , columns=['pcmX','pcmY','pcmZ','Pmiss3Mag','rooWeight']  )
+    ana = read_root( str(fana.GetFileName()) , key='anaTree' , columns=['pcmX','pcmY','pcmZ','Pmiss3Mag','rooWeight']  )
     if debug>4: print 'ana: ',ana
 
     for i in range(len(PmissBins)):
