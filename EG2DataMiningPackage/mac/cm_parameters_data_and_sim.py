@@ -28,7 +28,7 @@ from cm_tools import *
 if flags.run > 0:
     start_run = flags.run
 else:
-    start_run = 500000
+    start_run = 600000
 
 if flags.NumberOfRuns > 0:
     Nruns = flags.NumberOfRuns
@@ -144,7 +144,7 @@ if 'plot all parameters for all targets' in flags.option or 'AllTargets' in flag
 if 'create bands for EG' in flags.option or 'bands' in flags.option:
 
     cm_parameters = pd.read_csv( CMParsFname(ppPath+'/DATA/data') )
-    fits = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' ) )
+    fits = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' , 'C12' ) )
 
     generate_cm_bands( cm_parameters , fits , N ,
                       flags.verbose ,
