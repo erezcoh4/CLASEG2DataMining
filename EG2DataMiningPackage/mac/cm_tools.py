@@ -28,8 +28,8 @@ def CMfitsFname( path , target='' ):
     return path+"CMfits%s.csv"%target
 def CMBandFname( path ):
     return path+"CMparameter_Bands.csv"
-def FigureFName( path ):
-    return path+"cm_width_and_mean.pdf"
+def FigureFName( path , target='' ):
+    return path+"cm_width_and_mean%s.pdf"%target
 def FigureBandFName( path ):
     return path+"cm_width_and_mean_Bands.pdf"
 def GeneParsFName( path ):
@@ -40,31 +40,6 @@ def buildup_resutlsFName( path ):
     return path+"runs_results.csv"
 def root_resutlsFName( path ):
     return path+"runs_results.root"
-
-# computations
-## ------------------------------------------------------------------------------- #
-#def Nsigma( v1 , v1Err , v2 , v2Err):
-#    return math.fabs( v1 - v2 )/math.sqrt( v1Err*v1Err + v2Err*v2Err )
-## ------------------------------------------------------------------------------- #
-
-## ------------------------------------------------------------------------------- #
-#def NsigmaScore( dataset1 , dataset2  , var   , weighting ):
-#    return Nsigma( dataset1[var+'_'+weighting] , dataset1[var+'err_'+weighting]  , dataset2[var+'_'+weighting] , dataset2[var+'err_'+weighting] )
-## ------------------------------------------------------------------------------- #
-
-#
-## ------------------------------------------------------------------------------- #
-#def compute_Nsigma_scores( data_fits , reco_fits , weighting ):
-#    
-#    NsigSigmaX = NsigmaScore( data_fits , reco_fits  , 'SigmaX'   , weighting )
-#    NsigSigmaY = NsigmaScore( data_fits , reco_fits  , 'SigmaY'   , weighting )
-#    NsigMeanZa1 = NsigmaScore( data_fits , reco_fits  , 'MeanZa1'   , weighting )
-#    NsigMeanZa2 = NsigmaScore( data_fits , reco_fits  , 'MeanZa2'   , weighting )
-#    NsigSigmaZa1 = NsigmaScore( data_fits , reco_fits  , 'SigmaZa1'   , weighting )
-#    NsigSigmaZa2 = NsigmaScore( data_fits , reco_fits  , 'SigmaZa2'   , weighting )
-#    
-#    return [NsigSigmaX , NsigSigmaY , NsigMeanZa1 , NsigMeanZa2 , NsigSigmaZa1 , NsigSigmaZa2]
-## ------------------------------------------------------------------------------- #
 
 
 # ------------------------------------------------------------------------------- #
@@ -92,31 +67,6 @@ def compute_Pval_parameters( data_fits , reco_fits , weighting ):
 # ------------------------------------------------------------------------------- #
 def KStest( PmissBins , ana_sim , ana_data , var , cut=ROOT.TCut() , debug=2 , Nbins=20):
     # [http://docs.scipy.org/doc/scipy-0.15.1/reference/generated/scipy.stats.ks_2samp.html]
-    # delete Jan-15
-    #    KS_distances , Pval_KS = [] , []
-    #    if debug>4 :
-    #        figure = plt.figure(figsize=[60,20])
-    #    for i in range(len(PmissBins)):
-    #        pMiss_min , pMiss_max = PmissBins[i][0] , PmissBins[i][1]
-    #        reduced_data = tree2array(ana_data.GetTree(),branches=var , selection = '%f < Pmiss3Mag && Pmiss3Mag < %f'%(pMiss_min , pMiss_max) )
-    #        reduced_sim = tree2array(ana_sim.GetTree(),branches=var , selection = '%f < Pmiss3Mag && Pmiss3Mag < %f'%(pMiss_min , pMiss_max))
-    #        D , Pvalue = ks_2samp( reduced_sim , reduced_data )
-    #
-    #        if debug>4 :
-    #            ax = figure.add_subplot(len(PmissBins)/2,3,i+1)
-    #            for array,col in zip([reduced_sim , reduced_data],['black','red']):
-    #                g=sns.distplot( array, bins=np.linspace(-1, 2 , Nbins), ax=ax, color=col , axlabel=var )
-    #            g.axes.set_title(r'%.2f < p$_{miss}$ < %.2f GeV/c'%(pMiss_min , pMiss_max), fontsize=34,color="b")
-    #            print_important( "KS test of data vs. simulation for %s in p(miss) bin %d is D = %f, Pvalue = %f"%(var , i , D , Pvalue) )
-    #
-    #        KS_distances.append(D)
-    #        Pval_KS.append(Pvalue)
-    #
-    #    if debug>4 :
-    #        figure.savefig( path + "/cmHistos_%s.pdf"%var)
-    #
-    #    return KS_distances , Pval_KS
-
     data = tree2array( ana_data.GetTree() , branches=var )
     sim = tree2array( ana_sim.GetTree() , branches=var )
     D_KS , Pval_KS = ks_2samp( sim , data )
@@ -124,7 +74,7 @@ def KStest( PmissBins , ana_sim , ana_data , var , cut=ROOT.TCut() , debug=2 , N
         fig,ax = plt.subplots(figsize=[20,20])
         for array,col in zip([sim , data],['black','red']):
             g=sns.distplot( array, bins=np.linspace(-1, 2 , Nbins), ax=ax, color=col , axlabel=var )
-        figure.savefig( path + "/cmHistos_%s.pdf"%var)
+        fig.savefig( path + "/cmHistos_%s.pdf"%var)
         print_important( "KS test of data vs. simulation for %s is D = %f, Pvalue = %f"%(var , D_KS , Pval_KS) )
 
     return D_KS , Pval_KS
@@ -133,18 +83,6 @@ def KStest( PmissBins , ana_sim , ana_data , var , cut=ROOT.TCut() , debug=2 , N
 
 # ------------------------------------------------------------------------------- #
 def get_KS_scores( PmissBins ,ana_sim , ana_data , h3_pcm_data ):
-    
-    # delete Jan-15
-#    # previous 1d KS tests
-#    KSpCMx , KSxPval = KStest( PmissBins ,ana_sim , ana_data , "pcmX" , ROOT.TCut('') , debug)
-#    KSpCMy , KSyPval = KStest( PmissBins ,ana_sim , ana_data , "pcmY" , ROOT.TCut('') , debug)
-#    KSpCMt , KStPval = KStest( PmissBins ,ana_sim , ana_data , "pcmT" , ROOT.TCut('') , debug)
-#    KSpCMz , KSzPval = KStest( PmissBins ,ana_sim , ana_data , "pcmZ" , ROOT.TCut('') , debug)
-#    KSxPval_tot = Fisher_combination_Pvals( KSxPval )
-#    KSyPval_tot = Fisher_combination_Pvals( KSyPval )
-#    KStPval_tot = Fisher_combination_Pvals( KStPval )
-#    KSzPval_tot = Fisher_combination_Pvals( KSzPval )
-#    KSPval_tot = Fisher_combination_Pvals([KSxPval_tot , KSyPval_tot , KSzPval_tot])
 
     # 1d KS tests
     KSpCMx , KSxPval = KStest( PmissBins ,ana_sim , ana_data , "pcmX" , ROOT.TCut('') , debug)
@@ -159,7 +97,6 @@ def get_KS_scores( PmissBins ,ana_sim , ana_data , h3_pcm_data ):
     
     # make it a data-frame
     KS_scores = pd.DataFrame({'KSxPval':KSxPval,'KSyPval':KSyPval,'KSzPval':KSyPval,'KStPval':KSyPval,
-                             #                             'KSxPval_tot':KSxPval_tot,'KSyPval_tot':KSyPval_tot,'KSzPval_tot':KSzPval_tot,'KStPval_tot':KStPval_tot, # previous
                              'KSPval_tot':KSPval_tot,
                              'KS3dHistPval':KS3dHistPval},
                              index=[0])
@@ -283,7 +220,7 @@ def set_frame( ax , title , xlabel , ylabel , legend_location="upper left" , nco
 
 
 # ------------------------------------------------------------------------------- #
-def fit_par_plot( fig , i_subplot , data , var , weight , title , do_plot_fit_pars=False): # a sub-routine to fit a single parameter
+def fit_par_plot( fig , i_subplot , data , var , weight , title , do_plot_fit_pars=True): # a sub-routine to fit a single parameter
 
     Pmiss = (data.pMiss_max + data.pMiss_min)/2.
     pMissUpErr , pMissLowErr = data.pMiss_max - Pmiss , Pmiss - data.pMiss_min
@@ -293,7 +230,7 @@ def fit_par_plot( fig , i_subplot , data , var , weight , title , do_plot_fit_pa
     [Yfit,YfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_y_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_yErr_' + weight ],data[ var + '_yErr_' + weight ]], 'red'  ,'o','none',r'$%s_{y}$'%title ,'const',do_plot_fit_pars=do_plot_fit_pars)
     [Tfit,TfitErr] = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_t_' + weight],'const')
     [Za1,Za1err],[Za2,Za2err] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_zErr_' + weight ],data[ var + '_zErr_' + weight ]], 'blue' ,'s','none',r'$%s_{\vec{p}_{miss}}$'%title ,'linear',do_plot_fit_pars=do_plot_fit_pars)
-#    set_frame( ax , r'%s $%s$'%(weight,title) , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left",ncol=2)
+    #    set_frame( ax , r'%s $%s$'%(weight,title) , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left",ncol=2)
     set_frame( ax , '' , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left",ncol=2)
     return [Xfit , XfitErr , Yfit , YfitErr , Tfit , TfitErr, Za1 , Za1err , Za2 , Za2err , ax]
 # ------------------------------------------------------------------------------- #
@@ -306,7 +243,6 @@ def fit_par_noplot( data , var , weight , title ): # a sub-routine to fit a sing
     Xfit,XfitErr = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_x_' + weight] ,'const')
     Yfit,YfitErr = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_y_' + weight] ,'const')
     Tfit,TfitErr = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_t_' + weight] ,'const')
-    #    Tfit , TfitErr = 0.5*(Xfit + Yfit) ,  math.sqrt(XfitErr*XfitErr + YfitErr*YfitErr)
     Za1,Za1err,Za2,Za2err = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_z_' + weight] , 'linear' )
     return [Xfit , XfitErr , Yfit , YfitErr , Tfit , TfitErr, Za1 , Za1err , Za2 , Za2err , 0 ]
 # ------------------------------------------------------------------------------- #
@@ -324,7 +260,7 @@ def fit_cm_parameters( run , data , FigureFName = '' , DoPlot = False ): # all p
      SigmaY_unweighted  , SigmaYerr_unweighted,
      sT_unweighted      , sTerr_unweighted,
      SigmaZa1_unweighted, SigmaZa1err_unweighted,
-     SigmaZa2_unweighted, SigmaZa2err_unweighted, ax ] = fit_par_plot ( fig, 221, data, 'sigma', 'unweighted', '\sigma') if DoPlot else fit_par_noplot ( data,'sigma','unweighted','\sigma' )
+     SigmaZa2_unweighted, SigmaZa2err_unweighted, ax ] = fit_par_plot ( fig, 221, data, 'sigma', 'unweighted', '\sigma' , do_plot_fit_pars=True ) if DoPlot else fit_par_noplot ( data,'sigma','unweighted','\sigma' )
 
     [MeanX_unweighted   , MeanXerr_unweighted,
      MeanY_unweighted   , MeanYerr_unweighted,
@@ -336,7 +272,7 @@ def fit_cm_parameters( run , data , FigureFName = '' , DoPlot = False ): # all p
      SigmaY_weighted  , SigmaYerr_weighted,
      sT_weighted      , sTerr_weighted,
      SigmaZa1_weighted, SigmaZa1err_weighted,
-     SigmaZa2_weighted, SigmaZa2err_weighted, ax ] = fit_par_plot ( fig, 223, data, 'sigma', 'weighted', '\sigma') if DoPlot else fit_par_noplot ( data,'sigma','weighted','\sigma')
+     SigmaZa2_weighted, SigmaZa2err_weighted, ax ] = fit_par_plot ( fig, 223, data, 'sigma', 'weighted', '\sigma'  , do_plot_fit_pars=True ) if DoPlot else fit_par_noplot ( data,'sigma','weighted','\sigma')
      
     [MeanX_weighted   , MeanXerr_weighted,
      MeanY_weighted   , MeanYerr_weighted,
@@ -766,10 +702,6 @@ def generate_runs_with_different_parameters( option,
             reco_parameters = calc_cm_parameters( ana_sim  , PmissBins )
             reco_fits = fit_cm_parameters( run , reco_parameters )
 
-            Pval_scores_12C  = get_Pval_scores( data_fits_12C   , reco_fits , '12C' )
-            Pval_scores_27Al = get_Pval_scores( data_fits_27Al  , reco_fits , '27Al' )
-            Pval_scores_56Fe = get_Pval_scores( data_fits_56Fe  , reco_fits , '56Fe' )
-            Pval_scores_208Pb = get_Pval_scores( data_fits_208Pb, reco_fits , '208Pb' )
 
             KS_scores = get_KS_scores( PmissBins ,ana_sim , ana_data , h3_pcm_data )
 
@@ -807,9 +739,10 @@ def generate_runs_with_different_parameters( option,
                                    
                                    , index = [int(run)])
             # all nuclei
-            for target,Pval_scores in zip(['12C','27Al','56Fe','208Pb'],
-                                          [Pval_scores_12C,Pval_scores_27Al,Pval_scores_56Fe,Pval_scores_208Pb]):
-                
+            for target,data_fits in zip(['12C','27Al','56Fe','208Pb'],
+                                        [data_fits_12C,data_fits_27Al,data_fits_56Fe,data_fits_208Pb]):
+                Pval_scores  = get_Pval_scores( data_fits , reco_fits , target )
+
                 results['PvalSigmaX_unweighted_%s'%target]  = float(Pval_scores.PvalSigmaX_unweighted)
                 results['PvalSigmaY_unweighted_%s'%target]  = float(Pval_scores.PvalSigmaY_unweighted)
                 results['PvalMeanZa1_unweighted_%s'%target] = float(Pval_scores.PvalMeanZa1_unweighted)
@@ -857,7 +790,7 @@ def generate_runs_with_different_parameters( option,
 
 
             if do_reco_fits_file:   stream_dataframe_to_file( reco_fits, reco_fitsFName  )
-            if do_resutls_file:     stream_dataframe_to_file( results, buildup_resutlsFName , float_format='%.4f' )
+            if do_resutls_file:     stream_dataframe_to_file( results, buildup_resutlsFName , float_format='%.6f' )
             if do_root_file:        stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
 
             ana_sim.CloseFile()

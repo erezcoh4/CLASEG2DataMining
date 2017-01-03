@@ -6,7 +6,7 @@ from cm_tools import *
     
     python mac/cm_parameters_data_and_sim.py --option=scheme
     python mac/cm_parameters_data_and_sim.py --option=bands
-    python mac/cm_parameters_data_and_sim.py --option=AllTragets
+    python mac/cm_parameters_data_and_sim.py --option=AllTargets
     python mac/cm_parameters_data_and_sim.py --option=generate_analyze -v2 -r1 -nruns=1
     
     
@@ -36,13 +36,14 @@ else:
     Nruns = 2
 
 PmissBins   = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65]  , [0.65,0.75] , [0.75,1.0]]
-Q2Bins      = [[0,1.5]     , [1.5,2]     , [2,2.5]      , [2.5,5]]
-N = pd.DataFrame({'SigmaT':30,'SigmaZa1':5 ,'SigmaZa2':5 ,'MeanZa1':5 ,'MeanZa2':5 ,'StartRun':500000 , 'NRand':100 }, index=[0])
+Q2Bins      = [[0,1.5]     , [1.5,2]     , [2,2.5]      , [2.5,6]]
+N = pd.DataFrame({'SigmaT':30,'SigmaZa1':5 ,'SigmaZa2':5 ,'MeanZa1':5 ,'MeanZa2':5 ,'StartRun':600000 , 'NRand':100 }, index=[0])
 SigmaTBandRange     = [0.11,0.22]   # [0.15,0.16]#
-SigmaZa1BandRange   = [0,2.4]       # [1.,1.2]#
-SigmaZa2BandRange   = [-0.5,0.5]    # [0.4,0.5]#
-MeanZa1BandRange    = [0,1.2]       # [1.,1.2]#
-MeanZa2BandRange    = [-0.5,0.5]    # [0.4,0.5]#
+SigmaZa1BandRange   = [0,0.4]       # [0,2.4]       nominal = 0.182 (12C) 0.085 (27Al) 0.207 (56Fe) 0.138 (Pb)
+SigmaZa2BandRange   = [-0.2,0.2]    # [-0.5,0.5]    nominal = 0.059 (12C) 0.111 (27Al) 0.052 (56Fe) 0.115 (Pb)
+MeanZa1BandRange    = [0.4,0.8]     # [0.,1.2]      nominal = 0.563 to 0.645 for all targets
+MeanZa2BandRange    = [-0.3,0.0]    # [-0.5,0.5]    nominal = -0.214 to -0.137 for all targets
+
 #N = pd.DataFrame({'SigmaT':10,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':100000 , 'NRand':10 }, index=[0])
 #N = pd.DataFrame({'SigmaT':1,'SigmaZa1':20 ,'SigmaZa2':20 ,'MeanZa1':20 ,'MeanZa2':20 ,'StartRun':300000 , 'NRand':10 }, index=[0])
 #N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1 ,'StartRun':0 , 'NRand':1}, index=[0]) # for debugging
@@ -113,7 +114,7 @@ if 'plot all parameters for all targets' in flags.option or 'AllTargets' in flag
                                             DoSaveCanvas = True )
         cm_parameters.to_csv( CMParsFname(ppPath+'/DATA/%s_data'%target) , header=True , index = False)
         cm_pars.append( cm_parameters )
-        fits = fit_cm_parameters( target + ' data' , cm_parameters , FigureFName(ppPath+'/DATA/data') , DoPlot = True )
+        fits = fit_cm_parameters( target + ' data' , cm_parameters , FigureFName(ppPath+'/DATA/data', target) , DoPlot = True )
         fits.to_csv( CMfitsFname( ppPath+'/DATA/data' , target ) , header=True , index=False)
         print_filename( CMfitsFname(ppPath+'/DATA/data' , target )  , target + " data c.m. fits at")
         cm_fits.append( fits )
