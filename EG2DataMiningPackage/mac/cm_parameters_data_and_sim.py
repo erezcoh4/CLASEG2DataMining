@@ -37,7 +37,7 @@ else:
 
 PmissBins   = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65]  , [0.65,0.75] , [0.75,1.0]]
 Q2Bins      = [[0,1.5]     , [1.5,2]     , [2,2.5]      , [2.5,6]]
-N = pd.DataFrame({'SigmaT':30,'SigmaZa1':5 ,'SigmaZa2':5 ,'MeanZa1':5 ,'MeanZa2':5 ,'StartRun':600000 , 'NRand':100 }, index=[0])
+N = pd.DataFrame({'SigmaT':30,'SigmaZa1':5 ,'SigmaZa2':5 ,'MeanZa1':5 ,'MeanZa2':5 ,'StartRun':600000 , 'NRand':20 }, index=[0])
 SigmaTBandRange     = [0.11,0.22]   # [0.15,0.16]#
 SigmaZa1BandRange   = [0,0.4]       # [0,2.4]       nominal = 0.182 (12C) 0.085 (27Al) 0.207 (56Fe) 0.138 (Pb)
 SigmaZa2BandRange   = [-0.2,0.2]    # [-0.5,0.5]    nominal = 0.059 (12C) 0.111 (27Al) 0.052 (56Fe) 0.115 (Pb)
