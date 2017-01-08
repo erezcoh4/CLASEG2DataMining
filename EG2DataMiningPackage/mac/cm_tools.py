@@ -191,6 +191,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
                                        , index=[i])
 
         df_pMissBins = df_pMissBins.append(df_pMissBin)
+
     if DoSaveCanvas:
         canvas_unweighted.SaveAs(unweightedRoofitsFName)
         print_filename(unweightedRoofitsFName,"unweighted rooFits at")
@@ -571,13 +572,17 @@ def get_Pval_scores( data_fits , reco_fits , name='' ):
                                                      PvalSigmaZa1_weighted , PvalSigmaZa2_weighted ] )
     if debug>2: print "got weighted P(value) results"
 
-    PvalSigmaZa1SigmaZa2 = Fisher_combination_Pvals( [ PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] )
-    PvalMeanZa1MeanZa2 = Fisher_combination_Pvals( [ PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ] )
+    PvalSigmaZa1SigmaZa2= Fisher_combination_Pvals( [ PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] )
+    PvalMeanZa1MeanZa2  = Fisher_combination_Pvals( [ PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ] )
     PvalSigmaZa1MeanZa1 = Fisher_combination_Pvals( [ PvalSigmaZa1_unweighted , PvalMeanZa1_unweighted ] )
     PvalSigmaZa1MeanZa2 = Fisher_combination_Pvals( [ PvalSigmaZa1_unweighted , PvalMeanZa2_unweighted ] )
     PvalSigmaZa2MeanZa1 = Fisher_combination_Pvals( [ PvalSigmaZa2_unweighted , PvalMeanZa1_unweighted ] )
     PvalSigmaZa2MeanZa2 = Fisher_combination_Pvals( [ PvalSigmaZa2_unweighted , PvalMeanZa2_unweighted ] )
-                                                                
+    PvalSigmaTSigmaZa1  = Fisher_combination_Pvals( [ PvalSigmaX_unweighted, PvalSigmaY_unweighted, PvalSigmaZa1_unweighted ] )
+    PvalSigmaTSigmaZa2  = Fisher_combination_Pvals( [ PvalSigmaX_unweighted, PvalSigmaY_unweighted, PvalSigmaZa2_unweighted ] )
+    PvalSigmaTMeanZa1   = Fisher_combination_Pvals( [ PvalSigmaX_unweighted, PvalSigmaY_unweighted, PvalMeanZa1_unweighted ] )
+    PvalSigmaTMeanZa2   = Fisher_combination_Pvals( [ PvalSigmaX_unweighted, PvalSigmaY_unweighted, PvalMeanZa2_unweighted ] )
+    
 
     Pval_scores = pd.DataFrame({'PvalSigmaX_unweighted':PvalSigmaX_unweighted,
                                'PvalSigmaY_unweighted':PvalSigmaY_unweighted ,
@@ -598,7 +603,12 @@ def get_Pval_scores( data_fits , reco_fits , name='' ):
                                'PvalSigmaZa1MeanZa1':PvalSigmaZa1MeanZa1,
                                'PvalSigmaZa1MeanZa2':PvalSigmaZa1MeanZa2,
                                'PvalSigmaZa2MeanZa1':PvalSigmaZa2MeanZa1,
-                               'PvalSigmaZa2MeanZa2':PvalSigmaZa2MeanZa2},index=[0])
+                               'PvalSigmaZa2MeanZa2':PvalSigmaZa2MeanZa2,
+                               'PvalSigmaTSigmaZa1':PvalSigmaTSigmaZa1,
+                               'PvalSigmaTSigmaZa2':PvalSigmaTSigmaZa2,
+                               'PvalSigmaTMeanZa1':PvalSigmaTMeanZa1,
+                               'PvalSigmaTMeanZa2':PvalSigmaTMeanZa2
+                               },index=[0])
     
     if debug>1:
         print "got Pval scores " + name
@@ -763,7 +773,12 @@ def generate_runs_with_different_parameters( option,
                 results['PvalSigmaZa1MeanZa2_%s'%target]    = float(Pval_scores.PvalSigmaZa1MeanZa2)
                 results['PvalSigmaZa2MeanZa1_%s'%target]    = float(Pval_scores.PvalSigmaZa2MeanZa1)
                 results['PvalSigmaZa2MeanZa2_%s'%target]    = float(Pval_scores.PvalSigmaZa2MeanZa2)
-        
+                results['PvalSigmaZa2MeanZa2_%s'%target]    = float(Pval_scores.PvalSigmaZa2MeanZa2)
+                results['PvalSigmaTSigmaZa1_%s'%target]     = float(Pval_scores.PvalSigmaTSigmaZa1)
+                results['PvalSigmaTSigmaZa2_%s'%target]     = float(Pval_scores.PvalSigmaTSigmaZa2)
+                results['PvalSigmaTMeanZa1_%s'%target]      = float(Pval_scores.PvalSigmaTMeanZa1)
+                results['PvalSigmaTMeanZa2_%s'%target]      = float(Pval_scores.PvalSigmaTMeanZa2)
+
 
 
 
