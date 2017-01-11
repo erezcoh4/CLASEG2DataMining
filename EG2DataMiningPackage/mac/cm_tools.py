@@ -673,7 +673,10 @@ def generate_runs_with_different_parameters( option,
 
 
     # event generation (and analysis) loop
+    Nruns = len(generated_parameters.run.tolist())
+    irun = 0
     for run in generated_parameters.run.tolist():
+        irun = irun+1
         genMeanX    = genMeanY = 0
         genSigmaX   = genSigmaY = float(generated_parameters[generated_parameters.run==run].genSigmaX)
         genSigmaZa1 = float(generated_parameters[generated_parameters.run==run].genSigmaZa1)
@@ -822,7 +825,7 @@ def generate_runs_with_different_parameters( option,
             garbage_list = [ ana_sim , reco_parameters , reco_fits  , results ]
             del garbage_list
                     
-        print_important( "completed run %d"%run )
+        print_important( "completed run %d [%.f"%(run,100%float(irun)/Nruns) + "%]" )
         print_line()
 
 
