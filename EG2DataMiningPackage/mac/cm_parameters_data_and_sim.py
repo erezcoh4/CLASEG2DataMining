@@ -28,7 +28,7 @@ from cm_tools import *
 if flags.run > 0:
     start_run = flags.run
 else:
-    start_run = 700000
+    start_run = 800000
 
 if flags.NumberOfRuns > 0:
     Nruns = flags.NumberOfRuns
@@ -37,15 +37,17 @@ else:
 
 PmissBins   = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65]  , [0.65,0.75] , [0.75,1.0]]
 Q2Bins      = [[0,1.5]     , [1.5,2]     , [2,2.5]      , [2.5,6]]
-N = pd.DataFrame({'SigmaT':100,'SigmaZa1':5 ,'SigmaZa2':5 ,'MeanZa1':5 ,'MeanZa2':5 ,'StartRun':700000 , 'NRand':20 }, index=[0])
-SigmaTBandRange     = [0.05,0.35]   # [0.15,0.16]#
-SigmaZa1BandRange   = [0,0.4]       # [0,2.4]       nominal = 0.182 (12C) 0.085 (27Al) 0.207 (56Fe) 0.138 (Pb)
-SigmaZa2BandRange   = [-0.2,0.2]    # [-0.5,0.5]    nominal = 0.059 (12C) 0.111 (27Al) 0.052 (56Fe) 0.115 (Pb)
-MeanZa1BandRange    = [0.4,0.8]     # [0.,1.2]      nominal = 0.563 to 0.645 for all targets
-MeanZa2BandRange    = [-0.3,0.0]    # [-0.5,0.5]    nominal = -0.214 to -0.137 for all targets
+SigmaTBandRange     = [0.05,0.25]   # [0.05,0.35]   nominal ~ 0.16 - 0.18
+SigmaZa1BandRange   = [0,2.4]       # [0,0.4]       nominal = 0.182 (12C) 0.085 (27Al) 0.207 (56Fe) 0.138 (Pb)
+SigmaZa2BandRange   = [-0.6,0.5]    # [-0.2,0.2]    nominal = 0.059 (12C) 0.111 (27Al) 0.052 (56Fe) 0.115 (Pb)
+MeanZa1BandRange    = [0.,1.2]      # [0.4,0.8]     nominal = 0.563 to 0.645 for all targets
+MeanZa2BandRange    = [-0.6,0.5]    # [-0.3,0.0]    nominal = -0.214 to -0.137 for all targets
+
 
 #N = pd.DataFrame({'SigmaT':10,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':100000 , 'NRand':10 }, index=[0])
 #N = pd.DataFrame({'SigmaT':1,'SigmaZa1':20 ,'SigmaZa2':20 ,'MeanZa1':20 ,'MeanZa2':20 ,'StartRun':300000 , 'NRand':10 }, index=[0])
+#N = pd.DataFrame({'SigmaT':100,'SigmaZa1':5 ,'SigmaZa2':5 ,'MeanZa1':5 ,'MeanZa2':5 ,'StartRun':700000 , 'NRand':20 }, index=[0])
+N = pd.DataFrame({'SigmaT':20,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':800000 , 'NRand':20 }, index=[0])
 #N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1 ,'StartRun':0 , 'NRand':1}, index=[0]) # for debugging
 
 

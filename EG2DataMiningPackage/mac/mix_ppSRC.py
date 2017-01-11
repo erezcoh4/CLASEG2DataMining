@@ -7,7 +7,7 @@ from cm_tools import *
     '''
 
 variables = [ 'Xb'
-             ,  'Prec.Px()' , 'Prec.Py()' , 'Prec.Pz()','Prec.P()'
+             ,'Prec.Px()'  , 'Prec.Py()'  , 'Prec.Pz()' ,'Prec.P()'
              ,'Pmiss.Px()' , 'Pmiss.Py()' , 'Pmiss.Pz()','Pmiss.P()'
              ,'pcmX'
              ]
@@ -26,7 +26,7 @@ for i in range(len(anarr)-1):
     PmissX = anarr[i]['Pmiss.Px()']
     PmissY = anarr[i]['Pmiss.Py()']
     PmissZ = anarr[i]['Pmiss.Pz()']
-    Pmiss = np.sqrt(PmissX*PmissX + PmissY*PmissY + PmissZ*PmissZ)
+    Pmiss = anarr[i]['Pmiss.P()']
 
 
     for j in range(i+1,len(anarr)-1):
@@ -35,7 +35,7 @@ for i in range(len(anarr)-1):
         PrecX = anarr[j]['Prec.Px()']
         PrecY = anarr[j]['Prec.Py()']
         PrecZ = anarr[j]['Prec.Pz()']
-        Prec = np.sqrt(PrecX*PrecX + PrecY*PrecY + PrecZ*PrecZ)
+        Prec = anarr[j]['Prec.P()']
 
 
         pcmX = PmissX + PrecX
