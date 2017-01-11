@@ -452,9 +452,10 @@ void GenerateEvents::SetRootTreeAddresses(){
 //    RootTree -> Branch("PoverQ"              ,&PoverQ                ,"PoverQ/F");               // ratio |p|/|q| for leading proton
 //    RootTree -> Branch("Mmiss"               ,&Mmiss                 ,"Mmiss/F");
 //    
-//    RootTree -> Branch("pFiducCut"           ,&pFiducCut             );// std::vector<Int_t>
-//    RootTree -> Branch("Prec"                ,"TLorentzVector"       ,&Prec);
-//    RootTree -> Branch("pVertex"             ,&pVertex);             // std::vector<TVector3>
+    // c.m. analysis
+    RootTree -> Branch("pFiducCut"           ,&pFiducCut             );// std::vector<Int_t>
+    RootTree -> Branch("Prec"                ,"TLorentzVector"       ,&Prec);
+    RootTree -> Branch("pVertex"             ,&pVertex);             // std::vector<TVector3>
 
 
     // c.m. analysis
