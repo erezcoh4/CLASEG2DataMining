@@ -429,33 +429,36 @@ Int_t GenerateEvents::DoGenerate( TString Type,
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void GenerateEvents::SetRootTreeAddresses(){
-    RootTree -> Branch("q3Vector"                    ,"TVector3"     ,&q3Vector);
-    RootTree -> Branch("Pcm"                         ,"TVector3"     ,&Pcm);
-    RootTree -> Branch("Pp1"                         ,"TVector3"     ,&Pp1);
-    RootTree -> Branch("Pp2"                         ,"TVector3"     ,&Pp2);
-    RootTree -> Branch("Pmiss"                       ,"TVector3"     ,&Pmiss);
-    RootTree -> Branch("Precoil"                     ,"TVector3"     ,&Pp2);
-    RootTree -> Branch("q_in_Pmiss_q_system"         ,"TVector3"     ,&q3Vector_in_Pmiss_q_system);
-    RootTree -> Branch("Pmiss_in_Pmiss_q_system"     ,"TVector3"     ,&Pmiss_in_Pmiss_q_system);
-    RootTree -> Branch("Pcm_in_Pmiss_q_system"       ,"TVector3"     ,&Pcm_in_Pmiss_q_system);
-    RootTree -> Branch("q_q_sys"                     ,"TVector3"     ,&q_q_sys);
-    RootTree -> Branch("Pmiss_q_sys"                 ,"TVector3"     ,&Pmiss_q_sys);
-    RootTree -> Branch("Pcm_q_sys"                   ,"TVector3"     ,&Pcm_q_sys);
-    RootTree -> Branch("Rp1"                         ,"TVector3"     ,&Rp1);                      // proton vertex
-    RootTree -> Branch("Rp2"                         ,"TVector3"     ,&Rp2);                      // proton vertex
-    RootTree -> Branch("Q2"                  ,&Q2                    ,"Q2/F");
-    RootTree -> Branch("theta_e"             ,&theta_e               ,"theta_e/F");
-    RootTree -> Branch("Xb"                  ,&Xb                    ,"Xb/F");
-    RootTree -> Branch("ThetaPQ"             ,&ThetaPQ               ,"ThetaPQ/F");              // angle between the leading proton and q
-    RootTree -> Branch("ThetaPmissQ"         ,&ThetaPmissQ           ,"ThetaPmissQ/F");          // angle between the missing momentum and q
-    RootTree -> Branch("ThetaPmissPrecoil"   ,&ThetaPmissPrecoil     ,"ThetaPmissPrecoil/F");    // angle between the missing and recoil momenta
-    RootTree -> Branch("PoverQ"              ,&PoverQ                ,"PoverQ/F");               // ratio |p|/|q| for leading proton
-    RootTree -> Branch("Mmiss"               ,&Mmiss                 ,"Mmiss/F");
     
-    RootTree -> Branch("pFiducCut"           ,&pFiducCut             );// std::vector<Int_t>
-    RootTree -> Branch("Prec"                ,"TLorentzVector"       ,&Prec);
-    RootTree -> Branch("pVertex"             ,&pVertex);             // std::vector<TVector3>
+//    RootTree -> Branch("q3Vector"                    ,"TVector3"     ,&q3Vector);
+//    RootTree -> Branch("Pcm"                         ,"TVector3"     ,&Pcm);
+//    RootTree -> Branch("Pp1"                         ,"TVector3"     ,&Pp1);
+//    RootTree -> Branch("Pp2"                         ,"TVector3"     ,&Pp2);
+//    RootTree -> Branch("Pmiss"                       ,"TVector3"     ,&Pmiss);
+//    RootTree -> Branch("Precoil"                     ,"TVector3"     ,&Pp2);
+//    RootTree -> Branch("q_in_Pmiss_q_system"         ,"TVector3"     ,&q3Vector_in_Pmiss_q_system);
+//    RootTree -> Branch("Pmiss_in_Pmiss_q_system"     ,"TVector3"     ,&Pmiss_in_Pmiss_q_system);
+//    RootTree -> Branch("Pcm_in_Pmiss_q_system"       ,"TVector3"     ,&Pcm_in_Pmiss_q_system);
+//    RootTree -> Branch("q_q_sys"                     ,"TVector3"     ,&q_q_sys);
+//    RootTree -> Branch("Pmiss_q_sys"                 ,"TVector3"     ,&Pmiss_q_sys);
+//    RootTree -> Branch("Pcm_q_sys"                   ,"TVector3"     ,&Pcm_q_sys);
+//    RootTree -> Branch("Rp1"                         ,"TVector3"     ,&Rp1);                      // proton vertex
+//    RootTree -> Branch("Rp2"                         ,"TVector3"     ,&Rp2);                      // proton vertex
+//    RootTree -> Branch("theta_e"             ,&theta_e               ,"theta_e/F");
+//    RootTree -> Branch("Xb"                  ,&Xb                    ,"Xb/F");
+//    RootTree -> Branch("ThetaPQ"             ,&ThetaPQ               ,"ThetaPQ/F");              // angle between the leading proton and q
+//    RootTree -> Branch("ThetaPmissQ"         ,&ThetaPmissQ           ,"ThetaPmissQ/F");          // angle between the missing momentum and q
+//    RootTree -> Branch("ThetaPmissPrecoil"   ,&ThetaPmissPrecoil     ,"ThetaPmissPrecoil/F");    // angle between the missing and recoil momenta
+//    RootTree -> Branch("PoverQ"              ,&PoverQ                ,"PoverQ/F");               // ratio |p|/|q| for leading proton
+//    RootTree -> Branch("Mmiss"               ,&Mmiss                 ,"Mmiss/F");
+//    
+//    RootTree -> Branch("pFiducCut"           ,&pFiducCut             );// std::vector<Int_t>
+//    RootTree -> Branch("Prec"                ,"TLorentzVector"       ,&Prec);
+//    RootTree -> Branch("pVertex"             ,&pVertex);             // std::vector<TVector3>
 
+
+    // c.m. analysis
+    RootTree -> Branch("Q2"                  ,&Q2                    ,"Q2/F");
     // p(cm) for RooFit
     RootTree -> Branch("Pmiss3Mag"           ,&Pmiss3Mag             , "Pmiss3Mag/F");
     RootTree -> Branch("pcmX"                ,&pcmX                  , "pcmX/F");
