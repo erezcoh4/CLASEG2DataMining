@@ -825,7 +825,7 @@ def generate_runs_with_different_parameters( option,
             garbage_list = [ ana_sim , reco_parameters , reco_fits  , results ]
             del garbage_list
                     
-        print_important( "completed run %d [%.f"%(run,100%float(irun)/Nruns) + "%]" )
+        print_important( "completed run %d [%.0f"%(run,100%float(irun)/Nruns) + "%]" )
         print_line()
 
 
