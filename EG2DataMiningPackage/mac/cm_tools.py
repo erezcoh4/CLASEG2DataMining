@@ -193,7 +193,6 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
             # Jan 2016, changing to a (weighted) average and variance using numpy
             ana_reduced = ana[ (pMiss_min < ana.Pmiss3Mag) & (ana.Pmiss3Mag < pMiss_max) ]
 
-            weights = ana_reduced.rooWeight if sum(ana_reduced.rooWeight) else None
             if len(ana_reduced)>0 and sum(ana_reduced.rooWeight)>0:
                 mean_x_unweighted , mean_x_weighted     = np.average( ana_reduced.pcmX ) , np.average( ana_reduced.pcmX , weights=weights )
                 sigma_x_unweighted, sigma_x_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_weighted) , weights=weights  ))
