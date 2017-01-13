@@ -155,8 +155,8 @@ def fit_as_a_function_of_pmiss( x , y , yerr, fit_type='const' , title='', x_off
         else:
             f = linear_06
         p2, v2 = curve_fit(f, xdata=x, ydata=y,sigma=yerr)# fit data using SciPy's Levenberg-Marquart method
-        
-    return p2[0] , sqrt(v2[0,0]) , p2[1] , sqrt(v2[1,1])
+    if debug>1: print 'p2:\n',p2,'\nv2:\n',v2,'\nv2[1,1]:',v2[1,1]
+    return p2[0] , sqrt(float(v2[0,0])) , p2[1] , sqrt(float(v2[1,1]))
 # ------------------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------------------- #
