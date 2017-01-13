@@ -193,6 +193,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
 
             # Jan 2016, changing to a (weighted) average and variance using numpy
             ana_reduced = ana[ (pMiss_min < ana.Pmiss3Mag) & (ana.Pmiss3Mag < pMiss_max) ]
+            if flags.verbose>1: print len(ana_reduced),'events in this bin'
 
             if len(ana_reduced)>0 and sum(ana_reduced.rooWeight)>0:
                 mean_x_unweighted , mean_x_weighted     = np.average( ana_reduced.pcmX ) , np.average( ana_reduced.pcmX , weights=ana_reduced.rooWeight )
@@ -209,7 +210,6 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
                 mean_z_unweighted , mean_z_weighted     = -100,-100
                 sigma_z_unweighted, sigma_z_weighted    = -100,-100
             
-
 
             df_pMissBin = pd.DataFrame({'pMiss_min':pMiss_min,'pMiss_max':pMiss_max
                                        ,'mean_x_unweighted':mean_x_unweighted,'mean_xErr_unweighted':0,'sigma_x_unweighted':sigma_x_unweighted,'sigma_xErr_unweighted':0
@@ -853,7 +853,7 @@ def generate_runs_with_different_parameters( option,
             garbage_list = [ ana_sim , reco_parameters , reco_fits  , results ]
             del garbage_list
                     
-        print_important( "completed run %d [%.0f"%(run,100%float(irun)/Nruns) + "%] at %4d-%02d-%02d"%time.localtime()[0:3] )
+        print_important( "completed run %d [%.0f"%(run,100%float(irun)/Nruns) + "%]" + " at %4d-%02d-%02d"%time.localtime()[0:3] )
         print_line()
 
 
