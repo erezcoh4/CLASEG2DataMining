@@ -12,6 +12,9 @@ import input_flags , Initiation as init, GeneralPlot as gp , gc
 from my_tools import *
 from calc_tools import *
 from root_pandas import read_root
+from scipy.optimize import curve_fit
+
+
 flags = input_flags.get_args()
 
 

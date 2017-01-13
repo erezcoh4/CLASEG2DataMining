@@ -109,35 +109,54 @@ def get_KS_scores( PmissBins ,ana_sim , ana_data , h3_pcm_data ):
     return KS_scores
 # ------------------------------------------------------------------------------- #
 
+# ------------------------------------------------------------------------------- #
+# define fitting functions
+def linear(x, slope, intercept):
+    return slope * ( x ) + intercept
+
+def linear_06(x, slope, intercept):
+    return slope * ( x - 0.6 ) + intercept
+# ------------------------------------------------------------------------------- #
 
 
 # ------------------------------------------------------------------------------- #
 def plot_errorbar_and_fit( ax , x , y , xerr , yerr , color , marker , lstyle , label ,
-                          fit_type='const' ,do_plot_fit_pars=False):
+                          fit_type='const' ,do_plot_fit_pars=False, x_offset=0.6):
     plt.errorbar(x, y, xerr=xerr, yerr=yerr, color=color, marker=marker , linestyle=lstyle , label=None , markersize=15)
     if fit_type=='const':
-        const_fit , const_fitErr = fit_as_a_function_of_pmiss( x , y , fit_type )
+        const_fit , const_fitErr = fit_as_a_function_of_pmiss( x , y , yerr=yerr , fit_type=fit_type )
         if do_plot_fit_pars: label=label + "$=%.3f\pm%.3f$"%(const_fit,const_fitErr)
         ax.plot(x, np.ones(len(x))*const_fit , color=color , linestyle='--', label=label,linewidth = 2 , )
         if debug>1: print 'const fit of ' + label + " : $=%.3f\pm%.3f$"%(const_fit,const_fitErr)
         return [ const_fit , const_fitErr ]
     
     elif fit_type=='linear':
-        a1 , a1err , a2 , a2err  = fit_as_a_function_of_pmiss( x , y , fit_type )
-        if do_plot_fit_pars: label=label + "$=(%.3f)p_{miss}+(%.3f)$"%( a1 , a2 )
-        ax.plot( x , a1 * x + a2 , color = color ,label=label )
-        if debug>1: print 'linear fit of ' + label + " : $=(%.3f)p_{miss}+(%.3f)$"%( a1 , a2 )
+        a1 , a1err , a2 , a2err  = fit_as_a_function_of_pmiss( x , y ,yerr=yerr, fit_type=fit_type )
+        if do_plot_fit_pars: label=label + "$=(%.3f)(p_{miss}-%.1f)+(%.3f)$"%( a1 , x_offset, a2 )
+        ax.plot( x , a1 * (x-x_offset) + a2 , color = color ,label=label )
+        if debug>1: print 'linear fit of ' + label + " : $=(%.3f)(p_{miss}-%.1f)+(%.3f)$"%( a1 ,x_offset ,  a2 )
         return [ a1 , a1err] , [ a2 , a2err ]
 # ------------------------------------------------------------------------------- #
 
+
+
+
 # ------------------------------------------------------------------------------- #
-def fit_as_a_function_of_pmiss( x , y , fit_type='const' ): # same as plot_errorbar_and_fit without plot
+def fit_as_a_function_of_pmiss( x , y , yerr, fit_type='const' , title='', x_offset=0.6): # the main fitting routine
+    
     if fit_type=='const':
         p1,v1 = np.polyfit( x , y , 0 , cov=True)
         return p1[0] , sqrt(v1[0][0])
+    
+    #        p2,v2 = np.polyfit( x , y , 1 , cov=True)        # fit a polynomial p2(x) = p2[0] * x + p2[1]
     elif fit_type=='linear':
-        p2,v2 = np.polyfit( x , y , 1 , cov=True)        # fit a polynomial p2(x) = p2[0] * x + p2[1]
-        return p2[0] , sqrt(v2[0][0]) , p2[1] , sqrt(v2[1][1])
+        if x_offset==0:
+            f = linear
+        else:
+            f = linear_06
+        p2, v2 = curve_fit(f, xdata=x, ydata=y,sigma=yerr)# fit data using SciPy's Levenberg-Marquart method
+        
+    return p2[0] , sqrt(v2[0][0]) , p2[1] , sqrt(v2[1][1])
 # ------------------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------------------- #
@@ -175,12 +194,21 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
             ana_reduced = ana[ (pMiss_min < ana.Pmiss3Mag) & (ana.Pmiss3Mag < pMiss_max) ]
 
             weights = ana_reduced.rooWeight if sum(ana_reduced.rooWeight) else None
-            mean_x_unweighted , mean_x_weighted     = np.average( ana_reduced.pcmX ) , np.average( ana_reduced.pcmX , weights=weights )
-            sigma_x_unweighted, sigma_x_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_weighted) , weights=weights  ))
-            mean_y_unweighted , mean_y_weighted     = np.average( ana_reduced.pcmY ) , np.average( ana_reduced.pcmY , weights=weights )
-            sigma_y_unweighted, sigma_y_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmY-mean_y_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmY-mean_y_weighted) , weights=weights  ))
-            mean_z_unweighted , mean_z_weighted     = np.average( ana_reduced.pcmZ ) , np.average( ana_reduced.pcmZ , weights=weights )
-            sigma_z_unweighted, sigma_z_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_weighted) , weights=weights  ))
+            if len(ana_reduced)>0 and sum(ana_reduced.rooWeight)>0:
+                mean_x_unweighted , mean_x_weighted     = np.average( ana_reduced.pcmX ) , np.average( ana_reduced.pcmX , weights=weights )
+                sigma_x_unweighted, sigma_x_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_weighted) , weights=weights  ))
+                mean_y_unweighted , mean_y_weighted     = np.average( ana_reduced.pcmY ) , np.average( ana_reduced.pcmY , weights=weights )
+                sigma_y_unweighted, sigma_y_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmY-mean_y_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmY-mean_y_weighted) , weights=weights  ))
+                mean_z_unweighted , mean_z_weighted     = np.average( ana_reduced.pcmZ ) , np.average( ana_reduced.pcmZ , weights=weights )
+                sigma_z_unweighted, sigma_z_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_weighted) , weights=weights  ))
+            else:
+                mean_x_unweighted , mean_x_weighted     = -100,-100
+                sigma_x_unweighted, sigma_x_weighted    = -100,-100
+                mean_y_unweighted , mean_y_weighted     = -100,-100
+                sigma_y_unweighted, sigma_y_weighted    = -100,-100
+                mean_z_unweighted , mean_z_weighted     = -100,-100
+                sigma_z_unweighted, sigma_z_weighted    = -100,-100
+            
 
 
             df_pMissBin = pd.DataFrame({'pMiss_min':pMiss_min,'pMiss_max':pMiss_max
@@ -236,7 +264,7 @@ def fit_par_plot( fig , i_subplot , data , var , weight , title , do_plot_fit_pa
     [Xfit,XfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_x_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , [data[ var + '_xErr_' + weight ],data[ var + '_xErr_' + weight ]], 'black','v','none',r'$x-direction$' ,'const',do_plot_fit_pars=do_plot_fit_pars)
     [Yfit,YfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_y_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , [data[ var + '_yErr_' + weight ],data[ var + '_yErr_' + weight ]], 'red'  ,'o','none',r'$y-direction$' ,'const',do_plot_fit_pars=do_plot_fit_pars)
     [Tfit,TfitErr] = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_t_' + weight],'const')
-    [Za1,Za1err],[Za2,Za2err] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , [data[ var + '_zErr_' + weight ],data[ var + '_zErr_' + weight ]], 'blue' ,'s','none',r'$\vec{p}_{miss}-direction$' ,'linear',do_plot_fit_pars=do_plot_fit_pars)
+    [Za1,Za1err],[Za2,Za2err] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , data[ var + '_zErr_' + weight ], 'blue' ,'s','none',r'$\vec{p}_{miss}-direction$' ,'linear',do_plot_fit_pars=do_plot_fit_pars)
     #    set_frame( ax , r'%s $%s$'%(weight,title) , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left",ncol=2)
     set_frame( ax , '' , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left",ncol=1)
     return [Xfit , XfitErr , Yfit , YfitErr , Tfit , TfitErr, Za1 , Za1err , Za2 , Za2err , ax]
@@ -250,7 +278,7 @@ def fit_par_noplot( data , var , weight , title ): # a sub-routine to fit a sing
     Xfit,XfitErr = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_x_' + weight] ,'const')
     Yfit,YfitErr = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_y_' + weight] ,'const')
     Tfit,TfitErr = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_t_' + weight] ,'const')
-    Za1,Za1err,Za2,Za2err = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_z_' + weight] , 'linear' )
+    Za1,Za1err,Za2,Za2err = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_z_' + weight], data[ var + '_zErr_' + weight ] , 'linear' )
     return [Xfit , XfitErr , Yfit , YfitErr , Tfit , TfitErr, Za1 , Za1err , Za2 , Za2err , 0 ]
 # ------------------------------------------------------------------------------- #
 
@@ -332,7 +360,7 @@ def fit_widths_z( cm_pars_list , colors , labels , FigureFName = '' ): # all par
     for color, label , data in zip(colors,labels,cm_pars_list):
        plot_errorbar_and_fit( ax ,Pmiss,data[ 'sigma_z_unweighted'] ,
                              [pMissLowErr,pMissUpErr] ,
-                             [data[ 'sigma_zErr_unweighted'],data[ 'sigma_zErr_unweighted']],
+                             data[ 'sigma_zErr_unweighted'],
                              color=color ,marker='s',lstyle='none',
                              label=label ,fit_type='linear')
     set_frame( ax , r'c.m. $\sigma$ (unweighted by the cross-section)' ,
@@ -354,7 +382,7 @@ def fit_means_z( cm_pars_list , colors , labels , FigureFName = '' ): # all para
     for color, label , data in zip(colors,labels,cm_pars_list):
         plot_errorbar_and_fit( ax ,Pmiss,data[ 'mean_z_unweighted'] ,
                               [pMissLowErr,pMissUpErr] ,
-                              [data[ 'mean_zErr_unweighted'],data[ 'mean_zErr_unweighted']],
+                              data[ 'mean_zErr_unweighted'],
                               color=color ,marker='s',lstyle='none',
                               label=label ,fit_type='linear')
     set_frame( ax , r'c.m. $mean$ (unweighted by the cross-section)' ,
@@ -825,7 +853,7 @@ def generate_runs_with_different_parameters( option,
             garbage_list = [ ana_sim , reco_parameters , reco_fits  , results ]
             del garbage_list
                     
-        print_important( "completed run %d [%.0f"%(run,100%float(irun)/Nruns) + "%]" )
+        print_important( "completed run %d [%.0f"%(run,100%float(irun)/Nruns) + "%] at %4d-%02d-%02d"%time.localtime()[0:3] )
         print_line()
 
 
