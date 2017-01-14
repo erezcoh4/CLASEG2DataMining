@@ -868,12 +868,12 @@ def generate_runs_with_different_parameters( option,
             # reconstructed parameters in 5 big p(miss) bins
             for i in range(len(PmissBins)):
                 pmin , pmax = PmissBins[i][0] , PmissBins[i][1]
-                results['recMeanX_unweighted_pmiss_%.3f_%.3f'%(pmin , pmax)]    = float(reco_parameters.get_value(i,'mean_x_unweighted'))
-                results['recSigmaX_unweighted_pmiss_%.3f_%.3f'%(pmin , pmax)]   = float(reco_parameters.get_value(i,'sigma_x_unweighted'))
-                results['recMeanY_unweighted_pmiss_%.3f_%.3f'%(pmin , pmax)]    = float(reco_parameters.get_value(i,'mean_y_unweighted'))
-                results['recSigmaY_unweighted_pmiss_%.3f_%.3f'%(pmin , pmax)]   = float(reco_parameters.get_value(i,'sigma_y_unweighted'))
-                results['recMeanZ_unweighted_pmiss_%.3f_%.3f'%(pmin , pmax)]    = float(reco_parameters.get_value(i,'mean_z_unweighted'))
-                results['recSigmaZ_unweighted_pmiss_%.3f_%.3f'%(pmin , pmax)]   = float(reco_parameters.get_value(i,'sigma_z_unweighted'))
+                results['recMeanX_unweighted_pmiss_%.3f_%.3f'%(pmin , pmax)]    = float(reco_parameters.get_value(i,'mean_x_unweighted'))  if do_fits else 0
+                results['recSigmaX_unweighted_pmiss_%.3f_%.3f'%(pmin , pmax)]   = float(reco_parameters.get_value(i,'sigma_x_unweighted')) if do_fits else 0
+                results['recMeanY_unweighted_pmiss_%.3f_%.3f'%(pmin , pmax)]    = float(reco_parameters.get_value(i,'mean_y_unweighted'))  if do_fits else 0
+                results['recSigmaY_unweighted_pmiss_%.3f_%.3f'%(pmin , pmax)]   = float(reco_parameters.get_value(i,'sigma_y_unweighted')) if do_fits else 0
+                results['recMeanZ_unweighted_pmiss_%.3f_%.3f'%(pmin , pmax)]    = float(reco_parameters.get_value(i,'mean_z_unweighted'))  if do_fits else 0
+                results['recSigmaZ_unweighted_pmiss_%.3f_%.3f'%(pmin , pmax)]   = float(reco_parameters.get_value(i,'sigma_z_unweighted')) if do_fits else 0
 
             # events loss in 20 p(miss) bins, for pp/p analysis
             for i in range( len(pmiss_bins) ):
