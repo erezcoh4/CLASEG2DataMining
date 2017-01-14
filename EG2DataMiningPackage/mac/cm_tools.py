@@ -3,19 +3,12 @@ from root_numpy import hist2array , tree2array
 from root_pandas import to_root
 from scipy.stats import ks_2samp
 from math import sqrt
+sqrt2pi = np.sqrt(2*np.pi)
+
 
 # ------------------------------------------------------------------------------- #
 # definitions
 nbins_pcm_3d = 100
-cm_pars_columns = ['pMiss_min','pMiss_max'
-                   ,'mean_x_unweighted','mean_xErr_unweighted','sigma_x_unweighted','sigma_xErr_unweighted'
-                   ,'mean_y_unweighted','mean_yErr_unweighted','sigma_y_unweighted','sigma_yErr_unweighted'
-                   ,'mean_t_unweighted','mean_tErr_unweighted','sigma_t_unweighted','sigma_tErr_unweighted'
-                   ,'mean_z_unweighted','mean_zErr_unweighted','sigma_z_unweighted','sigma_zErr_unweighted'
-                   ,'mean_x_weighted','mean_xErr_weighted','sigma_x_weighted','sigma_xErr_weighted'
-                   ,'mean_y_weighted','mean_yErr_weighted','sigma_y_weighted','sigma_yErr_weighted'
-                   ,'mean_t_weighted','mean_tErr_weighted','sigma_t_weighted','sigma_tErr_weighted'
-                   ,'mean_z_weighted','mean_zErr_weighted','sigma_z_weighted','sigma_zErr_weighted']
 
 
 
@@ -116,6 +109,7 @@ def linear(x, slope, intercept):
 
 def linear_06(x, slope, intercept):
     return slope * ( x - 0.6 ) + intercept
+
 # ------------------------------------------------------------------------------- #
 
 
@@ -155,14 +149,13 @@ def fit_as_a_function_of_pmiss( x , y , yerr, fit_type='const' , title='', x_off
         else:
             f = linear_06
         p2, v2 = curve_fit(f, xdata=x, ydata=y,sigma=yerr)# fit data using SciPy's Levenberg-Marquart method
-    if debug>1: print 'p2:\n',p2,'\nv2:\n',v2
-    if debug>1: print '\np2[1]:\n',p2[1],'\nv2[1,1]:',v2[1,1]
+    if debug>4: print 'p2:\n',p2,'\nv2:\n',v2
     return p2[0] , sqrt(float(v2[0,0])) , p2[1] , sqrt(float(v2[1,1]))
 # ------------------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------------------- #
 def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weightedRoofitsFName = '' , DoSaveCanvas = False ):
-    df_pMissBins = pd.DataFrame(columns=cm_pars_columns)
+    df_pMissBins = pd.DataFrame()#columns=cm_pars_columns)
     
     if DoSaveCanvas:
         canvas_unweighted , canvas_weighted = fana.CreateCanvas( "RooFit plots - unweighted" , "Divide" , 4 , len(PmissBins) ) , fana.CreateCanvas( "RooFit plots - weighted" , "Divide" , 4 , len(PmissBins) )
@@ -196,6 +189,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
             if flags.verbose>1: print len(ana_reduced),'events in this bin'
 
             if len(ana_reduced)>0 and sum(ana_reduced.rooWeight)>0:
+                good_bin = 1
                 mean_x_unweighted , mean_x_weighted     = np.average( ana_reduced.pcmX ) , np.average( ana_reduced.pcmX , weights=ana_reduced.rooWeight )
                 sigma_x_unweighted, sigma_x_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_weighted) , weights=ana_reduced.rooWeight  ))
                 mean_y_unweighted , mean_y_weighted     = np.average( ana_reduced.pcmY ) , np.average( ana_reduced.pcmY , weights=ana_reduced.rooWeight )
@@ -203,21 +197,25 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
                 mean_z_unweighted , mean_z_weighted     = np.average( ana_reduced.pcmZ ) , np.average( ana_reduced.pcmZ , weights=ana_reduced.rooWeight )
                 sigma_z_unweighted, sigma_z_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_weighted) , weights=ana_reduced.rooWeight  ))
             else:
+                good_bin = 0
                 mean_x_unweighted , mean_x_weighted     = -100,-100
                 sigma_x_unweighted, sigma_x_weighted    = -100,-100
                 mean_y_unweighted , mean_y_weighted     = -100,-100
                 sigma_y_unweighted, sigma_y_weighted    = -100,-100
                 mean_z_unweighted , mean_z_weighted     = -100,-100
                 sigma_z_unweighted, sigma_z_weighted    = -100,-100
-            
 
-            df_pMissBin = pd.DataFrame({'pMiss_min':pMiss_min,'pMiss_max':pMiss_max
-                                       ,'mean_x_unweighted':mean_x_unweighted,'mean_xErr_unweighted':0,'sigma_x_unweighted':sigma_x_unweighted,'sigma_xErr_unweighted':0
-                                       ,'mean_y_unweighted':mean_y_unweighted,'mean_yErr_unweighted':0,'sigma_y_unweighted':sigma_y_unweighted,'sigma_yErr_unweighted':0
-                                       ,'mean_z_unweighted':mean_z_unweighted,'mean_zErr_unweighted':0,'sigma_z_unweighted':sigma_z_unweighted,'sigma_zErr_unweighted':0
-                                       ,'mean_x_weighted':mean_x_weighted,'mean_xErr_weighted':0,'sigma_x_weighted':sigma_x_weighted,'sigma_xErr_weighted':0
-                                       ,'mean_y_weighted':mean_y_weighted,'mean_yErr_weighted':0,'sigma_y_weighted':sigma_y_weighted,'sigma_yErr_weighted':0
-                                       ,'mean_z_weighted':mean_z_weighted,'mean_zErr_weighted':0,'sigma_z_weighted':sigma_z_weighted,'sigma_zErr_weighted':0}
+
+            sqrtN = sqrt(len(ana_reduced))
+            df_pMissBin = pd.DataFrame({'pMiss_min':pMiss_min                   ,'pMiss_max':pMiss_max
+                                       ,'EvtsInBin':len(ana_reduced)            ,'good_bin':good_bin
+                                       ,'mean_x_unweighted':mean_x_unweighted   ,'mean_xErr_unweighted':sigma_x_unweighted/sqrtN ,'sigma_x_unweighted':sigma_x_unweighted,'sigma_xErr_unweighted':0.02 # resolution uncertainty
+                                       ,'mean_y_unweighted':mean_y_unweighted   ,'mean_yErr_unweighted':sigma_y_unweighted/sqrtN ,'sigma_y_unweighted':sigma_y_unweighted,'sigma_yErr_unweighted':0.02 # resolution uncertainty0
+                                       ,'mean_z_unweighted':mean_z_unweighted   ,'mean_zErr_unweighted':sigma_z_unweighted/sqrtN ,'sigma_z_unweighted':sigma_z_unweighted,'sigma_zErr_unweighted':0.02 # resolution uncertainty
+                                       ,'mean_x_weighted':mean_x_weighted       ,'mean_xErr_weighted':sigma_x_weighted/sqrtN     ,'sigma_x_weighted':sigma_x_weighted    ,'sigma_xErr_weighted':0.02 # resolution uncertainty
+                                       ,'mean_y_weighted':mean_y_weighted       ,'mean_yErr_weighted':sigma_y_weighted/sqrtN     ,'sigma_y_weighted':sigma_y_weighted    ,'sigma_yErr_weighted':0.02 # resolution uncertainty
+                                       ,'mean_z_weighted':mean_z_weighted       ,'mean_zErr_weighted':sigma_z_weighted/sqrtN     ,'sigma_z_weighted':sigma_z_weighted    ,'sigma_zErr_weighted':0.02 # resolution uncertainty
+                                       }
                                        , index=[i])
 
         df_pMissBins = df_pMissBins.append(df_pMissBin)
@@ -273,13 +271,15 @@ def fit_par_plot( fig , i_subplot , data , var , weight , title , do_plot_fit_pa
 # ------------------------------------------------------------------------------- #
 def fit_par_noplot( data , var , weight , title ): # a sub-routine to fit a single parameter; same as fit_par_plot without a plot
     
+    # remove empty bins
+    data = data[data['good_bin']==1]
+    # fit x/y/z as a function of p(miss)
     Pmiss = (data.pMiss_max + data.pMiss_min)/2.
     pMissUpErr , pMissLowErr = data.pMiss_max - Pmiss , Pmiss - data.pMiss_min
     Xfit,XfitErr = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_x_' + weight] ,'const')
     Yfit,YfitErr = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_y_' + weight] ,'const')
-    Tfit,TfitErr = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_t_' + weight] ,'const')
     Za1,Za1err,Za2,Za2err = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_z_' + weight], data[ var + '_zErr_' + weight ] , 'linear' )
-    return [Xfit , XfitErr , Yfit , YfitErr , Tfit , TfitErr, Za1 , Za1err , Za2 , Za2err , 0 ]
+    return [Xfit , XfitErr , Yfit , YfitErr, Za1 , Za1err , Za2 , Za2err , None ]
 # ------------------------------------------------------------------------------- #
 
 
@@ -293,25 +293,21 @@ def fit_cm_parameters( run , data , FigureFName = '' , DoPlot = False ): # all p
     
     [SigmaX_unweighted  , SigmaXerr_unweighted,
      SigmaY_unweighted  , SigmaYerr_unweighted,
-     sT_unweighted      , sTerr_unweighted,
      SigmaZa1_unweighted, SigmaZa1err_unweighted,
      SigmaZa2_unweighted, SigmaZa2err_unweighted, ax ] = fit_par_plot ( fig, 221, data, 'sigma', 'unweighted', '\sigma' , do_plot_fit_pars=True ) if DoPlot else fit_par_noplot ( data,'sigma','unweighted','\sigma' )
 
     [MeanX_unweighted   , MeanXerr_unweighted,
      MeanY_unweighted   , MeanYerr_unweighted,
-     mT_unweighted      , mTerr_unweighted,
      MeanZa1_unweighted , MeanZa1err_unweighted,
      MeanZa2_unweighted , MeanZa2err_unweighted, ax ] = fit_par_plot( fig, 222, data, 'mean', 'unweighted', 'mean') if DoPlot else fit_par_noplot( data, 'mean','unweighted','mean')
 
     [SigmaX_weighted  , SigmaXerr_weighted,
      SigmaY_weighted  , SigmaYerr_weighted,
-     sT_weighted      , sTerr_weighted,
      SigmaZa1_weighted, SigmaZa1err_weighted,
      SigmaZa2_weighted, SigmaZa2err_weighted, ax ] = fit_par_plot ( fig, 223, data, 'sigma', 'weighted', '\sigma'  , do_plot_fit_pars=True ) if DoPlot else fit_par_noplot ( data,'sigma','weighted','\sigma')
      
     [MeanX_weighted   , MeanXerr_weighted,
      MeanY_weighted   , MeanYerr_weighted,
-     mT_weighted      , mTerr_weighted,
      MeanZa1_weighted , MeanZa1err_weighted,
      MeanZa2_weighted , MeanZa2err_weighted, ax ] = fit_par_plot( fig, 224, data, 'mean', 'weighted', 'mean') if DoPlot else fit_par_noplot( data, 'mean','weighted','mean')
      
@@ -319,7 +315,6 @@ def fit_cm_parameters( run , data , FigureFName = '' , DoPlot = False ): # all p
     df_fit_parameters = pd.DataFrame({ 'run':run
                                       ,'SigmaX_unweighted':SigmaX_unweighted     ,'SigmaXerr_unweighted':SigmaXerr_unweighted
                                       ,'SigmaY_unweighted':SigmaY_unweighted     ,'SigmaYerr_unweighted':SigmaYerr_unweighted
-                                      ,'sT_unweighted':sT_unweighted             ,'sTerr_unweighted':sTerr_unweighted
                                       ,'SigmaZa1_unweighted':SigmaZa1_unweighted ,'SigmaZa1err_unweighted':SigmaZa1err_unweighted
                                       ,'SigmaZa2_unweighted':SigmaZa2_unweighted ,'SigmaZa2err_unweighted':SigmaZa2err_unweighted
                                       ,'MeanX_unweighted':MeanX_unweighted       ,'MeanXerr_unweighted':MeanXerr_unweighted
@@ -328,7 +323,6 @@ def fit_cm_parameters( run , data , FigureFName = '' , DoPlot = False ): # all p
                                       ,'MeanZa2_unweighted':MeanZa2_unweighted   ,'MeanZa2err_unweighted':MeanZa2err_unweighted
                                       ,'SigmaX_weighted':SigmaX_weighted         ,'SigmaXerr_weighted':SigmaXerr_weighted
                                       ,'SigmaY_weighted':SigmaY_weighted         ,'SigmaYerr_weighted':SigmaYerr_weighted
-                                      ,'sT_weighted':SigmaY_weighted             ,'sTerr_weighted':SigmaYerr_weighted
                                       ,'SigmaZa1_weighted':SigmaZa1_weighted     ,'SigmaZa1err_weighted':SigmaZa1err_weighted
                                       ,'SigmaZa2_weighted':SigmaZa2_weighted     ,'SigmaZa2err_weighted':SigmaZa2err_weighted
                                       ,'MeanX_weighted':MeanX_weighted           ,'MeanXerr_weighted':MeanXerr_weighted
@@ -594,7 +588,7 @@ def get_Pval_scores( data_fits , reco_fits , name='' ):
     PvalTotal_unweighted = Fisher_combination_Pvals( [PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
                                                        PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ,
                                                        PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] )
-    if debug>2: print "got unweighted P(value) results"
+    if debug>2: print "got unweighted P(value) results, PvalTotal_unweighted=",PvalTotal_unweighted
  
     # With Mott/FF - weighting (un - weighted roofit results)
     [PvalSigmaX_weighted, PvalSigmaY_weighted ,
@@ -604,7 +598,7 @@ def get_Pval_scores( data_fits , reco_fits , name='' ):
     PvalTotal_weighted = Fisher_combination_Pvals( [PvalSigmaX_weighted, PvalSigmaY_weighted ,
                                                      PvalMeanZa1_weighted , PvalMeanZa2_weighted ,
                                                      PvalSigmaZa1_weighted , PvalSigmaZa2_weighted ] )
-    if debug>2: print "got weighted P(value) results"
+    if debug>2: print "got weighted P(value) results, PvalTotal_weighted=",PvalTotal_weighted
 
     PvalSigmaZa1SigmaZa2= Fisher_combination_Pvals( [ PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] )
     PvalMeanZa1MeanZa2  = Fisher_combination_Pvals( [ PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ] )
@@ -646,8 +640,6 @@ def get_Pval_scores( data_fits , reco_fits , name='' ):
     
     if debug>1:
         print "got Pval scores " + name
-        if debug>4:
-            print "Pval_scores:",Pval_scores
 
     return Pval_scores
 # ------------------------------------------------------------------------------- #
@@ -663,7 +655,7 @@ def generate_runs_with_different_parameters( option,
                                             reco_fitsFName , target ,
                                             N ,
                                             root_resutlsFName ,
-                                            do_root_file=False, do_reco_fits_file=False, do_resutls_file=True):
+                                            do_root_file=False, do_reco_fits_file=False, do_resutls_file=True, do_add_plots=False):
     
     from definitions import *
     ana_data = TAnalysisEG2( path+"/AnaFiles" ,"Ana_ppSRCCut_DATA_%s"% target )
@@ -674,8 +666,6 @@ def generate_runs_with_different_parameters( option,
     if 'helion' in flags.worker:
         path = "/extra/Erez/DataMining/Analysis_DATA/ppSRCcm"
 
-    # simulation pandas::DataFrame
-    df_reco_parameters = pd.DataFrame(columns=cm_pars_columns)
 
 
     # the bands around data (around nominal values)
@@ -712,7 +702,7 @@ def generate_runs_with_different_parameters( option,
         genMeanZa1  = float(generated_parameters[generated_parameters.run==run].genMeanZa1)
         genMeanZa2  = float(generated_parameters[generated_parameters.run==run].genMeanZa2)
         if flags.verbose>2:
-            print 'run:',run , genSigmaX , genSigmaZa1 , genSigmaZa2 , genMeanZa1 , genMeanZa2
+            print 'run:',run,',i(run):',irun,',parameters:', genSigmaX , genSigmaZa1 , genSigmaZa2 , genMeanZa1 , genMeanZa2
             
         # (1) generate the simulated data (the 'run')
         # ----------------------------
@@ -741,7 +731,7 @@ def generate_runs_with_different_parameters( option,
             loss_pmiss_bins , loss_Q2pmiss_bins = get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins ,
                                                                       Q2Bins , evtsgen_Q2pmiss_bins , ana_sim )
 
-            if debug>5:
+            if do_add_plots:
                 reco_parameters = calc_cm_parameters( ana_sim  , PmissBins , CMRooFitsName( path + '/eg_cm_roofits/run%d_unweighted_'%run ), CMRooFitsName( path + '/eg_cm_roofits/run%d_weighted_'%run ) , True )
                 fit_cm_parameters( run , reco_parameters , FigureFName( path + '/eg_cm_figures/run%d_'%run ) , True )
             
@@ -853,7 +843,7 @@ def generate_runs_with_different_parameters( option,
             garbage_list = [ ana_sim , reco_parameters , reco_fits  , results ]
             del garbage_list
                     
-        print_important( "completed run %d [%.0f"%(run,100%float(irun)/Nruns) + "%]" + " at %4d-%02d-%02d"%time.localtime()[0:3] )
+        print_important( "completed run %d [%.0f"%(run,100.*float(irun)/Nruns) + "%]" + " at %4d-%02d-%02d %d:%d:%d"%time.localtime()[0:6] )
         print_line()
 
 
