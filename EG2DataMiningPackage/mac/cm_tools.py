@@ -191,7 +191,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
 
     # Jan 2016, changing to a (weighted) average and variance using numpy
     if fana.GetEntries()==0:
-        print 'no entries in anaTree of',fana.GetName()
+        print 'no entries in anaTree of',fana.GetFileName()
         print 'leaving calc_cm_parameters'
         return pd.DataFrame() , False
 
