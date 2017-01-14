@@ -180,6 +180,10 @@ def fit_as_a_function_of_pmiss( x , y , yerr, fit_type='const' , title='', x_off
 
 # ------------------------------------------------------------------------------- #
 def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weightedRoofitsFName = '' , DoSaveCanvas = False ):
+    '''
+        Return: df_pMissBin , do_fits (continue or not)
+        '''
+    
     df_pMissBins = pd.DataFrame()#columns=cm_pars_columns)
     
     if DoSaveCanvas:
@@ -189,7 +193,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
     if fana.GetEntries()==0:
         print 'no entries in anaTree of',fana.GetName()
         print 'leaving calc_cm_parameters'
-        return False
+        return pd.DataFrame() , False
 
     ana = read_root( str(fana.GetFileName()) , key='anaTree' , columns=['pcmX','pcmY','pcmZ','Pmiss3Mag','rooWeight']  )
     if debug>4: print 'ana: ',ana
@@ -261,7 +265,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
         if debug>4:
             print 'df_pMissBins:',df_pMissBins
 
-    return df_pMissBins
+    return df_pMissBins , True
 # ------------------------------------------------------------------------------- #
 
 
@@ -314,9 +318,11 @@ def fit_par_noplot( data , var , weight , title ): # a sub-routine to fit a sing
 
 
 # ------------------------------------------------------------------------------- #
-def fit_cm_parameters( run , data , FigureFName = '' , DoPlot = False ): # all parameters
-
-    if data==False or data.empty:
+def fit_cm_parameters( run , data , do_fits=True , FigureFName = '' , DoPlot = False ): # all parameters
+    '''
+        Return: df_fit_parameters
+        '''
+    if do_fits==False:
         print 'nothing in cm-paramteres input as data to fit_cm_parameters()'
         print 'leaving fit_cm_parameters by appending -100 to all'
         return pd.DataFrame({ 'run':run
@@ -782,12 +788,12 @@ def generate_runs_with_different_parameters( option,
                                                                       Q2Bins , evtsgen_Q2pmiss_bins , ana_sim )
 
             if do_add_plots:
-                reco_parameters = calc_cm_parameters( ana_sim  , PmissBins , CMRooFitsName( path + '/eg_cm_roofits/run%d_unweighted_'%run ), CMRooFitsName( path + '/eg_cm_roofits/run%d_weighted_'%run ) , True )
+                reco_parameters , do_fits = calc_cm_parameters( ana_sim  , PmissBins , CMRooFitsName( path + '/eg_cm_roofits/run%d_unweighted_'%run ), CMRooFitsName( path + '/eg_cm_roofits/run%d_weighted_'%run ) , True )
                 fit_cm_parameters( run , reco_parameters , FigureFName( path + '/eg_cm_figures/run%d_'%run ) , True )
             
             # reconstruct c.m. parameters and fit
-            reco_parameters = calc_cm_parameters( ana_sim  , PmissBins )
-            reco_fits = fit_cm_parameters( run , reco_parameters )
+            reco_parameters, do_fits = calc_cm_parameters( ana_sim  , PmissBins )
+            reco_fits = fit_cm_parameters( run , reco_parameters , do_fits=do_fits )
 
 
             KS_scores = get_KS_scores( PmissBins ,ana_sim , ana_data , h3_pcm_data )
