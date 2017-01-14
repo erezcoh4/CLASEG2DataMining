@@ -77,19 +77,22 @@ def KStest( PmissBins , ana_sim , ana_data , var , cut=ROOT.TCut() , debug=2 , N
 # ------------------------------------------------------------------------------- #
 def get_KS_scores( PmissBins ,ana_sim , ana_data , h3_pcm_data ):
 
-    # 1d KS tests
-    KSpCMx , KSxPval = KStest( PmissBins ,ana_sim , ana_data , "pcmX" , ROOT.TCut('') , debug)
-    KSpCMy , KSyPval = KStest( PmissBins ,ana_sim , ana_data , "pcmY" , ROOT.TCut('') , debug)
-    KSpCMt , KStPval = KStest( PmissBins ,ana_sim , ana_data , "pcmT" , ROOT.TCut('') , debug)
-    KSpCMz , KSzPval = KStest( PmissBins ,ana_sim , ana_data , "pcmZ" , ROOT.TCut('') , debug)
-    KSPval_tot = Fisher_combination_Pvals([ KSxPval , KSyPval , KSzPval ])
+    if ana_sim.GetEntries():
+        # 1d KS tests
+        KSpCMx , KSxPval = KStest( PmissBins ,ana_sim , ana_data , "pcmX" , ROOT.TCut('') , debug)
+        KSpCMy , KSyPval = KStest( PmissBins ,ana_sim , ana_data , "pcmY" , ROOT.TCut('') , debug)
+        KSpCMt , KStPval = KStest( PmissBins ,ana_sim , ana_data , "pcmT" , ROOT.TCut('') , debug)
+        KSpCMz , KSzPval = KStest( PmissBins ,ana_sim , ana_data , "pcmZ" , ROOT.TCut('') , debug)
+        KSPval_tot = Fisher_combination_Pvals([ KSxPval , KSyPval , KSzPval ])
     
-    # 3d KS test
-    h3_pcm_sim = ana_sim.H3("pcmX","pcmY","pcmZ",ROOT.TCut(),"goff",nbins_pcm_3d,-1,1,nbins_pcm_3d,-1,1,nbins_pcm_3d,-1,1)
-    KS3dHistPval = h3_pcm_sim.KolmogorovTest(h3_pcm_data)
+        # 3d KS test
+        h3_pcm_sim = ana_sim.H3("pcmX","pcmY","pcmZ",ROOT.TCut(),"goff",nbins_pcm_3d,-1,1,nbins_pcm_3d,-1,1,nbins_pcm_3d,-1,1)
+        KS3dHistPval = h3_pcm_sim.KolmogorovTest(h3_pcm_data)
     
+    else:
+        KSxPval=KSyPval=KSzPval=KStPval=KSPval_tot=KS3dHistPval=0
     # make it a data-frame
-    KS_scores = pd.DataFrame({'KSxPval':KSxPval,'KSyPval':KSyPval,'KSzPval':KSyPval,'KStPval':KSyPval,
+    KS_scores = pd.DataFrame({'KSxPval':KSxPval,'KSyPval':KSyPval,'KSzPval':KSzPval,'KStPval':KStPval,
                              'KSPval_tot':KSPval_tot,
                              'KS3dHistPval':KS3dHistPval},
                              index=[0])
@@ -183,6 +186,11 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
         canvas_unweighted , canvas_weighted = fana.CreateCanvas( "RooFit plots - unweighted" , "Divide" , 4 , len(PmissBins) ) , fana.CreateCanvas( "RooFit plots - weighted" , "Divide" , 4 , len(PmissBins) )
 
     # Jan 2016, changing to a (weighted) average and variance using numpy
+    if fana.GetEntries()==0:
+        print 'no entries in anaTree of',fana.GetName()
+        print 'leaving calc_cm_parameters'
+        return False
+
     ana = read_root( str(fana.GetFileName()) , key='anaTree' , columns=['pcmX','pcmY','pcmZ','Pmiss3Mag','rooWeight']  )
     if debug>4: print 'ana: ',ana
 
@@ -308,6 +316,27 @@ def fit_par_noplot( data , var , weight , title ): # a sub-routine to fit a sing
 # ------------------------------------------------------------------------------- #
 def fit_cm_parameters( run , data , FigureFName = '' , DoPlot = False ): # all parameters
 
+    if not data:
+        print 'nothing in cm-paramteres input as data to fit_cm_parameters()'
+        print 'leaving fit_cm_parameters by appending -100 to all'
+        return pd.DataFrame({ 'run':run
+                            ,'SigmaX_unweighted':-100      ,'SigmaXerr_unweighted':0
+                            ,'SigmaY_unweighted':-100      ,'SigmaYerr_unweighted':0
+                            ,'SigmaZa1_unweighted':-100    ,'SigmaZa1err_unweighted':0
+                            ,'SigmaZa2_unweighted':-100    ,'SigmaZa2err_unweighted':0
+                            ,'MeanX_unweighted':-100       ,'MeanXerr_unweighted':0
+                            ,'MeanY_unweighted':-100       ,'MeanYerr_unweighted':0
+                            ,'MeanZa1_unweighted':-100     ,'MeanZa1err_unweighted':0
+                            ,'MeanZa2_unweighted':-100     ,'MeanZa2err_unweighted':0
+                            ,'SigmaX_weighted':-100        ,'SigmaXerr_weighted':0
+                            ,'SigmaY_weighted':-100        ,'SigmaYerr_weighted':0
+                            ,'SigmaZa1_weighted':-100      ,'SigmaZa1err_weighted':0
+                            ,'SigmaZa2_weighted':-100      ,'SigmaZa2err_weighted':0
+                            ,'MeanX_weighted':-100         ,'MeanXerr_weighted':0
+                            ,'MeanY_weighted':-100         ,'MeanYerr_weighted':0
+                            ,'MeanZa1_weighted':-100       ,'MeanZa1err_weighted':0
+                            ,'MeanZa2_weighted':-100       ,'MeanZa2err_weighted':0 }
+                            , index=[0] )
 
     if DoPlot: # this means we want plots
         fig = plt.figure(figsize=(40,20)) # four plots, two unweighted and two weighted
