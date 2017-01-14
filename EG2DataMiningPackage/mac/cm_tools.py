@@ -316,7 +316,7 @@ def fit_par_noplot( data , var , weight , title ): # a sub-routine to fit a sing
 # ------------------------------------------------------------------------------- #
 def fit_cm_parameters( run , data , FigureFName = '' , DoPlot = False ): # all parameters
 
-    if not data:
+    if data==False or data.empty:
         print 'nothing in cm-paramteres input as data to fit_cm_parameters()'
         print 'leaving fit_cm_parameters by appending -100 to all'
         return pd.DataFrame({ 'run':run
