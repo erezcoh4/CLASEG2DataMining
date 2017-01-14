@@ -156,7 +156,9 @@ def fit_as_a_function_of_pmiss( x , y , yerr, fit_type='const' , title='', x_off
     if debug>4:
         print 'p2:\n',p2,'\nv2:\n',v2
 
-    if p2 is None or v2 is None or np.inf in p2 or -np.inf in p2 or np.inf in v2 or np.inf in v2 or len(p2)==0 or len(v2)==0:
+    if p2 is None or v2 is None or len(p2)==0 or len(v2)==0:
+        return -100 , 0 , -100 , 0
+    if p2[0] is np.inf or if p2[1] is np.inf or if v2[0,0] is np.inf or if v2[1,1] is np.inf:
         return -100 , 0 , -100 , 0
     else:
         return p2[0] , sqrt(float(v2[0,0])) , p2[1] , sqrt(float(v2[1,1]))
