@@ -139,7 +139,11 @@ def plot_errorbar_and_fit( ax , x , y , xerr , yerr , color , marker , lstyle , 
 def fit_as_a_function_of_pmiss( x , y , yerr, fit_type='const' , title='', x_offset=0.6): # the main fitting routine
     
     if fit_type=='const':
+        if len(x)<3:
+            return -100 , 0
+
         p1,v1 = np.polyfit( x , y , 0 , cov=True)
+        
         if debug>4:
             print 'p1:',p1,',\tv1:',v1
 
@@ -150,6 +154,10 @@ def fit_as_a_function_of_pmiss( x , y , yerr, fit_type='const' , title='', x_off
     
     #        p2,v2 = np.polyfit( x , y , 1 , cov=True)        # fit a polynomial p2(x) = p2[0] * x + p2[1]
     elif fit_type=='linear':
+
+        if len(x)<4:
+            return -100 , 0 , -100 , 0
+
         if x_offset==0:
             f = linear
         else:
