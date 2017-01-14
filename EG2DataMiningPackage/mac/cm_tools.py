@@ -149,8 +149,14 @@ def fit_as_a_function_of_pmiss( x , y , yerr, fit_type='const' , title='', x_off
         else:
             f = linear_06
         p2, v2 = curve_fit(f, xdata=x, ydata=y,sigma=yerr)# fit data using SciPy's Levenberg-Marquart method
-    if debug>4: print 'p2:\n',p2,'\nv2:\n',v2
-    return p2[0] , sqrt(float(v2[0,0])) , p2[1] , sqrt(float(v2[1,1]))
+
+    if debug>4:
+        print 'p2:\n',p2,'\nv2:\n',v2
+
+    if p2 is np.inf or p2 is -np.inf or v2 is np.inf or v2 is -np.inf:
+        return -100 , 0 , -100 , 0
+    else:
+        return p2[0] , sqrt(float(v2[0,0])) , p2[1] , sqrt(float(v2[1,1]))
 # ------------------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------------------- #
@@ -189,7 +195,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
             if flags.verbose>1: print len(ana_reduced),'events in this bin'
 
             if len(ana_reduced)>0 and sum(ana_reduced.rooWeight)>0:
-                good_bin = 1
+                good_bin , sqrtN = 1 , sqrt(len(ana_reduced))
                 mean_x_unweighted , mean_x_weighted     = np.average( ana_reduced.pcmX ) , np.average( ana_reduced.pcmX , weights=ana_reduced.rooWeight )
                 sigma_x_unweighted, sigma_x_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_weighted) , weights=ana_reduced.rooWeight  ))
                 mean_y_unweighted , mean_y_weighted     = np.average( ana_reduced.pcmY ) , np.average( ana_reduced.pcmY , weights=ana_reduced.rooWeight )
@@ -197,7 +203,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
                 mean_z_unweighted , mean_z_weighted     = np.average( ana_reduced.pcmZ ) , np.average( ana_reduced.pcmZ , weights=ana_reduced.rooWeight )
                 sigma_z_unweighted, sigma_z_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_weighted) , weights=ana_reduced.rooWeight  ))
             else:
-                good_bin = 0
+                good_bin , sqrtN = 0 , 1
                 mean_x_unweighted , mean_x_weighted     = -100,-100
                 sigma_x_unweighted, sigma_x_weighted    = -100,-100
                 mean_y_unweighted , mean_y_weighted     = -100,-100
@@ -206,7 +212,6 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
                 sigma_z_unweighted, sigma_z_weighted    = -100,-100
 
 
-            sqrtN = sqrt(len(ana_reduced))
             df_pMissBin = pd.DataFrame({'pMiss_min':pMiss_min                   ,'pMiss_max':pMiss_max
                                        ,'EvtsInBin':len(ana_reduced)            ,'good_bin':good_bin
                                        ,'mean_x_unweighted':mean_x_unweighted   ,'mean_xErr_unweighted':sigma_x_unweighted/sqrtN ,'sigma_x_unweighted':sigma_x_unweighted,'sigma_xErr_unweighted':0.02 # resolution uncertainty
