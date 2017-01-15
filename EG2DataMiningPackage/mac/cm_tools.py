@@ -58,12 +58,12 @@ def compute_Pval_parameters( data_fits , reco_fits , weighting ):
 
 
 # ------------------------------------------------------------------------------- #
-def KStest( PmissBins , ana_sim , ana_data , var , cut=ROOT.TCut() , debug=2 , Nbins=20):
+def KStest( PmissBins , ana_sim , ana_data , var , cut=ROOT.TCut() , debug=2 , Nbins=20, do_save_plots=False):
     # [http://docs.scipy.org/doc/scipy-0.15.1/reference/generated/scipy.stats.ks_2samp.html]
     data = tree2array( ana_data.GetTree() , branches=var )
     sim = tree2array( ana_sim.GetTree() , branches=var )
     D_KS , Pval_KS = ks_2samp( sim , data )
-    if debug>4 :
+    if do_save_plots :
         fig,ax = plt.subplots(figsize=[20,20])
         for array,col in zip([sim , data],['black','red']):
             g=sns.distplot( array, bins=np.linspace(-1, 2 , Nbins), ax=ax, color=col , axlabel=var )
@@ -112,7 +112,6 @@ def linear(x, slope, intercept):
 
 def linear_06(x, slope, intercept):
     return slope * ( x - 0.6 ) + intercept
-
 # ------------------------------------------------------------------------------- #
 
 
@@ -184,7 +183,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
         Return: df_pMissBin , do_fits (continue or not)
         '''
     
-    df_pMissBins = pd.DataFrame()#columns=cm_pars_columns)
+    df_pMissBins = pd.DataFrame()
     
     if DoSaveCanvas:
         canvas_unweighted , canvas_weighted = fana.CreateCanvas( "RooFit plots - unweighted" , "Divide" , 4 , len(PmissBins) ) , fana.CreateCanvas( "RooFit plots - weighted" , "Divide" , 4 , len(PmissBins) )
@@ -200,7 +199,6 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
 
     for i in range(len(PmissBins)):
         pMiss_min , pMiss_max = PmissBins[i][0] , PmissBins[i][1]
-        if flags.verbose>1: print 'running p(miss) bin ',i,',',pMiss_min,' to ',pMiss_max,' GeV/c'
         if DoSaveCanvas:
             unweighted = fana.RooFitCM( pMiss_min , pMiss_max , False , True, flags.verbose, canvas_unweighted, 4*i + 1 )
             weighted = fana.RooFitCM( pMiss_min , pMiss_max , True , True, flags.verbose, canvas_weighted, 4*i + 1 )
@@ -220,7 +218,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
 
             # Jan 2016, changing to a (weighted) average and variance using numpy
             ana_reduced = ana[ (pMiss_min < ana.Pmiss3Mag) & (ana.Pmiss3Mag < pMiss_max) ]
-            if flags.verbose>1: print len(ana_reduced),'events in this bin'
+            if flags.verbose>1: print print 'running p(miss) bin ',i,',',pMiss_min,' to ',pMiss_max,' GeV/c, ',len(ana_reduced),'events in this bin'
 
             if len(ana_reduced)>0 and sum(ana_reduced.rooWeight)>0:
                 good_bin , sqrtN = 1 , sqrt(len(ana_reduced))
@@ -265,6 +263,12 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
         if debug>4:
             print 'df_pMissBins:',df_pMissBins
 
+    garbage_list = [ ana ,
+                    mean_x_unweighted , mean_x_weighted , sigma_x_unweighted , sigma_x_weighted ,
+                    mean_y_unweighted , mean_y_weighted , sigma_y_unweighted , sigma_y_weighted ,
+                    mean_z_unweighted , mean_z_weighted , sigma_z_unweighted , sigma_z_weighted ]
+    del garbage_list
+
     return df_pMissBins , True
 # ------------------------------------------------------------------------------- #
 
@@ -288,10 +292,10 @@ def fit_par_plot( fig , i_subplot , data , var , weight , title , do_plot_fit_pa
     pMissUpErr , pMissLowErr = data.pMiss_max - Pmiss , Pmiss - data.pMiss_min
     ax = fig.add_subplot( i_subplot )
     ax.grid(True,linestyle='-',color='0.95')
-#    [Xfit,XfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_x_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_xErr_' + weight ],data[ var + '_xErr_' + weight ]], 'black','v','none',r'$%s_{x}$'%title ,'const',do_plot_fit_pars=do_plot_fit_pars)
-#    [Yfit,YfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_y_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_yErr_' + weight ],data[ var + '_yErr_' + weight ]], 'red'  ,'o','none',r'$%s_{y}$'%title ,'const',do_plot_fit_pars=do_plot_fit_pars)
-#    [Tfit,TfitErr] = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_t_' + weight],'const')
-#    [Za1,Za1err],[Za2,Za2err] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_zErr_' + weight ],data[ var + '_zErr_' + weight ]], 'blue' ,'s','none',r'$%s_{\vec{p}_{miss}}$'%title ,'linear',do_plot_fit_pars=do_plot_fit_pars)
+    #    [Xfit,XfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_x_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_xErr_' + weight ],data[ var + '_xErr_' + weight ]], 'black','v','none',r'$%s_{x}$'%title ,'const',do_plot_fit_pars=do_plot_fit_pars)
+    #    [Yfit,YfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_y_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_yErr_' + weight ],data[ var + '_yErr_' + weight ]], 'red'  ,'o','none',r'$%s_{y}$'%title ,'const',do_plot_fit_pars=do_plot_fit_pars)
+    #    [Tfit,TfitErr] = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_t_' + weight],'const')
+    #    [Za1,Za1err],[Za2,Za2err] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_zErr_' + weight ],data[ var + '_zErr_' + weight ]], 'blue' ,'s','none',r'$%s_{\vec{p}_{miss}}$'%title ,'linear',do_plot_fit_pars=do_plot_fit_pars)
     [Xfit,XfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_x_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , [data[ var + '_xErr_' + weight ],data[ var + '_xErr_' + weight ]], 'black','v','none',r'$x-direction$' ,'const',do_plot_fit_pars=do_plot_fit_pars)
     [Yfit,YfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_y_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , [data[ var + '_yErr_' + weight ],data[ var + '_yErr_' + weight ]], 'red'  ,'o','none',r'$y-direction$' ,'const',do_plot_fit_pars=do_plot_fit_pars)
     [Tfit,TfitErr] = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_t_' + weight],'const')
@@ -879,7 +883,6 @@ def generate_runs_with_different_parameters( option,
             for i in range( len(pmiss_bins) ):
                 pmin , pmax = pmiss_bins[i][0] , pmiss_bins[i][1]
                 results['fracLoss_pmiss_%.3f_%.3f'%(pmin , pmax)] = loss_pmiss_bins[i]
-                loss_pmiss_bins[i]
                 for j in range( len(Q2Bins) ):
                     Q2min , Q2max = Q2Bins[j][0] , Q2Bins[j][1]
                     results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmin , pmax , Q2min , Q2max)] = loss_Q2pmiss_bins[i][j]
@@ -896,7 +899,7 @@ def generate_runs_with_different_parameters( option,
                 print "appended into results"
                 if debug>3: print "results: ",results
 
-            garbage_list = [ ana_sim , reco_parameters , reco_fits  , results ]
+            garbage_list = [ ana_sim , reco_parameters , reco_fits  , results , Pval_scores , KS_scores , loss_pmiss_bins , loss_Q2pmiss_bins ]
             del garbage_list
                     
         print_important( "completed run %d [%.0f"%(run,100.*float(irun)/Nruns) + "%]" + " at %4d-%02d-%02d %d:%d:%d"%time.localtime()[0:6] )
