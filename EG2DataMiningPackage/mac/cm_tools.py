@@ -218,7 +218,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
 
             # Jan 2016, changing to a (weighted) average and variance using numpy
             ana_reduced = ana[ (pMiss_min < ana.Pmiss3Mag) & (ana.Pmiss3Mag < pMiss_max) ]
-            if flags.verbose>1: print print 'running p(miss) bin ',i,',',pMiss_min,' to ',pMiss_max,' GeV/c, ',len(ana_reduced),'events in this bin'
+            if flags.verbose>1: print 'running p(miss) bin ',i,',',pMiss_min,' to ',pMiss_max,' GeV/c, ',len(ana_reduced),'events in this bin'
 
             if len(ana_reduced)>0 and sum(ana_reduced.rooWeight)>0:
                 good_bin , sqrtN = 1 , sqrt(len(ana_reduced))
