@@ -891,7 +891,7 @@ def generate_runs_with_different_parameters( option,
 
 
             if do_reco_fits_file:   stream_dataframe_to_file( reco_fits, reco_fitsFName  )
-            if do_resutls_file:     stream_dataframe_to_file( results, buildup_resutlsFName , float_format='%g' )
+            if do_resutls_file:     stream_dataframe_to_file( results, buildup_resutlsFName , float_format='%f' )
             if do_root_file:        stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
 
             ana_sim.CloseFile()
