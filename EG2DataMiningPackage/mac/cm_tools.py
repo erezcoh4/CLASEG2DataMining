@@ -86,16 +86,16 @@ def get_KS_scores( PmissBins ,ana_sim , ana_data , h3_pcm_data ):
         KSPval_tot = Fisher_combination_Pvals([ KSxPval , KSyPval , KSzPval ])
     
         # 3d KS test
-        h3_pcm_sim = ana_sim.H3("pcmX","pcmY","pcmZ",ROOT.TCut(),"goff",nbins_pcm_3d,-1,1,nbins_pcm_3d,-1,1,nbins_pcm_3d,-1,1)
-        KS3dHistPval = h3_pcm_sim.KolmogorovTest(h3_pcm_data)
-    
+        #        h3_pcm_sim = ana_sim.H3("pcmX","pcmY","pcmZ",ROOT.TCut(),"goff",nbins_pcm_3d,-1,1,nbins_pcm_3d,-1,1,nbins_pcm_3d,-1,1)
+        #        KS3dHistPval = h3_pcm_sim.KolmogorovTest(h3_pcm_data)
+        # this routine has a problem of acquiring too much memoory without allocating it; Since its not that crucial (not helpfull) I removed it temporarily
     else:
         KSxPval=KSyPval=KSzPval=KStPval=KSPval_tot=KS3dHistPval=0
     # make it a data-frame
     KS_scores = pd.DataFrame({'KSxPval':KSxPval,'KSyPval':KSyPval,'KSzPval':KSzPval,'KStPval':KStPval,
                              'KSPval_tot':KSPval_tot,
-                             'KS3dHistPval':KS3dHistPval},
-                             index=[0])
+                             #                             'KS3dHistPval':KS3dHistPval
+                             },index=[0])
 
     if debug>1:
         print "performed KS tests"
@@ -827,7 +827,7 @@ def generate_runs_with_different_parameters( option,
                                    ,'KSzPval':float(KS_scores.KSzPval)
                                    ,'KStPval':float(KS_scores.KStPval)
                                    ,'KSPval_tot':float(KS_scores.KSPval_tot)
-                                   ,'KS3dHistPval':float(KS_scores.KS3dHistPval)
+                                   # ,'KS3dHistPval':float(KS_scores.KS3dHistPval)
                                    
                                    # events loss
                                    ,'NLostEvents':(9907*float(N.NRand) - ana_sim.GetEntries())
@@ -899,8 +899,12 @@ def generate_runs_with_different_parameters( option,
                 print "appended into results"
                 if debug>3: print "results: ",results
 
-            garbage_list = [ ana_sim , reco_parameters , reco_fits  , results , Pval_scores , KS_scores , loss_pmiss_bins , loss_Q2pmiss_bins ]
+            garbage_list = [ ana_sim , reco_parameters , reco_fits
+                            , results
+                            , Pval_scores , KS_scores , loss_pmiss_bins , loss_Q2pmiss_bins
+                            ]
             del garbage_list
+            gc.collect() # collect() calls PyInt_ClearFreeList()
                     
         print_important( "completed run %d [%.0f"%(run,100.*float(irun)/Nruns) + "%]" + " at %4d-%02d-%02d %d:%d:%d"%time.localtime()[0:6] )
         print_line()

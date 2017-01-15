@@ -1,5 +1,5 @@
 
-import ROOT , time , os, sys , math , datetime
+import ROOT , time , os, sys , math , datetime , gc 
 sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
 sys.path.insert(0, '/home/erez/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
 sys.path.insert(0, '../../GSIMulation')
@@ -8,7 +8,7 @@ import seaborn as sns ; sns.set(style="white", color_codes=True , font_scale=1)
 from ROOT import TPlots, TAnalysis, TAnalysisEG2 , TEG2dm , TCalcPhysVarsEG2 , TSchemeDATA ,GenerateEvents
 from matplotlib import pyplot as plt
 
-import input_flags , Initiation as init, GeneralPlot as gp , gc
+import input_flags , Initiation as init, GeneralPlot as gp
 from my_tools import *
 from calc_tools import *
 from root_pandas import read_root
