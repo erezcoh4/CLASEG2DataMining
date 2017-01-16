@@ -399,6 +399,83 @@ void TAnalysisEG2::MixEvents(TTree * OutTree, bool DoPrint){
     }
 }
 
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void TAnalysisEG2::Mix_pp_pairs(TTree * OutTree, bool DoPrint){
+    int Np;
+    Float_t         phi_q   , phi_Pmiss , theta_Pmiss , q_phi   , Pmiss_phi , Pmiss_theta;
+    TVector3        pcm3vec , prel3vec;
+    TLorentzVector  *Pm = 0, *Pr = 0, *q4 = 0, Pmiss, q, Pcm, Prec , Prel;
+    vector <TLorentzVector> * p = 0 , protons;
+    
+    Tree -> SetBranchAddress("q_phi"        , &q_phi);
+    Tree -> SetBranchAddress("Pmiss_phi"    , &Pmiss_phi);
+    Tree -> SetBranchAddress("Pmiss_theta"  , &Pmiss_theta);
+    Tree -> SetBranchAddress("q"            , &q4);
+    Tree -> SetBranchAddress("Pmiss"        , &Pm);
+    Tree -> SetBranchAddress("Prec"         , &Pr);
+    Tree -> SetBranchAddress("protonsLab"   , &p);
+    int N = Tree->GetEntries()*(Tree->GetEntries()-1);
+    OutTree -> Branch("q"               ,"q"                    ,&q);
+    OutTree -> Branch("Pcm"             ,"TLorentzVector"       ,&Pcm);
+    OutTree -> Branch("Prec"            ,"TLorentzVector"       ,&Prec);
+    OutTree -> Branch("Pmiss"           ,"TLorentzVector"       ,&Pmiss);
+    OutTree -> Branch("pcmX"            ,&pcmX                  , "pcmX/F");
+    OutTree -> Branch("pcmY"            ,&pcmY                  , "pcmY/F");
+    OutTree -> Branch("pcmZ"            ,&pcmZ                  , "pcmZ/F");
+    OutTree -> Branch("prelX"           ,&prelX                 , "prelX/F");
+    OutTree -> Branch("prelY"           ,&prelY                 , "prelY/F");
+    OutTree -> Branch("prelZ"           ,&prelZ                 , "prelZ/F");
+    
+    
+    for (int i1 = 0; i1 < Tree->GetEntries() ; i1++) {
+        
+        for (int i2 = 0; i2 < Tree->GetEntries() ; i2++) {
+            if (i1 != i2) {
+                
+                
+                // Fill entry with mixed protons...
+                Tree -> GetEntry(i1);
+                phi_q = q_phi;
+                phi_Pmiss = Pmiss_phi;
+                theta_Pmiss = Pmiss_theta;
+                q = *q4;
+                Pmiss = *Pm;
+                
+                Tree -> GetEntry(i2);
+                Prec = *Pr;
+                
+                Pcm  = Pmiss + Prec;
+                pcm3vec = Pcm.Vect();
+                Prel = 0.5*(Pmiss - Prec);
+                
+                
+                RotVec2_Pm_q_Frame( & pcm3vec , Pmiss_phi, Pmiss_theta, q_phi );
+
+                OutTree -> Fill();
+                
+                // print out info
+                if (DoPrint) {
+                    SHOWTLorentzVector(q);
+                    SHOWTLorentzVector(Pmiss);
+                    SHOWTLorentzVector(Prec);
+                    SHOWTLorentzVector(Pcm);
+                    SHOWTLorentzVector(Prel);
+                    PrintLine();
+                }
+                if (OutTree->GetEntries()%(N/10) == 0) {
+                    Printf("\t[%.0f%%]",100*(float)OutTree->GetEntries()/N);
+                }
+            }
+        }
+    }
+}
+
+
+
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 std::vector<Double_t> TAnalysisEG2::RooFitCM( Float_t PmissMin, Float_t PmissMax, bool DoWeight , bool PlotFits, int debug, TCanvas * c, Int_t start_cd ){
     // returns a parameter matrix: (μ-x,𝜎-x,μ-y,𝜎-y,μ-z,𝜎-z) and their uncertainties (𝚫μ-x,𝚫𝜎-x,𝚫μ-y,𝚫𝜎-y,𝚫μ-z,𝚫𝜎-z)

@@ -94,6 +94,7 @@ public:
     vector<Float_t>        GetGSIMEvt (int, bool DoPrint = false);
     vector<Float_t>     GetGSIMeep_pp_Evt (int, bool DoPrint = false);
     void                    MixEvents (TTree *, bool DoPrint = false);
+    void                 Mix_pp_pairs (TTree *, bool DoPrint = false);
 };
 
 #endif

@@ -83,6 +83,14 @@ void TEG2dm::RotVec2_Pm_q_Frame( TVector3 * V, float Pmiss_phi, float Pmiss_thet
     V -> RotateZ(-q_phi);
 }
 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void TEG2dm::RotVec_from_Pm_q_Frame( TVector3 * V, float Pmiss_phi, float Pmiss_theta, float q_phi){
+    // move to Pmiss-q system: Pmiss is the z axis, q is in x-z plane
+    V -> RotateZ(q_phi);
+    V -> RotateY(Pmiss_theta);
+    V -> RotateZ(Pmiss_phi);
+}
+
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
