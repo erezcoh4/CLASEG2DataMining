@@ -159,6 +159,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("q_phi"               ,&q_phi                 , "q_phi/F");
     OutTree -> Branch("q_theta"             ,&q_theta               , "q_theta/F");
     OutTree -> Branch("Pmiss_phi"           ,&Pmiss_phi             , "Pmiss_phi/F");
+    OutTree -> Branch("Pmiss_theta"         ,&Pmiss_theta           , "Pmiss_theta/F");
     OutTree -> Branch("pLab_phi"            ,&pLab_phi              , "pLab_phi/F");
     OutTree -> Branch("pLab_theta"          ,&pLab_theta            , "pLab_theta/F");
 
