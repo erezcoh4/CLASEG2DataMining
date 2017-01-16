@@ -35,37 +35,19 @@ for i in range(len(anarr)-1):
     Pmiss_theta = Pmiss.Theta()
     Pmiss_phi   = Pmiss.Phi()
 
-#    q_phi       = anarr[i]['q_phi']
-#    Pmiss_theta = anarr[i]['Pmiss_theta']
-#    Pmiss_phi   = anarr[i]['Pmiss_phi']
-
-#    # rotate into the lab frame
-#    Pmiss = ROOT.TVector3(anarr[i]['Pmiss.Px()'],anarr[i]['Pmiss.Py()'],anarr[i]['Pmiss.Pz()'])
-#    Pmiss.RotateZ(q_phi)
-#    Pmiss.RotateY(Pmiss_theta)
-#    Pmiss.RotateZ(Pmiss_phi)
 
     for j in range(i+1,len(anarr)-1):
         mixed_counter += 1
         Prec = ROOT.TVector3( anarr[j]['protonsLab[1].Px()'] ,  anarr[j]['protonsLab[1].Py()'] ,  anarr[j]['protonsLab[1].Pz()'] )
-
-#        Prec = ROOT.TVector3(anarr[j]['Prec.Px()'],anarr[j]['Prec.Py()'],anarr[j]['Prec.Pz()'])
-#
-#        # rotate into the lab frame
-#        Prec.RotateZ(q_phi)
-#        Prec.RotateY(Pmiss_theta)
-#        Prec.RotateZ(Pmiss_phi)
 
 
         Pcm = Pmiss + Prec
         Prel = 0.5*(Pmiss - Prec)
 
         # rotate into the p(miss)-q frame
-#        print 'pcmX before rotation:',Pcm.X()
         Pcm.RotateZ(-Pmiss_phi)
         Pcm.RotateY(-Pmiss_theta)
         Pcm.RotateZ(-q_phi)
-#        print 'pcmX after rotation:',Pcm.X()
 
         # rotate into the p(miss)-q frame
         Prel.RotateZ(-Pmiss_phi)
@@ -76,7 +58,6 @@ for i in range(len(anarr)-1):
         mixed = pd.DataFrame({
                      'Pmiss':   Pmiss.Mag()
                      ,'Precoil':Prec.Mag()
-#                     ,'Original_pcmX':anarr[i]['pcmX']
                      ,'pcmX':   Pcm.X()
                      ,'pcmY':   Pcm.Y()
                      ,'pcmZ':   Pcm.Z()
