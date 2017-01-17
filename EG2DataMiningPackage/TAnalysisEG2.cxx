@@ -422,12 +422,12 @@ void TAnalysisEG2::Mix_pp_pairs(TTree * OutTree, bool DoPrint){
     OutTree -> Branch("Pcm"             ,"TLorentzVector"       ,&Pcm);
     OutTree -> Branch("Prec"            ,"TLorentzVector"       ,&Prec);
     OutTree -> Branch("Pmiss"           ,"TLorentzVector"       ,&Pmiss);
-    OutTree -> Branch("pcmX"            ,&pcmX                  , "pcmX/F");
-    OutTree -> Branch("pcmY"            ,&pcmY                  , "pcmY/F");
-    OutTree -> Branch("pcmZ"            ,&pcmZ                  , "pcmZ/F");
-    OutTree -> Branch("prelX"           ,&prelX                 , "prelX/F");
-    OutTree -> Branch("prelY"           ,&prelY                 , "prelY/F");
-    OutTree -> Branch("prelZ"           ,&prelZ                 , "prelZ/F");
+//    OutTree -> Branch("pcmX"            ,&pcmX                  , "pcmX/F");
+//    OutTree -> Branch("pcmY"            ,&pcmY                  , "pcmY/F");
+//    OutTree -> Branch("pcmZ"            ,&pcmZ                  , "pcmZ/F");
+//    OutTree -> Branch("prelX"           ,&prelX                 , "prelX/F");
+//    OutTree -> Branch("prelY"           ,&prelY                 , "prelY/F");
+//    OutTree -> Branch("prelZ"           ,&prelZ                 , "prelZ/F");
     
     
     for (int i1 = 0; i1 < Tree->GetEntries() ; i1++) {
