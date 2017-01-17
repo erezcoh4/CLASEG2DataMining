@@ -200,7 +200,6 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
         return pd.DataFrame() , False
 
     ana = read_root( str(fana.GetFileName()) , key='anaTree' , columns=['pcmX','pcmY','pcmZ','Pmiss3Mag','rooWeight']  )
-    if debug>4: print 'ana: ',ana
 
     for i in range(len(PmissBins)):
         pMiss_min , pMiss_max = PmissBins[i][0] , PmissBins[i][1]
@@ -266,7 +265,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
     print "computed cm parameters for "+fana.InFileName
     if debug>1:
         print "reconstructed cm parameters"
-        if debug>4:
+        if debug>5:
             print 'df_pMissBins:',df_pMissBins
 
     garbage_list = [ ana ]
@@ -655,7 +654,7 @@ def get_Pval_scores( data_fits , reco_fits , name='' ):
     PvalTotal_largePvals = FisherCombinationLargePvals( Pval_array )
     PvalTotal_allPvals   = FisherMethodPvals( Pval_array )
 
-    if debug>2: print "got unweighted P(value) results, PvalTotal_unweighted=%g"%PvalTotal_unweighted
+    if debug>2: print "got unweighted P(value) results, PvalTotal_unweighted=%g, PvalTotal_largePvals=%g, PvalTotal_allPvals=%g"%(PvalTotal_unweighted,PvalTotal_largePvals,PvalTotal_allPvals)
  
     # With Mott/FF - weighting (un - weighted roofit results)
     Pval_array = compute_Pval_parameters( data_fits , reco_fits , 'weighted' )
@@ -930,7 +929,8 @@ def generate_runs_with_different_parameters( option,
             ana_sim.CloseFile()
             if debug>1:
                 print "appended into results"
-                if debug>3: print "results: ",results
+                if debug>3: print 'PvalTotal_allPvals_C12:',float(results['PvalTotal_allPvals_12C']) , '\nPvalTotal_largePvals_C12:',float(results['PvalTotal_largePvals_12C']) , '\nPvalTotal_tw_C12:',float(results['PvalTotal_tw_12C'])
+                if debug>5: print "results: ",results
 
             garbage_list = [ ana_sim , reco_parameters , reco_fits
                             , results

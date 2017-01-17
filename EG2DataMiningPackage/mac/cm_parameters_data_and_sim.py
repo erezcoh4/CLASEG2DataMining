@@ -33,7 +33,7 @@ else:
 if flags.NumberOfRuns > 0:
     Nruns = flags.NumberOfRuns
 else:
-    Nruns = 2
+    Nruns = 1
 
 PmissBins   = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65]  , [0.65,0.75] , [0.75,1.0]]
 Q2Bins      = [[0,1.5]     , [1.5,2]     , [2,2.5]      , [2.5,6]]
@@ -175,7 +175,7 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
     fits_56Fe = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' , 'Fe56' ) )
     fits_208Pb = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' , 'Pb208' ) )
     generated_parameters = pd.read_csv( GeneParsFName ( ppPath+'/simulation/' ) )
-    generated_parameters = generated_parameters[(start_run <= generated_parameters.run) & (generated_parameters.run <= start_run + Nruns)] # perhaps:  generated_parameters.run < start_run + Nruns ? check!
+    generated_parameters = generated_parameters[(start_run <= generated_parameters.run) & (generated_parameters.run < start_run + Nruns)] # perhaps:  generated_parameters.run < start_run + Nruns ? check!
     print 'generated_parameters runs: ',generated_parameters.run.tolist()
 
     test_name = 'runs%dto%d_NsigmaT_%d_NSigmaZa1_%d_NSigmaZa2_%d_NMeanZa1_%d_NMeanZa2_%d_NRand_%d'%( start_run , start_run+Nruns , N.SigmaT , N.SigmaZa1 , N.SigmaZa2 , N.MeanZa1 , N.MeanZa2 , N.NRand ) # perhaps: start_run+Nruns-1 ?
