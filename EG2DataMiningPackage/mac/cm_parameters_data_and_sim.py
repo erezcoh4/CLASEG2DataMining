@@ -52,8 +52,11 @@ MeanZa2BandRange    = [0.0,0.3]    # [-0.3,0.6]    # [-0.3,0.0]    nominal = 0.1
 #N = pd.DataFrame({'SigmaT':1,'SigmaZa1':20 ,'SigmaZa2':20 ,'MeanZa1':20 ,'MeanZa2':20 ,'StartRun':300000 , 'NRand':10 }, index=[0])
 #N = pd.DataFrame({'SigmaT':100,'SigmaZa1':5 ,'SigmaZa2':5 ,'MeanZa1':5 ,'MeanZa2':5 ,'StartRun':700000 , 'NRand':20 }, index=[0])
 #N = pd.DataFrame({'SigmaT':30,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':1100000 , 'NRand':10 }, index=[0])
-N = pd.DataFrame({'SigmaT':10,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':1400000 , 'NRand':10 }, index=[0])
-
+N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1000 ,'StartRun':1503000 , 'NRand':10 }, index=[0])
+#runs 1500000-1501000, 'SigmaZa1':1000
+#runs 1501000-1502000, 'SigmaZa2':1000
+#runs 1502000-1503000, 'MeanZa1':1000
+#runs 1503000-1504000, 'MeanZa2':1000
 
 
 # proton acceptance plot
