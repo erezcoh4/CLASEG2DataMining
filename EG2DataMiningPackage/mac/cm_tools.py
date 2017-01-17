@@ -36,22 +36,27 @@ def root_resutlsFName( path ):
 
 
 # ------------------------------------------------------------------------------- #
-def Pval( dataset1 , dataset2  , var   , weighting ):
+def Pval( dataset1 , dataset2  , var   , weighting , tweeked=False):
+    
     v1 , v1Err = float(dataset1[var+'_'+weighting]) , float(dataset1[var+'err_'+weighting])
     v2 , v2Err = float(dataset2[var+'_'+weighting]) , float(dataset2[var+'err_'+weighting])
+    
+    if tweeked and ('a1' in var or 'a2' in var) :
+        v1Err , v2Err = v1Err/10 , v2Err/10
+    
     return Pval2varsAssumeGausDist( v1 , v1Err , v2 , v2Err , flags.verbose  , name=var+' '+weighting )
 # ------------------------------------------------------------------------------- #
 
 
 # ------------------------------------------------------------------------------- #
-def compute_Pval_parameters( data_fits , reco_fits , weighting ):
-
-    PvalSigmaX = Pval( data_fits , reco_fits  , 'SigmaX'   , weighting )
-    PvalSigmaY = Pval( data_fits , reco_fits  , 'SigmaY'   , weighting )
-    PvalMeanZa1 = Pval( data_fits , reco_fits  , 'MeanZa1'   , weighting )
-    PvalMeanZa2 = Pval( data_fits , reco_fits  , 'MeanZa2'   , weighting )
-    PvalSigmaZa1 = Pval( data_fits , reco_fits  , 'SigmaZa1'   , weighting )
-    PvalSigmaZa2 = Pval( data_fits , reco_fits  , 'SigmaZa2'   , weighting )
+def compute_Pval_parameters( data_fits , reco_fits , weighting , tweeked=False):
+    
+    PvalSigmaX = Pval( data_fits , reco_fits  , 'SigmaX'   , weighting , tweeked=tweeked)
+    PvalSigmaY = Pval( data_fits , reco_fits  , 'SigmaY'   , weighting , tweeked=tweeked)
+    PvalMeanZa1 = Pval( data_fits , reco_fits  , 'MeanZa1'   , weighting , tweeked=tweeked)
+    PvalMeanZa2 = Pval( data_fits , reco_fits  , 'MeanZa2'   , weighting , tweeked=tweeked)
+    PvalSigmaZa1 = Pval( data_fits , reco_fits  , 'SigmaZa1'   , weighting , tweeked=tweeked)
+    PvalSigmaZa2 = Pval( data_fits , reco_fits  , 'SigmaZa2'   , weighting , tweeked=tweeked)
     
     return [PvalSigmaX , PvalSigmaY , PvalMeanZa1 , PvalMeanZa2 , PvalSigmaZa1 , PvalSigmaZa2]
 # ------------------------------------------------------------------------------- #
@@ -202,6 +207,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
         if DoSaveCanvas:
             unweighted = fana.RooFitCM( pMiss_min , pMiss_max , False , True, flags.verbose, canvas_unweighted, 4*i + 1 )
             weighted = fana.RooFitCM( pMiss_min , pMiss_max , True , True, flags.verbose, canvas_weighted, 4*i + 1 )
+               
             df_pMissBin = pd.DataFrame({'pMiss_min':pMiss_min,'pMiss_max':pMiss_max
                                        ,'mean_x_unweighted':unweighted[0],'mean_xErr_unweighted':unweighted[1],'sigma_x_unweighted':unweighted[2],'sigma_xErr_unweighted':unweighted[3]
                                        ,'mean_y_unweighted':unweighted[4],'mean_yErr_unweighted':unweighted[5],'sigma_y_unweighted':unweighted[6],'sigma_yErr_unweighted':unweighted[7]
@@ -263,10 +269,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
         if debug>4:
             print 'df_pMissBins:',df_pMissBins
 
-    garbage_list = [ ana ,
-                    mean_x_unweighted , mean_x_weighted , sigma_x_unweighted , sigma_x_weighted ,
-                    mean_y_unweighted , mean_y_weighted , sigma_y_unweighted , sigma_y_weighted ,
-                    mean_z_unweighted , mean_z_weighted , sigma_z_unweighted , sigma_z_weighted ]
+    garbage_list = [ ana ]
     del garbage_list
 
     return df_pMissBins , True
@@ -302,7 +305,7 @@ def fit_par_plot( fig , i_subplot , data , var , weight , title , do_plot_fit_pa
     [Za1,Za1err],[Za2,Za2err] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , data[ var + '_zErr_' + weight ], 'blue' ,'s','none',r'$\vec{p}_{miss}-direction$' ,'linear',do_plot_fit_pars=do_plot_fit_pars)
     #    set_frame( ax , r'%s $%s$'%(weight,title) , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left",ncol=2)
     set_frame( ax , '' , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left",ncol=1)
-    return [Xfit , XfitErr , Yfit , YfitErr , Tfit , TfitErr, Za1 , Za1err , Za2 , Za2err , ax]
+    return [Xfit , XfitErr , Yfit , YfitErr , Za1 , Za1err , Za2 , Za2err , ax]
 # ------------------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------------------- #
@@ -456,7 +459,7 @@ def plot_band_around_cm_parameter_fits( fig , i_subplot , data , var , weight , 
 
     Pmiss = (data.pMiss_max + data.pMiss_min)/2.
     pMissUpErr , pMissLowErr = data.pMiss_max - Pmiss , Pmiss - data.pMiss_min
-    [a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,ax] = fit_par_plot( fig , i_subplot , data , var , weight , title , do_plot_fit_pars=False)
+    [a1,a2,a3,a4,a5,a8,a9,a10,ax] = fit_par_plot( fig , i_subplot , data , var , weight , title , do_plot_fit_pars=False)
     plt.fill_between(Pmiss, TBandMin , TBandMax ,alpha=0.5, edgecolor='#CC4F1B', facecolor='#FF9848')
     plt.fill_between(Pmiss, ZBandMin , ZBandMax ,alpha=0.5, edgecolor='#C14F1B', facecolor='#1122CC')
     return ax
@@ -642,27 +645,38 @@ def get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins , Q2Bins , evtsgen_Q2pm
 def get_Pval_scores( data_fits , reco_fits , name='' ):
     
     # No Mott/FF - weighting (un - weighted roofit results)
+    Pval_array = compute_Pval_parameters( data_fits , reco_fits , 'unweighted' )
+    
     [PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
      PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ,
-     PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] = compute_Pval_parameters( data_fits , reco_fits , 'unweighted' )
-    PvalTotal_unweighted = Fisher_combination_Pvals( [PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
-                                                       PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ,
-                                                       PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] )
-    Pvaltot_pandas = Fisher_combination_Pvals_pandas( [ PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
-                                                          PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ,
-                                                          PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] )
+     PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] = Pval_array
+     
+    PvalTotal_unweighted = Fisher_combination_Pvals( Pval_array )
+    PvalTotal_largePvals = FisherCombinationLargePvals( Pval_array )
+    PvalTotal_allPvals   = FisherMethodPvals( Pval_array )
 
-    if debug>2: print "got unweighted P(value) results, PvalTotal_unweighted=",PvalTotal_unweighted
+    if debug>2: print "got unweighted P(value) results, PvalTotal_unweighted=%g"%PvalTotal_unweighted
  
     # With Mott/FF - weighting (un - weighted roofit results)
+    Pval_array = compute_Pval_parameters( data_fits , reco_fits , 'weighted' )
+    
     [PvalSigmaX_weighted, PvalSigmaY_weighted ,
      PvalMeanZa1_weighted , PvalMeanZa2_weighted ,
-     PvalSigmaZa1_weighted , PvalSigmaZa2_weighted ] = compute_Pval_parameters( data_fits , reco_fits , 'weighted' )
-        
-    PvalTotal_weighted = Fisher_combination_Pvals( [PvalSigmaX_weighted, PvalSigmaY_weighted ,
-                                                     PvalMeanZa1_weighted , PvalMeanZa2_weighted ,
-                                                     PvalSigmaZa1_weighted , PvalSigmaZa2_weighted ] )
-    if debug>2: print "got weighted P(value) results, PvalTotal_weighted=",PvalTotal_weighted
+     PvalSigmaZa1_weighted , PvalSigmaZa2_weighted ] = Pval_array
+
+    PvalTotal_weighted = Fisher_combination_Pvals( Pval_array )
+    
+    if debug>2: print "got weighted P(value) results, PvalTotal_weighted=%g"%PvalTotal_weighted
+
+    # tweeking the uncertainty in the a1 and a2 of \sigma_Z
+    Pval_array = compute_Pval_parameters( data_fits , reco_fits , 'unweighted' , tweeked=True)
+    
+    [PvalSigmaX_tw, PvalSigmaY_tw ,
+     PvalMeanZa1_tw , PvalMeanZa2_tw ,
+     PvalSigmaZa1_tw , PvalSigmaZa2_tw ] = Pval_array
+    PvalTotal_tw = Fisher_combination_Pvals( Pval_array )
+         
+    if debug>2: print "got tweeked P(value) results, PvalTotal_tw=%g"%PvalTotal_tw
 
     PvalSigmaZa1SigmaZa2= Fisher_combination_Pvals( [ PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] )
     PvalMeanZa1MeanZa2  = Fisher_combination_Pvals( [ PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ] )
@@ -700,7 +714,15 @@ def get_Pval_scores( data_fits , reco_fits , name='' ):
                                'PvalSigmaTSigmaZa2':PvalSigmaTSigmaZa2,
                                'PvalSigmaTMeanZa1':PvalSigmaTMeanZa1,
                                'PvalSigmaTMeanZa2':PvalSigmaTMeanZa2,
-                               'Pvaltot_pandas':Pvaltot_pandas
+                               'PvalSigmaX_tw':PvalSigmaX_tw,
+                               'PvalSigmaY_tw':PvalSigmaY_tw ,
+                               'PvalMeanZa1_tw':PvalMeanZa1_tw ,
+                               'PvalMeanZa2_tw':PvalMeanZa2_tw ,
+                               'PvalSigmaZa1_tw':PvalSigmaZa1_tw ,
+                               'PvalSigmaZa2_tw':PvalSigmaZa2_tw,
+                               'PvalTotal_largePvals':PvalTotal_largePvals,
+                               'PvalTotal_allPvals':PvalTotal_allPvals,
+                               'PvalTotal_tw':PvalTotal_tw,
                                },index=[0])
     
     if debug>1:
@@ -852,6 +874,7 @@ def generate_runs_with_different_parameters( option,
                 results['PvalSigmaZa1_unweighted_%s'%target]= float(Pval_scores.PvalSigmaZa1_unweighted)
                 results['PvalSigmaZa2_unweighted_%s'%target]= float(Pval_scores.PvalSigmaZa2_unweighted)
                 results['PvalTotal_unweighted_%s'%target]   = float(Pval_scores.PvalTotal_unweighted)
+                
                 results['PvalSigmaX_weighted_%s'%target]    = float(Pval_scores.PvalSigmaX_weighted)
                 results['PvalSigmaY_weighted_%s'%target]    = float(Pval_scores.PvalSigmaY_weighted)
                 results['PvalMeanZa1_weighted_%s'%target]   = float(Pval_scores.PvalMeanZa1_weighted)
@@ -859,6 +882,7 @@ def generate_runs_with_different_parameters( option,
                 results['PvalSigmaZa1_weighted_%s'%target]  = float(Pval_scores.PvalSigmaZa1_weighted)
                 results['PvalSigmaZa2_weighted_%s'%target]  = float(Pval_scores.PvalSigmaZa2_weighted)
                 results['PvalTotal_weighted_%s'%target]     = float(Pval_scores.PvalTotal_weighted)
+                
                 results['PvalSigmaZa1SigmaZa2_%s'%target]   = float(Pval_scores.PvalSigmaZa1SigmaZa2)
                 results['PvalMeanZa1MeanZa2_%s'%target]     = float(Pval_scores.PvalMeanZa1MeanZa2)
                 results['PvalSigmaZa1MeanZa1_%s'%target]    = float(Pval_scores.PvalSigmaZa1MeanZa1)
@@ -870,7 +894,10 @@ def generate_runs_with_different_parameters( option,
                 results['PvalSigmaTSigmaZa2_%s'%target]     = float(Pval_scores.PvalSigmaTSigmaZa2)
                 results['PvalSigmaTMeanZa1_%s'%target]      = float(Pval_scores.PvalSigmaTMeanZa1)
                 results['PvalSigmaTMeanZa2_%s'%target]      = float(Pval_scores.PvalSigmaTMeanZa2)
-                results['Pvaltot_pandas_%s'%target]         = float(Pval_scores.Pvaltot_pandas)
+                
+                results['PvalTotal_allPvals_%s'%target]     = float(Pval_scores.PvalTotal_allPvals)
+                results['PvalTotal_largePvals_%s'%target]   = float(Pval_scores.PvalTotal_largePvals)
+                results['PvalTotal_tw_%s'%target]           = float(Pval_scores.PvalTotal_tw)
 
 
 

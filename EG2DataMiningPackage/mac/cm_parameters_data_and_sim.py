@@ -41,17 +41,18 @@ Q2Bins      = [[0,1.5]     , [1.5,2]     , [2,2.5]      , [2.5,6]]
 # Jan 2017, chaning to fit pcmZ = a1*( p(miss) - 0.6 ) + a2
 
 SigmaTBandRange     = [0.04,0.26]   # [0.05,0.35]   nominal ~ 0.16 - 0.18
-SigmaZa1BandRange   = [-0.4,1.2]    # [0,0.4]       nominal = 0.144 (12C)
-SigmaZa2BandRange   = [-0.6,0.5]    # [-0.2,0.2]    nominal = 0.159 (12C)
-MeanZa1BandRange    = [-0.1,1.5]    # [0.4,0.8]     nominal = 0.562 (12C)
-MeanZa2BandRange    = [-0.3,0.6]    # [-0.3,0.0]    nominal = 0.159 (12C)
+SigmaZa1BandRange   = [0.0,0.3]    # [-0.4,1.2]    # [0,0.4]       nominal = 0.143 (12C)
+SigmaZa2BandRange   = [0.0,0.3]    # [-0.6,0.5]    # [-0.2,0.2]    nominal = 0.159 (12C)
+MeanZa1BandRange    = [0.4,0.7]    # [-0.1,1.5]    # [0.4,0.8]     nominal = 0.562 (12C)
+MeanZa2BandRange    = [0.0,0.3]    # [-0.3,0.6]    # [-0.3,0.0]    nominal = 0.159 (12C)
 
 
+#N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1 ,'StartRun':0 , 'NRand':1}, index=[0]) # for debugging
 #N = pd.DataFrame({'SigmaT':10,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':100000 , 'NRand':10 }, index=[0])
 #N = pd.DataFrame({'SigmaT':1,'SigmaZa1':20 ,'SigmaZa2':20 ,'MeanZa1':20 ,'MeanZa2':20 ,'StartRun':300000 , 'NRand':10 }, index=[0])
 #N = pd.DataFrame({'SigmaT':100,'SigmaZa1':5 ,'SigmaZa2':5 ,'MeanZa1':5 ,'MeanZa2':5 ,'StartRun':700000 , 'NRand':20 }, index=[0])
-N = pd.DataFrame({'SigmaT':30,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':1100000 , 'NRand':10 }, index=[0])
-#N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1 ,'StartRun':0 , 'NRand':1}, index=[0]) # for debugging
+#N = pd.DataFrame({'SigmaT':30,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':1100000 , 'NRand':10 }, index=[0])
+N = pd.DataFrame({'SigmaT':10,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':1400000 , 'NRand':10 }, index=[0])
 
 
 
@@ -113,7 +114,7 @@ if 'plot all parameters for all targets' in flags.option or 'AllTargets' in flag
     ana , cm_pars , cm_fits = [] , [] , []
     for target in targets:
         ana.append( TAnalysisEG2( path+"/AnaFiles" ,  "Ana_ppSRCCut_DATA_%s"%target ) )
-        cm_parameters = calc_cm_parameters( ana[-1]  , PmissBins ,
+        cm_parameters , _ = calc_cm_parameters( ana[-1]  , PmissBins ,
                                             CMRooFitsName( ppPath + '/DATA/%s_unweighted'%target ) ,
                                             CMRooFitsName( ppPath + '/DATA/%s_weighted'%target ) ,
                                             DoSaveCanvas = True )
