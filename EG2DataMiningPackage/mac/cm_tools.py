@@ -648,6 +648,10 @@ def get_Pval_scores( data_fits , reco_fits , name='' ):
     PvalTotal_unweighted = Fisher_combination_Pvals( [PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
                                                        PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ,
                                                        PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] )
+    Pvaltot_pandas = Fisher_combination_Pvals_pandas( [ PvalSigmaX_unweighted, PvalSigmaY_unweighted ,
+                                                          PvalMeanZa1_unweighted , PvalMeanZa2_unweighted ,
+                                                          PvalSigmaZa1_unweighted , PvalSigmaZa2_unweighted ] )
+
     if debug>2: print "got unweighted P(value) results, PvalTotal_unweighted=",PvalTotal_unweighted
  
     # With Mott/FF - weighting (un - weighted roofit results)
@@ -695,7 +699,8 @@ def get_Pval_scores( data_fits , reco_fits , name='' ):
                                'PvalSigmaTSigmaZa1':PvalSigmaTSigmaZa1,
                                'PvalSigmaTSigmaZa2':PvalSigmaTSigmaZa2,
                                'PvalSigmaTMeanZa1':PvalSigmaTMeanZa1,
-                               'PvalSigmaTMeanZa2':PvalSigmaTMeanZa2
+                               'PvalSigmaTMeanZa2':PvalSigmaTMeanZa2,
+                               'Pvaltot_pandas':Pvaltot_pandas
                                },index=[0])
     
     if debug>1:
@@ -865,6 +870,7 @@ def generate_runs_with_different_parameters( option,
                 results['PvalSigmaTSigmaZa2_%s'%target]     = float(Pval_scores.PvalSigmaTSigmaZa2)
                 results['PvalSigmaTMeanZa1_%s'%target]      = float(Pval_scores.PvalSigmaTMeanZa1)
                 results['PvalSigmaTMeanZa2_%s'%target]      = float(Pval_scores.PvalSigmaTMeanZa2)
+                results['Pvaltot_pandas_%s'%target]         = float(Pval_scores.Pvaltot_pandas)
 
 
 
