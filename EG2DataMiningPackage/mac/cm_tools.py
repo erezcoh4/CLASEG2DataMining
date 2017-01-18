@@ -561,10 +561,10 @@ def generate_cm_bands( cm_parameters , fit_pars , N ,
     MeanZa1  = linspace_parameter( float(MeanZa1BandMin)   , float(MeanZa1BandMax)  , int(N.MeanZa1) )
     MeanZa2  = linspace_parameter( float(MeanZa2BandMin)   , float(MeanZa2BandMax)  , int(N.MeanZa2) )
     StartRun = int(N.StartRun)
-    EndRun   = StartRun + len(SigmaT)*len(SigmaZa1)*len(SigmaZa2)*len(MeanZa1)*len(MeanZa2)
+    EndRun   = int(StartRun + len(SigmaT)*len(SigmaZa1)*len(SigmaZa2)*len(MeanZa1)*len(MeanZa2))
 #    if debug>1:
 #        print "SigmaT:",SigmaT , "\nSigmaZa1:",SigmaZa1 , "\nSigmaZa2:",SigmaZa2 , "\nMeanZa1:",MeanZa1, "\nMeanZa2:",MeanZa2 , "\n mean(pcmZ) = %f * p(miss) + %f"%(MeanZa1 , MeanZa2  )
-    print '\033[95m' + "runs ",StartRun , " to ", EndRun + '\033[0m'
+    print '\033[95m' + "generating parameters for runs %d to %d"%(StartRun, EndRun) + '\033[0m'
 
     run , irun  = StartRun , 0
     # write generated parameters to file
