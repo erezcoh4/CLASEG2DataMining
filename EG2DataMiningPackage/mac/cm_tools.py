@@ -478,41 +478,52 @@ def generate_cm_bands( cm_parameters , fit_pars , N ,
                       SigmaZa1BandRange = None,
                       SigmaZa2BandRange = None,
                       MeanZa1BandRange  = None,
-                      MeanZa2BandRange  = None ):
+                      MeanZa2BandRange  = None,
+                      nom_vals          = None):
  
     Pmiss = (cm_parameters.pMiss_max + cm_parameters.pMiss_min)/2.
 
     # ----------------------------------------------------------------------------------------------------------------------------------
     # width
     print "N: ",N
-
+    # sigma-t
     if SigmaTBandRange is None:
         SigmaTBandMin   , SigmaTBandMax     = 0.7*np.min( [fit_pars.SigmaX_unweighted , fit_pars.SigmaY_unweighted] ) , 1.2*np.max( [fit_pars.SigmaX_unweighted,fit_pars.SigmaY_unweighted] )
+    elif int(N.SigmaT)==1:
+        SigmaTBandMin   , SigmaTBandMax     = float(nom_vals.SigmaT)-float(nom_vals.SigmaT_err) , float(nom_vals.SigmaT)+float(nom_vals.SigmaT_err)
     else:
         SigmaTBandMin   , SigmaTBandMax     = SigmaTBandRange[0] , SigmaTBandRange[1]
-
+    # sigma-z a1
     if SigmaZa1BandRange is None:
         SigmaZa1BandMin , SigmaZa1BandMax   = fit_pars.SigmaZa1_unweighted*0.6,fit_pars.SigmaZa1_unweighted*1.3 # 0.9 , 1.1
+    elif int(N.SigmaZa1)==1:
+        SigmaZa1BandMin , SigmaZa1BandMax   = float(nom_vals.SigmaZa1)-float(nom_vals.SigmaZa1_err) , float(nom_vals.SigmaZa1)+float(nom_vals.SigmaZa1_err)
     else:
         SigmaZa1BandMin , SigmaZa1BandMax   = SigmaZa1BandRange[0] , SigmaZa1BandRange[1]
-
+    # sigma-z a2
     if SigmaZa2BandRange is None:
         SigmaZa2BandMin , SigmaZa2BandMax   = fit_pars.SigmaZa2_unweighted*0.0,fit_pars.SigmaZa2_unweighted*3
+    elif int(N.SigmaZa2)==1:
+        SigmaZa2BandMin , SigmaZa2BandMax   = float(nom_vals.SigmaZa2)-float(nom_vals.SigmaZa2_err) , float(nom_vals.SigmaZa2)+float(nom_vals.SigmaZa2_err)
     else:
         SigmaZa2BandMin , SigmaZa2BandMax   = SigmaZa2BandRange[0] , SigmaZa2BandRange[1]
 
     SigmaZBandMin = float(SigmaZa1BandMin)*(Pmiss)+float(SigmaZa2BandMin)
     SigmaZBandMax = float(SigmaZa1BandMax)*(Pmiss)+float(SigmaZa2BandMax)
 
-    # mean
+    # mean-z b1
     MeanTBandMin   , MeanTBandMax       = np.zeros(len(Pmiss)) , np.zeros(len(Pmiss))
     if MeanZa1BandRange is None:
         MeanZa1BandMin , MeanZa1BandMax   = fit_pars.MeanZa1_unweighted*0.5,fit_pars.MeanZa1_unweighted*1.5 # 0.7 , 1.3
+    elif int(N.MeanZa1)==1:
+        MeanZa1BandMin , MeanZa1BandMax   = float(nom_vals.MeanZa1)-float(nom_vals.MeanZa1_err) , float(nom_vals.MeanZa1)+float(nom_vals.MeanZa1_err)
     else:
         MeanZa1BandMin , MeanZa1BandMax   = MeanZa1BandRange[0] , MeanZa1BandRange[1]
-
+    # mean-z b2
     if MeanZa2BandRange is None:
         MeanZa2BandMin , MeanZa2BandMax   = np.min([fit_pars.MeanZa2_unweighted*0.2,fit_pars.MeanZa2_unweighted*2]) , np.max([fit_pars.MeanZa2_unweighted*0.2,fit_pars.MeanZa2_unweighted*2])
+    elif int(N.MeanZa2)==1:
+        MeanZa2BandMin , MeanZa2BandMax   = float(nom_vals.MeanZa2)-float(nom_vals.MeanZa2_err) , float(nom_vals.MeanZa2)+float(nom_vals.MeanZa2_err)
     else:
         MeanZa2BandMin , MeanZa2BandMax   = MeanZa2BandRange[0] , MeanZa2BandRange[1]
 
@@ -555,7 +566,7 @@ def generate_cm_bands( cm_parameters , fit_pars , N ,
         print "SigmaT:",SigmaT , "\nSigmaZa1:",SigmaZa1 , "\nSigmaZa2:",SigmaZa2 , "\nMeanZa1:",MeanZa1, "\nMeanZa2:",MeanZa2 , "\n mean(pcmZ) = %f * p(miss) + %f"%(MeanZa1 , MeanZa2  )
         print '\033[95m' + "runs ",StartRun , " to ", EndRun + '\033[0m'
 
-    run = StartRun
+    run , irun  = StartRun , 0
     # write generated parameters to file
     for sigma_transverse in SigmaT:
         for sigma_longitudinal_a1 in SigmaZa1:
@@ -563,6 +574,10 @@ def generate_cm_bands( cm_parameters , fit_pars , N ,
                 for mean_longitudinal_a1 in MeanZa1:
                     for mean_longitudinal_a2 in MeanZa2:
                         run = run+1
+                        irun = irun+1
+                        if irun%((EndRun-StartRun)/10)==0:
+                            print 100.*irun/(EndRun-StartRun),'%'
+
                         generated_parameters = pd.DataFrame({'run':run
                                                             ,'genMeanX':0                           ,'genSigmaX':sigma_transverse
                                                             ,'genMeanY':0                           ,'genSigmaY':sigma_transverse
@@ -570,7 +585,7 @@ def generate_cm_bands( cm_parameters , fit_pars , N ,
                                                             ,'genSigmaZa1':sigma_longitudinal_a1    ,'genSigmaZa2':sigma_longitudinal_a2
                                                             },
                                                             index = [run])
-                        stream_dataframe_to_file( generated_parameters, GeneParsFName  )
+                        stream_dataframe_to_file( generated_parameters, GeneParsFName , float_format='%g' )
 
 
     bands.to_csv( CMBandFname , header=True , index = False)
@@ -896,6 +911,14 @@ def generate_runs_with_different_parameters( option,
                 
                 results['PvalTotal_allPvals_%s'%target]     = float(Pval_scores.PvalTotal_allPvals)
                 results['PvalTotal_largePvals_%s'%target]   = float(Pval_scores.PvalTotal_largePvals)
+                
+                results['PvalSigmaX_tw_%s'%target]  = float(Pval_scores.PvalSigmaX_tw)
+                results['PvalSigmaY_tw_%s'%target]  = float(Pval_scores.PvalSigmaY_tw)
+                results['PvalMeanZa1_tw_%s'%target] = float(Pval_scores.PvalMeanZa1_tw)
+                results['PvalMeanZa2_tw_%s'%target] = float(Pval_scores.PvalMeanZa2_tw)
+                results['PvalSigmaZa1_tw_%s'%target]= float(Pval_scores.PvalSigmaZa1_tw)
+                results['PvalSigmaZa2_tw_%s'%target]= float(Pval_scores.PvalSigmaZa2_tw)
+
                 results['PvalTotal_tw_%s'%target]           = float(Pval_scores.PvalTotal_tw)
 
 

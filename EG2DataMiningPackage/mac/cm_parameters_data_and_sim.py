@@ -39,12 +39,20 @@ PmissBins   = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65]  , [0.65,0.75] , [0.75,1.
 Q2Bins      = [[0,1.5]     , [1.5,2]     , [2,2.5]      , [2.5,6]]
 
 # Jan 2017, chaning to fit pcmZ = a1*( p(miss) - 0.6 ) + a2
+# 12C nominal values
+nom_vals = pd.DataFrame({'SigmaT':0.167 ,'SigmaT_err':0.006,
+                'SigmaZa1':0.143,'SigmaZa1_err':0.075   ,'SigmaZa2':0.158   ,'SigmaZa2_err':0.009,
+                'MeanZa1':0.562 ,'MeanZa1_err':0.078    ,'MeanZa2':0.159    ,'MeanZa2_err':0.009},index=[0])
+# best correspondance
+cor_vals = pd.DataFrame({'SigmaT':0.155 ,'SigmaT_err':0.0010,
+                'SigmaZa1':0.143,'SigmaZa1_err':0.075   ,'SigmaZa2':0.158   ,'SigmaZa2_err':0.009,
+                'MeanZa1':0.562 ,'MeanZa1_err':0.078    ,'MeanZa2':0.159    ,'MeanZa2_err':0.009},index=[0])
 
-SigmaTBandRange     = [0.04,0.26]   # [0.05,0.35]   nominal ~ 0.16 - 0.18
-SigmaZa1BandRange   = [0.0,0.3]    # [-0.4,1.2]    # [0,0.4]       nominal = 0.143 (12C)
-SigmaZa2BandRange   = [0.0,0.3]    # [-0.6,0.5]    # [-0.2,0.2]    nominal = 0.159 (12C)
-MeanZa1BandRange    = [0.4,0.7]    # [-0.1,1.5]    # [0.4,0.8]     nominal = 0.562 (12C)
-MeanZa2BandRange    = [0.0,0.3]    # [-0.3,0.6]    # [-0.3,0.0]    nominal = 0.159 (12C)
+SigmaTBandRange     = [0.140,0.170]     # [0.05,0.35]   nominal ~ 0.16 - 0.18
+SigmaZa1BandRange   = [0.0,0.8]         # [-0.4,1.2]    # [-0.4,1.2]    # [0,0.4]       nominal = 0.143 (12C)
+SigmaZa2BandRange   = [-0.1,0.3]        # [-0.6,0.5]    # [-0.6,0.5]    # [-0.2,0.2]    nominal = 0.159 (12C)
+MeanZa1BandRange    = [0.0,0.7]         # [-0.1,1.5]    # [-0.1,1.5]    # [0.4,0.8]     nominal = 0.562 (12C)
+MeanZa2BandRange    = [-0.2,0.2]        # [-0.3,0.6]    # [-0.3,0.6]    # [-0.3,0.0]    nominal = 0.159 (12C)
 
 
 #N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1 ,'StartRun':0 , 'NRand':1}, index=[0]) # for debugging
@@ -52,11 +60,11 @@ MeanZa2BandRange    = [0.0,0.3]    # [-0.3,0.6]    # [-0.3,0.0]    nominal = 0.1
 #N = pd.DataFrame({'SigmaT':1,'SigmaZa1':20 ,'SigmaZa2':20 ,'MeanZa1':20 ,'MeanZa2':20 ,'StartRun':300000 , 'NRand':10 }, index=[0])
 #N = pd.DataFrame({'SigmaT':100,'SigmaZa1':5 ,'SigmaZa2':5 ,'MeanZa1':5 ,'MeanZa2':5 ,'StartRun':700000 , 'NRand':20 }, index=[0])
 #N = pd.DataFrame({'SigmaT':30,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':1100000 , 'NRand':10 }, index=[0])
-N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1000 ,'StartRun':1503000 , 'NRand':10 }, index=[0])
-#runs 1500000-1501000, 'SigmaZa1':1000
-#runs 1501000-1502000, 'SigmaZa2':1000
-#runs 1502000-1503000, 'MeanZa1':1000
-#runs 1503000-1504000, 'MeanZa2':1000
+N = pd.DataFrame({'SigmaT':6,'SigmaZa1':6 ,'SigmaZa2':6 ,'MeanZa1':6 ,'MeanZa2':6 ,'StartRun':1510000 , 'NRand':10 }, index=[0])
+#runs 1500000-1501000, 1504000-1505000, 'SigmaZa1':1000
+#runs 1501000-1502000, 1505000-1506000, 'SigmaZa2':1000
+#runs 1502000-1503000, 1506000-1507000, 'MeanZa1':1000
+#runs 1503000-1504000, 1507000-1508000, 'MeanZa2':1000
 
 
 # proton acceptance plot
@@ -164,6 +172,7 @@ if 'create bands for EG' in flags.option or 'bands' in flags.option:
                       SigmaZa2BandRange = SigmaZa2BandRange,
                       MeanZa1BandRange  = MeanZa1BandRange,
                       MeanZa2BandRange = MeanZa2BandRange,
+                      nom_vals = cor_vals
                       )
 
 
@@ -177,9 +186,9 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
     fits_27Al = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' , 'Al27' ) )
     fits_56Fe = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' , 'Fe56' ) )
     fits_208Pb = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' , 'Pb208' ) )
+    print_filename(GeneParsFName ( ppPath+'/simulation/' ),'generated-parameters')
     generated_parameters = pd.read_csv( GeneParsFName ( ppPath+'/simulation/' ) )
     generated_parameters = generated_parameters[(start_run <= generated_parameters.run) & (generated_parameters.run < start_run + Nruns)] # perhaps:  generated_parameters.run < start_run + Nruns ? check!
-    print 'generated_parameters runs: ',generated_parameters.run.tolist()
 
     test_name = 'runs%dto%d_NsigmaT_%d_NSigmaZa1_%d_NSigmaZa2_%d_NMeanZa1_%d_NMeanZa2_%d_NRand_%d'%( start_run , start_run+Nruns , N.SigmaT , N.SigmaZa1 , N.SigmaZa2 , N.MeanZa1 , N.MeanZa2 , N.NRand ) # perhaps: start_run+Nruns-1 ?
     full_path = ppPath+'/simulation/'+test_name+'_simulation'

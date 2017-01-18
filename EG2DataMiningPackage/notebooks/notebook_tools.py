@@ -11,7 +11,6 @@ from calc_tools import *
 from root_numpy import tree2array, root2array
 from root_pandas import read_root
 from ROOT import TPlots, TAnalysis, TAnalysisEG2 , TEG2dm , TCalcPhysVarsEG2 , TSchemeDATA
-dirname = init.createnewdir()
 dm  = TEG2dm()
 
 
