@@ -575,7 +575,7 @@ def generate_cm_bands( cm_parameters , fit_pars , N ,
                     for mean_longitudinal_a2 in MeanZa2:
                         run = run+1
                         irun = irun+1
-                        if irun%((EndRun-StartRun)/10)==0:
+                        if irun%((EndRun-StartRun)/20)==0:
                             print 100.*irun/(EndRun-StartRun),'%'
 
                         generated_parameters = pd.DataFrame({'run':run
@@ -585,7 +585,7 @@ def generate_cm_bands( cm_parameters , fit_pars , N ,
                                                             ,'genSigmaZa1':sigma_longitudinal_a1    ,'genSigmaZa2':sigma_longitudinal_a2
                                                             },
                                                             index = [run])
-                        stream_dataframe_to_file( generated_parameters, GeneParsFName , float_format='%g' )
+                        stream_dataframe_to_file( generated_parameters, GeneParsFName , float_format='%.3f' )
 
 
     bands.to_csv( CMBandFname , header=True , index = False)
