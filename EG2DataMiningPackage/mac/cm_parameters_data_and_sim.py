@@ -28,7 +28,7 @@ from cm_tools import *
 if flags.run > 0:
     start_run = flags.run
 else:
-    start_run = 1100000
+    start_run = 1
 
 if flags.NumberOfRuns > 0:
     Nruns = flags.NumberOfRuns
@@ -189,7 +189,8 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
     print_filename(GeneParsFName ( ppPath+'/simulation/' ),'generated-parameters')
     generated_parameters = pd.read_csv( GeneParsFName ( ppPath+'/simulation/' ) )
     generated_parameters = generated_parameters[(start_run <= generated_parameters.run) & (generated_parameters.run < start_run + Nruns)] # perhaps:  generated_parameters.run < start_run + Nruns ? check!
-
+    
+    if debug>2: print 'generated_parameters:',generated_parameters
     test_name = 'runs%dto%d_NsigmaT_%d_NSigmaZa1_%d_NSigmaZa2_%d_NMeanZa1_%d_NMeanZa2_%d_NRand_%d'%( start_run , start_run+Nruns , N.SigmaT , N.SigmaZa1 , N.SigmaZa2 , N.MeanZa1 , N.MeanZa2 , N.NRand ) # perhaps: start_run+Nruns-1 ?
     full_path = ppPath+'/simulation/'+test_name+'_simulation'
     generate_runs_with_different_parameters( flags.option ,
