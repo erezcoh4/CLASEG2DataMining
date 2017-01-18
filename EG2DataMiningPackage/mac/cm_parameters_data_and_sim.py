@@ -188,6 +188,8 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
     fits_208Pb = pd.read_csv( CMfitsFname( ppPath+'/DATA/data' , 'Pb208' ) )
     print_filename(GeneParsFName ( ppPath+'/simulation/' ),'generated-parameters')
     generated_parameters = pd.read_csv( GeneParsFName ( ppPath+'/simulation/' ) )
+    print start_run , start_run + Nruns
+    
     generated_parameters = generated_parameters[(start_run <= generated_parameters.run) & (generated_parameters.run < start_run + Nruns)] # perhaps:  generated_parameters.run < start_run + Nruns ? check!
     
     if debug>2: print 'generated_parameters:',generated_parameters
