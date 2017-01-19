@@ -23,7 +23,7 @@ void GenerateEvents::Set_eep_Parameters(Float_t fMeanX, Float_t fSigmaX,
 
     // Px = gRandom -> Gaus( MeanX  , SigmaX )
     // Py = gRandom -> Gaus( MeanY  , SigmaY )
-    // Pz = gRandom -> Gaus( ShiftL_a1*PmissMag + ShiftL_a2  , SigmaL_a1*PmissMag + SigmaL_a2 )
+    // Pz = gRandom -> Gaus( ShiftL_a1*(PmissMag-0.6) + ShiftL_a2  , SigmaL_a1*(PmissMag-0.6) + SigmaL_a2 )
     MeanX     = fMeanX;    SigmaX    = fSigmaX;
     MeanY     = fMeanY;    SigmaY    = fSigmaY;
 
@@ -178,8 +178,8 @@ Int_t GenerateEvents::DoGenerateRun_eepp( Int_t fRunNumber, bool DoGetRootFile, 
             float Px = gRandom -> Gaus( MeanX  , SigmaX );
             float Py = gRandom -> Gaus( MeanY  , SigmaY );
             
-            float MeanZ = MeanZ_a1*PmissMag + MeanZ_a2    ;
-            float SigmaZ = SigmaZ_a1*PmissMag + SigmaZ_a2 ;
+            float MeanZ = MeanZ_a1*(PmissMag-0.6) + MeanZ_a2    ;
+            float SigmaZ = SigmaZ_a1*(PmissMag-0.6) + SigmaZ_a2 ;
             float Pz = gRandom -> Gaus( MeanZ  , SigmaZ ) ;
             //            float Pz = gRandom -> Gaus( ShiftL_a1*PmissMag + ShiftL_a2  , 0.07 );
             if(debug > 4) {

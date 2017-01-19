@@ -771,7 +771,9 @@ def generate_runs_with_different_parameters( option,
 
     # the bands around data (around nominal values)
     if debug>2: print "generated_parameters:",generated_parameters
-    if debug: print '\033[95m' + 'processing %d runs'%len(generated_parameters)+ '\033[0m'
+    if debug:
+        print generated_parameters.run.tolist()
+        print '\033[95m' + 'processing %d runs'%len(generated_parameters)+ '\033[0m'
 
     # multiple bins for pp/p ratio
     pmiss_bins , evtsgen_pmiss_bins , evtsgen_Q2pmiss_bins = get_pmiss_bins( PmissBins , Q2Bins , path , int(N.NRand) )
@@ -795,6 +797,7 @@ def generate_runs_with_different_parameters( option,
     Nruns = len(generated_parameters.run.tolist())
     irun = 0
     for run in generated_parameters.run.tolist():
+        run = int(run)
         irun = irun+1
         genMeanX    = genMeanY = 0
         genSigmaX   = genSigmaY = float(generated_parameters[generated_parameters.run==run].genSigmaX)
