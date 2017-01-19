@@ -52,7 +52,7 @@ SigmaTBandRange     = [0.140,0.170]     # [0.05,0.35]
 SigmaZa1BandRange   = [-0.1,0.8]         # [-0.4,1.2]    # [-0.4,1.2]    # [0,0.4]
 SigmaZa2BandRange   = [-0.3,0.4]        # [-0.6,0.5]    # [-0.6,0.5]    # [-0.2,0.2]
 MeanZa1BandRange    = [0.0,1.0]         # [-0.1,1.5]    # [-0.1,1.5]    # [0.4,0.8]
-MeanZa2BandRange    = [-0.4,0.5]        # [-0.3,0.6]    # [-0.3,0.6]    # [-0.3,0.0]    
+MeanZa2BandRange    = [-0.4,0.5]        # [-0.3,0.6]    # [-0.3,0.6]    # [-0.3,0.0]
 
 
 #N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1 ,'StartRun':0 , 'NRand':1}, index=[0]) # for debugging
