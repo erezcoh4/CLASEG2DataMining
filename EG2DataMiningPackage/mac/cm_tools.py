@@ -797,6 +797,7 @@ def generate_runs_with_different_parameters( option,
     Nruns = len(generated_parameters.run.tolist())
     irun = 0
     for run in generated_parameters.run.tolist():
+        run = int(run)
         irun = irun+1
         genMeanX    = genMeanY = 0
         genSigmaX   = genSigmaY = float(generated_parameters[generated_parameters.run==run].genSigmaX)
