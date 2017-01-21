@@ -93,6 +93,27 @@ if 'scheme pp-SRC' in flags.option or 'scheme' in flags.option: # scheme to pp-S
     print 'schemed to %s'%SchemedName
 
 
+# (3) cuts sensitivity studies for (e,e'pp)/(e,e'p)
+# ---------------------------------------------------
+if 'cuts sensitivity studies' in flags.option or 'sensitivity' in flags.option: # scheme to pp-SRC in wider cuts
+    # xB >= 1.15 and xB >= 1.125
+    # theta_pq < 20 and theta_pq < 30
+    # 0.57 < p/q < 0.91 and 0.67 < p/q < 1.01
+    # m_miss < 1050 and m_miss < 1150
+    relaxed_cut = ROOT.TCut("(1.15<Xb) && (theta_pq < 30) && (0.57 < p_over_q && p_over_q < 1.01) && (Mmiss<1150) && (1<Np)")
+    relaxed_eep_cut = ROOT.TCut("(1.15<Xb) && (theta_pq < 30) && (0.57 < p_over_q && p_over_q < 1.01) && (Mmiss<1150)")
+    
+    
+    DataName    = "DATA_%s"% dm.Target(flags.atomic_mass)
+    ana     = TAnalysisEG2( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName , flags.cut )
+    scheme  = TSchemeDATA()
+    SchemedName = "relaxed_ppSRCCut_%s"% DataName
+    scheme.SchemeOnTCut( path+"/AnaFiles","Ana_SRCPmissXb_"+DataName+".root","anaTree","Ana_"+SchemedName+".root",ROOT.TCut(relaxed_cut) )
+    SchemedName = "eep_in_relaxed_ppSRCCut_%s"% DataName
+    scheme.SchemeOnTCut( path+"/AnaFiles","Ana_SRCPmissXb_"+DataName+".root","anaTree","Ana_"+SchemedName+".root",ROOT.TCut(relaxed_eep_cut) )
+    print 'schemed to %s'%SchemedName
+
+
 # (3) extract cm-parameters from data (no acc. correction)
 # ----------------------------------------------------------
 if 'extract data cm-parameters' in flags.option or 'extract' in flags.option: # DATA
