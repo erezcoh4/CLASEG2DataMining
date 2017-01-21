@@ -100,8 +100,11 @@ if 'cuts sensitivity studies' in flags.option or 'sensitivity' in flags.option: 
     # theta_pq < 20 and theta_pq < 30
     # 0.57 < p/q < 0.91 and 0.67 < p/q < 1.01
     # m_miss < 1050 and m_miss < 1150
-    relaxed_cut = ROOT.TCut("(1.15<Xb) && (theta_pq < 30) && (0.57 < p_over_q && p_over_q < 1.01) && (Mmiss<1150) && (1<Np)")
-    relaxed_eep_cut = ROOT.TCut("(1.15<Xb) && (theta_pq < 30) && (0.57 < p_over_q && p_over_q < 1.01) && (Mmiss<1150)")
+    relaxed_src_cuts = '(1.15<Xb) && (theta_pq < 30) && (0.57 < p_over_q && p_over_q < 1.01) && (Mmiss<1150) && (0.3 < Pmiss.P() && Pmiss.P() < 1.0)'
+    p_lead_cut = '-24.5 < pVertex[0].Z() && pVertex[0].Z() < -20'
+    relaxed_eep_cut = ROOT.TCut("(%s) && (%s) "%(relaxed_src_cuts,p_lead_cut))
+    p_rec_cut = '0.35 < Prec.P()  &&  -24.5 < pVertex[1].Z() && pVertex[1].Z() < -20 && pFiducCut[1] == 1'
+    relaxed_cut = ROOT.TCut("(%s) && (%s) && (%s) && (1<Np)"%(relaxed_src_cuts,p_lead_cut,p_rec_cut))
     
     
     DataName    = "DATA_%s"% dm.Target(flags.atomic_mass)
