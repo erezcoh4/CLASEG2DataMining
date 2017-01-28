@@ -11,12 +11,115 @@ from calc_tools import *
 from root_numpy import tree2array, root2array
 from root_pandas import read_root
 from ROOT import TPlots, TAnalysis, TAnalysisEG2 , TEG2dm , TCalcPhysVarsEG2 , TSchemeDATA
+from scipy.optimize import curve_fit
+
 dm  = TEG2dm()
 
 
 
 path = "/Users/erezcohen/Desktop/DataMining"
 my_hot_cmap = gp.reverse_colourmap(mpl.cm.hot)
+
+
+
+# ----------------------------------------------------------
+def eta( a , b , do_print=False ):
+    ab_avg , ab_diff = 0.5*(a+b) , [float(a[i]-b[i]) for i in range(len(a))]
+    eta = [float(ab_diff[i])/ab_avg[i] if ab_avg[i]>0 else 0.01 for i in range(len(a))]
+    eta_err = [np.sqrt(np.abs(ab_diff[i]))/ab_avg[i] if ab_avg[i]>0 else 0.01 for i in range(len(a))]
+    if do_print:
+        print 'eta:',eta
+        print 'eta_err:',eta_err
+    return np.array(eta) , np.array(eta_err)
+# ----------------------------------------------------------
+
+# ----------------------------------------------------------
+def linear(x, slope, intercept):
+    return slope * ( x ) + intercept
+# ----------------------------------------------------------
+
+# ----------------------------------------------------------
+def linear_06(x, slope, intercept):
+    return slope * ( x - 0.6 ) + intercept
+# ----------------------------------------------------------
+
+
+# ----------------------------------------------------------
+def fit_as_a_function_of_pmiss( x , y , yerr, fit_type='const' , title='', x_offset=0.6 ):
+    if fit_type=='const':
+        p1,v1 = np.polyfit( x , y , 0 , cov=True)
+        #         print 'const fit (%s) parameters:\n'%title,p1,'\n covariance:\n',v1
+        return p1[0] , sqrt(v1[0][0])
+
+    elif fit_type=='linear':
+        if x_offset==0:
+            f = linear
+        else:
+            f = linear_06
+        p2, v2 = curve_fit(f, xdata=x, ydata=y,sigma=yerr)# fit data using SciPy's Levenberg-Marquart method
+
+    print 'linear fit (%s)\n-----------\n parameters:\n'%title,p2,'\n covariance:\n',v2
+    return p2[0] , sqrt(v2[0][0]) , p2[1] , sqrt(v2[1][1])
+# ----------------------------------------------------------
+
+# ----------------------------------------------------------
+def fit_par_plot_pp_cm( data , var , weight , target='C12' ,
+                       PmissOffset = 0.6,
+                       title=None , do_plot_fit_pars=True , fontsize=25, figsize=(20,10),
+                       do_save_fit=False):
+    
+    fig,ax=plt.subplots(figsize=figsize)
+    ax.grid(True,linestyle='-',color='0.95')
+    p_err = np.zeros(len(pmiss_bin_width))
+    print target
+    [Xfit,XfitErr] = plot_errorbar_and_fit_pp_cm( ax , Pmiss, data[ var + '_x_' + weight] ,
+                                           [p_err,p_err] , [data[ var + '_xErr_' + weight ], data[ var + '_xErr_' + weight ]],
+                                           'black','v','none',r'$x-direction$' ,'const',do_plot_fit_pars=do_plot_fit_pars)
+        
+    [Yfit,YfitErr] = plot_errorbar_and_fit_pp_cm( ax , Pmiss, data[ var + '_y_' + weight] ,
+                                           [p_err,p_err] , [data[ var + '_yErr_' + weight ],data[ var + '_yErr_' + weight ]],
+                                           'red'  ,'o','none',r'$y-direction$' ,'const',do_plot_fit_pars=do_plot_fit_pars)
+    [Za1,Za1err],[Za2,Za2err] = plot_errorbar_and_fit_pp_cm( ax=ax , x=Pmiss, x_offset=PmissOffset, y=data[ var + '_z_' + weight] ,
+                                                      xerr=[p_err,p_err] , yerr=data[ var + '_zErr_' + weight ],
+                                                      color='blue' ,marker='s',lstyle='none',label=r'$\vec{p}_{miss}-direction$' ,fit_type='linear',
+                                                      do_plot_fit_pars=do_plot_fit_pars)
+
+    ax.legend(loc='best',fontsize=fontsize)
+    set_axes(ax=ax,x_label='$p_{miss}$ [GeV/c]',y_label='c.m. momentum %s [Gev/c]'%title,fontsize=fontsize)
+    if do_save_fit:
+    
+        plt.savefig('/Users/erezcohen/Desktop/DataMining/AccCorr_ppSRCAnalysisNote/all_figures/fits/%s_fit_%s.odf'%(target,var))
+
+    return Xfit,XfitErr,Yfit,YfitErr,Za1,Za1err,Za2,Za2err
+# ----------------------------------------------------------
+
+
+
+
+# ----------------------------------------------------------
+def plot_errorbar_and_fit_pp_cm( ax , x , y , xerr , yerr , color , marker , lstyle , label ,
+                                fit_type='const' ,do_plot_fit_pars=False, x_offset=0):
+    plt.errorbar(x, y, xerr=xerr, yerr=yerr, color=color, marker=marker , linestyle=lstyle , label=None , markersize=15)
+    
+    if fit_type=='const':
+        const_fit , const_fitErr = fit_as_a_function_of_pmiss( x , y , yerr , fit_type , title=label)
+        if do_plot_fit_pars: label=label + "$=%.3f\pm%.3f$"%(const_fit,const_fitErr)
+        ax.plot(x, np.ones(len(x))*const_fit , color=color , linestyle='--', label=label,linewidth = 2 , )
+        print 'const_fit:',const_fit,'+/-',const_fitErr
+        return [ const_fit , const_fitErr ]
+    
+    elif fit_type=='linear':
+        a1 , a1err , a2 , a2err  = fit_as_a_function_of_pmiss( x , y,  yerr , fit_type , title=label, x_offset=x_offset)
+        if do_plot_fit_pars: label=label + "$=(%.3f)(p_{miss}-%.1f)+(%.3f)$"%( a1 , x_offset, a2 )
+        ax.plot( x , a1*(x-x_offset) + a2 , color = color ,label=label )
+        print label
+        print 'a1:',a1,'+/-',a1err
+        print 'a2:',a2,'+/-',a2err
+        return [ a1 , a1err] , [ a2 , a2err ]
+# ----------------------------------------------------------
+
+
+
 
 # ----------------------------------------------------------
 def plot_hist1d( ana , var , xmin , xmax , nbins=10 , x_label='' , y_label=''
