@@ -12,6 +12,9 @@ from root_numpy import tree2array, root2array
 from root_pandas import read_root
 from ROOT import TPlots, TAnalysis, TAnalysisEG2 , TEG2dm , TCalcPhysVarsEG2 , TSchemeDATA
 from scipy.optimize import curve_fit
+from matplotlib.ticker import NullFormatter,MultipleLocator, FormatStrFormatter
+from matplotlib.offsetbox import AnchoredText
+
 
 dm  = TEG2dm()
 
