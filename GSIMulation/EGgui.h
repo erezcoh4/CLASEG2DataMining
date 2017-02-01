@@ -40,7 +40,7 @@ public:
     // Physical variables
     TLorentzVector                              Proton                  ,   q4Vector        , m2N       , miss;
     Float_t  Q2                         ,       Xb                      ,   PoverQ          ,    Mmiss;
-    Float_t  ThetaPQ                    ,       ThetaPmissQ             ,   ThetaPmissPrecoil;
+    Float_t  ThetaPQ                    ,       theta_miss_q             ,   ThetaPmissPrecoil;
     Float_t  Mott                       ,       DipoleFF                ,   Weight;
     Float_t  theta_e;
     TVector3 e                          ,       Pp1                     ,   Pp2             , Precoil;

@@ -71,6 +71,8 @@ void GenerateEvents::SetInputChain_eep(){
     InputT -> SetBranchAddress("Pmiss_size",         &Pm_size);
     InputT -> SetBranchAddress("q"       ,           &q);
     InputT -> SetBranchAddress("q_size"  ,           &q_size);
+    InputT -> SetBranchAddress("Pmiss_q_angle",      &theta_miss_q);
+
     
 }
 
@@ -112,6 +114,7 @@ Int_t GenerateEvents::DoGenerateRun_eepp( Int_t fRunNumber, bool DoGetRootFile, 
         if ( debug > 2 && entry%(InputNentries/4) == 0 ) std::cout  <<  (int)(100*(double)entry/InputNentries)+1 << "%\n";
         InitEvent();
         InputT -> GetEntry(entry);
+        theta_miss_q = TMath::DegToRad()*theta_miss_q;
         if(debug > 2) cout << "got entry " << entry << endl;
         
         double PmissMag = Pm_size[0];
@@ -153,7 +156,7 @@ Int_t GenerateEvents::DoGenerateRun_eepp( Int_t fRunNumber, bool DoGetRootFile, 
         if(debug > 2) cout << "define omega and other variables" << endl;
         double  omega   = 5.009 - sqrt( 0.000511*0.000511 + e.Mag()*e.Mag() );
         ThetaPQ         = (180/TMath::Pi())*(Pp1.Angle(q3Vector));
-        ThetaPmissQ     = (180/TMath::Pi())*(Pmiss.Angle(q3Vector));
+//        theta_miss_q     = (180/TMath::Pi())*(Pmiss.Angle(q3Vector));
         PoverQ          = Pp1.Mag()/q3Vector.Mag();
         Proton          .SetVectM   ( Pp1 , 0.938 ); // struck proton
         q4Vector        .SetXYZT    ( q3Vector.x() , q3Vector.y() , q3Vector.z() , omega );
@@ -162,7 +165,7 @@ Int_t GenerateEvents::DoGenerateRun_eepp( Int_t fRunNumber, bool DoGetRootFile, 
         Mmiss           = miss.Mag();
         Rp1             .SetXYZ(Rproton[0][0],Rproton[0][1],Rproton[0][2]); // since there is no actual Rp2....
         Rp2 = Rp1;// since there is no actual Rp2....
-        if(debug > 2) SHOW3( Mmiss , PoverQ , ThetaPmissQ );
+        if(debug > 2) SHOW3( Mmiss , PoverQ , theta_miss_q );
         
         // struck proton fiducial cut and vertex
         pFiducCut.push_back( eg2dm->protonFiducial( Pmiss+q3Vector , debug ) );
@@ -447,7 +450,7 @@ void GenerateEvents::SetRootTreeAddresses(){
 //    RootTree -> Branch("theta_e"             ,&theta_e               ,"theta_e/F");
 //    RootTree -> Branch("Xb"                  ,&Xb                    ,"Xb/F");
 //    RootTree -> Branch("ThetaPQ"             ,&ThetaPQ               ,"ThetaPQ/F");              // angle between the leading proton and q
-//    RootTree -> Branch("ThetaPmissQ"         ,&ThetaPmissQ           ,"ThetaPmissQ/F");          // angle between the missing momentum and q
+//    RootTree -> Branch("theta_miss_q"         ,&theta_miss_q           ,"theta_miss_q/F");          // angle between the missing momentum and q
 //    RootTree -> Branch("ThetaPmissPrecoil"   ,&ThetaPmissPrecoil     ,"ThetaPmissPrecoil/F");    // angle between the missing and recoil momenta
 //    RootTree -> Branch("PoverQ"              ,&PoverQ                ,"PoverQ/F");               // ratio |p|/|q| for leading proton
 //    RootTree -> Branch("Mmiss"               ,&Mmiss                 ,"Mmiss/F");
@@ -456,6 +459,7 @@ void GenerateEvents::SetRootTreeAddresses(){
     RootTree -> Branch("pFiducCut"           ,&pFiducCut             );// std::vector<Int_t>
     RootTree -> Branch("Prec"                ,"TLorentzVector"       ,&Prec);
     RootTree -> Branch("pVertex"             ,&pVertex);             // std::vector<TVector3>
+    RootTree -> Branch("theta_miss_q"        ,&theta_miss_q          , "theta_miss_q/F");
 
 
     // c.m. analysis

@@ -122,7 +122,7 @@ public:
     Int_t       NRand       , NPTheta   , NeTheta   ,debug;
    
     Float_t     Q2      , Xb            , PoverQ    , Mmiss;
-    Float_t     ThetaPQ , ThetaPmissQ   , ThetaPmissPrecoil;
+    Float_t     ThetaPQ , theta_miss_q   , ThetaPmissPrecoil;
     Float_t     theta_e ;
     Float_t     MeanX   , MeanY , SigmaX    , SigmaY;
     Float_t     SigmaZ_a1       , SigmaZ_a2 , MeanZ_a1  , MeanZ_a2  ;
