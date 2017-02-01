@@ -915,12 +915,12 @@ def generate_runs_with_different_parameters( option,
                 results['PvalTotal_allPvals_%s'%target]     = float(Pval_scores.PvalTotal_allPvals)
                 results['PvalTotal_largePvals_%s'%target]   = float(Pval_scores.PvalTotal_largePvals)
                 
-                results['PvalSigmaX_tw_%s'%target]  = float(Pval_scores.PvalSigmaX_tw)
-                results['PvalSigmaY_tw_%s'%target]  = float(Pval_scores.PvalSigmaY_tw)
-                results['PvalMeanZa1_tw_%s'%target] = float(Pval_scores.PvalMeanZa1_tw)
-                results['PvalMeanZa2_tw_%s'%target] = float(Pval_scores.PvalMeanZa2_tw)
-                results['PvalSigmaZa1_tw_%s'%target]= float(Pval_scores.PvalSigmaZa1_tw)
-                results['PvalSigmaZa2_tw_%s'%target]= float(Pval_scores.PvalSigmaZa2_tw)
+                results['PvalSigmaX_tw_%s'%target]          = float(Pval_scores.PvalSigmaX_tw)
+                results['PvalSigmaY_tw_%s'%target]          = float(Pval_scores.PvalSigmaY_tw)
+                results['PvalMeanZa1_tw_%s'%target]         = float(Pval_scores.PvalMeanZa1_tw)
+                results['PvalMeanZa2_tw_%s'%target]         = float(Pval_scores.PvalMeanZa2_tw)
+                results['PvalSigmaZa1_tw_%s'%target]        = float(Pval_scores.PvalSigmaZa1_tw)
+                results['PvalSigmaZa2_tw_%s'%target]        = float(Pval_scores.PvalSigmaZa2_tw)
 
                 results['PvalTotal_tw_%s'%target]           = float(Pval_scores.PvalTotal_tw)
 
