@@ -625,7 +625,7 @@ def get_pmiss_bins( PmissBins , Q2Bins , thetapmqBins , path , NRand ): # for pp
     
         for j in range( len(thetapmqBins) ):
             thetapmqmin , thetapmqmax = thetapmqBins[j][0] , thetapmqBins[j][1]
-            thetapmq_cut = ROOT.TCut("%f<TMath::RadToDeg()*theta_miss_q && TMath::RadToDeg()*theta_miss_q<%f"%(thetapmqmin , thetapmqmax))
+            thetapmq_cut = ROOT.TCut("%f<Pmiss_q_angle && Pmiss_q_angle<%f"%(thetapmqmin , thetapmqmax))
             evtsgen_thetapmqpmiss_bins[i][j] = NRand * (p1.GetEntries(p_cut+thetapmq_cut) + p2.GetEntries(p_cut+thetapmq_cut))
 
     p1.Close()
@@ -798,7 +798,7 @@ def generate_runs_with_different_parameters( option,
         print '\033[95m' + 'processing %d runs'%len(generated_parameters)+ '\033[0m'
 
     # multiple bins for pp/p ratio
-    pmiss_bins , evtsgen_pmiss_bins , evtsgen_Q2pmiss_bins  , evtsgen_thetapmqpmiss_bins = get_pmiss_bins( PmissBins , Q2Bins , path , int(N.NRand) )
+    pmiss_bins , evtsgen_pmiss_bins , evtsgen_Q2pmiss_bins  , evtsgen_thetapmqpmiss_bins = get_pmiss_bins( PmissBins , Q2Bins , thetapmqBins , path , int(N.NRand) )
 
 
     '''
