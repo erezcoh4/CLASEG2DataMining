@@ -595,7 +595,7 @@ def generate_cm_bands( cm_parameters , fit_pars , N ,
 # ------------------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------------------- #
-def get_pmiss_bins( PmissBins , Q2Bins , path , NRand ): # for pp/p analysis
+def get_pmiss_bins( PmissBins , Q2Bins , thetapmqBins , path , NRand ): # for pp/p analysis
 
     # define the bins - 4 bins in each large p(miss) bin that we have in the analysis
     pmiss_bins = []
@@ -608,6 +608,7 @@ def get_pmiss_bins( PmissBins , Q2Bins , path , NRand ): # for pp/p analysis
     # get the number of generated events per bin
     evtsgen_pmiss_bins = []
     evtsgen_Q2pmiss_bins = np.zeros( (len(pmiss_bins) , len(Q2Bins)) )
+    evtsgen_thetapmqpmiss_bins = np.zeros( (len(pmiss_bins) , len(thetapmqBins)) )
 
     p1 = TPlots(path + '/DATA/SRC_e1_C.root' , 'T')
     p2 = TPlots(path + '/DATA/SRC_e2_C.root' , 'T')
@@ -621,20 +622,29 @@ def get_pmiss_bins( PmissBins , Q2Bins , path , NRand ): # for pp/p analysis
             Q2min , Q2max = Q2Bins[j][0] , Q2Bins[j][1]
             q2_cut = ROOT.TCut("%f<Q2 && Q2<%f"%(Q2min , Q2max))
             evtsgen_Q2pmiss_bins[i][j] = NRand * (p1.GetEntries(p_cut+q2_cut) + p2.GetEntries(p_cut+q2_cut))
+    
+        for j in range( len(thetapmqBins) ):
+            thetapmqmin , thetapmqmax = thetapmqBins[j][0] , thetapmqBins[j][1]
+            thetapmq_cut = ROOT.TCut("%f<TMath::RadToDeg()*theta_miss_q && TMath::RadToDeg()*theta_miss_q<%f"%(thetapmqmin , thetapmqmax))
+            evtsgen_thetapmqpmiss_bins[i][j] = NRand * (p1.GetEntries(p_cut+thetapmq_cut) + p2.GetEntries(p_cut+thetapmq_cut))
 
     p1.Close()
     p2.Close()
 
-    return pmiss_bins , evtsgen_pmiss_bins , evtsgen_Q2pmiss_bins
+    return pmiss_bins , evtsgen_pmiss_bins , evtsgen_Q2pmiss_bins , evtsgen_thetapmqpmiss_bins
 # ------------------------------------------------------------------------------- #
 
 
 # ------------------------------------------------------------------------------- #
-def get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins , Q2Bins , evtsgen_Q2pmiss_bins , ana_sim ):
-
+def get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins , Q2Bins , evtsgen_Q2pmiss_bins, thetapmqBins , evtsgen_thetapmqpmiss_bins , ana_sim ):
+    # in p(miss) bins
     loss_pmiss_bins = []
+    # in Q2 bins and p(miss) bins
     accepted_Q2pmiss_bins = np.zeros( (len(pmiss_bins) , len(Q2Bins) ))
     loss_Q2pmiss_bins = np.zeros( (len(pmiss_bins) , len(Q2Bins) ))
+    # in theta(pm,q) bins and p(miss) bins
+    accepted_thetapmqpmiss_bins = np.zeros( (len(pmiss_bins) , len(thetapmqBins) ))
+    loss_thetapmqpmiss_bins = np.zeros( (len(pmiss_bins) , len(thetapmqBins) ))
     
     for i in range( len(pmiss_bins) ):
         pmin , pmax = pmiss_bins[i][0] , pmiss_bins[i][1]
@@ -642,6 +652,8 @@ def get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins , Q2Bins , evtsgen_Q2pm
         p_cut = ROOT.TCut("%f<Pmiss3Mag && Pmiss3Mag<%f"%(pmin , pmax))
         evts_acc = ana_sim.GetEntries(p_cut)
         loss_pmiss_bins.append( float(evts_gen-evts_acc)/evts_gen )
+        
+        # in Q2 bins
         for j in range( len(Q2Bins) ):
             Q2min , Q2max = Q2Bins[j][0] , Q2Bins[j][1]
             q2_cut = ROOT.TCut("%f<Q2 && Q2<%f"%(Q2min , Q2max))
@@ -650,8 +662,18 @@ def get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins , Q2Bins , evtsgen_Q2pm
                 loss_Q2pmiss_bins[i][j] = float(evtsgen_Q2pmiss_bins[i][j] - accepted_Q2pmiss_bins[i][j])/evtsgen_Q2pmiss_bins[i][j]
             else:
                 loss_Q2pmiss_bins[i][j] = 0.0
+    
+        # in theta(pm,q) bins
+        for j in range( len(Q2Bins) ):
+            thetapmqmin , thetapmqmax = thetapmqBins[j][0] , thetapmqBins[j][1]
+            thetapmq_cut = ROOT.TCut("%f<TMath::RadToDeg()*theta_miss_q && TMath::RadToDeg()*theta_miss_q<%f"%(thetapmqmin , thetapmqmax))
+            accepted_thetapmqpmiss_bins[i][j] = ana_sim.GetEntries( p_cut + thetapmq_cut )
+            if evtsgen_thetapmqpmiss_bins[i][j]>0:
+                loss_thetapmqpmiss_bins[i][j] = float(evtsgen_thetapmqpmiss_bins[i][j] - accepted_thetapmqpmiss_bins[i][j])/evtsgen_thetapmqpmiss_bins[i][j]
+            else:
+                loss_thetapmqpmiss_bins[i][j] = 0.0
 
-    return loss_pmiss_bins , loss_Q2pmiss_bins
+    return loss_pmiss_bins , loss_Q2pmiss_bins , loss_thetapmqpmiss_bins
 # ------------------------------------------------------------------------------- #
 
 
@@ -751,7 +773,7 @@ def get_Pval_scores( data_fits , reco_fits , name='' ):
 def generate_runs_with_different_parameters( option,
                                             data_fits_12C, data_fits_27Al, data_fits_56Fe, data_fits_208Pb,
                                             generated_parameters ,
-                                            debug , PmissBins , Q2Bins ,
+                                            debug , PmissBins , Q2Bins , thetapmqBins ,
                                             buildup_resutlsFName ,
                                             reco_fitsFName , target ,
                                             N ,
@@ -776,7 +798,7 @@ def generate_runs_with_different_parameters( option,
         print '\033[95m' + 'processing %d runs'%len(generated_parameters)+ '\033[0m'
 
     # multiple bins for pp/p ratio
-    pmiss_bins , evtsgen_pmiss_bins , evtsgen_Q2pmiss_bins = get_pmiss_bins( PmissBins , Q2Bins , path , int(N.NRand) )
+    pmiss_bins , evtsgen_pmiss_bins , evtsgen_Q2pmiss_bins  , evtsgen_thetapmqpmiss_bins = get_pmiss_bins( PmissBins , Q2Bins , path , int(N.NRand) )
 
 
     '''
@@ -832,8 +854,10 @@ def generate_runs_with_different_parameters( option,
             if debug>1: print "analyzing run %d"%run
             ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
                 
-            loss_pmiss_bins , loss_Q2pmiss_bins = get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins ,
-                                                                      Q2Bins , evtsgen_Q2pmiss_bins , ana_sim )
+            loss_pmiss_bins , loss_Q2pmiss_bins , loss_thetapmqpmiss_bins = get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins ,
+                                                                                                Q2Bins , evtsgen_Q2pmiss_bins ,
+                                                                                                thetapmqBins , evtsgen_thetapmqpmiss_bins ,
+                                                                                                ana_sim )
 
             if do_add_plots:
                 reco_parameters , do_fits = calc_cm_parameters( ana_sim  , PmissBins , CMRooFitsName( path + '/eg_cm_roofits/run%d_unweighted_'%run ), CMRooFitsName( path + '/eg_cm_roofits/run%d_weighted_'%run ) , True )
@@ -939,11 +963,17 @@ def generate_runs_with_different_parameters( option,
 
             # events loss in 20 p(miss) bins, for pp/p analysis
             for i in range( len(pmiss_bins) ):
+                # p(miss) bins
                 pmin , pmax = pmiss_bins[i][0] , pmiss_bins[i][1]
                 results['fracLoss_pmiss_%.3f_%.3f'%(pmin , pmax)] = loss_pmiss_bins[i]
+                # Q2 and p(miss) bins
                 for j in range( len(Q2Bins) ):
                     Q2min , Q2max = Q2Bins[j][0] , Q2Bins[j][1]
                     results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmin , pmax , Q2min , Q2max)] = loss_Q2pmiss_bins[i][j]
+                # theta(pm,q) and p(miss) bins
+                for j in range( len(thetapmqBins) ):
+                    thetapmqmin , thetapmqmax = thetapmqBins[j][0] , thetapmqBins[j][1]
+                    results['fracLoss_pmiss_%.3f_%.3f_thetapmq_%.1f_%.1f'%(pmin , pmax , thetapmqmin , thetapmqmax)] = loss_thetapmqpmiss_bins[i][j]
             # ----------------------------
                 
 
@@ -955,12 +985,11 @@ def generate_runs_with_different_parameters( option,
             ana_sim.CloseFile()
             if debug>1:
                 print "appended into results"
-                if debug>3: print 'PvalTotal_allPvals_C12:',float(results['PvalTotal_allPvals_12C']) , '\nPvalTotal_largePvals_C12:',float(results['PvalTotal_largePvals_12C']) , '\nPvalTotal_tw_C12:',float(results['PvalTotal_tw_12C'])
                 if debug>5: print "results: ",results
 
             garbage_list = [ ana_sim , reco_parameters , reco_fits
                             , results
-                            , Pval_scores , KS_scores , loss_pmiss_bins , loss_Q2pmiss_bins
+                            , Pval_scores , KS_scores , loss_pmiss_bins , loss_Q2pmiss_bins , loss_thetapmqpmiss_bins
                             ]
             del garbage_list
             gc.collect() # collect() calls PyInt_ClearFreeList()

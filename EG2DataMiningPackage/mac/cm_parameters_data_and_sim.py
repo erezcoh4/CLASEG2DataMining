@@ -37,6 +37,7 @@ else:
 
 PmissBins   = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65]  , [0.65,0.75] , [0.75,1.0]]
 Q2Bins      = [[0,1.5]     , [1.5,2]     , [2,2.5]      , [2.5,6]]
+thetapmqBins= [[100,135]   , [135,145]   , [145,155]    , [155,180]]
 
 # Jan 2017, chaning to fit pcmZ = a1*( p(miss) - 0.6 ) + a2
 # 12C nominal values
@@ -222,7 +223,7 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
     generate_runs_with_different_parameters( flags.option ,
                                             fits_12C, fits_27Al, fits_56Fe, fits_208Pb,
                                             generated_parameters ,
-                                            flags.verbose , PmissBins , Q2Bins,
+                                            flags.verbose , PmissBins , Q2Bins, thetapmqBins,
                                             buildup_resutlsFName( full_path ) ,
                                             CMfitsFname( full_path ) ,
                                             dm.Target(A) ,

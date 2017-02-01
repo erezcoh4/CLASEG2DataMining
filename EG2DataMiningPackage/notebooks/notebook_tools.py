@@ -6,6 +6,7 @@ sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackag
 sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/CLASEG2DataMining/EG2DataMiningPackage/mac')
 import GeneralPlot as gp , Initiation as init, plot_tools as pt
 import matplotlib.patches as patches
+from scipy.interpolate import interp1d, Akima1DInterpolator,BarycentricInterpolator,splprep
 from plot_tools import *
 from my_tools import *
 from calc_tools import *
@@ -15,6 +16,8 @@ from ROOT import TPlots, TAnalysis, TAnalysisEG2 , TEG2dm , TCalcPhysVarsEG2 , T
 from scipy.optimize import curve_fit
 from matplotlib.ticker import NullFormatter,MultipleLocator, FormatStrFormatter
 from matplotlib.offsetbox import AnchoredText
+from scipy.signal import savgol_filter
+
 
 
 dm  = TEG2dm()
