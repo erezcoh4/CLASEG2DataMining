@@ -666,7 +666,7 @@ def get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins , Q2Bins , evtsgen_Q2pm
         # in theta(pm,q) bins
         for j in range( len(Q2Bins) ):
             thetapmqmin , thetapmqmax = thetapmqBins[j][0] , thetapmqBins[j][1]
-            thetapmq_cut = ROOT.TCut("%f<TMath::RadToDeg()*theta_miss_q && TMath::RadToDeg()*theta_miss_q<%f"%(thetapmqmin , thetapmqmax))
+            thetapmq_cut = ROOT.TCut("%f< theta_miss_q && TMath::RadToDeg()*theta_miss_q<%f"%(thetapmqmin , thetapmqmax))
             accepted_thetapmqpmiss_bins[i][j] = ana_sim.GetEntries( p_cut + thetapmq_cut )
             if evtsgen_thetapmqpmiss_bins[i][j]>0:
                 loss_thetapmqpmiss_bins[i][j] = float(evtsgen_thetapmqpmiss_bins[i][j] - accepted_thetapmqpmiss_bins[i][j])/evtsgen_thetapmqpmiss_bins[i][j]
