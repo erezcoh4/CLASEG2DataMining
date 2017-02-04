@@ -32,6 +32,47 @@ my_hot_cmap = gp.reverse_colourmap(mpl.cm.hot)
 
 
 # ----------------------------------------------------------
+def get_mean_and_sigma( x , w ):
+    
+    mean_unweighted , mean_weighted = np.average( x ) , np.average( x , weights=w )
+    sigma_unweighted, sigma_weighted= np.sqrt(np.average( np.square(x-mean_unweighted) )) , np.sqrt(np.average( np.square(x-mean_weighted) , weights=w  ))
+    return mean_unweighted , mean_weighted , sigma_unweighted, sigma_weighted
+# ----------------------------------------------------------
+
+
+
+
+
+# ----------------------------------------------------------
+def fit2constant(y=None , yerr=None):
+    
+    simga2_inverse = [1./np.square(yerr[i]) if yerr[i]>0.01 else 0.01 for i in range(len(y))]
+    mean = np.average(y , weights=simga2_inverse)
+    sigma = np.sqrt(np.average(np.square(y-mean),weights=simga2_inverse))
+    
+    return mean , sigma
+# ----------------------------------------------------------
+
+# ----------------------------------------------------------
+def plot_fit2constant(x=None , y=None , yerr=None , color='black' , do_plot_result=True, alpha=0.1 , xtext=None, ytext=None):
+    
+    mean , sigma = fit2constant(y=y , yerr=yerr)
+    
+    if do_plot_result:
+        y , yerr = mean*np.ones(len(x)) , sigma*np.ones(len(x))
+        plt.plot( x , y , '-',color=color)
+        plt.fill_between( x , y-yerr , y+yerr , color=color , alpha=alpha)
+        if xtext is None:
+            xtext = np.min(x) + 0.1*(np.max(x)-np.min(x))
+        if ytext is None:
+            ytext = np.min(y) + 0.1*(np.max(y)-np.min(y))
+        plt.text(xtext , ytext , '$%.3f \\pm %.3f $'%(mean,sigma) + '%', color=color , fontsize=20)
+
+    return mean , sigma
+# ----------------------------------------------------------
+
+
+# ----------------------------------------------------------
 def eta( a , b , do_print=False ):
     ab_avg , ab_diff = 0.5*(a+b) , [float(a[i]-b[i]) for i in range(len(a))]
     eta = [float(ab_diff[i])/ab_avg[i] if ab_avg[i]>0 else 0.01 for i in range(len(a))]
