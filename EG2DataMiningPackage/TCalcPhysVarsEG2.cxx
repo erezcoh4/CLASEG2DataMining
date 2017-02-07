@@ -146,7 +146,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("q LC fraction"       ,&alpha_q               , "alpha_q/F");
     OutTree -> Branch("sum of LC fractions" ,&sum_alpha             , "sum_alpha/F");
     OutTree -> Branch("theta p(miss)-p2 p3" ,&thetaMiss23           , "thetaMiss23/F");
-    OutTree -> Branch("OpeningAngle"        ,&thetaMiss23           , "OpeningAngle/F");
+    OutTree -> Branch("OpeningAngle"        ,&OpeningAngle          , "OpeningAngle/F");
     OutTree -> Branch("theta23"             ,&theta23               , "theta23/F");
     OutTree -> Branch("theta p(lead)-p(rec)",&thetaLeadRec          , "thetaLeadRec/F");
     OutTree -> Branch("phi p(miss)-p2 p3"   ,&phiMiss23             , "phiMiss23/F");
@@ -433,6 +433,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     theta_rec_q  = q.Vect().Angle(Prec.Vect());
     theta_miss_q = q.Vect().Angle(Pmiss.Vect());
     if (debug > 2) Printf("got thetaLeadRec");
+    OpeningAngle = r2d*Pmiss.Vect().Angle(Prec.Vect());
     
     
     // roofit

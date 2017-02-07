@@ -88,7 +88,7 @@ public:
     Float_t             TpMiss      , m_A_1         , E_p_init      , M_p_init  , pq            ;
     vector<Float_t>     alpha       , pEdep         , pCTOF         , Tp        , proton_angle  ;
     vector<Int_t>       pCTOFCut    , pFiducCut     , pFiducCut_g;
-    Float_t             pLab_phi    , pLab_theta;
+    Float_t             pLab_phi    , pLab_theta    , OpeningAngle;
     
     TVector3            Pbeam       , Pe        , Pe_g;
     TVector3            * NMom      , * P1Mom   , * P2Mom           , * e3Vector;
