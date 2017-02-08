@@ -1000,10 +1000,10 @@ def generate_runs_with_different_parameters( option,
 
 
 
-    if 'generate' in option:
+    if 'gen' in option:
         gen_events.ReleaseInputChain_eep()
     
-    if 'analyze' in option:
+    if 'ana' in option:
         if do_reco_fits_file:   print_filename( reco_fitsFName , "reconstructed parameters fits wrote to" )
         if do_resutls_file:     print_filename( buildup_resutlsFName , "results wrote to " )
 
