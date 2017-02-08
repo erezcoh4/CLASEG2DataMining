@@ -24,6 +24,9 @@ from cm_tools import *
     genmodcut_anamodcut {"enerate and analyze runs with different cuts"}
 '''
 
+targets = ['C12', 'Al27' , 'Fe56' , 'Pb208' ]
+labels  = ['$^{12}$C'   , '$^{27}$Al'   , '$^{56}$Fe'   , '$^{208}$Pb'  ]
+
 
 if flags.run > 0:
     start_run = flags.run
@@ -143,9 +146,7 @@ if 'extract data cm-parameters' in flags.option or 'extract' in flags.option: # 
 if 'plot all parameters for all targets' in flags.option or 'AllTargets' in flags.option: # DATA
     
     # (A) compute width and mean for all nuclei
-    targets = ['C12'        , 'Al27'        , 'Fe56'        , 'Pb208'       ]
     colors  = ['black'      , 'red'         , 'green'       , 'blue'        ]
-    labels  = ['$^{12}$C'   , '$^{27}$Al'   , '$^{56}$Fe'   , '$^{208}$Pb'  ]
     
     ana , cm_pars , cm_fits = [] , [] , []
     for target in targets:
@@ -235,48 +236,61 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
 
 
 
-# (6) generate runs with different parameters
+
+
+
+# (6) prepare runs with different parameters
 # ----------------------------------------------------------
-if 'generate/analyzes with modified cuts' in flags.option or 'genmodcut' in flags.option or 'anamodcut' in flags.option in flags.option:
-
+if 'prepare to generate/analyzes with modified cuts' in flags.option or 'prepmodcut' in flags.option:
+    
     scheme  = TSchemeDATA()
-
+    
     mod_cut = dict({'name':"Xb125",
                    'XbCut':"1.25<Xb",
                    'theta_pqCut':"theta_pq < 25",
                    'p_over_qCut':"0.62 < p_over_q && p_over_q < 0.96",
                    'MmissCut':"Mmiss<1.100"})
-                   
+        
     mod_src_cuts = ROOT.TCut("(%s) && (%s) && (%s) && (%s) && (1<Np)"
                              %(mod_cut['XbCut'],mod_cut['theta_pqCut'],mod_cut['p_over_qCut'],mod_cut['MmissCut']))
+
     p_lead_cut = '-24.5 < pVertex[0].Z() && pVertex[0].Z() < -20'
     mod_eep_cut = ROOT.TCut("(%s) && (%s) "%(mod_src_cuts,p_lead_cut))
     p_rec_cut = '0.35 < Prec.P()  &&  -24.5 < pVertex[1].Z() && pVertex[1].Z() < -20 && pFiducCut[1] == 1'
     mod_eepp_cut = ROOT.TCut("(%s) && (%s) && (%s) && (1<Np)"%(mod_src_cuts,p_lead_cut,p_rec_cut))
+                   
+                   
 
-    
-    targets = ['C12', 'Al27' , 'Fe56' , 'Pb208' ]
-    colors = ['red','blue','purple','black']
-    target_names = ['$^{12}$C','$^{27}$Al','$^{56}$Fe','$^{208}$Pb']
-    ana = dict()
-    cm_pars = dict()
-    fits = dict()
-
+    ana , cm_pars  , fits  = dict() , dict() , dict()
+        
     for target in targets:
-        DataName    = "DATA_%s"%target
+        
+        DataName  = "DATA_%s"%target
         # scheme to modified cuts
         SchemedName = "eep_in_mod_cut_%s_ppSRCCut_%s"% (mod_cut['name'],DataName)
         scheme.SchemeOnTCut( path+"/AnaFiles","Ana_SRCPmissXb_"+DataName+".root","anaTree","Ana_"+SchemedName+".root",mod_eep_cut )
         SchemedName = "mod_cut_%s_ppSRCCut_%s"% (mod_cut['name'],DataName)
         scheme.SchemeOnTCut( path+"/AnaFiles","Ana_SRCPmissXb_"+DataName+".root","anaTree","Ana_"+SchemedName+".root",mod_eepp_cut )
+        
         # get cm parameters and fit
         ana[target] = TAnalysisEG2( path+"/AnaFiles" ,  "Ana_"+SchemedName )
         cm_pars[target] , _ = calc_cm_parameters( ana[target]  , PmissBins  )
         cm_pars[target].to_csv( CMParsFname(ppPath+'/DATA/%s_data_mod_cut_%s'%(target,mod_cut['name'])) , header=True , index = False)
+        
         fits[target] = fit_cm_parameters( target + ' data  cut %s'%mod_cut['name'], cm_pars[target] ,  )
         fits[target].to_csv( CMfitsFname( ppPath+'/DATA/data_mod_cut_%s'%mod_cut['name'] , target ) , header=True , index=False)
         print_filename( CMfitsFname( ppPath+'/DATA/data_mod_cut_%s'%mod_cut['name'], target )  , target + "c.m. fits (modified cut %s)"%mod_cut['name'])
-        
+
+
+
+# (6) generate runs with different parameters
+# ----------------------------------------------------------
+if 'generate/analyzes with modified cuts' in flags.option or 'genmodcut' in flags.option or 'anamodcut' in flags.option in flags.option:
+    
+    fits = dict()
+    for target in targets:
+        fits[target] = pd.read_csv( CMfitsFname( ppPath+'/DATA/data_mod_cut_%s'%mod_cut['name'] , target ) )
+    
         
     print_filename(GeneParsFName ( ppPath+'/simulation/' ),'reading generated-parameters...')
     generated_parameters = pd.read_csv( GeneParsFName ( ppPath+'/simulation/' ) )
