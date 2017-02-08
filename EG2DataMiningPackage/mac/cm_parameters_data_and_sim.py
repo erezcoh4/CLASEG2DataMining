@@ -238,29 +238,27 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
 
 
 
+mod_cut = dict({'name':"Xb125",
+               'XbCut':"1.25<Xb",
+               'theta_pqCut':"theta_pq < 25",
+               'p_over_qCut':"0.62 < p_over_q && p_over_q < 0.96",
+               'MmissCut':"Mmiss<1.100"})
+    
+mod_src_cuts = ROOT.TCut("(%s) && (%s) && (%s) && (%s) && (1<Np)"
+                         %(mod_cut['XbCut'],mod_cut['theta_pqCut'],mod_cut['p_over_qCut'],mod_cut['MmissCut']))
+        
+
+p_lead_cut = '-24.5 < pVertex[0].Z() && pVertex[0].Z() < -20'
+mod_eep_cut = ROOT.TCut("(%s) && (%s) "%(mod_src_cuts,p_lead_cut))
+p_rec_cut = '0.35 < Prec.P()  &&  -24.5 < pVertex[1].Z() && pVertex[1].Z() < -20 && pFiducCut[1] == 1'
+mod_eepp_cut = ROOT.TCut("(%s) && (%s) && (%s) && (1<Np)"%(mod_src_cuts,p_lead_cut,p_rec_cut))
+
 
 # (6) prepare runs with different parameters
 # ----------------------------------------------------------
 if 'prepare to generate/analyzes with modified cuts' in flags.option or 'prepmodcut' in flags.option:
     
     scheme  = TSchemeDATA()
-    
-    mod_cut = dict({'name':"Xb125",
-                   'XbCut':"1.25<Xb",
-                   'theta_pqCut':"theta_pq < 25",
-                   'p_over_qCut':"0.62 < p_over_q && p_over_q < 0.96",
-                   'MmissCut':"Mmiss<1.100"})
-        
-    mod_src_cuts = ROOT.TCut("(%s) && (%s) && (%s) && (%s) && (1<Np)"
-                             %(mod_cut['XbCut'],mod_cut['theta_pqCut'],mod_cut['p_over_qCut'],mod_cut['MmissCut']))
-
-    p_lead_cut = '-24.5 < pVertex[0].Z() && pVertex[0].Z() < -20'
-    mod_eep_cut = ROOT.TCut("(%s) && (%s) "%(mod_src_cuts,p_lead_cut))
-    p_rec_cut = '0.35 < Prec.P()  &&  -24.5 < pVertex[1].Z() && pVertex[1].Z() < -20 && pFiducCut[1] == 1'
-    mod_eepp_cut = ROOT.TCut("(%s) && (%s) && (%s) && (1<Np)"%(mod_src_cuts,p_lead_cut,p_rec_cut))
-                   
-                   
-
     ana , cm_pars  , fits  = dict() , dict() , dict()
         
     for target in targets:
@@ -309,7 +307,8 @@ if 'generate/analyzes with modified cuts' in flags.option or 'genmodcut' in flag
                                             CMfitsFname( full_path ) ,
                                             dm.Target(A) ,
                                             N ,
-                                            root_resutlsFName( full_path ) )
+                                            root_resutlsFName( full_path ) ,
+                                            main_cut=mod_eepp_cut )
 
 
 
