@@ -242,7 +242,7 @@ if 'generate/analyzes with modified cuts' in flags.option or 'genmodcut' in flag
     scheme  = TSchemeDATA()
 
     mod_cut = dict({'name':"Xb125",
-                   'XbCut':"1.2<Xb",
+                   'XbCut':"1.25<Xb",
                    'theta_pqCut':"theta_pq < 25",
                    'p_over_qCut':"0.62 < p_over_q && p_over_q < 0.96",
                    'MmissCut':"Mmiss<1.100"})
