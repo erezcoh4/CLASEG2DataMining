@@ -22,14 +22,38 @@ from scipy.stats import norm
 
 
 
-
-
 dm  = TEG2dm()
-
-
 
 path = "/Users/erezcohen/Desktop/DataMining"
 my_hot_cmap = gp.reverse_colourmap(mpl.cm.hot)
+
+
+# ----------------------------------------------------------
+def plot_data(data , Ashift=0, fmt='o', marker='^',color='red',
+              markersize=20, linewidth=4,
+              vary=None , varyerr=None , label=None , mulfac=1):
+    ax.errorbar((data['A']+Ashift), mulfac*data[vary], yerr=mulfac*data[varyerr],
+                color=color, marker=marker,markersize=markersize,linewidth=linewidth, fmt=fmt,label=label)
+# ----------------------------------------------------------
+
+
+# ----------------------------------------------------------
+def plot_calculation_line( data , varx='A',kind='nearest' , vary=None , color='blue' , label=None, linewidth=4):
+    x = data[varx]
+    y = data[vary]
+    itp = interp1d(x,y, kind='linear')
+    
+    if kind is None:
+        f = interp1d( x , y )
+    else:
+        f = interp1d( x , y ,kind=kind)
+    
+    window_size, poly_order = 101, 4
+    xnew = np.linspace(x.min(),x.max(), num=500, endpoint=True)
+    yy_sg = savgol_filter(itp(xnew), window_size, poly_order)
+    plt.plot( xnew, yy_sg, '--', color=color , label=label, linewidth=linewidth )
+# ----------------------------------------------------------
+
 
 
 
