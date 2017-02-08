@@ -807,7 +807,7 @@ def generate_runs_with_different_parameters( option,
         (a) efficiency and acceptacne from the 'uniform' map i've generated using virtual CLAS
         (b) proton fiducial cuts (coded inside the event generator class)
     '''
-    if 'generate' in option:
+    if 'gen' in option:
         h = pAcceptacneFile.Get("hRescaled")
         gen_events = GenerateEvents( path , 0 , debug - 2 )
         gen_events.SetNRand( int(N.NRand) )
@@ -833,7 +833,7 @@ def generate_runs_with_different_parameters( option,
             
         # (1) generate the simulated data (the 'run')
         # ----------------------------
-        if 'generate' in option:
+        if 'gen' in option:
                             
             gen_events.Set_eep_Parameters( genMeanX , genSigmaX , genMeanY , genSigmaY , genMeanZa1 , genMeanZa2 , genSigmaZa1 , genSigmaZa2 )
             gen_events.DoGenerateRun_eepp( run )
@@ -850,7 +850,7 @@ def generate_runs_with_different_parameters( option,
                     
         # (2) analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
         # ----------------------------
-        if 'analyze' in option or 'analyse' in option:
+        if 'ana' in option:
                             
             if debug>1: print "analyzing run %d"%run
             ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , main_cut )
