@@ -778,7 +778,8 @@ def generate_runs_with_different_parameters( option,
                                             reco_fitsFName , target ,
                                             N ,
                                             root_resutlsFName ,
-                                            do_root_file=False, do_reco_fits_file=False, do_resutls_file=True, do_add_plots=False):
+                                            do_root_file=False, do_reco_fits_file=False, do_resutls_file=True, do_add_plots=False,
+                                            main_cut = ROOT.TCut()):
     
     from definitions import *
     ana_data = TAnalysisEG2( path+"/AnaFiles" ,"Ana_ppSRCCut_DATA_%s"% target )
@@ -839,7 +840,7 @@ def generate_runs_with_different_parameters( option,
                             
             # and now scheme them to our desired pp-SRC cuts
             ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
-            scheme.SchemeOnTCut( path + '/eg_rootfiles' , 'run%d.root'%run , "anaTree", 'run%d.root'%run , ana_sim.EGppSRCCut + ana_sim.PrecFiducial )
+            scheme.SchemeOnTCut( path + '/eg_rootfiles' , 'run%d.root'%run , "anaTree", 'run%d.root'%run , ana_sim.EGppSRCCut + ana_sim.PrecFiducial + main_cut )
                             
             ana_sim.CloseFile()
             garbage_list = [ ana_sim ]
@@ -852,7 +853,7 @@ def generate_runs_with_different_parameters( option,
         if 'analyze' in option or 'analyse' in option:
                             
             if debug>1: print "analyzing run %d"%run
-            ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
+            ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , main_cut )
                 
             loss_pmiss_bins , loss_Q2pmiss_bins , loss_thetapmqpmiss_bins = get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins ,
                                                                                                 Q2Bins , evtsgen_Q2pmiss_bins ,

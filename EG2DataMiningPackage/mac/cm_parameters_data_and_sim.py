@@ -21,7 +21,7 @@ from cm_tools import *
     generate            {"generate runs"}
     analyze             {"analyze runs"}
     generate_analyze    {"generate and analyze runs"}
-    
+    genmodcut_anamodcut {"enerate and analyze runs with different cuts"}
 '''
 
 
@@ -97,7 +97,7 @@ if 'scheme pp-SRC' in flags.option or 'scheme' in flags.option: # scheme to pp-S
 # (3) cuts sensitivity studies for (e,e'pp)/(e,e'p)
 # ---------------------------------------------------
 if 'cuts sensitivity studies' in flags.option or 'sensitivity' in flags.option: # scheme to pp-SRC in wider cuts
-    # xB >= 1.15 and xB >= 1.125
+    # xB >= 1.15 and xB >= 1.25
     # theta_pq < 20 and theta_pq < 30
     # 0.57 < p/q < 0.91 and 0.67 < p/q < 1.01
     # m_miss < 1050 and m_miss < 1150 (open to m_miss < 1.3 to study it)
@@ -232,6 +232,70 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
 
 
 
+
+
+
+# (6) generate runs with different parameters
+# ----------------------------------------------------------
+if 'generate/analyzes with modified cuts' in flags.option or 'genmodcut' in flags.option or 'anamodcut' in flags.option in flags.option:
+
+    scheme  = TSchemeDATA()
+
+    mod_cut = dict({'name':"Xb125",
+                   'XbCut':"1.2<Xb",
+                   'theta_pqCut':"theta_pq < 25",
+                   'p_over_qCut':"0.62 < p_over_q && p_over_q < 0.96",
+                   'MmissCut':"Mmiss<1.100"})
+                   
+    mod_src_cuts = ROOT.TCut("(%s) && (%s) && (%s) && (%s) && (1<Np)"
+                             %(mod_cut['XbCut'],mod_cut['theta_pqCut'],mod_cut['p_over_qCut'],mod_cut['MmissCut']))
+    p_lead_cut = '-24.5 < pVertex[0].Z() && pVertex[0].Z() < -20'
+    mod_eep_cut = ROOT.TCut("(%s) && (%s) "%(mod_src_cuts,p_lead_cut))
+    p_rec_cut = '0.35 < Prec.P()  &&  -24.5 < pVertex[1].Z() && pVertex[1].Z() < -20 && pFiducCut[1] == 1'
+    mod_eepp_cut = ROOT.TCut("(%s) && (%s) && (%s) && (1<Np)"%(mod_src_cuts,p_lead_cut,p_rec_cut))
+
+    
+    targets = ['C12', 'Al27' , 'Fe56' , 'Pb208' ]
+    colors = ['red','blue','purple','black']
+    target_names = ['$^{12}$C','$^{27}$Al','$^{56}$Fe','$^{208}$Pb']
+    ana = dict()
+    cm_pars = dict()
+    fits = dict()
+
+    for target in targets:
+        DataName    = "DATA_%s"%target
+        # scheme to modified cuts
+        SchemedName = "eep_in_mod_cut_%s_ppSRCCut_%s"% (mod_cut['name'],DataName)
+        scheme.SchemeOnTCut( path+"/AnaFiles","Ana_SRCPmissXb_"+DataName+".root","anaTree","Ana_"+SchemedName+".root",mod_eep_cut )
+        SchemedName = "mod_cut_%s_ppSRCCut_%s"% (mod_cut['name'],DataName)
+        scheme.SchemeOnTCut( path+"/AnaFiles","Ana_SRCPmissXb_"+DataName+".root","anaTree","Ana_"+SchemedName+".root",mod_eepp_cut )
+        # get cm parameters and fit
+        ana[target] = TAnalysisEG2( path+"/AnaFiles" ,  "Ana_"+SchemedName )
+        cm_pars[target] , _ = calc_cm_parameters( ana[target]  , PmissBins  )
+        cm_pars[target].to_csv( CMParsFname(ppPath+'/DATA/%s_data_mod_cut_%s'%(target,mod_cut['name'])) , header=True , index = False)
+        fits[target] = fit_cm_parameters( target + ' data  cut %s'%mod_cut['name'], cm_pars[target] ,  )
+        fits[target].to_csv( CMfitsFname( ppPath+'/DATA/data_mod_cut_%s'%mod_cut['name'] , target ) , header=True , index=False)
+        print_filename( CMfitsFname( ppPath+'/DATA/data_mod_cut_%s'%mod_cut['name'], target )  , target + "c.m. fits (modified cut %s)"%mod_cut['name'])
+        
+        
+    print_filename(GeneParsFName ( ppPath+'/simulation/' ),'reading generated-parameters...')
+    generated_parameters = pd.read_csv( GeneParsFName ( ppPath+'/simulation/' ) )
+    if debug>3: print 'generated_parameters:',generated_parameters
+    print start_run , start_run + Nruns
+    generated_parameters = generated_parameters[(start_run <= generated_parameters.run) & (generated_parameters.run < start_run + Nruns)]
+    
+    if debug>2: print 'generated_parameters:',generated_parameters
+    test_name = 'runs%dto%d_NsigmaT_%d_NSigmaZa1_%d_NSigmaZa2_%d_NMeanZa1_%d_NMeanZa2_%d_NRand_%d_mod_cut_%s'%( start_run , start_run+Nruns , N.SigmaT , N.SigmaZa1 , N.SigmaZa2 , N.MeanZa1 , N.MeanZa2 , N.NRand , mod_cut['name'] )
+    full_path = ppPath+'/simulation/'+test_name+'_simulation'
+    generate_runs_with_different_parameters( flags.option ,
+                                            fits['C12'], fits['Al27'], fits['Fe56'], fits['Pb208'],
+                                            generated_parameters ,
+                                            flags.verbose , PmissBins , Q2Bins, thetapmqBins,
+                                            buildup_resutlsFName( full_path ) ,
+                                            CMfitsFname( full_path ) ,
+                                            dm.Target(A) ,
+                                            N ,
+                                            root_resutlsFName( full_path ) )
 
 
 
