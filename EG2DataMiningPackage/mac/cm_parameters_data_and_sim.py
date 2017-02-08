@@ -238,11 +238,11 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
 
 
 
-mod_cut = dict({'name':"theta_pq20",
+mod_cut = dict({'name':"Mmiss_1050",
                'XbCut':"1.2<Xb",
-               'theta_pqCut':"theta_pq < 20",
+               'theta_pqCut':"theta_pq < 25",
                'p_over_qCut':"0.62 < p_over_q && p_over_q < 0.96",
-               'MmissCut':"Mmiss<1.100"})
+               'MmissCut':"Mmiss<1.050"})
     
 mod_src_cuts = ROOT.TCut("(%s) && (%s) && (%s) && (%s) && (1<Np)"
                          %(mod_cut['XbCut'],mod_cut['theta_pqCut'],mod_cut['p_over_qCut'],mod_cut['MmissCut']))
