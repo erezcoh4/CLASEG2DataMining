@@ -238,9 +238,9 @@ if 'generate and analyze runs' in flags.option or 'generate' in flags.option or 
 
 
 
-mod_cut = dict({'name':"Xb125",
-               'XbCut':"1.25<Xb",
-               'theta_pqCut':"theta_pq < 25",
+mod_cut = dict({'name':"theta_pq20",
+               'XbCut':"1.2<Xb",
+               'theta_pqCut':"theta_pq < 20",
                'p_over_qCut':"0.62 < p_over_q && p_over_q < 0.96",
                'MmissCut':"Mmiss<1.100"})
     
