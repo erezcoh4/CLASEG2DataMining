@@ -52,24 +52,31 @@ cor_vals = pd.DataFrame({'SigmaT':0.155 ,'SigmaT_err':0.0010,
                 'SigmaZa1':0.143,'SigmaZa1_err':0.075   ,'SigmaZa2':0.158   ,'SigmaZa2_err':0.009,
                 'MeanZa1':0.562 ,'MeanZa1_err':0.078    ,'MeanZa2':0.159    ,'MeanZa2_err':0.009},index=[0])
 
-SigmaTBandRange     = [0.05,0.35]       # [0.05,0.35]
-SigmaZa1BandRange   = [0.05,0.25]          # [-0.4,1.2]    # [-0.4,1.2]    # [0,0.4]
-SigmaZa2BandRange   = [0.0,0.3]        # [-0.6,0.5]    # [-0.6,0.5]    # [-0.2,0.2]
-MeanZa1BandRange    = [0.45,0.65]         # [-0.1,1.5]    # [-0.1,1.5]    # [0.4,0.8]
-MeanZa2BandRange    = [0.0,0.3]        # [-0.3,0.6]    # [-0.3,0.6]    # [-0.3,0.0]
 
 
 #N = pd.DataFrame({'SigmaT':1,'SigmaZa1':1 ,'SigmaZa2':1 ,'MeanZa1':1 ,'MeanZa2':1 ,'StartRun':0 , 'NRand':1}, index=[0]) # for debugging
-#N = pd.DataFrame({'SigmaT':10,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':100000 , 'NRand':10 }, index=[0])
-#N = pd.DataFrame({'SigmaT':1,'SigmaZa1':20 ,'SigmaZa2':20 ,'MeanZa1':20 ,'MeanZa2':20 ,'StartRun':300000 , 'NRand':10 }, index=[0])
-#N = pd.DataFrame({'SigmaT':100,'SigmaZa1':5 ,'SigmaZa2':5 ,'MeanZa1':5 ,'MeanZa2':5 ,'StartRun':700000 , 'NRand':20 }, index=[0])
-#N = pd.DataFrame({'SigmaT':30,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':1100000 , 'NRand':10 }, index=[0])
-N = pd.DataFrame({'SigmaT':100,'SigmaZa1':5 ,'SigmaZa2':5 ,'MeanZa1':5 ,'MeanZa2':5 ,'StartRun':10000 , 'NRand':10 }, index=[0])
+
 #runs 1500000-1501000, 1504000-1505000, 'SigmaZa1':1000
 #runs 1501000-1502000, 1505000-1506000, 'SigmaZa2':1000
 #runs 1502000-1503000, 1506000-1507000, 'MeanZa1':1000
 #runs 1503000-1504000, 1507000-1508000, 'MeanZa2':1000
-#runs 10000-41250:'SigmaT':50,'SigmaZa1':5 ,'SigmaZa2':5 ,'MeanZa1':5 ,'MeanZa2':5
+
+##runs 10000-72500
+#SigmaTBandRange     = [0.05,0.35]       # [0.05,0.35]
+#SigmaZa1BandRange   = [0.05,0.25]          # [-0.4,1.2]    # [-0.4,1.2]    # [0,0.4]
+#SigmaZa2BandRange   = [0.0,0.3]        # [-0.6,0.5]    # [-0.6,0.5]    # [-0.2,0.2]
+#MeanZa1BandRange    = [0.45,0.65]         # [-0.1,1.5]    # [-0.1,1.5]    # [0.4,0.8]
+#MeanZa2BandRange    = [0.0,0.3]        # [-0.3,0.6]    # [-0.3,0.6]    # [-0.3,0.0]
+#N = pd.DataFrame({'SigmaT':5,'SigmaZa1':15 ,'SigmaZa2':15 ,'MeanZa1':15 ,'MeanZa2':15 ,'StartRun':100000 , 'NRand':10 }, index=[0])
+
+#runs 100000-200000:
+SigmaTBandRange     = [0.145,0.165]
+SigmaZa1BandRange   = [-0.1,0.6]
+SigmaZa2BandRange   = [-0.1,0.6]
+MeanZa1BandRange    = [0.1,1.1]
+MeanZa2BandRange    = [-0.1,0.6]
+N = pd.DataFrame({'SigmaT':5,'SigmaZa1':15 ,'SigmaZa2':15 ,'MeanZa1':15 ,'MeanZa2':15 ,'StartRun':100000 , 'NRand':10 }, index=[0])
+
 
 # proton acceptance plot
 # ----------------------------------------
