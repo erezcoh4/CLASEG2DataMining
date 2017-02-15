@@ -69,13 +69,23 @@ cor_vals = pd.DataFrame({'SigmaT':0.155 ,'SigmaT_err':0.0010,
 #MeanZa2BandRange    = [0.0,0.3]        # [-0.3,0.6]    # [-0.3,0.6]    # [-0.3,0.0]
 #N = pd.DataFrame({'SigmaT':5,'SigmaZa1':15 ,'SigmaZa2':15 ,'MeanZa1':15 ,'MeanZa2':15 ,'StartRun':100000 , 'NRand':10 }, index=[0])
 
-#runs 100000-200000:
-SigmaTBandRange     = [0.145,0.165]
-SigmaZa1BandRange   = [-0.1,0.6]
-SigmaZa2BandRange   = [-0.1,0.6]
-MeanZa1BandRange    = [0.1,1.1]
-MeanZa2BandRange    = [-0.1,0.6]
-N = pd.DataFrame({'SigmaT':5,'SigmaZa1':15 ,'SigmaZa2':15 ,'MeanZa1':15 ,'MeanZa2':15 ,'StartRun':100000 , 'NRand':10 }, index=[0])
+##runs 100000-353125:
+#SigmaTBandRange     = [0.145,0.165]
+#SigmaZa1BandRange   = [-0.1,0.6]
+#SigmaZa2BandRange   = [-0.1,0.6]
+#MeanZa1BandRange    = [0.1,1.1]
+#MeanZa2BandRange    = [-0.1,0.6]
+#N = pd.DataFrame({'SigmaT':5,'SigmaZa1':15 ,'SigmaZa2':15 ,'MeanZa1':15 ,'MeanZa2':15 ,'StartRun':100000 , 'NRand':10 }, index=[0])
+
+
+#runs 400000-500000:
+SigmaTBandRange     = [0.11,0.21]
+SigmaZa1BandRange   = [-0.3,0.7]
+SigmaZa2BandRange   = [0.0,0.5]
+MeanZa1BandRange    = [-0.1,1.2]
+MeanZa2BandRange    = [0.0,0.5]
+N = pd.DataFrame({'SigmaT':10,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':400000 , 'NRand':10 }, index=[0])
+
 
 
 # proton acceptance plot
