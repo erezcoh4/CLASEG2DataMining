@@ -85,15 +85,18 @@ cor_vals = pd.DataFrame({'SigmaT':0.155 ,'SigmaT_err':0.0010,
 #MeanZa1BandRange    = [-0.1,1.2]
 #MeanZa2BandRange    = [0.0,0.5]
 #N = pd.DataFrame({'SigmaT':10,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':400000 , 'NRand':10 }, index=[0])
-
-
-#runs 500000-1000000:
+#
+#
+#runs 500,000-1,259,375:
 SigmaTBandRange     = [0.06,0.26]
 SigmaZa1BandRange   = [-0.3,0.9]
 SigmaZa2BandRange   = [-0.2,0.8]
 MeanZa1BandRange    = [-0.1,1.2]
 MeanZa2BandRange    = [-0.1,0.9]
 N = pd.DataFrame({'SigmaT':15,'SigmaZa1':15 ,'SigmaZa2':15 ,'MeanZa1':15 ,'MeanZa2':15 ,'StartRun':500000 , 'NRand':10 }, index=[0])
+
+
+
 
 
 

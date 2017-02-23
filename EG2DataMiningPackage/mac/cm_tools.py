@@ -984,10 +984,10 @@ def generate_runs_with_different_parameters( option,
             if do_root_file:        stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
 
             ana_sim.CloseFile()
-            if debug>1:
+            if debug>1: #{
                 print "appended into results"
                 if debug>5: print "results: ",results
-
+            #}
             garbage_list = [ ana_sim , reco_parameters , reco_fits
                             , results
                             , Pval_scores , KS_scores , loss_pmiss_bins , loss_Q2pmiss_bins , loss_thetapmqpmiss_bins
@@ -997,6 +997,11 @@ def generate_runs_with_different_parameters( option,
                     
         print_important( "completed run %d [%.0f"%(run,100.*float(irun)/Nruns) + "%]" + " at %4d-%02d-%02d %d:%d:%d"%time.localtime()[0:6] )
         print_line()
+        
+        # (1) generate the simulated data (the 'run')
+        # ----------------------------
+        if 'delete' in option:
+            delete_file( path + '/eg_rootfiles/run%d.root'%run  , debug )
 
 
 
