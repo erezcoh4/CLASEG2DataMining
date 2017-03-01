@@ -23,10 +23,26 @@ from scipy.stats import norm
 from scipy import stats
 
 
+
 dm  = TEG2dm()
 
 path = "/Users/erezcohen/Desktop/DataMining"
 my_hot_cmap = gp.reverse_colourmap(mpl.cm.hot)
+
+# ----------------------------------------------------------
+def calc_PvalTotal(data=None):
+    for target in ['12C','27Al','56Fe','208Pb']:
+        data['PvalTotal_%s'%target] = Fisher_combination_Pvals_pandas([
+                data['PvalSigmaX_unweighted_%s'%target],                
+                data['PvalSigmaY_unweighted_%s'%target],                
+                data['PvalSigmaZa1_unweighted_%s'%target],                
+                data['PvalSigmaZa2_unweighted_%s'%target],                 
+                data['PvalMeanZa1_unweighted_%s'%target],                
+                data['PvalMeanZa2_unweighted_%s'%target]                         
+            ])
+# ----------------------------------------------------------
+
+
 
 
 # ----------------------------------------------------------

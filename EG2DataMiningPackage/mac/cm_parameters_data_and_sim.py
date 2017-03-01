@@ -87,13 +87,21 @@ cor_vals = pd.DataFrame({'SigmaT':0.155 ,'SigmaT_err':0.0010,
 #N = pd.DataFrame({'SigmaT':10,'SigmaZa1':10 ,'SigmaZa2':10 ,'MeanZa1':10 ,'MeanZa2':10 ,'StartRun':400000 , 'NRand':10 }, index=[0])
 #
 #
-#runs 500,000-1,259,375:
+##runs 500,000-1,259,375:
+#SigmaTBandRange     = [0.06,0.26]
+#SigmaZa1BandRange   = [-0.3,0.9]
+#SigmaZa2BandRange   = [-0.2,0.8]
+#MeanZa1BandRange    = [-0.1,1.2]
+#MeanZa2BandRange    = [-0.1,0.9]
+#N = pd.DataFrame({'SigmaT':15,'SigmaZa1':15 ,'SigmaZa2':15 ,'MeanZa1':15 ,'MeanZa2':15 ,'StartRun':500000 , 'NRand':10 }, index=[0])
+
+#runs 1,300,000-:
 SigmaTBandRange     = [0.06,0.26]
-SigmaZa1BandRange   = [-0.3,0.9]
-SigmaZa2BandRange   = [-0.2,0.8]
-MeanZa1BandRange    = [-0.1,1.2]
-MeanZa2BandRange    = [-0.1,0.9]
-N = pd.DataFrame({'SigmaT':15,'SigmaZa1':15 ,'SigmaZa2':15 ,'MeanZa1':15 ,'MeanZa2':15 ,'StartRun':500000 , 'NRand':10 }, index=[0])
+SigmaZa1BandRange   = [-0.3,0.6]
+SigmaZa2BandRange   = [-0.2,0.7]
+MeanZa1BandRange    = [-0.1,1.]
+MeanZa2BandRange    = [-0.1,0.7]
+N = pd.DataFrame({'SigmaT':40,'SigmaZa1':40 ,'SigmaZa2':40 ,'MeanZa1':40 ,'MeanZa2':40 ,'StartRun':1300000 , 'NRand':10 }, index=[0])
 
 
 
