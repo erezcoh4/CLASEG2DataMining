@@ -1,5 +1,6 @@
 import sys, pandas as pd, numpy as np , ast
 import ROOT , time , os, sys , math , datetime
+from ROOT import TPlots, TAnalysis, TAnalysisEG2 , TEG2dm , TCalcPhysVarsEG2 , TSchemeDATA ,GenerateEvents
 import matplotlib.pyplot as plt
 import matplotlib as mpl , seaborn as sns; sns.set(style="white", color_codes=True , font_scale=1)
 sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
