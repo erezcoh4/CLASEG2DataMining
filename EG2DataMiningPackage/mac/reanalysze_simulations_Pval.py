@@ -22,17 +22,19 @@ measured=dict({
 targets = ['12C','27Al','56Fe','208Pb']
 variables = ['SigmaX','SigmaY','SigmaZa1','SigmaZa2','MeanZa1','MeanZa2']
 
-sims500 = pd.read_csv('/extra/Erez/DataMining/Analysis_DATA/ppSRCcm/results/runs500000_results.csv')
-
+sims500 = pd.read_csv('/extra/Erez/DataMining/Analysis_DATA/ppSRCcm/results/runs500000_recalculated_Pvals.csv')
+print 'loaded data.'
 
 debug = 1
-Nmax = 10
+Nmax = flags.NumberOfRuns
+print 'Nmax = ',Nmax
 
-# define new columns for local and global Pval
-for target in targets:
-    for var in variables:
-        sims500['local_Pval_'+var+'_'+target] = -100
-    sims500['global_Pval_'+target] = -100
+## define new columns for local and global Pval
+#for target in targets:
+#    for var in variables:
+#        sims500['local_Pval_'+var+'_'+target] = -100
+#    sims500['global_Pval_'+target] = -100
+#print 'defined new columns - local and global Pvalues'
 
 # calculate new Pvalues
 for i,row in sims500[0:Nmax].iterrows():
@@ -54,9 +56,12 @@ for i,row in sims500[0:Nmax].iterrows():
             
             if debug>2 and np.abs(local_Pval - row['Pval'+var+'_unweighted_'+target])>1e-50:
                 print 'local Pval different than in df:\n',target, var,'meas:',meas,'gen:',gen,'rec:',rec,'local Pval:',local_Pval,'while in df:',row['Pval'+var+'_unweighted_'+target]
-            
-            z -= 2*np.log( local_Pval )
-        
+
+            if local_Pval>1e-20: # cutoff
+                z -= 2*np.log( local_Pval )
+            else:
+                z -= 2*np.log( 1e-10 )
+
         
         global_Pval = chisqprob( z , 2*len(variables) )
         sims500.loc[i, 'global_Pval_'+target ] = global_Pval
