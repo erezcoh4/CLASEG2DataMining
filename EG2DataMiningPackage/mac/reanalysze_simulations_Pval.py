@@ -66,3 +66,5 @@ for i,row in sims500[0:Nmax].iterrows():
 print 'done calculating Pvals.'
 
 sims500.to_csv('/extra/Erez/DataMining/Analysis_DATA/ppSRCcm/results/runs500000_recalculated_Pvals.csv')
+
+print 'wrote to ' + '/extra/Erez/DataMining/Analysis_DATA/ppSRCcm/results/runs500000_recalculated_Pvals.csv'
