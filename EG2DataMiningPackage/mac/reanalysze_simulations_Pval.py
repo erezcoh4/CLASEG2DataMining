@@ -25,7 +25,7 @@ variables = ['SigmaX','SigmaY','SigmaZa1','SigmaZa2','MeanZa1','MeanZa2']
 sims500 = pd.read_csv('/extra/Erez/DataMining/Analysis_DATA/ppSRCcm/results/runs500000_recalculated_Pvals.csv')
 print 'loaded data.'
 
-debug = 1
+debug = flags.verbose
 Nmax = flags.NumberOfRuns
 print 'Nmax = ',Nmax
 
