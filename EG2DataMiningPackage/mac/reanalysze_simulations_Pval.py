@@ -1,5 +1,5 @@
 import sys; sys.path.insert(0,'../notebooks/')
-from notebook_tools import *
+from cm_tools import *
 
 measured=dict({
               'SigmaX_12C':0.165,'SigmaX_err_12C':0.007,'SigmaY_12C':0.170,'SigmaY_err_12C':0.012,
