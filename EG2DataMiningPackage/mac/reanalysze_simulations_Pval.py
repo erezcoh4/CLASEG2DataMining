@@ -29,10 +29,10 @@ debug = 1
 Nmax = 10
 
 # define new columns for local and global Pval
- for target in targets:
-     for var in variables:
-         sims500['local_Pval_'+var+'_'+target] = -100
-     sims500['global_Pval_'+target] = -100
+for target in targets:
+    for var in variables:
+        sims500['local_Pval_'+var+'_'+target] = -100
+    sims500['global_Pval_'+target] = -100
 
 # calculate new Pvalues
 for i,row in sims500[0:Nmax].iterrows():
