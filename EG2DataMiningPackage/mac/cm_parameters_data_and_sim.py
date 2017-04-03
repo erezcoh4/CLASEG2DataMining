@@ -318,7 +318,7 @@ if 'prepare to generate/analyzes with modified cuts' in flags.option or 'prepmod
 
 
 
-# (6) generate runs with different parameters
+# (7) generate runs with different parameters
 # ----------------------------------------------------------
 if 'generate/analyzes with modified cuts' in flags.option or 'genmodcut' in flags.option or 'anamodcut' in flags.option in flags.option:
     
@@ -346,7 +346,6 @@ if 'generate/analyzes with modified cuts' in flags.option or 'genmodcut' in flag
                                             N ,
                                             root_resutlsFName( full_path ) ,
                                             main_cut=mod_eepp_cut )
-
 
 
 

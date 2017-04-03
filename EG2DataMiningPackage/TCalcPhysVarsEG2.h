@@ -85,6 +85,7 @@ public:
     Double_t k0         , kCMmag    , Px    , Py    ,Pz ;
     
     Float_t             Pmiss3Mag   , pcmX          , pcmY          , pcmT      , pcmZ          ;
+    Float_t             prelX,      prelY,          prelZ;
     Float_t             TpMiss      , m_A_1         , E_p_init      , M_p_init  , pq            ;
     vector<Float_t>     alpha       , pEdep         , pCTOF         , Tp        , proton_angle  ;
     vector<Int_t>       pCTOFCut    , pFiducCut     , pFiducCut_g;

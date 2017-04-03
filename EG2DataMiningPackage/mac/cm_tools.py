@@ -2,13 +2,21 @@ from definitions import *
 from root_numpy import hist2array , tree2array
 from root_pandas import to_root
 from scipy.stats import ks_2samp
+from matplotlib.ticker import LinearLocator
 from math import sqrt
+from scipy.stats.mstats import ttest_onesamp
 sqrt2pi = np.sqrt(2*np.pi)
 
 
 # ------------------------------------------------------------------------------- #
 # definitions
 nbins_pcm_3d = 100
+PmissBins   = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65]  , [0.65,0.75] , [0.75,1.0]]
+Q2Bins      = [[0,1.5]     , [1.5,2]     , [2,2.5]      , [2.5,6]]
+thetapmqBins= [[100,135]   , [135,145]   , [145,155]    , [155,180]]
+targets         = ['C12'        , 'Al27'        , 'Fe56'        , 'Pb208'       ]
+labels          = ['$^{12}$C'   , '$^{27}$Al'   , '$^{56}$Fe'   , '$^{208}$Pb'  ]
+target_colors   = ['black'      , 'red'         , 'green'       , 'blue'        ]
 
 
 
@@ -38,8 +46,9 @@ def root_resutlsFName( path ):
 # ------------------------------------------------------------------------------- #
 def Pval( dataset1 , dataset2  , var   , weighting , tweeked=False):
     
-    v1 , v1Err = float(dataset1[var+'_'+weighting]) , float(dataset1[var+'err_'+weighting])
-    v2 , v2Err = float(dataset2[var+'_'+weighting]) , float(dataset2[var+'err_'+weighting])
+    weightsuffix = '_' + weighting if weighting is not '' else ''
+    v1 , v1Err = float(dataset1[var+weightsuffix]) , float(dataset1[var+'err'+weightsuffix])
+    v2 , v2Err = float(dataset2[var+weightsuffix]) , float(dataset2[var+'err'+weightsuffix])
     
     if tweeked and ('a1' in var or 'a2' in var) :
         v1Err , v2Err = v1Err/10 , v2Err/10
@@ -47,18 +56,98 @@ def Pval( dataset1 , dataset2  , var   , weighting , tweeked=False):
     return Pval2varsAssumeGausDist( v1 , v1Err , v2 , v2Err , flags.verbose  , name=var+' '+weighting )
 # ------------------------------------------------------------------------------- #
 
+# ------------------------------------------------------------------------------- #
+def generate_a_gaussian_from_value_and_error( dataframe=None , parname=None, parerrname=None , N=1000 , PmissBin=None ):
+    if PmissBin is None: #{
+        mean = dataframe[parname]
+        sigma = dataframe[parerrname]
+    #}
+    else: #{
+        mean = dataframe.get_value( PmissBin , parname )
+        sigma = dataframe.get_value( PmissBin , parerrname )
+    #}
+    return np.random.normal( mean , sigma , N )
+# ------------------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------------------- #
-def compute_Pval_parameters( data_fits , reco_fits , weighting , tweeked=False):
+def CalcKS2sampAssumingGaussian( data_df=None, sim_df=None, parname=None, parerrname=None , PmissBin=None):
+    '''
+        calculate the KS test p-value for 2-sample comparison,
+        by assuming that the fit values were sampled from a Gaussian distribution function
+        '''
+    data_gaussian = generate_a_gaussian_from_value_and_error( dataframe=data_df, parname=parname, parerrname=parerrname, PmissBin=PmissBin )
+    sim_gaussian = generate_a_gaussian_from_value_and_error( dataframe=sim_df, parname=parname, parerrname=parerrname, PmissBin=PmissBin )
+    D_ks, Pval_ks = ks_2samp( data_gaussian , sim_gaussian )
+    print 'for',parname,'comparing ',np.mean(data_gaussian),'+/-',np.std(data_gaussian),'and',np.mean(sim_gaussian),'+/-',np.std(sim_gaussian)
+    print 'Pval_ks:',Pval_ks
+    return Pval_ks
+# ------------------------------------------------------------------------------- #
+
+# ------------------------------------------------------------------------------- #
+def compute_Pval_parameters(data_cm_pars=None, data_fits=None ,
+                            reco_fits=None, reco_parameters=None,
+                            ):
+    #                            target=None,
+    #                            cm_pars_as_gaussians=None, fits_pars_as_gaussians=None
+    #                            weighting='' ,
     
-    PvalSigmaX = Pval( data_fits , reco_fits  , 'SigmaX'   , weighting , tweeked=tweeked)
-    PvalSigmaY = Pval( data_fits , reco_fits  , 'SigmaY'   , weighting , tweeked=tweeked)
-    PvalMeanZa1 = Pval( data_fits , reco_fits  , 'MeanZa1'   , weighting , tweeked=tweeked)
-    PvalMeanZa2 = Pval( data_fits , reco_fits  , 'MeanZa2'   , weighting , tweeked=tweeked)
-    PvalSigmaZa1 = Pval( data_fits , reco_fits  , 'SigmaZa1'   , weighting , tweeked=tweeked)
-    PvalSigmaZa2 = Pval( data_fits , reco_fits  , 'SigmaZa2'   , weighting , tweeked=tweeked)
+    # My Pval pairwise comparison
+    #    PvalSigmaX = Pval( data_fits , reco_fits  , 'SigmaX'   , weighting , tweeked=tweeked)
+    #    PvalSigmaY = Pval( data_fits , reco_fits  , 'SigmaY'   , weighting , tweeked=tweeked)
+    #    PvalMeanX = Pval( data_fits , reco_fits  , 'SigmaX'   , weighting , tweeked=tweeked)
+    #    PvalMeanY = Pval( data_fits , reco_fits  , 'SigmaY'   , weighting , tweeked=tweeked)
+    #    PvalMeanZa1 = Pval( data_fits , reco_fits  , 'MeanZa1'   , weighting , tweeked=tweeked)
+    #    PvalMeanZa2 = Pval( data_fits , reco_fits  , 'MeanZa2'   , weighting , tweeked=tweeked)
+    #    PvalSigmaZa1 = Pval( data_fits , reco_fits  , 'SigmaZa1'   , weighting , tweeked=tweeked)
+    #    PvalSigmaZa2 = Pval( data_fits , reco_fits  , 'SigmaZa2'   , weighting , tweeked=tweeked)
+    #    return [PvalSigmaX, PvalSigmaY, PvalMeanZa1, PvalMeanZa2, PvalSigmaZa1, PvalSigmaZa2]
     
-    return [PvalSigmaX , PvalSigmaY , PvalMeanZa1 , PvalMeanZa2 , PvalSigmaZa1 , PvalSigmaZa2]
+    #    Pval_mean_x  = Pval( data_fits , reco_fits  , 'SigmaX'   , weighting )
+    #    Pval_sigma_x = Pval( data_fits , reco_fits  , 'SigmaX'   , weighting )
+    #    Pval_mean_y  = Pval( data_fits , reco_fits  , 'SigmaY'   , weighting )
+    #    Pval_sigma_y = Pval( data_fits , reco_fits  , 'SigmaY'   , weighting )
+    #    Pval_a1 = Pval( data_fits , reco_fits  , 'a1'   , weighting )
+    #    Pval_a2 = Pval( data_fits , reco_fits  , 'a2'   , weighting )
+    #    Pval_b1 = Pval( data_fits , reco_fits  , 'b1'   , weighting )
+    #    Pval_b2 = Pval( data_fits , reco_fits  , 'b2'   , weighting )
+    #    return [Pval_mean_x, Pval_mean_y ,Pval_sigma_x, Pval_sigma_y, Pval_a1 , Pval_a2 , Pval_b1 , Pval_b2 ]
+    
+    
+    # April-2017, change to Pval using ks-test
+    pval_fits_scores = dict()
+    pval_fits_scores_array = []
+    for i,parname in enumerate(['MeanX','MeanY','SigmaX','SigmaY','a1','a2','b1','b2']):#{
+        pval_fits_scores[parname] = CalcKS2sampAssumingGaussian( data_df=data_fits, sim_df=reco_fits, parname=parname, parerrname=parname+'err' )
+        #        t,pval_fits_scores[parameter] = ttest_onesamp( fits_pars_as_gaussians[target][parameter], reco_fits[parameter] )
+        pval_fits_scores_array.append(pval_fits_scores[parname])
+    #}
+    pval_fits_scores['Pval_array'] = pval_fits_scores_array
+    pval_fits_scores['PvalTotal'] = Fisher_combination_Pvals( pval_fits_scores_array ) # with a cutoff on 1e-20
+    pval_fits_scores['PvalTotal_allPvals'] = FisherMethodPvals( pval_fits_scores_array )
+    if debug>2: print 'pval_fits_scores:',pval_fits_scores
+
+    pval_cm_pars_scores = dict()
+    pval_cm_pars_scores_array = []
+    for bin in range(len(PmissBins)):#{
+        pmin , pmax = PmissBins[bin][0] , PmissBins[bin][1]
+        for parameter in ['mean','sigma']:#{
+            for direction in ['x','y','z']:#{
+                parname = parameter + '_' + direction
+                pval_cm_pars_scores[parname+'_bin%d'%bin] = CalcKS2sampAssumingGaussian( data_df=data_cm_pars, sim_df=reco_parameters, parname=parname+'_unweighted', parerrname=parname+'Err_unweighted' , PmissBin=bin)
+                #                t,pval_cm_pars_scores[parnamedir+'_bin%d'%bin] = ttest_onesamp( cm_pars_as_gaussians[target][bin][parnamedir], reco_parameters.get_value(bin,parnamedir+'_unweighted'))
+                pval_cm_pars_scores_array.append( pval_cm_pars_scores[parname+'_bin%d'%bin] )
+            #}
+        #}
+    #}
+
+
+    pval_cm_pars_scores['Pval_array'] = pval_cm_pars_scores_array
+    pval_cm_pars_scores['PvalTotal'] = Fisher_combination_Pvals( pval_cm_pars_scores_array ) # with a cutoff on 1e-20
+    pval_cm_pars_scores['PvalTotal_allPvals'] = FisherMethodPvals( pval_cm_pars_scores_array )
+    if debug>2: print 'pval_cm_pars_scores:',pval_cm_pars_scores
+
+
+    return pval_fits_scores , pval_cm_pars_scores
 # ------------------------------------------------------------------------------- #
 
 
@@ -125,39 +214,39 @@ def plot_errorbar_and_fit( ax , x , y , xerr , yerr , color , marker , lstyle , 
                           fit_type='const' ,do_plot_fit_pars=False, x_offset=0.6):
     plt.errorbar(x, y, xerr=xerr, yerr=yerr, color=color, marker=marker , linestyle=lstyle , label=None , markersize=15)
     if fit_type=='const':
-        const_fit , const_fitErr = fit_as_a_function_of_pmiss( x , y , yerr=yerr , fit_type=fit_type )
+        const_fit , const_fitErr , const_chi2red = fit_as_a_function_of_pmiss( x , y , yerr=yerr , fit_type=fit_type )
         if do_plot_fit_pars: label=label + "$=%.3f\pm%.3f$"%(const_fit,const_fitErr)
         ax.plot(x, np.ones(len(x))*const_fit , color=color , linestyle='--', label=label,linewidth = 2 , )
         if debug>1: print 'const fit of ' + label + " : $=%.3f\pm%.3f$"%(const_fit,const_fitErr)
-        return [ const_fit , const_fitErr ]
+        return [ const_fit , const_fitErr , const_chi2red ]
     
     elif fit_type=='linear':
-        a1 , a1err , a2 , a2err  = fit_as_a_function_of_pmiss( x , y ,yerr=yerr, fit_type=fit_type )
+        a1 , a1err , a2 , a2err , chi2red = fit_as_a_function_of_pmiss( x , y ,yerr=yerr, fit_type=fit_type )
         if do_plot_fit_pars: label=label + "$=(%.3f)(p_{miss}-%.1f)+(%.3f)$"%( a1 , x_offset, a2 )
         ax.plot( x , a1 * (x-x_offset) + a2 , color = color ,label=label )
         if debug>1: print 'linear fit of ' + label + " : $=(%.3f)(p_{miss}-%.1f)+(%.3f)$"%( a1 ,x_offset ,  a2 )
-        return [ a1 , a1err] , [ a2 , a2err ]
+        return [ a1 , a1err] , [ a2 , a2err ] , chi2red
 # ------------------------------------------------------------------------------- #
 
 
 
 
 # ------------------------------------------------------------------------------- #
-def fit_as_a_function_of_pmiss( x , y , yerr, fit_type='const' , title='', x_offset=0.6): # the main fitting routine
+def fit_as_a_function_of_pmiss( x , y , yerr=None, fit_type='const' , title='', x_offset=0.6): # the main fitting routine
     
     if fit_type=='const':
         if len(x)<3:
             return -100 , 0
 
         p1,v1 = np.polyfit( x , y , 0 , cov=True)
-        
+        chi2red = -100
         if debug>4:
             print 'p1:',p1,',\tv1:',v1
 
         if not p1 or not v1 or len(p1)==0 or len(v1)==0:
             return -100 , 0
         else:
-            return p1[0] , sqrt(v1[0,0])
+            return p1[0] , sqrt(v1[0,0]) , chi2red
     
     #        p2,v2 = np.polyfit( x , y , 1 , cov=True)        # fit a polynomial p2(x) = p2[0] * x + p2[1]
     elif fit_type=='linear':
@@ -170,6 +259,7 @@ def fit_as_a_function_of_pmiss( x , y , yerr, fit_type='const' , title='', x_off
         else:
             f = linear_06
         p2, v2 = curve_fit(f, xdata=x, ydata=y,sigma=yerr)# fit data using SciPy's Levenberg-Marquart method
+        chi2red = (np.sum( np.square( (np.polyval(p2, x) - y) / yerr ) ))/(len(x) - 2)
 
         if debug>4:
             print 'p2:\n',p2,'\nv2:\n',v2
@@ -179,7 +269,7 @@ def fit_as_a_function_of_pmiss( x , y , yerr, fit_type='const' , title='', x_off
         if p2[0] is np.inf or p2[1] is np.inf or v2[0,0] is np.inf or v2[1,1] is np.inf:
             return -100 , 0 , -100 , 0
         else:
-            return p2[0] , sqrt(float(v2[0,0])) , p2[1] , sqrt(float(v2[1,1]))
+            return p2[0] , sqrt(float(v2[0,0])) , p2[1] , sqrt(float(v2[1,1])) , chi2red
 # ------------------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------------------- #
@@ -193,7 +283,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
     if DoSaveCanvas:
         canvas_unweighted , canvas_weighted = fana.CreateCanvas( "RooFit plots - unweighted" , "Divide" , 4 , len(PmissBins) ) , fana.CreateCanvas( "RooFit plots - weighted" , "Divide" , 4 , len(PmissBins) )
 
-    # Jan 2016, changing to a (weighted) average and variance using numpy
+    # Jan 2017, changing to a (weighted) average and variance using numpy
     if fana.GetEntries()==0:
         print 'no entries in anaTree of',fana.GetFileName()
         print 'leaving calc_cm_parameters'
@@ -203,11 +293,19 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
 
     for i in range(len(PmissBins)):
         pMiss_min , pMiss_max = PmissBins[i][0] , PmissBins[i][1]
+        ana_reduced = ana[ (pMiss_min < ana.Pmiss3Mag) & (ana.Pmiss3Mag < pMiss_max) ]
+        good_bin = True if len(ana_reduced)>0 else False
+        
         if DoSaveCanvas:
             unweighted = fana.RooFitCM( pMiss_min , pMiss_max , False , True, flags.verbose, canvas_unweighted, 4*i + 1 )
             weighted = fana.RooFitCM( pMiss_min , pMiss_max , True , True, flags.verbose, canvas_weighted, 4*i + 1 )
-               
-            df_pMissBin = pd.DataFrame({'pMiss_min':pMiss_min,'pMiss_max':pMiss_max
+        
+        else:
+            unweighted = fana.RooFitCM( pMiss_min , pMiss_max , False )
+            weighted = fana.RooFitCM( pMiss_min , pMiss_max , True )
+            
+        df_pMissBin = pd.DataFrame({'pMiss_min':pMiss_min,'pMiss_max':pMiss_max
+                                       ,'EvtsInBin':len(ana_reduced)            ,'good_bin':good_bin
                                        ,'mean_x_unweighted':unweighted[0],'mean_xErr_unweighted':unweighted[1],'sigma_x_unweighted':unweighted[2],'sigma_xErr_unweighted':unweighted[3]
                                        ,'mean_y_unweighted':unweighted[4],'mean_yErr_unweighted':unweighted[5],'sigma_y_unweighted':unweighted[6],'sigma_yErr_unweighted':unweighted[7]
                                        ,'mean_t_unweighted':unweighted[8],'mean_tErr_unweighted':unweighted[9],'sigma_t_unweighted':unweighted[10],'sigma_tErr_unweighted':unweighted[11]
@@ -217,42 +315,43 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
                                        ,'mean_t_weighted':weighted[8],'mean_tErr_weighted':weighted[9],'sigma_t_weighted':weighted[10],'sigma_tErr_weighted':weighted[11]
                                        ,'mean_z_weighted':weighted[12],'mean_zErr_weighted':weighted[13],'sigma_z_weighted':weighted[14],'sigma_zErr_weighted':weighted[15]}
                                        , index=[i])
-        else:
+
+#        else:
 #            unweighted = fana.RooFitCM( pMiss_min , pMiss_max , False )
 #            weighted = fana.RooFitCM( pMiss_min , pMiss_max , True )
 
-            # Jan 2016, changing to a (weighted) average and variance using numpy
-            ana_reduced = ana[ (pMiss_min < ana.Pmiss3Mag) & (ana.Pmiss3Mag < pMiss_max) ]
-            if flags.verbose>1: print 'running p(miss) bin ',i,',',pMiss_min,' to ',pMiss_max,' GeV/c, ',len(ana_reduced),'events in this bin'
-
-            if len(ana_reduced)>0 and sum(ana_reduced.rooWeight)>0:
-                good_bin , sqrtN = 1 , sqrt(len(ana_reduced))
-                mean_x_unweighted , mean_x_weighted     = np.average( ana_reduced.pcmX ) , np.average( ana_reduced.pcmX , weights=ana_reduced.rooWeight )
-                sigma_x_unweighted, sigma_x_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_weighted) , weights=ana_reduced.rooWeight  ))
-                mean_y_unweighted , mean_y_weighted     = np.average( ana_reduced.pcmY ) , np.average( ana_reduced.pcmY , weights=ana_reduced.rooWeight )
-                sigma_y_unweighted, sigma_y_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmY-mean_y_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmY-mean_y_weighted) , weights=ana_reduced.rooWeight  ))
-                mean_z_unweighted , mean_z_weighted     = np.average( ana_reduced.pcmZ ) , np.average( ana_reduced.pcmZ , weights=ana_reduced.rooWeight )
-                sigma_z_unweighted, sigma_z_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_weighted) , weights=ana_reduced.rooWeight  ))
-            else:
-                good_bin , sqrtN = 0 , 1
-                mean_x_unweighted , mean_x_weighted     = -100,-100
-                sigma_x_unweighted, sigma_x_weighted    = -100,-100
-                mean_y_unweighted , mean_y_weighted     = -100,-100
-                sigma_y_unweighted, sigma_y_weighted    = -100,-100
-                mean_z_unweighted , mean_z_weighted     = -100,-100
-                sigma_z_unweighted, sigma_z_weighted    = -100,-100
-
-
-            df_pMissBin = pd.DataFrame({'pMiss_min':pMiss_min                   ,'pMiss_max':pMiss_max
-                                       ,'EvtsInBin':len(ana_reduced)            ,'good_bin':good_bin
-                                       ,'mean_x_unweighted':mean_x_unweighted   ,'mean_xErr_unweighted':sigma_x_unweighted/sqrtN ,'sigma_x_unweighted':sigma_x_unweighted,'sigma_xErr_unweighted':0.02 # resolution uncertainty
-                                       ,'mean_y_unweighted':mean_y_unweighted   ,'mean_yErr_unweighted':sigma_y_unweighted/sqrtN ,'sigma_y_unweighted':sigma_y_unweighted,'sigma_yErr_unweighted':0.02 # resolution uncertainty0
-                                       ,'mean_z_unweighted':mean_z_unweighted   ,'mean_zErr_unweighted':sigma_z_unweighted/sqrtN ,'sigma_z_unweighted':sigma_z_unweighted,'sigma_zErr_unweighted':0.02 # resolution uncertainty
-                                       ,'mean_x_weighted':mean_x_weighted       ,'mean_xErr_weighted':sigma_x_weighted/sqrtN     ,'sigma_x_weighted':sigma_x_weighted    ,'sigma_xErr_weighted':0.02 # resolution uncertainty
-                                       ,'mean_y_weighted':mean_y_weighted       ,'mean_yErr_weighted':sigma_y_weighted/sqrtN     ,'sigma_y_weighted':sigma_y_weighted    ,'sigma_yErr_weighted':0.02 # resolution uncertainty
-                                       ,'mean_z_weighted':mean_z_weighted       ,'mean_zErr_weighted':sigma_z_weighted/sqrtN     ,'sigma_z_weighted':sigma_z_weighted    ,'sigma_zErr_weighted':0.02 # resolution uncertainty
-                                       }
-                                       , index=[i])
+#            # Jan 2017, changing to a (weighted) average and variance using numpy
+#            ana_reduced = ana[ (pMiss_min < ana.Pmiss3Mag) & (ana.Pmiss3Mag < pMiss_max) ]
+#            if flags.verbose>1: print 'running p(miss) bin ',i,',',pMiss_min,' to ',pMiss_max,' GeV/c, ',len(ana_reduced),'events in this bin'
+#
+#            if len(ana_reduced)>0 and sum(ana_reduced.rooWeight)>0:
+#                good_bin , sqrtN = 1 , sqrt(len(ana_reduced))
+#                mean_x_unweighted , mean_x_weighted     = np.average( ana_reduced.pcmX ) , np.average( ana_reduced.pcmX , weights=ana_reduced.rooWeight )
+#                sigma_x_unweighted, sigma_x_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_weighted) , weights=ana_reduced.rooWeight  ))
+#                mean_y_unweighted , mean_y_weighted     = np.average( ana_reduced.pcmY ) , np.average( ana_reduced.pcmY , weights=ana_reduced.rooWeight )
+#                sigma_y_unweighted, sigma_y_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmY-mean_y_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmY-mean_y_weighted) , weights=ana_reduced.rooWeight  ))
+#                mean_z_unweighted , mean_z_weighted     = np.average( ana_reduced.pcmZ ) , np.average( ana_reduced.pcmZ , weights=ana_reduced.rooWeight )
+#                sigma_z_unweighted, sigma_z_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_weighted) , weights=ana_reduced.rooWeight  ))
+#            else:
+#                good_bin , sqrtN = 0 , 1
+#                mean_x_unweighted , mean_x_weighted     = -100,-100
+#                sigma_x_unweighted, sigma_x_weighted    = -100,-100
+#                mean_y_unweighted , mean_y_weighted     = -100,-100
+#                sigma_y_unweighted, sigma_y_weighted    = -100,-100
+#                mean_z_unweighted , mean_z_weighted     = -100,-100
+#                sigma_z_unweighted, sigma_z_weighted    = -100,-100
+#
+#
+#            df_pMissBin = pd.DataFrame({'pMiss_min':pMiss_min                   ,'pMiss_max':pMiss_max
+#                                       ,'EvtsInBin':len(ana_reduced)            ,'good_bin':good_bin
+#                                       ,'mean_x_unweighted':mean_x_unweighted   ,'mean_xErr_unweighted':sigma_x_unweighted/sqrtN ,'sigma_x_unweighted':sigma_x_unweighted,'sigma_xErr_unweighted':0.02 # resolution uncertainty
+#                                       ,'mean_y_unweighted':mean_y_unweighted   ,'mean_yErr_unweighted':sigma_y_unweighted/sqrtN ,'sigma_y_unweighted':sigma_y_unweighted,'sigma_yErr_unweighted':0.02 # resolution uncertainty0
+#                                       ,'mean_z_unweighted':mean_z_unweighted   ,'mean_zErr_unweighted':sigma_z_unweighted/sqrtN ,'sigma_z_unweighted':sigma_z_unweighted,'sigma_zErr_unweighted':0.02 # resolution uncertainty
+#                                       ,'mean_x_weighted':mean_x_weighted       ,'mean_xErr_weighted':sigma_x_weighted/sqrtN     ,'sigma_x_weighted':sigma_x_weighted    ,'sigma_xErr_weighted':0.02 # resolution uncertainty
+#                                       ,'mean_y_weighted':mean_y_weighted       ,'mean_yErr_weighted':sigma_y_weighted/sqrtN     ,'sigma_y_weighted':sigma_y_weighted    ,'sigma_yErr_weighted':0.02 # resolution uncertainty
+#                                       ,'mean_z_weighted':mean_z_weighted       ,'mean_zErr_weighted':sigma_z_weighted/sqrtN     ,'sigma_z_weighted':sigma_z_weighted    ,'sigma_zErr_weighted':0.02 # resolution uncertainty
+#                                       }
+#                                       , index=[i])
 
         df_pMissBins = df_pMissBins.append(df_pMissBin)
 
@@ -294,17 +393,12 @@ def fit_par_plot( fig , i_subplot , data , var , weight , title , do_plot_fit_pa
     pMissUpErr , pMissLowErr = data.pMiss_max - Pmiss , Pmiss - data.pMiss_min
     ax = fig.add_subplot( i_subplot )
     ax.grid(True,linestyle='-',color='0.95')
-    #    [Xfit,XfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_x_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_xErr_' + weight ],data[ var + '_xErr_' + weight ]], 'black','v','none',r'$%s_{x}$'%title ,'const',do_plot_fit_pars=do_plot_fit_pars)
-    #    [Yfit,YfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_y_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_yErr_' + weight ],data[ var + '_yErr_' + weight ]], 'red'  ,'o','none',r'$%s_{y}$'%title ,'const',do_plot_fit_pars=do_plot_fit_pars)
-    #    [Tfit,TfitErr] = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_t_' + weight],'const')
-    #    [Za1,Za1err],[Za2,Za2err] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [pMissLowErr,pMissUpErr] , [data[ var + '_zErr_' + weight ],data[ var + '_zErr_' + weight ]], 'blue' ,'s','none',r'$%s_{\vec{p}_{miss}}$'%title ,'linear',do_plot_fit_pars=do_plot_fit_pars)
-    [Xfit,XfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_x_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , [data[ var + '_xErr_' + weight ],data[ var + '_xErr_' + weight ]], 'black','v','none',r'$x-direction$' ,'const',do_plot_fit_pars=do_plot_fit_pars)
-    [Yfit,YfitErr] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_y_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , [data[ var + '_yErr_' + weight ],data[ var + '_yErr_' + weight ]], 'red'  ,'o','none',r'$y-direction$' ,'const',do_plot_fit_pars=do_plot_fit_pars)
-    [Tfit,TfitErr] = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_t_' + weight],'const')
-    [Za1,Za1err],[Za2,Za2err] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , data[ var + '_zErr_' + weight ], 'blue' ,'s','none',r'$\vec{p}_{miss}-direction$' ,'linear',do_plot_fit_pars=do_plot_fit_pars)
+    [Xfit,XfitErr,Xchi2red] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_x_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , [data[ var + '_xErr_' + weight ],data[ var + '_xErr_' + weight ]], 'black','v','none',r'$x-direction$' ,'const',do_plot_fit_pars=do_plot_fit_pars)
+    [Yfit,YfitErr,Ychi2red] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_y_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , [data[ var + '_yErr_' + weight ],data[ var + '_yErr_' + weight ]], 'red'  ,'o','none',r'$y-direction$' ,'const',do_plot_fit_pars=do_plot_fit_pars)
+    [Za1,Za1err],[Za2,Za2err],Zchi2red = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , data[ var + '_zErr_' + weight ], 'blue' ,'s','none',r'$\vec{p}_{miss}-direction$' ,'linear',do_plot_fit_pars=do_plot_fit_pars)
     #    set_frame( ax , r'%s $%s$'%(weight,title) , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left",ncol=2)
     set_frame( ax , '' , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left",ncol=1)
-    return [Xfit , XfitErr , Yfit , YfitErr , Za1 , Za1err , Za2 , Za2err , ax]
+    return [Xfit , XfitErr , Yfit , YfitErr , Za1 , Za1err , Za2 , Za2err , Zchi2red , ax]
 # ------------------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------------------- #
@@ -315,10 +409,10 @@ def fit_par_noplot( data , var , weight , title ): # a sub-routine to fit a sing
     # fit x/y/z as a function of p(miss)
     Pmiss = (data.pMiss_max + data.pMiss_min)/2.
     pMissUpErr , pMissLowErr = data.pMiss_max - Pmiss , Pmiss - data.pMiss_min
-    Xfit,XfitErr = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_x_' + weight] ,'const')
-    Yfit,YfitErr = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_y_' + weight] ,'const')
-    Za1,Za1err,Za2,Za2err = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_z_' + weight], data[ var + '_zErr_' + weight ] , 'linear' )
-    return [Xfit , XfitErr , Yfit , YfitErr, Za1 , Za1err , Za2 , Za2err , None ]
+    Xfit,XfitErr,Xchi2red = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_x_' + weight] ,'const')
+    Yfit,YfitErr,Ychi2red = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_y_' + weight] ,'const')
+    Za1,Za1err,Za2,Za2err,Zchi2red = fit_as_a_function_of_pmiss( Pmiss, data[ var + '_z_' + weight], data[ var + '_zErr_' + weight ],'linear')
+    return [Xfit , XfitErr , Yfit , YfitErr, Za1 , Za1err , Za2 , Za2err , Zchi2red , None ]
 # ------------------------------------------------------------------------------- #
 
 
@@ -331,67 +425,93 @@ def fit_cm_parameters( run , data , do_fits=True , FigureFName = '' , DoPlot = F
     if do_fits==False:
         print 'nothing in cm-paramteres input as data to fit_cm_parameters()'
         print 'leaving fit_cm_parameters by appending -100 to all'
-        return pd.DataFrame({ 'run':run
-                            ,'SigmaX_unweighted':-100      ,'SigmaXerr_unweighted':0
-                            ,'SigmaY_unweighted':-100      ,'SigmaYerr_unweighted':0
-                            ,'SigmaZa1_unweighted':-100    ,'SigmaZa1err_unweighted':0
-                            ,'SigmaZa2_unweighted':-100    ,'SigmaZa2err_unweighted':0
-                            ,'MeanX_unweighted':-100       ,'MeanXerr_unweighted':0
-                            ,'MeanY_unweighted':-100       ,'MeanYerr_unweighted':0
-                            ,'MeanZa1_unweighted':-100     ,'MeanZa1err_unweighted':0
-                            ,'MeanZa2_unweighted':-100     ,'MeanZa2err_unweighted':0
-                            ,'SigmaX_weighted':-100        ,'SigmaXerr_weighted':0
-                            ,'SigmaY_weighted':-100        ,'SigmaYerr_weighted':0
-                            ,'SigmaZa1_weighted':-100      ,'SigmaZa1err_weighted':0
-                            ,'SigmaZa2_weighted':-100      ,'SigmaZa2err_weighted':0
-                            ,'MeanX_weighted':-100         ,'MeanXerr_weighted':0
-                            ,'MeanY_weighted':-100         ,'MeanYerr_weighted':0
-                            ,'MeanZa1_weighted':-100       ,'MeanZa1err_weighted':0
-                            ,'MeanZa2_weighted':-100       ,'MeanZa2err_weighted':0 }
-                            , index=[0] )
+#        return pd.DataFrame({ 'run':run
+#                            ,'SigmaX_unweighted':-100      ,'SigmaXerr_unweighted':0
+#                            ,'SigmaY_unweighted':-100      ,'SigmaYerr_unweighted':0
+#                            ,'SigmaZa1_unweighted':-100    ,'SigmaZa1err_unweighted':0
+#                            ,'SigmaZa2_unweighted':-100    ,'SigmaZa2err_unweighted':0
+#                            ,'MeanX_unweighted':-100       ,'MeanXerr_unweighted':0
+#                            ,'MeanY_unweighted':-100       ,'MeanYerr_unweighted':0
+#                            ,'MeanZa1_unweighted':-100     ,'MeanZa1err_unweighted':0
+#                            ,'MeanZa2_unweighted':-100     ,'MeanZa2err_unweighted':0
+#                            ,'SigmaX_weighted':-100        ,'SigmaXerr_weighted':0
+#                            ,'SigmaY_weighted':-100        ,'SigmaYerr_weighted':0
+#                            ,'SigmaZa1_weighted':-100      ,'SigmaZa1err_weighted':0
+#                            ,'SigmaZa2_weighted':-100      ,'SigmaZa2err_weighted':0
+#                            ,'MeanX_weighted':-100         ,'MeanXerr_weighted':0
+#                            ,'MeanY_weighted':-100         ,'MeanYerr_weighted':0
+#                            ,'MeanZa1_weighted':-100       ,'MeanZa1err_weighted':0
+#                            ,'MeanZa2_weighted':-100       ,'MeanZa2err_weighted':0 }
+#                            , index=[0] )
+        return pd.DataFrame({ 'run':run,'Nevents':(np.sum(data['EvtsInBin']))
+                            ,'SigmaX':-100,'SigmaXerr':0,'MeanX':-100, 'MeanXerr':0
+                            ,'SigmaY':-100,'SigmaYerr':0,'MeanY':-100,'MeanYerr':0
+                            ,'a1':-100,'a1err':0,'a2':-100,'a2err':0,'a_chi2red':-100
+                            ,'b1':-100,'b1err':0,'b2':-100,'b2err':0,'b_chi2red':-100
+                            }, index=[0] )
 
     if DoPlot: # this means we want plots
         fig = plt.figure(figsize=(40,20)) # four plots, two unweighted and two weighted
-    
-    [SigmaX_unweighted  , SigmaXerr_unweighted,
-     SigmaY_unweighted  , SigmaYerr_unweighted,
-     SigmaZa1_unweighted, SigmaZa1err_unweighted,
-     SigmaZa2_unweighted, SigmaZa2err_unweighted, ax ] = fit_par_plot ( fig, 221, data, 'sigma', 'unweighted', '\sigma' , do_plot_fit_pars=True ) if DoPlot else fit_par_noplot ( data,'sigma','unweighted','\sigma' )
 
-    [MeanX_unweighted   , MeanXerr_unweighted,
-     MeanY_unweighted   , MeanYerr_unweighted,
-     MeanZa1_unweighted , MeanZa1err_unweighted,
-     MeanZa2_unweighted , MeanZa2err_unweighted, ax ] = fit_par_plot( fig, 222, data, 'mean', 'unweighted', 'mean') if DoPlot else fit_par_noplot( data, 'mean','unweighted','mean')
+    if DoPlot: #{
+        width_fits = fit_par_plot ( fig, 221, data, 'sigma', 'unweighted', '\sigma' , do_plot_fit_pars=True )
+        mean_fits = fit_par_plot( fig, 222, data, 'mean', 'unweighted', 'mean')
+    #}
+    else: #{
+        width_fits = fit_par_noplot ( data,'sigma','unweighted','\sigma' )
+        mean_fits = fit_par_noplot( data, 'mean','unweighted','mean')
+    #}
 
-    [SigmaX_weighted  , SigmaXerr_weighted,
-     SigmaY_weighted  , SigmaYerr_weighted,
-     SigmaZa1_weighted, SigmaZa1err_weighted,
-     SigmaZa2_weighted, SigmaZa2err_weighted, ax ] = fit_par_plot ( fig, 223, data, 'sigma', 'weighted', '\sigma'  , do_plot_fit_pars=True ) if DoPlot else fit_par_noplot ( data,'sigma','weighted','\sigma')
-     
-    [MeanX_weighted   , MeanXerr_weighted,
-     MeanY_weighted   , MeanYerr_weighted,
-     MeanZa1_weighted , MeanZa1err_weighted,
-     MeanZa2_weighted , MeanZa2err_weighted, ax ] = fit_par_plot( fig, 224, data, 'mean', 'weighted', 'mean') if DoPlot else fit_par_noplot( data, 'mean','weighted','mean')
-     
+    [SigmaX, SigmaXerr, SigmaY, SigmaYerr, a1, a1err, a2, a2err, a_chi2red, ax ] = width_fits
+    [MeanX, MeanXerr, MeanY, MeanYerr, b1, b1err, b2, b2err, b_chi2red, ax ] = mean_fits
 
-    df_fit_parameters = pd.DataFrame({ 'run':run
-                                      ,'SigmaX_unweighted':SigmaX_unweighted     ,'SigmaXerr_unweighted':SigmaXerr_unweighted
-                                      ,'SigmaY_unweighted':SigmaY_unweighted     ,'SigmaYerr_unweighted':SigmaYerr_unweighted
-                                      ,'SigmaZa1_unweighted':SigmaZa1_unweighted ,'SigmaZa1err_unweighted':SigmaZa1err_unweighted
-                                      ,'SigmaZa2_unweighted':SigmaZa2_unweighted ,'SigmaZa2err_unweighted':SigmaZa2err_unweighted
-                                      ,'MeanX_unweighted':MeanX_unweighted       ,'MeanXerr_unweighted':MeanXerr_unweighted
-                                      ,'MeanY_unweighted':MeanY_unweighted       ,'MeanYerr_unweighted':MeanYerr_unweighted
-                                      ,'MeanZa1_unweighted':MeanZa1_unweighted   ,'MeanZa1err_unweighted':MeanZa1err_unweighted
-                                      ,'MeanZa2_unweighted':MeanZa2_unweighted   ,'MeanZa2err_unweighted':MeanZa2err_unweighted
-                                      ,'SigmaX_weighted':SigmaX_weighted         ,'SigmaXerr_weighted':SigmaXerr_weighted
-                                      ,'SigmaY_weighted':SigmaY_weighted         ,'SigmaYerr_weighted':SigmaYerr_weighted
-                                      ,'SigmaZa1_weighted':SigmaZa1_weighted     ,'SigmaZa1err_weighted':SigmaZa1err_weighted
-                                      ,'SigmaZa2_weighted':SigmaZa2_weighted     ,'SigmaZa2err_weighted':SigmaZa2err_weighted
-                                      ,'MeanX_weighted':MeanX_weighted           ,'MeanXerr_weighted':MeanXerr_weighted
-                                      ,'MeanY_weighted':MeanY_weighted           ,'MeanYerr_weighted':MeanYerr_weighted
-                                      ,'MeanZa1_weighted':MeanZa1_weighted       ,'MeanZa1err_weighted':MeanZa1err_weighted
-                                      ,'MeanZa2_weighted':MeanZa2_weighted       ,'MeanZa2err_weighted':MeanZa2err_weighted }
-                                      , index=[0] )
+    df_fit_parameters = pd.DataFrame({ 'run':run,'Nevents':(np.sum(data['EvtsInBin']))
+                                     ,'SigmaX':SigmaX,'SigmaXerr':SigmaXerr,'MeanX':MeanX, 'MeanXerr':MeanXerr
+                                     ,'SigmaY':SigmaY,'SigmaYerr':SigmaYerr,'MeanY':MeanY,'MeanYerr':MeanYerr
+                                     ,'a1':a1,'a1err':a1err,'a2':a2,'a2err':a2err,'a_chi2red':a_chi2red
+                                     ,'b1':b1,'b1err':b1err,'b2':b2,'b2err':b2err,'b_chi2red':b_chi2red
+                                     }, index=[0] )
+
+#
+#    [SigmaX_unweighted  , SigmaXerr_unweighted,
+#     SigmaY_unweighted  , SigmaYerr_unweighted,
+#     SigmaZa1_unweighted, SigmaZa1err_unweighted,
+#     SigmaZa2_unweighted, SigmaZa2err_unweighted, ax ] = fit_par_plot ( fig, 221, data, 'sigma', 'unweighted', '\sigma' , do_plot_fit_pars=True ) if DoPlot else fit_par_noplot ( data,'sigma','unweighted','\sigma' )
+#
+#    [MeanX_unweighted   , MeanXerr_unweighted,
+#     MeanY_unweighted   , MeanYerr_unweighted,
+#     MeanZa1_unweighted , MeanZa1err_unweighted,
+#     MeanZa2_unweighted , MeanZa2err_unweighted, ax ] = fit_par_plot( fig, 222, data, 'mean', 'unweighted', 'mean') if DoPlot else fit_par_noplot( data, 'mean','unweighted','mean')
+#
+#    [SigmaX_weighted  , SigmaXerr_weighted,
+#     SigmaY_weighted  , SigmaYerr_weighted,
+#     SigmaZa1_weighted, SigmaZa1err_weighted,
+#     SigmaZa2_weighted, SigmaZa2err_weighted, ax ] = fit_par_plot ( fig, 223, data, 'sigma', 'weighted', '\sigma'  , do_plot_fit_pars=True ) if DoPlot else fit_par_noplot ( data,'sigma','weighted','\sigma')
+#
+#    [MeanX_weighted   , MeanXerr_weighted,
+#     MeanY_weighted   , MeanYerr_weighted,
+#     MeanZa1_weighted , MeanZa1err_weighted,
+#     MeanZa2_weighted , MeanZa2err_weighted, ax ] = fit_par_plot( fig, 224, data, 'mean', 'weighted', 'mean') if DoPlot else fit_par_noplot( data, 'mean','weighted','mean')
+#
+
+#    df_fit_parameters = pd.DataFrame({ 'run':run
+#                                      ,'SigmaX_unweighted':SigmaX_unweighted     ,'SigmaXerr_unweighted':SigmaXerr_unweighted
+#                                      ,'SigmaY_unweighted':SigmaY_unweighted     ,'SigmaYerr_unweighted':SigmaYerr_unweighted
+#                                      ,'SigmaZa1_unweighted':SigmaZa1_unweighted ,'SigmaZa1err_unweighted':SigmaZa1err_unweighted
+#                                      ,'SigmaZa2_unweighted':SigmaZa2_unweighted ,'SigmaZa2err_unweighted':SigmaZa2err_unweighted
+#                                      ,'MeanX_unweighted':MeanX_unweighted       ,'MeanXerr_unweighted':MeanXerr_unweighted
+#                                      ,'MeanY_unweighted':MeanY_unweighted       ,'MeanYerr_unweighted':MeanYerr_unweighted
+#                                      ,'MeanZa1_unweighted':MeanZa1_unweighted   ,'MeanZa1err_unweighted':MeanZa1err_unweighted
+#                                      ,'MeanZa2_unweighted':MeanZa2_unweighted   ,'MeanZa2err_unweighted':MeanZa2err_unweighted
+#                                      ,'SigmaX_weighted':SigmaX_weighted         ,'SigmaXerr_weighted':SigmaXerr_weighted
+#                                      ,'SigmaY_weighted':SigmaY_weighted         ,'SigmaYerr_weighted':SigmaYerr_weighted
+#                                      ,'SigmaZa1_weighted':SigmaZa1_weighted     ,'SigmaZa1err_weighted':SigmaZa1err_weighted
+#                                      ,'SigmaZa2_weighted':SigmaZa2_weighted     ,'SigmaZa2err_weighted':SigmaZa2err_weighted
+#                                      ,'MeanX_weighted':MeanX_weighted           ,'MeanXerr_weighted':MeanXerr_weighted
+#                                      ,'MeanY_weighted':MeanY_weighted           ,'MeanYerr_weighted':MeanYerr_weighted
+#                                      ,'MeanZa1_weighted':MeanZa1_weighted       ,'MeanZa1err_weighted':MeanZa1err_weighted
+#                                      ,'MeanZa2_weighted':MeanZa2_weighted       ,'MeanZa2err_weighted':MeanZa2err_weighted }
+#                                      , index=[0] )
 
     if DoPlot:
         plt.savefig(FigureFName)
@@ -414,7 +534,8 @@ def fit_widths_z( cm_pars_list , colors , labels , FigureFName = '' ): # all par
     pMissUpErr , pMissLowErr = cm_pars_list[0].pMiss_max - Pmiss , Pmiss - cm_pars_list[0].pMiss_min
     fig , ax = plt.subplots(figsize=(20,10)) # four plots, two unweighted and two weighted
     for color, label , data in zip(colors,labels,cm_pars_list):
-       plot_errorbar_and_fit( ax ,Pmiss,data[ 'sigma_z_unweighted'] ,
+        if debug: print 'fiting width of z-direction for ',label
+        plot_errorbar_and_fit( ax ,Pmiss,data[ 'sigma_z_unweighted'] ,
                              [pMissLowErr,pMissUpErr] ,
                              data[ 'sigma_zErr_unweighted'],
                              color=color ,marker='s',lstyle='none',
@@ -423,9 +544,9 @@ def fit_widths_z( cm_pars_list , colors , labels , FigureFName = '' ): # all par
               r'$p_{miss}$ [GeV/c]' ,
               r'longitudinal c.m. momentum $\sigma$ [Gev/c]' , "upper left")
     ax.set_ylim(0.11,0.31)
+    fig.tight_layout()
     plt.savefig(FigureFName)
     print_filename( FigureFName , "longitudinal widths plot at" )
-    print_line()
 # ------------------------------------------------------------------------------- #
 
 
@@ -445,9 +566,9 @@ def fit_means_z( cm_pars_list , colors , labels , FigureFName = '' ): # all para
               r'$p_{miss}$ [GeV/c]' ,
               r'longitudinal c.m. momentum $mean$ [Gev/c]' , "upper left")
     ax.set_ylim(0,0.5)
+    fig.tight_layout()
     plt.savefig(FigureFName)
     print_filename( FigureFName , "longitudinal widths plot at" )
-    print_line()
 # ------------------------------------------------------------------------------- #
 
 
@@ -666,7 +787,7 @@ def get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins , Q2Bins , evtsgen_Q2pm
         # in theta(pm,q) bins
         for j in range( len(Q2Bins) ):
             thetapmqmin , thetapmqmax = thetapmqBins[j][0] , thetapmqBins[j][1]
-            thetapmq_cut = ROOT.TCut("%f< theta_miss_q && TMath::RadToDeg()*theta_miss_q<%f"%(thetapmqmin , thetapmqmax))
+            thetapmq_cut = ROOT.TCut("%f< TMath::RadToDeg()*theta_miss_q && TMath::RadToDeg()*theta_miss_q<%f"%(thetapmqmin , thetapmqmax))
             accepted_thetapmqpmiss_bins[i][j] = ana_sim.GetEntries( p_cut + thetapmq_cut )
             if evtsgen_thetapmqpmiss_bins[i][j]>0:
                 loss_thetapmqpmiss_bins[i][j] = float(evtsgen_thetapmqpmiss_bins[i][j] - accepted_thetapmqpmiss_bins[i][j])/evtsgen_thetapmqpmiss_bins[i][j]
@@ -676,10 +797,36 @@ def get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins , Q2Bins , evtsgen_Q2pm
     return loss_pmiss_bins , loss_Q2pmiss_bins , loss_thetapmqpmiss_bins
 # ------------------------------------------------------------------------------- #
 
+# ------------------------------------------------------------------------------- #
+def calc_Pval_scores( data_fits , reco_fits , name='' ): #{
+    # XX delete by April 15
+    # No Mott/FF - weighting (un - weighted roofit results)
+    pval_scores = compute_Pval_parameters( target=None,
+                                         reco_fits=reco_fits, reco_parameters=reco_parameters,
+                                         cm_pars_as_gaussians=fits_pars_as_gaussians, fits_pars_as_gaussians=fits_pars_as_gaussians)
+
+    #        Pval_array = compute_Pval_parameters( data_fits , reco_fits , weighting='' )
+    #    [Pval_mean_x, Pval_mean_y ,Pval_sigma_x, Pval_sigma_y ,
+    #     Pval_a1 , Pval_a2 , Pval_b1 , Pval_b2 ] = Pval_array
+
+#    PvalTotal = Fisher_combination_Pvals( Pval_array ) # with a cutoff on 1e-20
+#    PvalTotal_allPvals = FisherMethodPvals( Pval_array )
+#    
+#    Pval_scores = pd.DataFrame({'Pval_mean_x':Pval_mean_x,'Pval_mean_y':Pval_mean_y,
+#                               'Pval_sigma_x':Pval_sigma_x,'Pval_sigma_y':Pval_sigma_y,
+#                               'Pval_a1':Pval_a1,'Pval_a2':Pval_a2,'Pval_b1':Pval_b1,'Pval_b2':Pval_b2,
+#                               'global_Pval':PvalTotal,'PvalTotal_allPvals':PvalTotal_allPvals}
+#                               ,index=[0])
+#                               
+#    if debug>2: print "calculated Pval scores " + name ; print Pval_scores
+#    
+#    return Pval_scores
+#}
+# ------------------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------------------- #
 def get_Pval_scores( data_fits , reco_fits , name='' ):
-    
+    # XX delete by April 30
     # No Mott/FF - weighting (un - weighted roofit results)
     Pval_array = compute_Pval_parameters( data_fits , reco_fits , 'unweighted' )
     
@@ -1031,3 +1178,303 @@ def stream_dataframe_to_root( df , filename , treename='tree' ):
 
 
 
+
+#
+## ------------------------------------------------------------------------------- #
+#def get_cm_parameters_as_gaussians( cm_pars=None ):
+#    cm_parameters_as_gaussians = dict() # dictionary that has 4 entries - 4 targets - each entry contains an array of 5 pmiss bins
+#    for target in targets:#{
+#        extracted_parameters_as_gaussians_in_Pmiss_Bins = [] # array in 5 Pmiss bins that includes the fitted mean and width of each gaussian
+#        for i in range(len(PmissBins)):#{
+#            cm_par_as_gaussian = dict() # each Pmiss bin has a different dictionary - in which the entries are different cm-parameters
+#            for parameter in ['mean','sigma']:#{
+#                for direction in ['x','y','z']:#{
+#                    cm_par = cm_pars[target].get_value( i , parameter + '_' + direction + '_unweighted' )
+#                    cm_parErr = cm_pars[target].get_value( i , parameter + '_' + direction + 'Err_unweighted' )
+#                    Nevents = cm_pars[target].get_value( i , 'EvtsInBin' )
+#                    cm_par_as_gaussian[parameter + '_' + direction] = [ np.random.normal( cm_par , cm_parErr ) for n in range(10*Nevents) ]
+#                #}
+#            #}
+#            extracted_parameters_as_gaussians_in_Pmiss_Bins.append(cm_par_as_gaussian)
+#        #}
+#        cm_parameters_as_gaussians[target] = extracted_parameters_as_gaussians_in_Pmiss_Bins
+#    #}
+#    return cm_parameters_as_gaussians
+##}
+## ------------------------------------------------------------------------------- #
+#
+## ------------------------------------------------------------------------------- #
+#def get_fit_parameters_as_gaussians( cm_fits=None ):
+#    fits_parameters_as_gaussians = dict() # dictionary that has 4 entries - 4 targets - each entry contains an array of 5 pmiss bins
+#    for target in targets: #{
+#        fit_par_as_gaussian = dict() # dictionary in which the entries are different fit-parameters
+#        for parameter in ['MeanX','MeanY','SigmaX','SigmaY','a1','a2','b1','b2']:#{
+#            fit_par_as_gaussian[parameter] = [ np.random.normal( cm_fits[target][parameter] , cm_fits[target][parameter+'err'] ) for i in range(10*cm_fits[target]['Nevents']) ]
+#        #}
+#        fits_parameters_as_gaussians[target] = fit_par_as_gaussian
+#    #}
+#    return fits_parameters_as_gaussians
+## ------------------------------------------------------------------------------- #
+#
+#
+#
+## ------------------------------------------------------------------------------- #
+#def get_cm_pars_and_fit_pars_as_gaussians( cm_pars=None, cm_fits=None , do_plots=False ):
+#    
+#    cm_parameters_as_gaussians = get_cm_parameters_as_gaussians( cm_pars )
+#    fits_parameters_as_gaussians = get_fit_parameters_as_gaussians( cm_fits )
+#    
+#    # plot the cm parameters and fit parameters as Gaussians,
+#    # to monitor the procedure
+#    if do_plots:#{
+#        print 'plotting cm_parameters_as_gaussians and fits_parameters_as_gaussians'
+#        
+#        for target in targets: #{
+#            fig = plt.figure(figsize=(20,10))
+#            for i,parameter in enumerate(['MeanX','MeanY','SigmaX','SigmaY','a1','a2','b1','b2']):#{
+#                ax = fig.add_subplot(2,4,i+1)
+#                plt.hist( fits_parameters_as_gaussians[target][parameter] )
+#                extracted_par = cm_fits[target][parameter]
+#                mean_gaussian = np.mean( fits_parameters_as_gaussians[target][parameter] )
+#                set_axes( ax , x_label=parameter , fontsize=20 )
+#                ax.set_title( '(%.3f/%.3f)'%(mean_gaussian,extracted_par) , fontsize=20, y=1.02)
+#                ax.xaxis.set_major_locator(LinearLocator(3));ax.yaxis.set_major_locator(LinearLocator(4))
+#            #}
+#            fig.set_tight_layout(True)
+#            fig.savefig('/Users/erezcohen/Desktop/TmpPlots/fits_parameters_as_gaussians_'+target)
+#            print 'completed plotting fits_parameters_as_gaussians for '+target
+#
+#            fig2 = plt.figure(figsize=(24,20))
+#            j = 0
+#            for bin in range(len(PmissBins)):#{
+#                for parameter in ['mean','sigma']:#{
+#                    for direction in ['x','y','z']:#{
+#                        ax = fig2.add_subplot(5,6,j+1)
+#                        plt.hist( cm_parameters_as_gaussians[target][bin][parameter + '_' + direction] )
+#                        set_axes( ax , x_label=parameter+'_'+direction , fontsize=20 )
+#                        extracted_par = cm_pars[target].get_value( bin , parameter + '_' + direction + '_unweighted' )
+#                        mean_gaussian = np.mean(cm_parameters_as_gaussians[target][bin][parameter + '_' + direction])
+#                        ax.set_title( '$p_{miss}$ %d (%.3f/%.3f)'%(bin,mean_gaussian,extracted_par) , fontsize=20, y=1.02)
+#                        ax.xaxis.set_major_locator(LinearLocator(3));ax.yaxis.set_major_locator(LinearLocator(4))
+#                        j += 1
+#            #}
+#            fig2.set_tight_layout(True)
+#            fig2.savefig('/Users/erezcohen/Desktop/TmpPlots/cm_parameters_as_gaussians_'+target)
+#            print 'completed plotting cm_parameters_as_gaussians for '+target
+#        #}
+#    #}
+#    
+#    return cm_parameters_as_gaussians, fits_parameters_as_gaussians
+## ------------------------------------------------------------------------------- #
+#
+
+# ------------------------------------------------------------------------------- #
+def generate_runs_with_random_parameters( option='', hyperparameters=None,
+                                         cm_pars=dict(), cm_fits=dict(),
+                                         debug=0 , PmissBins=None , Q2Bins=None , thetapmqBins=None ,
+                                         buildup_resutlsFName='' ,
+                                         reco_fitsFName='', root_resutlsFName='' ,
+                                         do_root_file=False, do_reco_fits_file=False, do_resutls_file=True, do_add_plots=False,
+                                         ):#{
+        
+    from definitions import path
+    if debug: print hyperparameters
+    start_run , Nruns = hyperparameters['start_run'], hyperparameters['Nruns']
+    NRand = hyperparameters['NRand']
+    
+    pAcceptacneFile = ROOT.TFile( path + "/GSIM_DATA/PrecoilAcceptance.root" )
+    path = path + "/Analysis_DATA/ppSRCcm"
+    if 'helion' in flags.worker: path = "/extra/Erez/DataMining/Analysis_DATA/ppSRCcm"
+
+    # multiple bins for pp/p ratio
+    pmiss_bins , evtsgen_pmiss_bins , evtsgen_Q2pmiss_bins  , evtsgen_thetapmqpmiss_bins = get_pmiss_bins( PmissBins , Q2Bins , thetapmqBins , path , int(hyperparameters['NRand']) )
+
+    # cm_pars_as_gaussians, fits_pars_as_gaussians = get_cm_pars_and_fit_pars_as_gaussians( cm_pars=cm_pars, cm_fits=cm_fits , do_plots=False)
+    
+    '''
+    recoil proton acceptances:
+    (a) efficiency and acceptacne from the 'uniform' map i've generated using virtual CLAS
+    (b) proton fiducial cuts (coded inside the event generator class)
+    '''
+    if 'gen' in option: #{
+        h = pAcceptacneFile.Get("hRescaled")
+        gen_events = GenerateEvents( path , 0 , debug - 2 )
+        gen_events.SetNRand( NRand )
+        gen_events.Use_protonAcceptacne( True )
+        gen_events.Set_protonAcceptacne( h )
+        gen_events.SetInputChain_eep()
+    #}
+
+    # event generation (and analysis) loop
+    irun=0
+    for run in range( start_run , start_run + Nruns ): #{
+
+        # (1) generate the simulated data (the 'run')
+        # ----------------------------
+        if 'gen' in option: #{
+            
+            # sample the geneated parameters uniformly within the ranges
+            gen_MeanX  = gen_MeanY = 0
+            gen_SigmaX = gen_SigmaY = np.random.uniform( np.min(hyperparameters['range_sigma_t']),np.max(hyperparameters['range_sigma_t']) )
+            gen_a1  = np.random.uniform( np.min(hyperparameters['range_a1']),np.max(hyperparameters['range_a1']) )
+            gen_a2  = np.random.uniform( np.min(hyperparameters['range_a2']),np.max(hyperparameters['range_a2']) )
+            gen_b1  = np.random.uniform( np.min(hyperparameters['range_b1']),np.max(hyperparameters['range_b1']) )
+            gen_b2  = np.random.uniform( np.min(hyperparameters['range_b2']),np.max(hyperparameters['range_b2']) )
+            
+            if flags.verbose>2: print 'run:',run,',parameters:', gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2
+
+            gen_events.Set_eep_Parameters( gen_MeanX , gen_SigmaX , gen_MeanY , gen_SigmaY , gen_a1 , gen_a2 , gen_b1 , gen_b2 )
+            gen_events.DoGenerateRun_eepp( run )
+            
+            # and now scheme them to our desired pp-SRC cuts
+            ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
+            scheme.SchemeOnTCut( path+'/eg_rootfiles', 'run%d.root'%run ,"anaTree", 'run%d.root'%run , ana_sim.EGppSRCCut + ana_sim.PrecFiducial )
+            
+            ana_sim.CloseFile()
+        #}
+        
+        # (2) analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
+        # ----------------------------
+        if 'ana' in option: #{
+            if debug>1: print "analyzing run %d"%run
+            
+            ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run )
+
+            loss_pmiss_bins , loss_Q2pmiss_bins , loss_thetapmqpmiss_bins = get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins ,
+                                                                                                Q2Bins , evtsgen_Q2pmiss_bins ,
+                                                                                                thetapmqBins , evtsgen_thetapmqpmiss_bins ,
+                                                                                                ana_sim )
+                
+
+            # reconstruct c.m. parameters and fit
+            reco_parameters, do_fits = calc_cm_parameters( ana_sim  , PmissBins )
+            reco_fits = fit_cm_parameters( run , reco_parameters , do_fits=do_fits )
+            
+            results = pd.DataFrame({'run':int(run)
+                                   ,'time':str(datetime.datetime.now().strftime("%Y%B%d"))
+                                   ,'NentriesSimRun':ana_sim.GetEntries()
+                                   
+                                   # generated
+                                   ,'gen_MeanX':gen_MeanX, 'gen_SigmaX':gen_SigmaX, 'gen_MeanY':gen_MeanY, 'gen_SigmaY':gen_SigmaY
+                                   ,'gen_a1':gen_a1, 'gen_a2':gen_a2, 'gen_b1':gen_b1, 'gen_b2':gen_b2
+                                   
+                                   
+                                   # reconstructed fits - unweighted
+                                   ,'recMeanX':float(reco_fits.MeanX),'recSigmaX':float(reco_fits.SigmaX)
+                                   ,'recMeanY':float(reco_fits.MeanY),'recSigmaY':float(reco_fits.SigmaY)
+                                   ,'rec_a1':float(reco_fits.a1)     ,'rec_a1err':float(reco_fits.a1err)
+                                   ,'rec_a2':float(reco_fits.a2)     ,'rec_a2err':float(reco_fits.a2err)
+                                   ,'rec_b1':float(reco_fits.b1)     ,'rec_b1err':float(reco_fits.b1err)
+                                   ,'rec_b2':float(reco_fits.b2)     ,'rec_b2err':float(reco_fits.b2err)
+
+                                   # events loss
+                                   ,'NLostEvents':(9907*float(NRand) - ana_sim.GetEntries())
+                                   ,'fracLostEvents':(float((9907.0*float(NRand)) - ana_sim.GetEntries())/(9907.0*float(NRand)))
+                                   }
+                                   , index = [int(run)])
+                
+            # reconstructed parameters in 5 big p(miss) bins
+                
+            for i in range(len(PmissBins)):#{
+                pmin , pmax = PmissBins[i][0] , PmissBins[i][1]
+                for parname in ['mean','sigma']: #{
+                    for direction in ['x','y','z']: #{
+                        
+                        parnamedir = parname + '_' + direction
+                        recparnamedir = 'rec'+parnamedir+'_pmiss_%.3f_%.3f'%(pmin , pmax)
+                        results[recparnamedir] = float(reco_parameters.get_value(i,parnamedir+'_unweighted')) if do_fits else -100
+                            
+                        parnamedirErr = parnamedir+'Err'
+                        recparnamedirErr = 'rec'+parnamedirErr+'_pmiss_%.3f_%.3f'%(pmin , pmax)
+                        results[recparnamedirErr] = float(reco_parameters.get_value(i,parnamedirErr+'_unweighted')) if do_fits else -100
+            
+                    #}
+                #}
+            #}
+        
+            # Pvalues
+            for target in targets: #{
+                print '---------------\ncalculating Pvalue for ',target,'\n------------------'
+                pval_fits_scores, pval_cm_pars_scores = compute_Pval_parameters(data_cm_pars=cm_pars[target], data_fits=cm_fits[target] ,
+                                                                                reco_fits=reco_fits, reco_parameters=reco_parameters)
+#                pval_fits_scores, pval_cm_pars_scores = compute_Pval_parameters( target=target,
+#                                                                                reco_fits=reco_fits,
+#                                                                                reco_parameters=reco_parameters,
+#                                                                                cm_pars_as_gaussians=cm_pars_as_gaussians,
+#                                                                                fits_pars_as_gaussians=fits_pars_as_gaussians)
+
+
+
+                for parameter in ['MeanX','MeanY','SigmaX','SigmaY','a1','a2','b1','b2']:#{
+                    results['local_Pval_'+parameter+'_'+target] = pval_fits_scores[parameter]
+                #}
+                results['PvalTotal'] = pval_fits_scores['PvalTotal']
+                results['PvalTotal_allPvals'] = pval_fits_scores['PvalTotal_allPvals']
+
+                for bin in range(len(PmissBins)):#{
+                    for parameter in ['mean','sigma']:#{
+                        for direction in ['x','y','z']:#{
+                            parname = parameter + '_' + direction
+                            parnamebin = parname+'_bin%d'%bin
+                            results['local_Pval_'+parnamebin+'_'+target] = pval_cm_pars_scores[parname+'_bin%d'%bin]
+                        #}
+                    #}
+                #}
+                results['PvalTotal'] = pval_cm_pars_scores['PvalTotal']
+                results['PvalTotal_allPvals'] = pval_cm_pars_scores['PvalTotal_allPvals']
+            #}
+
+    
+    
+            # events loss in 20 p(miss) bins, for pp/p analysis
+            for i in range( len(pmiss_bins) ):#{
+                pmin , pmax = pmiss_bins[i][0] , pmiss_bins[i][1]
+                results['fracLoss_pmiss_%.3f_%.3f'%(pmin , pmax)] = loss_pmiss_bins[i]
+                
+                # Q2 and p(miss) bins
+                for j in range( len(Q2Bins) ):#{
+                    Q2min , Q2max = Q2Bins[j][0] , Q2Bins[j][1]
+                    results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmin , pmax , Q2min , Q2max)] = loss_Q2pmiss_bins[i][j]
+                #}
+
+                # theta(pm,q) and p(miss) bins
+                for j in range( len(thetapmqBins) ):#{
+                    thetapmqmin , thetapmqmax = thetapmqBins[j][0] , thetapmqBins[j][1]
+                    results['fracLoss_pmiss_%.3f_%.3f_thetapmq_%.1f_%.1f'%(pmin,pmax,thetapmqmin,thetapmqmax)] = loss_thetapmqpmiss_bins[i][j]
+                #}
+            #}
+            
+            # ------------------------------------------------------------------------------------------------------------------------------------------------
+            
+            
+            
+            if do_reco_fits_file:   stream_dataframe_to_file( reco_fits, reco_fitsFName  )
+            if do_resutls_file:     stream_dataframe_to_file( results, buildup_resutlsFName , float_format='%f' )
+            if do_root_file:        stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
+            ana_sim.CloseFile()
+            irun += 1
+            print_important("completed run %d [%.0f"%(run,100.*float(irun)/Nruns) + "%]"+" at %4d-%02d-%02d %d:%d:%d"%time.localtime()[0:6] )
+            print_line()
+
+        if 'delete' in option:
+            delete_file( path + '/eg_rootfiles/run%d.root'%run  , debug )
+    #}
+
+
+    if 'gen' in option: #{
+            gen_events.ReleaseInputChain_eep()
+    #}
+
+    if 'ana' in option:#{
+        if do_reco_fits_file:   print_filename( reco_fitsFName , "reconstructed parameters fits wrote to" )
+        if do_resutls_file:     print_filename( buildup_resutlsFName , "results wrote to " )
+        if do_root_file:        print_filename( root_resutlsFName , "results converted also to root format " )
+    #}
+
+    print_important("done...") ; print_line()
+#}
+# ------------------------------------------------------------------------------- #
+
+
+
+#

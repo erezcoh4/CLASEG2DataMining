@@ -136,6 +136,9 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("pcmY"                ,&pcmY                  , "pcmY/F");
     OutTree -> Branch("pcmT"                ,&pcmT                  , "pcmT/F");
     OutTree -> Branch("pcmZ"                ,&pcmZ                  , "pcmZ/F");
+    OutTree -> Branch("prelX"               ,&prelX                 , "prelX/F");
+    OutTree -> Branch("prelY"               ,&prelY                 , "prelY/F");
+    OutTree -> Branch("prelZ"               ,&prelZ                 , "prelZ/F");
     OutTree -> Branch("rooWeight"           ,&rooWeight             , "rooWeight/F");
 
     OutTree -> Branch("missing energy"      ,&Emiss                 , "Emiss/F");
@@ -441,6 +444,10 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     pcmY = Pcm.Py();
     pcmT = Pcm.Pt();
     pcmZ = Pcm.Pz();
+    prelX = 0.5*(Pmiss.Px() - Prec.Px());
+    prelY = 0.5*(Pmiss.Py() - Prec.Py());
+    prelZ = 0.5*(Pmiss.Pz() - Prec.Pz());
+
     ComputeWeights();
     if (debug > 2) Printf("got roofit c.m. ");
     
