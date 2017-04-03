@@ -78,8 +78,8 @@ def CalcKS2sampAssumingGaussian( data_df=None, sim_df=None, parname=None, parerr
     data_gaussian = generate_a_gaussian_from_value_and_error( dataframe=data_df, parname=parname, parerrname=parerrname, PmissBin=PmissBin )
     sim_gaussian = generate_a_gaussian_from_value_and_error( dataframe=sim_df, parname=parname, parerrname=parerrname, PmissBin=PmissBin )
     D_ks, Pval_ks = ks_2samp( data_gaussian , sim_gaussian )
-    print 'for',parname,'comparing ',np.mean(data_gaussian),'+/-',np.std(data_gaussian),'and',np.mean(sim_gaussian),'+/-',np.std(sim_gaussian)
-    print 'Pval_ks:',Pval_ks
+    # print 'for',parname,'comparing ',np.mean(data_gaussian),'+/-',np.std(data_gaussian),'and',np.mean(sim_gaussian),'+/-',np.std(sim_gaussian)
+    # print 'Pval_ks:',Pval_ks
     return Pval_ks
 # ------------------------------------------------------------------------------- #
 
