@@ -51,11 +51,11 @@ if 'generate' in flags.option or 'analyse' in flags.option:#{
     
     hyperparameters = dict({'start_run':flags.run,
                            'Nruns':flags.NumberOfRuns,
-                           'range_sigma_t':(0.155 , 0.160),
-                           'range_a1':(0.113 , 0.25),   # 0.143
-                           'range_a2':(0.13 , 0.18),      # 0.158
+                           'range_sigma_t':(0.145 , 0.180),
+                           'range_a1':(0.05 , 0.25),   # 0.143
+                           'range_a2':(0.1  , 0.2),      # 0.158
                            'range_b1':(0.5  , 0.7),
-                           'range_b2':(0.13 , 0.18),      # 0.159
+                           'range_b2':(0.1  , 0.2),      # 0.159
                            'NRand':10}
                            )
 
