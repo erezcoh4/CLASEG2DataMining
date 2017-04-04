@@ -1362,6 +1362,8 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             scheme.SchemeOnTCut( path+'/eg_rootfiles', 'run%d.root'%run ,"anaTree", 'run%d.root'%run , ana_sim.EGppSRCCut + ana_sim.PrecFiducial )
             
             ana_sim.CloseFile()
+#            garbage_list = [ ana_sim ]
+#            del garbage_list
         #}
         
         # (2) analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
@@ -1380,8 +1382,8 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             # reconstruct c.m. parameters and fit
             reco_parameters, do_fits = calc_cm_parameters( ana_sim  , PmissBins )
             reco_fits = fit_cm_parameters( run , reco_parameters , do_fits=do_fits )
-            ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data )
-            
+#            ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data )
+
             results = pd.DataFrame({'run':int(run)
                                    ,'time':str(datetime.datetime.now().strftime("%Y%B%d"))
                                    ,'NentriesSimRun':ana_sim.GetEntries()
@@ -1423,9 +1425,6 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     #}
                 #}
             #}
-        
-        
-        
         
 #            # Pvalues
 #            for target in targets: #{
@@ -1497,6 +1496,12 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             if do_resutls_file:     stream_dataframe_to_file( results, buildup_resutlsFName , float_format='%f' )
             if do_root_file:        stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
             ana_sim.CloseFile()
+#            garbage_list = [ ana_sim , reco_parameters , reco_fits, results
+#                            , ks_pval_scores , loss_pmiss_bins , loss_Q2pmiss_bins , loss_thetapmqpmiss_bins
+#                            ]
+#            del garbage_list
+#            gc.collect()
+
             irun += 1
             print_important("completed run %d [%.0f"%(run,100.*float(irun)/Nruns) + "%]"+" at %4d-%02d-%02d %d:%d:%d"%time.localtime()[0:6] )
             print_line()
