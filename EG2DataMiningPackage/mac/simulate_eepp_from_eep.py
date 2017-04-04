@@ -45,9 +45,12 @@ if 'extractCMparsAllNuclei' in flags.option: #{
 if 'generate' in flags.option or 'analyse' in flags.option:#{
     
     cm_pars , cm_fits = dict() , dict()
+    ana_data = dict()
+
     for target in targets:
         cm_pars[target] = pd.read_csv( CMParsFname(ppPath+'/DATA/%s_data'%target) )
         cm_fits[target] = pd.read_csv( CMfitsFname(ppPath+'/DATA/data',target ) )
+        ana_data[target] = TAnalysisEG2( path+"/AnaFiles" ,  "Ana_ppSRCCut_DATA_%s"%target )
     
     hyperparameters = dict({'start_run':flags.run,
                            'Nruns':flags.NumberOfRuns,
@@ -63,6 +66,7 @@ if 'generate' in flags.option or 'analyse' in flags.option:#{
     full_path = ppPath+'/simulation/'+test_name+'_simulation'
 
     generate_runs_with_random_parameters( option=flags.option, hyperparameters=hyperparameters,
+                                         ana_data=ana_data,
                                          cm_pars=cm_pars, cm_fits=cm_fits,
                                          debug=flags.verbose , PmissBins=PmissBins , Q2Bins=Q2Bins , thetapmqBins=thetapmqBins ,
                                          buildup_resutlsFName=buildup_resutlsFName( full_path ),

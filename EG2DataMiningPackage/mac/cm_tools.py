@@ -152,7 +152,7 @@ def compute_Pval_parameters(data_cm_pars=None, data_fits=None ,
 
 
 # ------------------------------------------------------------------------------- #
-def KStest( PmissBins , ana_sim , ana_data , var , cut=ROOT.TCut() , debug=2 , Nbins=20, do_save_plots=False):
+def KStest( PmissBins , ana_sim , ana_data , var , Nbins=20, do_save_plots=False):
     # [http://docs.scipy.org/doc/scipy-0.15.1/reference/generated/scipy.stats.ks_2samp.html]
     data = tree2array( ana_data.GetTree() , branches=var )
     sim = tree2array( ana_sim.GetTree() , branches=var )
@@ -169,14 +169,44 @@ def KStest( PmissBins , ana_sim , ana_data , var , cut=ROOT.TCut() , debug=2 , N
 
 
 # ------------------------------------------------------------------------------- #
+def calc_pval_ks_scores(ana_sim=None, ana_data=dict()):
+    ks_pval_scores = dict()
+    # April-2017, change to Pval using ks-test
+#    ana_sim.GetTree().Print()
+    df_sim = tree2array( ana_sim.GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
+    for target in targets: #{
+        ks_pval_scores_target_array = []
+        ks_pval_scores_target = dict()
+        df_data = tree2array( ana_data[target].GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
+        for bin in range(len(PmissBins)):#{
+            pmin , pmax = PmissBins[bin][0] , PmissBins[bin][1]
+            df_sim_reduced = df_sim[ (pmin < df_sim['Pmiss3Mag']) & (df_sim['Pmiss3Mag'] < pmax) ]
+            df_data_reduced = df_sim[ (pmin < df_data['Pmiss3Mag']) & (df_data['Pmiss3Mag'] < pmax) ]
+            for direction in ['X','Y','Z']: #{
+                D_KS , Pval_KS = ks_2samp( df_sim_reduced['pcm'+direction] , df_data_reduced['pcm'+direction] )
+                ks_pval_scores_target['pcm'+direction+'_bin%d'%bin] = Pval_KS
+                ks_pval_scores_target_array.append( Pval_KS )
+            #}
+        #}
+        ks_pval_scores_target['PvalTotal'] = Fisher_combination_Pvals( ks_pval_scores_target_array ) # with a cutoff on 1e-20
+        ks_pval_scores_target['PvalTotal_allPvals'] = FisherMethodPvals( ks_pval_scores_target_array )
+        ks_pval_scores[target] = ks_pval_scores_target
+    #}
+    if debug>2: print 'ks_pval_scores:',ks_pval_scores
+    return ks_pval_scores
+# ------------------------------------------------------------------------------- #
+
+
+
+# ------------------------------------------------------------------------------- #
 def get_KS_scores( PmissBins ,ana_sim , ana_data , h3_pcm_data ):
 
     if ana_sim.GetEntries():
         # 1d KS tests
-        KSpCMx , KSxPval = KStest( PmissBins ,ana_sim , ana_data , "pcmX" , ROOT.TCut('') , debug)
-        KSpCMy , KSyPval = KStest( PmissBins ,ana_sim , ana_data , "pcmY" , ROOT.TCut('') , debug)
-        KSpCMt , KStPval = KStest( PmissBins ,ana_sim , ana_data , "pcmT" , ROOT.TCut('') , debug)
-        KSpCMz , KSzPval = KStest( PmissBins ,ana_sim , ana_data , "pcmZ" , ROOT.TCut('') , debug)
+        KSpCMx , KSxPval = KStest( PmissBins ,ana_sim , ana_data , "pcmX" )
+        KSpCMy , KSyPval = KStest( PmissBins ,ana_sim , ana_data , "pcmY" )
+        KSpCMt , KStPval = KStest( PmissBins ,ana_sim , ana_data , "pcmT" )
+        KSpCMz , KSzPval = KStest( PmissBins ,ana_sim , ana_data , "pcmZ" )
         KSPval_tot = Fisher_combination_Pvals([ KSxPval , KSyPval , KSzPval ])
     
         # 3d KS test
@@ -300,11 +330,11 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
             unweighted = fana.RooFitCM( pMiss_min , pMiss_max , False , True, flags.verbose, canvas_unweighted, 4*i + 1 )
             weighted = fana.RooFitCM( pMiss_min , pMiss_max , True , True, flags.verbose, canvas_weighted, 4*i + 1 )
         
-        else:
-            unweighted = fana.RooFitCM( pMiss_min , pMiss_max , False )
-            weighted = fana.RooFitCM( pMiss_min , pMiss_max , True )
-            
-        df_pMissBin = pd.DataFrame({'pMiss_min':pMiss_min,'pMiss_max':pMiss_max
+#        else:
+#            unweighted = fana.RooFitCM( pMiss_min , pMiss_max , False )
+#            weighted = fana.RooFitCM( pMiss_min , pMiss_max , True )
+
+            df_pMissBin = pd.DataFrame({'pMiss_min':pMiss_min,'pMiss_max':pMiss_max
                                        ,'EvtsInBin':len(ana_reduced)            ,'good_bin':good_bin
                                        ,'mean_x_unweighted':unweighted[0],'mean_xErr_unweighted':unweighted[1],'sigma_x_unweighted':unweighted[2],'sigma_xErr_unweighted':unweighted[3]
                                        ,'mean_y_unweighted':unweighted[4],'mean_yErr_unweighted':unweighted[5],'sigma_y_unweighted':unweighted[6],'sigma_yErr_unweighted':unweighted[7]
@@ -316,42 +346,42 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
                                        ,'mean_z_weighted':weighted[12],'mean_zErr_weighted':weighted[13],'sigma_z_weighted':weighted[14],'sigma_zErr_weighted':weighted[15]}
                                        , index=[i])
 
-#        else:
-#            unweighted = fana.RooFitCM( pMiss_min , pMiss_max , False )
-#            weighted = fana.RooFitCM( pMiss_min , pMiss_max , True )
+        else:
+            unweighted = fana.RooFitCM( pMiss_min , pMiss_max , False )
+            weighted = fana.RooFitCM( pMiss_min , pMiss_max , True )
 
-#            # Jan 2017, changing to a (weighted) average and variance using numpy
-#            ana_reduced = ana[ (pMiss_min < ana.Pmiss3Mag) & (ana.Pmiss3Mag < pMiss_max) ]
-#            if flags.verbose>1: print 'running p(miss) bin ',i,',',pMiss_min,' to ',pMiss_max,' GeV/c, ',len(ana_reduced),'events in this bin'
-#
-#            if len(ana_reduced)>0 and sum(ana_reduced.rooWeight)>0:
-#                good_bin , sqrtN = 1 , sqrt(len(ana_reduced))
-#                mean_x_unweighted , mean_x_weighted     = np.average( ana_reduced.pcmX ) , np.average( ana_reduced.pcmX , weights=ana_reduced.rooWeight )
-#                sigma_x_unweighted, sigma_x_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_weighted) , weights=ana_reduced.rooWeight  ))
-#                mean_y_unweighted , mean_y_weighted     = np.average( ana_reduced.pcmY ) , np.average( ana_reduced.pcmY , weights=ana_reduced.rooWeight )
-#                sigma_y_unweighted, sigma_y_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmY-mean_y_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmY-mean_y_weighted) , weights=ana_reduced.rooWeight  ))
-#                mean_z_unweighted , mean_z_weighted     = np.average( ana_reduced.pcmZ ) , np.average( ana_reduced.pcmZ , weights=ana_reduced.rooWeight )
-#                sigma_z_unweighted, sigma_z_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_weighted) , weights=ana_reduced.rooWeight  ))
-#            else:
-#                good_bin , sqrtN = 0 , 1
-#                mean_x_unweighted , mean_x_weighted     = -100,-100
-#                sigma_x_unweighted, sigma_x_weighted    = -100,-100
-#                mean_y_unweighted , mean_y_weighted     = -100,-100
-#                sigma_y_unweighted, sigma_y_weighted    = -100,-100
-#                mean_z_unweighted , mean_z_weighted     = -100,-100
-#                sigma_z_unweighted, sigma_z_weighted    = -100,-100
-#
-#
-#            df_pMissBin = pd.DataFrame({'pMiss_min':pMiss_min                   ,'pMiss_max':pMiss_max
-#                                       ,'EvtsInBin':len(ana_reduced)            ,'good_bin':good_bin
-#                                       ,'mean_x_unweighted':mean_x_unweighted   ,'mean_xErr_unweighted':sigma_x_unweighted/sqrtN ,'sigma_x_unweighted':sigma_x_unweighted,'sigma_xErr_unweighted':0.02 # resolution uncertainty
-#                                       ,'mean_y_unweighted':mean_y_unweighted   ,'mean_yErr_unweighted':sigma_y_unweighted/sqrtN ,'sigma_y_unweighted':sigma_y_unweighted,'sigma_yErr_unweighted':0.02 # resolution uncertainty0
-#                                       ,'mean_z_unweighted':mean_z_unweighted   ,'mean_zErr_unweighted':sigma_z_unweighted/sqrtN ,'sigma_z_unweighted':sigma_z_unweighted,'sigma_zErr_unweighted':0.02 # resolution uncertainty
-#                                       ,'mean_x_weighted':mean_x_weighted       ,'mean_xErr_weighted':sigma_x_weighted/sqrtN     ,'sigma_x_weighted':sigma_x_weighted    ,'sigma_xErr_weighted':0.02 # resolution uncertainty
-#                                       ,'mean_y_weighted':mean_y_weighted       ,'mean_yErr_weighted':sigma_y_weighted/sqrtN     ,'sigma_y_weighted':sigma_y_weighted    ,'sigma_yErr_weighted':0.02 # resolution uncertainty
-#                                       ,'mean_z_weighted':mean_z_weighted       ,'mean_zErr_weighted':sigma_z_weighted/sqrtN     ,'sigma_z_weighted':sigma_z_weighted    ,'sigma_zErr_weighted':0.02 # resolution uncertainty
-#                                       }
-#                                       , index=[i])
+            # Jan 2017, changing to a (weighted) average and variance using numpy
+            ana_reduced = ana[ (pMiss_min < ana.Pmiss3Mag) & (ana.Pmiss3Mag < pMiss_max) ]
+            if flags.verbose>1: print 'running p(miss) bin ',i,',',pMiss_min,' to ',pMiss_max,' GeV/c, ',len(ana_reduced),'events in this bin'
+
+            if len(ana_reduced)>0 and sum(ana_reduced.rooWeight)>0:
+                good_bin , sqrtN = 1 , sqrt(len(ana_reduced))
+                mean_x_unweighted , mean_x_weighted     = np.average( ana_reduced.pcmX ) , np.average( ana_reduced.pcmX , weights=ana_reduced.rooWeight )
+                sigma_x_unweighted, sigma_x_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmX-mean_x_weighted) , weights=ana_reduced.rooWeight  ))
+                mean_y_unweighted , mean_y_weighted     = np.average( ana_reduced.pcmY ) , np.average( ana_reduced.pcmY , weights=ana_reduced.rooWeight )
+                sigma_y_unweighted, sigma_y_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmY-mean_y_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmY-mean_y_weighted) , weights=ana_reduced.rooWeight  ))
+                mean_z_unweighted , mean_z_weighted     = np.average( ana_reduced.pcmZ ) , np.average( ana_reduced.pcmZ , weights=ana_reduced.rooWeight )
+                sigma_z_unweighted, sigma_z_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_weighted) , weights=ana_reduced.rooWeight  ))
+            else:
+                good_bin , sqrtN = 0 , 1
+                mean_x_unweighted , mean_x_weighted     = -100,-100
+                sigma_x_unweighted, sigma_x_weighted    = -100,-100
+                mean_y_unweighted , mean_y_weighted     = -100,-100
+                sigma_y_unweighted, sigma_y_weighted    = -100,-100
+                mean_z_unweighted , mean_z_weighted     = -100,-100
+                sigma_z_unweighted, sigma_z_weighted    = -100,-100
+
+
+            df_pMissBin = pd.DataFrame({'pMiss_min':pMiss_min                   ,'pMiss_max':pMiss_max
+                                       ,'EvtsInBin':len(ana_reduced)            ,'good_bin':good_bin
+                                       ,'mean_x_unweighted':mean_x_unweighted   ,'mean_xErr_unweighted':sigma_x_unweighted/sqrtN ,'sigma_x_unweighted':sigma_x_unweighted,'sigma_xErr_unweighted':0.02 # resolution uncertainty
+                                       ,'mean_y_unweighted':mean_y_unweighted   ,'mean_yErr_unweighted':sigma_y_unweighted/sqrtN ,'sigma_y_unweighted':sigma_y_unweighted,'sigma_yErr_unweighted':0.02 # resolution uncertainty0
+                                       ,'mean_z_unweighted':mean_z_unweighted   ,'mean_zErr_unweighted':sigma_z_unweighted/sqrtN ,'sigma_z_unweighted':sigma_z_unweighted,'sigma_zErr_unweighted':0.02 # resolution uncertainty
+                                       ,'mean_x_weighted':mean_x_weighted       ,'mean_xErr_weighted':sigma_x_weighted/sqrtN     ,'sigma_x_weighted':sigma_x_weighted    ,'sigma_xErr_weighted':0.02 # resolution uncertainty
+                                       ,'mean_y_weighted':mean_y_weighted       ,'mean_yErr_weighted':sigma_y_weighted/sqrtN     ,'sigma_y_weighted':sigma_y_weighted    ,'sigma_yErr_weighted':0.02 # resolution uncertainty
+                                       ,'mean_z_weighted':mean_z_weighted       ,'mean_zErr_weighted':sigma_z_weighted/sqrtN     ,'sigma_z_weighted':sigma_z_weighted    ,'sigma_zErr_weighted':0.02 # resolution uncertainty
+                                       }
+                                       , index=[i])
 
         df_pMissBins = df_pMissBins.append(df_pMissBin)
 
@@ -797,33 +827,33 @@ def get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins , Q2Bins , evtsgen_Q2pm
     return loss_pmiss_bins , loss_Q2pmiss_bins , loss_thetapmqpmiss_bins
 # ------------------------------------------------------------------------------- #
 
-# ------------------------------------------------------------------------------- #
-def calc_Pval_scores( data_fits , reco_fits , name='' ): #{
-    # XX delete by April 15
-    # No Mott/FF - weighting (un - weighted roofit results)
-    pval_scores = compute_Pval_parameters( target=None,
-                                         reco_fits=reco_fits, reco_parameters=reco_parameters,
-                                         cm_pars_as_gaussians=fits_pars_as_gaussians, fits_pars_as_gaussians=fits_pars_as_gaussians)
-
-    #        Pval_array = compute_Pval_parameters( data_fits , reco_fits , weighting='' )
-    #    [Pval_mean_x, Pval_mean_y ,Pval_sigma_x, Pval_sigma_y ,
-    #     Pval_a1 , Pval_a2 , Pval_b1 , Pval_b2 ] = Pval_array
-
-#    PvalTotal = Fisher_combination_Pvals( Pval_array ) # with a cutoff on 1e-20
-#    PvalTotal_allPvals = FisherMethodPvals( Pval_array )
-#    
-#    Pval_scores = pd.DataFrame({'Pval_mean_x':Pval_mean_x,'Pval_mean_y':Pval_mean_y,
-#                               'Pval_sigma_x':Pval_sigma_x,'Pval_sigma_y':Pval_sigma_y,
-#                               'Pval_a1':Pval_a1,'Pval_a2':Pval_a2,'Pval_b1':Pval_b1,'Pval_b2':Pval_b2,
-#                               'global_Pval':PvalTotal,'PvalTotal_allPvals':PvalTotal_allPvals}
-#                               ,index=[0])
-#                               
-#    if debug>2: print "calculated Pval scores " + name ; print Pval_scores
-#    
-#    return Pval_scores
-#}
-# ------------------------------------------------------------------------------- #
-
+## ------------------------------------------------------------------------------- #
+#def calc_Pval_scores( data_fits , reco_fits , name='' ): #{
+#    # XX delete by April 15
+#    # No Mott/FF - weighting (un - weighted roofit results)
+#    pval_scores = compute_Pval_parameters( target=None,
+#                                         reco_fits=reco_fits, reco_parameters=reco_parameters,
+#                                         cm_pars_as_gaussians=fits_pars_as_gaussians, fits_pars_as_gaussians=fits_pars_as_gaussians)
+#
+#    #        Pval_array = compute_Pval_parameters( data_fits , reco_fits , weighting='' )
+#    #    [Pval_mean_x, Pval_mean_y ,Pval_sigma_x, Pval_sigma_y ,
+#    #     Pval_a1 , Pval_a2 , Pval_b1 , Pval_b2 ] = Pval_array
+#
+##    PvalTotal = Fisher_combination_Pvals( Pval_array ) # with a cutoff on 1e-20
+##    PvalTotal_allPvals = FisherMethodPvals( Pval_array )
+##    
+##    Pval_scores = pd.DataFrame({'Pval_mean_x':Pval_mean_x,'Pval_mean_y':Pval_mean_y,
+##                               'Pval_sigma_x':Pval_sigma_x,'Pval_sigma_y':Pval_sigma_y,
+##                               'Pval_a1':Pval_a1,'Pval_a2':Pval_a2,'Pval_b1':Pval_b1,'Pval_b2':Pval_b2,
+##                               'global_Pval':PvalTotal,'PvalTotal_allPvals':PvalTotal_allPvals}
+##                               ,index=[0])
+##                               
+##    if debug>2: print "calculated Pval scores " + name ; print Pval_scores
+##    
+##    return Pval_scores
+##}
+## ------------------------------------------------------------------------------- #
+#
 # ------------------------------------------------------------------------------- #
 def get_Pval_scores( data_fits , reco_fits , name='' ):
     # XX delete by April 30
@@ -1270,6 +1300,7 @@ def stream_dataframe_to_root( df , filename , treename='tree' ):
 
 # ------------------------------------------------------------------------------- #
 def generate_runs_with_random_parameters( option='', hyperparameters=None,
+                                         ana_data=dict(),
                                          cm_pars=dict(), cm_fits=dict(),
                                          debug=0 , PmissBins=None , Q2Bins=None , thetapmqBins=None ,
                                          buildup_resutlsFName='' ,
@@ -1349,6 +1380,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             # reconstruct c.m. parameters and fit
             reco_parameters, do_fits = calc_cm_parameters( ana_sim  , PmissBins )
             reco_fits = fit_cm_parameters( run , reco_parameters , do_fits=do_fits )
+            ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data )
             
             results = pd.DataFrame({'run':int(run)
                                    ,'time':str(datetime.datetime.now().strftime("%Y%B%d"))
@@ -1392,37 +1424,51 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                 #}
             #}
         
-            # Pvalues
+        
+        
+        
+#            # Pvalues
+#            for target in targets: #{
+#                #print '---------------\ncalculating Pvalue for ',target,'\n------------------'
+#                pval_fits_scores, pval_cm_pars_scores = compute_Pval_parameters(data_cm_pars=cm_pars[target], data_fits=cm_fits[target], reco_fits=reco_fits, reco_parameters=reco_parameters)
+##                pval_fits_scores, pval_cm_pars_scores = compute_Pval_parameters( target=target,
+##                                                                                reco_fits=reco_fits,
+##                                                                                reco_parameters=reco_parameters,
+##                                                                                cm_pars_as_gaussians=cm_pars_as_gaussians,
+##                                                                                fits_pars_as_gaussians=fits_pars_as_gaussians)
+#
+#                for parameter in ['MeanX','MeanY','SigmaX','SigmaY','a1','a2','b1','b2']:#{
+#                    results['local_Pval_'+parameter+'_'+target] = pval_fits_scores[parameter]
+#                #}
+#                results['PvalTotal'] = pval_fits_scores['PvalTotal']
+#                results['PvalTotal_allPvals'] = pval_fits_scores['PvalTotal_allPvals']
+#
+#                for bin in range(len(PmissBins)):#{
+#                    for parameter in ['mean','sigma']:#{
+#                        for direction in ['x','y','z']:#{
+#                            parname = parameter + '_' + direction
+#                            parnamebin = parname+'_bin%d'%bin
+#                            results['local_Pval_'+parnamebin+'_'+target] = pval_cm_pars_scores[parname+'_bin%d'%bin]
+#                        #}
+#                    #}
+#                #}
+#                results['PvalTotal'] = pval_cm_pars_scores['PvalTotal']
+#                results['PvalTotal_allPvals'] = pval_cm_pars_scores['PvalTotal_allPvals']
+#            #}
+
+            # KS Pvalues
             for target in targets: #{
-                print '---------------\ncalculating Pvalue for ',target,'\n------------------'
-                pval_fits_scores, pval_cm_pars_scores = compute_Pval_parameters(data_cm_pars=cm_pars[target], data_fits=cm_fits[target] ,
-                                                                                reco_fits=reco_fits, reco_parameters=reco_parameters)
-#                pval_fits_scores, pval_cm_pars_scores = compute_Pval_parameters( target=target,
-#                                                                                reco_fits=reco_fits,
-#                                                                                reco_parameters=reco_parameters,
-#                                                                                cm_pars_as_gaussians=cm_pars_as_gaussians,
-#                                                                                fits_pars_as_gaussians=fits_pars_as_gaussians)
-
-
-
-                for parameter in ['MeanX','MeanY','SigmaX','SigmaY','a1','a2','b1','b2']:#{
-                    results['local_Pval_'+parameter+'_'+target] = pval_fits_scores[parameter]
-                #}
-                results['PvalTotal'] = pval_fits_scores['PvalTotal']
-                results['PvalTotal_allPvals'] = pval_fits_scores['PvalTotal_allPvals']
-
+                if debug>2: print '---------------\npluging ks-Pvalue scores for ',target,'\n------------------'
                 for bin in range(len(PmissBins)):#{
-                    for parameter in ['mean','sigma']:#{
-                        for direction in ['x','y','z']:#{
-                            parname = parameter + '_' + direction
-                            parnamebin = parname+'_bin%d'%bin
-                            results['local_Pval_'+parnamebin+'_'+target] = pval_cm_pars_scores[parname+'_bin%d'%bin]
-                        #}
+                    for direction in ['X','Y','Z']: #{
+                        results['ks_local_Pval_'+'pcm'+direction+'_bin%d'%bin+'_'+target] = ks_pval_scores[target]['pcm'+direction+'_bin%d'%bin]
                     #}
                 #}
-                results['PvalTotal'] = pval_cm_pars_scores['PvalTotal']
-                results['PvalTotal_allPvals'] = pval_cm_pars_scores['PvalTotal_allPvals']
+                if debug>2: print "ks_pval_scores["+target+"]['PvalTotal_allPvals'],ks_pval_scores["+target+"]['PvalTotal']:",ks_pval_scores[target]['PvalTotal_allPvals'],ks_pval_scores[target]['PvalTotal']
+                results['ks_PvalTot_allPvals'+'_'+target] = ks_pval_scores[target]['PvalTotal_allPvals']
+                results['ks_PvalTotal'+'_'+target] = ks_pval_scores[target]['PvalTotal'] # with a cutoff on 1e-20
             #}
+
 
     
     
@@ -1443,7 +1489,6 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     results['fracLoss_pmiss_%.3f_%.3f_thetapmq_%.1f_%.1f'%(pmin,pmax,thetapmqmin,thetapmqmax)] = loss_thetapmqpmiss_bins[i][j]
                 #}
             #}
-            
             # ------------------------------------------------------------------------------------------------------------------------------------------------
             
             
