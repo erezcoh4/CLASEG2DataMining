@@ -257,7 +257,7 @@ def plot_errorbar_and_fit( ax , x , y , xerr , yerr , color , marker , lstyle , 
         if do_plot_fit_pars: label=label + "$=(%.3f)(p_{miss}-%.1f)+(%.3f)$"%( a1 , x_offset, a2 )
         ax.plot( x , a1 * (x-x_offset) + a2 , color = color ,label=label )
         if debug>1: print 'linear fit of ' + label + " : $=(%.3f)(p_{miss}-%.1f)+(%.3f)$"%( a1 ,x_offset ,  a2 )
-        return [ a1 , a1err] , [ a2 , a2err ] , chi2red
+        return [ a1 , a1err ,  a2 , a2err  , chi2red ]
 # ------------------------------------------------------------------------------- #
 
 
