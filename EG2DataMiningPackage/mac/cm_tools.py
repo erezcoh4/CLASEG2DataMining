@@ -118,7 +118,6 @@ def compute_Pval_parameters(data_cm_pars=None, data_fits=None ,
     pval_fits_scores_array = []
     for i,parname in enumerate(['MeanX','MeanY','SigmaX','SigmaY','a1','a2','b1','b2']):#{
         pval_fits_scores[parname] = CalcKS2sampAssumingGaussian( data_df=data_fits, sim_df=reco_fits, parname=parname, parerrname=parname+'err' )
-        #        t,pval_fits_scores[parameter] = ttest_onesamp( fits_pars_as_gaussians[target][parameter], reco_fits[parameter] )
         pval_fits_scores_array.append(pval_fits_scores[parname])
     #}
     pval_fits_scores['Pval_array'] = pval_fits_scores_array
@@ -134,7 +133,6 @@ def compute_Pval_parameters(data_cm_pars=None, data_fits=None ,
             for direction in ['x','y','z']:#{
                 parname = parameter + '_' + direction
                 pval_cm_pars_scores[parname+'_bin%d'%bin] = CalcKS2sampAssumingGaussian( data_df=data_cm_pars, sim_df=reco_parameters, parname=parname+'_unweighted', parerrname=parname+'Err_unweighted' , PmissBin=bin)
-                #                t,pval_cm_pars_scores[parnamedir+'_bin%d'%bin] = ttest_onesamp( cm_pars_as_gaussians[target][bin][parnamedir], reco_parameters.get_value(bin,parnamedir+'_unweighted'))
                 pval_cm_pars_scores_array.append( pval_cm_pars_scores[parname+'_bin%d'%bin] )
             #}
         #}
@@ -172,10 +170,9 @@ def KStest( PmissBins , ana_sim , ana_data , var , Nbins=20, do_save_plots=False
 def calc_pval_ks_scores(ana_sim=None, ana_data=dict()):
     ks_pval_scores = dict()
     # April-2017, change to Pval using ks-test
-#    ana_sim.GetTree().Print()
     df_sim = tree2array( ana_sim.GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
     for target in targets: #{
-        ks_pval_scores_target_array = []
+        ks_pval_scores_target_array , ks_pval_scores_transverse_target_array , ks_pval_scores_longitudinal_target_array = [] , [] , []
         ks_pval_scores_target = dict()
         df_data = tree2array( ana_data[target].GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
         for bin in range(len(PmissBins)):#{
@@ -186,10 +183,15 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict()):
                 D_KS , Pval_KS = ks_2samp( df_sim_reduced['pcm'+direction] , df_data_reduced['pcm'+direction] )
                 ks_pval_scores_target['pcm'+direction+'_bin%d'%bin] = Pval_KS
                 ks_pval_scores_target_array.append( Pval_KS )
+                # local longitudinal and transverse p-values
+                if direction is 'X' or direction is 'Y': ks_pval_scores_transverse_target_array.append( Pval_KS )
+                else: ks_pval_scores_longitudinal_target_array.append( Pval_KS )
             #}
         #}
         ks_pval_scores_target['PvalTotal'] = Fisher_combination_Pvals( ks_pval_scores_target_array ) # with a cutoff on 1e-20
         ks_pval_scores_target['PvalTotal_allPvals'] = FisherMethodPvals( ks_pval_scores_target_array )
+        ks_pval_scores_target['PvalTotalTransverse'] = Fisher_combination_Pvals( ks_pval_scores_transverse_target_array ) # with a cutoff on 1e-20
+        ks_pval_scores_target['PvalTotalLongitudinal'] = Fisher_combination_Pvals( ks_pval_scores_longitudinal_target_array ) # with a cutoff on 1e-20
         ks_pval_scores[target] = ks_pval_scores_target
     #}
     if debug>2: print 'ks_pval_scores:',ks_pval_scores
@@ -307,7 +309,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
     '''
         Return: df_pMissBin , do_fits (continue or not)
         '''
-    
+    do_fits = True
     df_pMissBins = pd.DataFrame()
     
     if DoSaveCanvas:
@@ -359,7 +361,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
                 mean_z_unweighted , mean_z_weighted     = np.average( ana_reduced.pcmZ ) , np.average( ana_reduced.pcmZ , weights=ana_reduced.rooWeight )
                 sigma_z_unweighted, sigma_z_weighted    = np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_unweighted) )) , np.sqrt(np.average( np.square(ana_reduced.pcmZ-mean_z_weighted) , weights=ana_reduced.rooWeight  ))
             else:
-                good_bin , sqrtN = 0 , 1
+                good_bin , sqrtN , do_fits  = 0 , 1 , False
                 mean_x_unweighted , mean_x_weighted     = -100,-100
                 sigma_x_unweighted, sigma_x_weighted    = -100,-100
                 mean_y_unweighted , mean_y_weighted     = -100,-100
@@ -396,7 +398,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
     garbage_list = [ ana ]
     del garbage_list
 
-    return df_pMissBins , True
+    return df_pMissBins , do_fits
 # ------------------------------------------------------------------------------- #
 
 
@@ -1294,6 +1296,17 @@ def stream_dataframe_to_root( df , filename , treename='tree' ):
 ## ------------------------------------------------------------------------------- #
 #
 
+def a1a2_create_negative_sigma_z( a1 , a2 ):
+    '''
+    check if a1 and a2 give \sigma_z < 0,
+    since we do not want to use those (unreasonable) values.
+    we check for the minimal Pmiss (0.3) and the maximal Pmiss (1.0)
+    '''
+    if a1*(0.3 - 0.6) + a2 < 0: return True
+    if a1*(1.0 - 0.6) + a2 < 0: return True
+    return False
+
+
 # ------------------------------------------------------------------------------- #
 def generate_runs_with_random_parameters( option='', hyperparameters=None,
                                          ana_data=dict(),
@@ -1349,7 +1362,10 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             gen_b2  = np.random.uniform( np.min(hyperparameters['range_b2']),np.max(hyperparameters['range_b2']) )
             
             if flags.verbose>2: print 'run:',run,',parameters:', gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2
-
+            if a1a2_create_negative_sigma_z( gen_a1 , gen_a2 ):
+                if debug: print 'a1 (%.2f) and a2(%.2f) create together a negative sigma_z, killing run %d'%( gen_a1 , gen_a2 , run )
+                continue
+            
             gen_events.Set_eep_Parameters( gen_MeanX , gen_SigmaX , gen_MeanY , gen_SigmaY , gen_a1 , gen_a2 , gen_b1 , gen_b2 )
             gen_events.DoGenerateRun_eepp( run )
             
@@ -1399,6 +1415,8 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                                    ,'fracLostEvents':(float((9907.0*float(NRand)) - ana_sim.GetEntries())/(9907.0*float(NRand)))
                                    }
                                    , index = [int(run)])
+                                   
+            results['parameters_reconstructed_well'] = True if do_fits else False
                 
             # reconstructed parameters in 5 big p(miss) bins
             for i in range(len(PmissBins)):#{
@@ -1407,11 +1425,11 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     for direction in ['x','y','z']: #{
                         
                         parnamedir = parname + '_' + direction
-                        recparnamedir = 'rec'+parnamedir+'_pmiss_%.3f_%.3f'%(pmin , pmax)
+                        recparnamedir = 'rec'+parnamedir+'_bin%d'%i
                         results[recparnamedir] = float(reco_parameters.get_value(i,parnamedir+'_unweighted')) if do_fits else -100
                             
                         parnamedirErr = parnamedir+'Err'
-                        recparnamedirErr = 'rec'+parnamedirErr+'_pmiss_%.3f_%.3f'%(pmin , pmax)
+                        recparnamedirErr = 'rec'+parnamedirErr+'_bin%d'%i
                         results[recparnamedirErr] = float(reco_parameters.get_value(i,parnamedirErr+'_unweighted')) if do_fits else -100
             
                     #}
@@ -1455,12 +1473,13 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                         results['ks_local_Pval_'+'pcm'+direction+'_bin%d'%bin+'_'+target] = ks_pval_scores[target]['pcm'+direction+'_bin%d'%bin]
                     #}
                 #}
-                if debug>2: print "ks_pval_scores["+target+"]['PvalTotal_allPvals'],ks_pval_scores["+target+"]['PvalTotal']:",ks_pval_scores[target]['PvalTotal_allPvals'],ks_pval_scores[target]['PvalTotal']
+                if debug>2: print "ks-pval["+target+"]['PvalTotal_allPvals'],ks-pval["+target+"]['PvalTotal']:",ks_pval_scores[target]['PvalTotal_allPvals'],ks_pval_scores[target]['PvalTotal']
                 results['ks_PvalTot_allPvals'+'_'+target] = ks_pval_scores[target]['PvalTotal_allPvals']
                 results['ks_PvalTotal'+'_'+target] = ks_pval_scores[target]['PvalTotal'] # with a cutoff on 1e-20
+                results['ks_PvalTotalTransverse'+'_'+target] = ks_pval_scores[target]['PvalTotalTransverse']
+                results['ks_PvalTotalLongitudinal'+'_'+target] = ks_pval_scores[target]['PvalTotalLongitudinal']            
             #}
-    
-    
+        
             # events loss in 20 p(miss) bins, for pp/p analysis
             for i in range( len(pmiss_bins) ):#{
                 pmin , pmax = pmiss_bins[i][0] , pmiss_bins[i][1]
