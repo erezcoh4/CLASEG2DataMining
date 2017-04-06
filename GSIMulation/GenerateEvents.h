@@ -66,7 +66,7 @@
    User defined class GenerateEvents ... these comments are used to generate
    doxygen documentation!
  */
-class GenerateEvents{
+class GenerateEvents: public myIncludes{
 
 public:
 
@@ -85,6 +85,8 @@ public:
     Int_t DoGenerateRun_eepp( Int_t run = 1
                             , bool DoGetRootFile = true
                             , bool DoGenTextFile = false);
+    
+    Int_t Generate_eepp_from_3dGaussian( Int_t run=1);
 
     void       SetRootTreeAddresses ();
     void                  SetLimits ( Float_t , Float_t , Float_t , Float_t );
@@ -119,13 +121,14 @@ public:
     bool        Do_pAcceptance , AcceptEvent;
     
     Int_t       RunNumber   , Nevents   , NAcceptedEvents;
-    Int_t       NRand       , NPTheta   , NeTheta   ,debug;
+    Int_t       NRand       , NPTheta   , NeTheta   ;
    
     Float_t     Q2      , Xb            , PoverQ    , Mmiss;
     Float_t     ThetaPQ , theta_miss_q   , ThetaPmissPrecoil;
+    Float_t     theta_Pmiss , phi_Pmiss;
     Float_t     theta_e ;
     Float_t     MeanX   , MeanY , SigmaX    , SigmaY;
-    Float_t     SigmaZ_a1       , SigmaZ_a2 , MeanZ_a1  , MeanZ_a2  ;
+    Float_t     a1       , a2 , b1  , b2  ;
     Float_t     Pmin    , Pmax  , Thetamin  , Thetamax;
     Float_t     Pmiss3Mag   , pcmX      , pcmY          , pcmT      , pcmZ  ;
     Float_t     Theta       , Mott      , DipoleFF2                 , rooWeight;
@@ -144,7 +147,7 @@ public:
     TVector3    q3Vector_in_Pmiss_q_system ,       Pmiss_in_Pmiss_q_system ,   Pcm_in_Pmiss_q_system   , Precoil_in_Pmiss_q_system;
     TVector3    q_q_sys                    ,       Pmiss_q_sys             ,   Pcm_q_sys;
 
-    TLorentzVector  Proton  ,       Prec    ,   q4Vector        , m2N       , miss;
+    TLorentzVector  Proton  ,       Prec    ,   q4Vector        , m2N       , miss , Pmiss4vec;
 
     TString     Path , RunsInfoFileName , txtFilename , rootFilename , runsFilename;
     
