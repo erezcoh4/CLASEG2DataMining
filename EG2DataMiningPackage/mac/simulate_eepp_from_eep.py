@@ -59,7 +59,7 @@ if 'generate' in flags.option or 'analyse' in flags.option:#{
                            'range_a2':(0.0  , 0.5),         # 0.158
                            'range_b1':(-0.2 , 0.8),         # 0.569
                            'range_b2':(-0.3 , 0.6),         # 0.159
-                           'NRand':10}
+                           'NRand':20}
                            )
 
     test_name = 'runs_%d_%d'%( hyperparameters['start_run'] , hyperparameters['start_run'] + hyperparameters['Nruns'] )

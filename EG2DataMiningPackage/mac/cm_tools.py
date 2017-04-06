@@ -1361,15 +1361,11 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             gen_b1  = np.random.uniform( np.min(hyperparameters['range_b1']),np.max(hyperparameters['range_b1']) )
             gen_b2  = np.random.uniform( np.min(hyperparameters['range_b2']),np.max(hyperparameters['range_b2']) )
             
-            if flags.verbose>2: print 'run:',run,',parameters:', gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2
+            if debug: print 'run:',run,',parameters:', gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2
             if a1a2_create_negative_sigma_z( gen_a1 , gen_a2 ):
                 if debug: print 'a1 (%.2f) and a2(%.2f) create together a negative sigma_z, killing run %d'%( gen_a1 , gen_a2 , run )
                 continue
             
-#            Set_eep_Parameters(Float_t fMeanX, Float_t fSigmaX,
-#                               Float_t fMeanY, Float_t fSigmaY,
-#                               Float_t fb1, Float_t fb2,
-#                               Float_t fa1, Float_t fa2 )
             gen_events.Set_eep_Parameters( gen_MeanX , gen_SigmaX , gen_MeanY , gen_SigmaY , gen_b1 , gen_b2 , gen_a1 , gen_a2 )
             gen_events.DoGenerateRun_eepp( run )
             
@@ -1509,12 +1505,13 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             if do_resutls_file:     stream_dataframe_to_file( results, buildup_resutlsFName , float_format='%f' )
             if do_root_file:        stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
             ana_sim.CloseFile()
-            irun += 1
-            print_important("completed run %d [%.0f"%(run,100.*float(irun)/Nruns) + "%]"+" at %4d-%02d-%02d %d:%d:%d"%time.localtime()[0:6] )
-            print_line()
-
-        if 'delete' in option:
+        #}
+        if 'delete' in option:#{
             delete_file( path + '/eg_rootfiles/run%d.root'%run  , debug )
+        #}
+        irun += 1
+        print_important("completed run %d [%.0f"%(run,100.*float(irun)/Nruns) + "%]"+" at %4d-%02d-%02d %d:%d:%d"%time.localtime()[0:6] )
+        print_line()
     #}
 
 
