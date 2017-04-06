@@ -1366,7 +1366,11 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                 if debug: print 'a1 (%.2f) and a2(%.2f) create together a negative sigma_z, killing run %d'%( gen_a1 , gen_a2 , run )
                 continue
             
-            gen_events.Set_eep_Parameters( gen_MeanX , gen_SigmaX , gen_MeanY , gen_SigmaY , gen_a1 , gen_a2 , gen_b1 , gen_b2 )
+#            Set_eep_Parameters(Float_t fMeanX, Float_t fSigmaX,
+#                               Float_t fMeanY, Float_t fSigmaY,
+#                               Float_t fb1, Float_t fb2,
+#                               Float_t fa1, Float_t fa2 )
+            gen_events.Set_eep_Parameters( gen_MeanX , gen_SigmaX , gen_MeanY , gen_SigmaY , gen_b1 , gen_b2 , gen_a1 , gen_a2 )
             gen_events.DoGenerateRun_eepp( run )
             
             # and now scheme them to our desired pp-SRC cuts
