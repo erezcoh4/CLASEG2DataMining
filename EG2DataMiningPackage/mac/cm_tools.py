@@ -471,7 +471,7 @@ def fit_cm_parameters( run , data , do_fits=True , FigureFName = '' , DoPlot = F
 #                            ,'MeanZa1_weighted':-100       ,'MeanZa1err_weighted':0
 #                            ,'MeanZa2_weighted':-100       ,'MeanZa2err_weighted':0 }
 #                            , index=[0] )
-        return pd.DataFrame({ 'run':run,'Nevents':(np.sum(data['EvtsInBin']))
+        return pd.DataFrame({ 'run':run,'Nevents':-100
                             ,'SigmaX':-100,'SigmaXerr':0,'MeanX':-100, 'MeanXerr':0
                             ,'SigmaY':-100,'SigmaYerr':0,'MeanY':-100,'MeanYerr':0
                             ,'a1':-100,'a1err':0,'a2':-100,'a2err':0,'a_chi2red':-100
