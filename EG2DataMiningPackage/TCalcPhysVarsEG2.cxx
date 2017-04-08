@@ -211,6 +211,8 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     // (e,e'p) for ppSRC analysis
     OutTree -> Branch("eep_in_ppSRCcut"     ,&eep_in_ppSRCcut           ,"eep_in_ppSRCcut/I");
     // (e,e'pp) for ppSRC analysis, and the recoiling proton also passed fiducial cuts
+    OutTree -> Branch("ppSRCcut"            ,&ppSRCcut                  ,"ppSRCcut/I");
+    // (e,e'pp) for ppSRC analysis, and the recoiling proton also passed fiducial cuts
     OutTree -> Branch("ppSRCcutFiducial"    ,&ppSRCcutFiducial          ,"ppSRCcutFiducial/I");
     
     if (debug>0) std::cout << "Initialized Output Tree TCalcPhysVarsEG2 on " << OutTree -> GetTitle() << std::endl;
@@ -224,7 +226,7 @@ void TCalcPhysVarsEG2::InitGlobals(){
     m_A_1 = mA - Mp;
     A_over_mA  = (float)A/mA;
     pA.SetVectM( TVector3() , Mp * A  );
-    Beam = TLorentzVector( 0 , 0 , 5.009 , 5.009 );
+    Beam = TLorentzVector( 0 , 0 , 5.014 , 5.014 );
     
     if (debug > 2) Printf("intialized globals");
 
@@ -248,7 +250,7 @@ void TCalcPhysVarsEG2::InitEvent(){
     if (!pFiducCut_g.empty()) pFiducCut_g.clear();
 
     Np = NpBack = NpCumulative = NpCumulativeSRC = 0;
-    Plead = Plead_g = TLorentzVector();
+    Pmiss = Plead = Plead_g = TLorentzVector();
     Wmiss.SetVectM( TVector3() , 3. * Mp  );
 
 
@@ -281,7 +283,8 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
     // electron
     if(DataType == "DATA" || DataType == "GSIM" ) {
-        Pe      = TVector3( Px_e , Py_e , Pz_e );
+        Pe = TVector3( Px_e , Py_e , Pz_e );
+        Pe = CoulombCorrection( Pe , CoulombDeltaE , Me , 1 ); // for the electron, the correction is E'+dE
         eVertex = TVector3( X_e , Y_e , Z_e );
     }
     else if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA"){
@@ -306,25 +309,24 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     // get protons - energy loss correction and Coulomb corrections
     for (int i = 0 ; i < Np ; i++ ){
-
-        p3vec.push_back( TVector3 (PpX[i],PpY[i],PpZ[i] ) );
-        EnergyLossCorrrection( p3vec.back() );
-        CoulombCorrection( p3vec.back() , CoulombDeltaE );
-        if ( p3vec.back().Mag() > Plead.P() )
-            Plead.SetVectM( p3vec.back() , Mp ) ;           // Plead is first calculated in Lab-Frame
+        
+        TVector3 p_3_momentum( PpX[i], PpY[i], PpZ[i] );
+        p_3_momentum = CoulombCorrection( p_3_momentum , CoulombDeltaE , Mp , -1 ); // for the protons, the correction is Ep-dE
+        p_3_momentum = EnergyLossCorrrection( p_3_momentum );
+        p3vec.push_back( p_3_momentum );
+        if ( p_3_momentum.Mag() > Plead.P() )
+            Plead.SetVectM( p_3_momentum , Mp ) ;           // Plead is first calculated in Lab-Frame
     }
     
     if (DataType == "GSIM") {
         for (int i = 0 ; i < Np_g ; i++ ){
             p3vec_g.push_back( TVector3 (PpX_g[i],PpY_g[i],PpZ_g[i] ) );
             EnergyLossCorrrection( p3vec_g.back() );
-            CoulombCorrection( p3vec_g.back() , CoulombDeltaE );
+            CoulombCorrection( p3vec_g.back() , CoulombDeltaE , Mp , -1 );
             if ( p3vec_g.back().Mag() > Plead_g.P() )
                 Plead_g.SetVectM( p3vec_g.back() , Mp ) ;           // Plead is first calculated in Lab-Frame
         }
     }
-
-    
     if (DataType == "(e,e'npp)"){
         // momenta corrections have already performed
         p3vec.push_back(*NMom);
@@ -332,7 +334,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         p3vec.push_back(*P1Mom);
         p3vec.push_back(*P2Mom);
     }
-    if(p3vec.size()==3)
+    if (p3vec.size()==3)
         PmRctLab3   = q.Vect() - p3vec.at(1) - p3vec.at(2);
     if (debug > 2) Printf("extracted protons' kinematics");
 
@@ -354,19 +356,16 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     p_over_q    = Plead.P() / q.P();
     if (debug > 2) Printf("computed Pmiss , p/q , 𝜃(p,q) , p(A-1)");
 
-
     
     // Bjorken scaling for a moving nucleon
     // Invariant mass of the system produced in the interaction of balancing nucleon with a virtual photon
     pA_Np_1.SetVectM( TVector3() , Mp * (A - Np + 1)  );
     Wtilde      = pA - pA_Np_1 + q ;
-
     
     
     // move to prefered axes frame
     ChangeAxesFrame();
     if (debug > 2) Printf("Changed Axes Frame");
-
     
     // α-s
     alpha_q     = LCfraction(q , q , A_over_mA);
@@ -420,9 +419,9 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         Nmiss = Nlead - q;
         Np = 3;
     }
-    if (Np==2) {
-        p12Randomize();
-    }
+//    if (Np==2) {
+//        p12Randomize();
+//    }
     else if (Np==3) {
         p23Randomize();
         PmissRct    = q - protons.at(1) - protons.at(2);
@@ -471,6 +470,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 void TCalcPhysVarsEG2::SetCuts(){
     
     eep_in_ppSRCcut = false;
+    ppSRCcut = false;
     ppSRCcutFiducial = false;
     
     if ( Np>=1
@@ -479,12 +479,23 @@ void TCalcPhysVarsEG2::SetCuts(){
         && 0.62 < p_over_q && p_over_q < 0.96
         && Mmiss < 1.1
         && 0.3 < Pmiss.P() && Pmiss.P() < 1.0
-        && -24.5 < pVertex[0].Z() && pVertex[0].Z() < -20){
+        && -24.5 < pVertex[0].Z() && pVertex[0].Z() < -20.0
+        && -24.5 < eVertex.Z() && eVertex.Z() < -20.0){
+//        && -26.5 < pVertex[0].Z() && pVertex[0].Z() < -22.0
+//        && -26.5 < eVertex.Z() && eVertex.Z() < -22.0){
+        
         eep_in_ppSRCcut = true;
         
-        if (0.35 < Prec.P()  &&  -24.5 < pVertex[1].Z() && pVertex[1].Z() < -20
-            && pFiducCut[1] == 1) {
-            ppSRCcutFiducial = true;
+        if (0.35 < Prec.P()  &&  -24.5 < pVertex[1].Z() && pVertex[1].Z() < -20.0){
+//        if (0.35 < Prec.P()  &&  -26.5 < pVertex[1].Z() && pVertex[1].Z() < -22.0){
+        
+            ppSRCcut = true;
+            
+            if (pFiducCut[1] == 1){
+                
+                ppSRCcutFiducial = true;
+                
+            }
         }
     }
 }

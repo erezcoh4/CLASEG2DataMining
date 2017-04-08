@@ -48,7 +48,7 @@ public:
     
     // momentum corrections: energy loss and Coulomb corrections
     TVector3    EnergyLossCorrrection ( TVector3 );
-    TVector3        CoulombCorrection ( TVector3 , Float_t );
+    TVector3        CoulombCorrection ( TVector3 , Float_t , Float_t m, Float_t dE_sign);
     TString                    Target ( int );
     TString            TargetAsString ( int, float *mA = 0 , float *CoulombDeltaE = 0);
     void           RotVec2_q_Pm_Frame ( TVector3* , float , float , float);

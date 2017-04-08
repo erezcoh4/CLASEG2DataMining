@@ -14,10 +14,18 @@ TVector3 TEG2dm::EnergyLossCorrrection(TVector3 p){ // following Or Hen Analysis
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-TVector3 TEG2dm::CoulombCorrection(TVector3 p , Float_t CoulombDeltaE){
+TVector3 TEG2dm::CoulombCorrection(TVector3 p , Float_t CoulombDeltaE , Float_t m , Float_t dE_sign){
     // following Or Hen Analysis : p' = p x √(√((m^2+p^2)^2+∆E^2) - m^2)
-    p = (sqrt(pow(sqrt(pow(Mp,2)+pow(p.Mag(),2))+CoulombDeltaE,2) - pow(Mp,2))/p.Mag())*p;
-    return p;
+    // for electrons the correction is E'+dE
+    // for protons it is Ep-dE
+    float E = sqrt( p.Mag2() + m*m );
+    float E_corrected = E + dE_sign*CoulombDeltaE ;
+    float p_mag_corrected = sqrt( E_corrected*E_corrected - m*m) ;
+    float correction = p_mag_corrected / p.Mag();
+    
+    // following Or Hen Analysis : p' = p x √(√((m^2+p^2)^2+∆E^2) - m^2)
+    //    p = (sqrt(pow(sqrt(pow(Mp,2)+pow(p.Mag(),2))+CoulombDeltaE,2) - pow(Mp,2))/p.Mag())*p;
+    return (correction * p);
 }
 
 

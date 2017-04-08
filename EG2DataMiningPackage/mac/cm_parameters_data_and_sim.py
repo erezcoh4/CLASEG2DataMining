@@ -4,7 +4,7 @@ from cm_tools import *
     example usages:
     ---------------
     
-    python mac/cm_parameters_data_and_sim.py --option=scheme
+    python mac/cm_parameters_data_and_sim.py --option=scheme -A12
     python mac/cm_parameters_data_and_sim.py --option=bands
     python mac/cm_parameters_data_and_sim.py --option=AllTargets
     python mac/cm_parameters_data_and_sim.py --option=generate_analyze -v2 -r1 -nruns=1
@@ -131,6 +131,8 @@ if 'scheme pp-SRC' in flags.option or 'scheme' in flags.option: # scheme to pp-S
     scheme.SchemeOnTCut( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ROOT.TCut("ppSRCcutFiducial") )
     SchemedName = "eep_in_ppSRCCut_%s"% DataName
     scheme.SchemeOnTCut( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ROOT.TCut("eep_in_ppSRCcut") )
+    SchemedName = "ppSRCCut_noFVcuts_%s"% DataName
+    scheme.SchemeOnTCut( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ROOT.TCut("ppSRCcut") )
     print 'schemed to %s'%SchemedName
 
 

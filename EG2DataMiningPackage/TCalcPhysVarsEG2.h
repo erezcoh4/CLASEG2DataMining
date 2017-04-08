@@ -57,7 +57,7 @@ public:
     Int_t   uns_pCut[20], uns_pID[20];
     
     // cuts
-    Int_t   ppSRCcutFiducial , eep_in_ppSRCcut;
+    Int_t   ppSRCcut, ppSRCcutFiducial, eep_in_ppSRCcut;
     
     
     // for GSIM: generated
@@ -80,7 +80,7 @@ public:
     Float_t N_Px[20]    , N_Py[20]  , N_Pz[20];                 // for raw data
     Float_t thetaMiss23 , phiMiss23 , thetaLeadRec   , theta23;
     Float_t Theta       , Mott      , DipoleFF2      , rooWeight;
-    const Float_t Ebeam = 5.009 , e2 = 1; // sqaure of e-charge in e-charge units (for simplcity)
+    const Float_t Ebeam = 5.014 , e2 = 1; // sqaure of e-charge in e-charge units (for simplcity)
     
     Double_t k0         , kCMmag    , Px    , Py    ,Pz ;
     

@@ -1296,6 +1296,7 @@ def stream_dataframe_to_root( df , filename , treename='tree' ):
 ## ------------------------------------------------------------------------------- #
 #
 
+# ------------------------------------------------------------------------------- #
 def a1a2_create_negative_sigma_z( a1 , a2 ):
     '''
     check if a1 and a2 give \sigma_z < 0,
@@ -1305,7 +1306,7 @@ def a1a2_create_negative_sigma_z( a1 , a2 ):
     if a1*(0.3 - 0.6) + a2 < 0: return True
     if a1*(1.0 - 0.6) + a2 < 0: return True
     return False
-
+# ------------------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------------------- #
 def generate_runs_with_random_parameters( option='', hyperparameters=None,
@@ -1421,6 +1422,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             # reconstructed parameters in 5 big p(miss) bins
             for i in range(len(PmissBins)):#{
                 pmin , pmax = PmissBins[i][0] , PmissBins[i][1]
+                results['EvtsInBin'+'_bin%d'%i] = reco_parameters.get_value(i,'EvtsInBin')
                 for parname in ['mean','sigma']: #{
                     for direction in ['x','y','z']: #{
                         
