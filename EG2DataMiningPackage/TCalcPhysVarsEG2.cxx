@@ -312,7 +312,6 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         
         TVector3 p_3_momentum( PpX[i], PpY[i], PpZ[i] );
         p_3_momentum = CoulombCorrection( p_3_momentum , CoulombDeltaE , Mp , -1 ); // for the protons, the correction is Ep-dE
-        p_3_momentum = EnergyLossCorrrection( p_3_momentum );
         p3vec.push_back( p_3_momentum );
         if ( p_3_momentum.Mag() > Plead.P() )
             Plead.SetVectM( p_3_momentum , Mp ) ;           // Plead is first calculated in Lab-Frame
@@ -480,14 +479,12 @@ void TCalcPhysVarsEG2::SetCuts(){
         && Mmiss < 1.1
         && 0.3 < Pmiss.P() && Pmiss.P() < 1.0
         && -24.5 < pVertex[0].Z() && pVertex[0].Z() < -20.0
-        && -24.5 < eVertex.Z() && eVertex.Z() < -20.0){
-//        && -26.5 < pVertex[0].Z() && pVertex[0].Z() < -22.0
-//        && -26.5 < eVertex.Z() && eVertex.Z() < -22.0){
-        
+        && -24.5 < eVertex.Z() && eVertex.Z() < -20.0
+        ){
+
         eep_in_ppSRCcut = true;
         
         if (0.35 < Prec.P()  &&  -24.5 < pVertex[1].Z() && pVertex[1].Z() < -20.0){
-//        if (0.35 < Prec.P()  &&  -26.5 < pVertex[1].Z() && pVertex[1].Z() < -22.0){
         
             ppSRCcut = true;
             
@@ -589,6 +586,11 @@ void TCalcPhysVarsEG2::loop_protons(){
     
     
     for (auto i: sort_pMag( p3vec )){
+        if (i>0) {
+            // -- - - --- - -- --- - - -- - -- -- ------- - -- -- -- - -- - -- -- -- - -- - - -
+            // DO NOT PERFORM CORRECTION FOR THE LEADING PROTON, ONLY THE RECOILING PROTONS
+            p3vec.at(i) = EnergyLossCorrrection( p3vec.at(i) );
+        }
         
         protonsLab.push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
         pLab_phi = ChangePhiToPhiLab( r2d*p3vec.at(i).Phi() ) ;

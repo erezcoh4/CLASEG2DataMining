@@ -129,7 +129,7 @@ void TSchemeDATA::SRCPmissXb(int fTargetType , float fXbMin, int fNpMin, int fNp
                 for (int p = 0 ; p < Np ; p++){
                     TVector3 p_3_momentum( PpX[p], PpY[p], PpZ[p] );
                     p_3_momentum = CoulombCorrection( p_3_momentum , CoulombDeltaE , Mp , -1 ); // for the protons, the correction is Ep-dE
-                    p_3_momentum = EnergyLossCorrrection( p_3_momentum );
+                    // no energy-loss correction for the leading proton
                     if (p_3_momentum.Mag() > Plead.P()) {   // this is a faster proton
                         Plead.SetVectM( p_3_momentum , Mp ) ;
                     }
