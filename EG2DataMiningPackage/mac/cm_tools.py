@@ -12,6 +12,7 @@ sqrt2pi = np.sqrt(2*np.pi)
 # definitions
 nbins_pcm_3d = 100
 PmissBins   = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65]  , [0.65,0.75] , [0.75,1.0]]
+Pmiss3Bins  = [[0.3,0.52]  , [0.52,0.68]  , [0.68,1.0]]
 Q2Bins      = [[0,1.5]     , [1.5,2]     , [2,2.5]      , [2.5,6]]
 thetapmqBins= [[100,135]   , [135,145]   , [145,155]    , [155,180]]
 targets         = ['C12'        , 'Al27'        , 'Fe56'        , 'Pb208'       ]
@@ -175,19 +176,40 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict()):
         ks_pval_scores_target_array , ks_pval_scores_transverse_target_array , ks_pval_scores_longitudinal_target_array = [] , [] , []
         ks_pval_scores_target = dict()
         df_data = tree2array( ana_data[target].GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
+        
+        
+        ks_pval_scores_target_array , ks_pval_scores_transverse_target_array , ks_pval_scores_longitudinal_target_array = [] , [] , []
+        ks_pval_scores_target = dict()
+        df_data = tree2array( ana_data[target].GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
+        
+        # compare x & y directions in 1 p(miss) bin - since there is no p(miss) dependence
+        for i_dir,direction in enumerate(['X','Y']): #{
+            x_data = df_data['pcm'+direction]
+            x_sim = df_sim['pcm'+direction]
+            D_KS , Pval_KS = ks_2samp( x_data , x_sim )
+            ks_pval_scores_target['pcm'+direction] = Pval_KS
+            ks_pval_scores_target_array.append( Pval_KS )
+            ks_pval_scores_transverse_target_array.append( Pval_KS )
+        #}
+        
+      
+        # in z direction - compare in 5 bins of p(miss)
         for bin in range(len(PmissBins)):#{
             pmin , pmax = PmissBins[bin][0] , PmissBins[bin][1]
             df_sim_reduced = df_sim[ (pmin < df_sim['Pmiss3Mag']) & (df_sim['Pmiss3Mag'] < pmax) ]
             df_data_reduced = df_data[ (pmin < df_data['Pmiss3Mag']) & (df_data['Pmiss3Mag'] < pmax) ]
-            for direction in ['X','Y','Z']: #{
+            #            for direction in ['X','Y','Z']: #{
+            for direction in ['Z']: #{
                 D_KS , Pval_KS = ks_2samp( df_sim_reduced['pcm'+direction] , df_data_reduced['pcm'+direction] )
                 ks_pval_scores_target['pcm'+direction+'_bin%d'%bin] = Pval_KS
                 ks_pval_scores_target_array.append( Pval_KS )
                 # local longitudinal and transverse p-values
-                if direction is 'X' or direction is 'Y': ks_pval_scores_transverse_target_array.append( Pval_KS )
-                else: ks_pval_scores_longitudinal_target_array.append( Pval_KS )
+                #                if direction is 'X' or direction is 'Y': ks_pval_scores_transverse_target_array.append( Pval_KS )
+                #                else:
+                ks_pval_scores_longitudinal_target_array.append( Pval_KS )
             #}
         #}
+        
         ks_pval_scores_target['PvalTotal'] = Fisher_combination_Pvals( ks_pval_scores_target_array ) # with a cutoff on 1e-20
         ks_pval_scores_target['PvalTotal_allPvals'] = FisherMethodPvals( ks_pval_scores_target_array )
         ks_pval_scores_target['PvalTotalTransverse'] = Fisher_combination_Pvals( ks_pval_scores_transverse_target_array ) # with a cutoff on 1e-20
@@ -349,7 +371,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
             #            weighted = fana.RooFitCM( pMiss_min , pMiss_max , True )
 
             # Jan 2017, changing to a (weighted) average and variance using numpy
-            ana_reduced = ana[ (pMiss_min < ana.Pmiss3Mag) & (ana.Pmiss3Mag < pMiss_max) ]
+            # ana_reduced = ana[ (pMiss_min < ana.Pmiss3Mag) & (ana.Pmiss3Mag < pMiss_max) ]
             if flags.verbose>1: print 'running p(miss) bin ',i,',',pMiss_min,' to ',pMiss_max,' GeV/c, ',len(ana_reduced),'events in this bin'
 
             if len(ana_reduced)>0 and sum(ana_reduced.rooWeight)>0:
@@ -1470,9 +1492,13 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             # KS Pvalues
             for target in targets: #{
                 if debug>2: print '---------------\npluging ks-Pvalue scores for ',target,'\n------------------'
-                for bin in range(len(PmissBins)):#{
-                    for direction in ['X','Y','Z']: #{
-                        results['ks_local_Pval_'+'pcm'+direction+'_bin%d'%bin+'_'+target] = ks_pval_scores[target]['pcm'+direction+'_bin%d'%bin]
+                for direction in ['X','Y']: #{
+                    results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores[target]['pcm'+direction]
+                #}
+                for bin in range(len(Pmiss3Bins)):#{
+#                    for direction in ['X','Y','Z']: #{
+                    for direction in ['Z']: #{
+                       results['ks_local_Pval_'+'pcm'+direction+'_bin%d'%bin+'_'+target] = ks_pval_scores[target]['pcm'+direction+'_bin%d'%bin]
                     #}
                 #}
                 if debug>2: print "ks-pval["+target+"]['PvalTotal_allPvals'],ks-pval["+target+"]['PvalTotal']:",ks_pval_scores[target]['PvalTotal_allPvals'],ks_pval_scores[target]['PvalTotal']
