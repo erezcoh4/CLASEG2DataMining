@@ -72,42 +72,89 @@ public:
 
     ~GenerateEvents(){}
 
-    GenerateEvents( TString fPath = "" , Int_t fRunNumber = 1 , Int_t fdebug = 1 );
+    GenerateEvents ( TString fPath = "" , Int_t fRunNumber = 1 , Int_t fdebug = 1 );
 
-    Int_t DoGenerate( TString Type = "(e,e'pp)"
-                     , bool DoGetRootFile = true
-                     , bool DoGenTextFile = false
-                     , TString BaryonName = "p"
-                     , bool DoReeNFromTree = false
-                     , bool DoReeNFromDist = false
-                     , bool DoFlateeN = false);
+    Int_t                   DoGenerate ( TString Type = "(e,e'pp)"
+                                        , bool DoGetRootFile = true
+                                        , bool DoGenTextFile = false
+                                        , TString BaryonName = "p"
+                                        , bool DoReeNFromTree = false
+                                        , bool DoReeNFromDist = false
+                                        , bool DoFlateeN = false);
     
-    Int_t DoGenerateRun_eepp( Int_t run = 1
-                            , bool DoGetRootFile = true
-                            , bool DoGenTextFile = false);
+    Int_t          DoGenerateRun_eepp ( Int_t run = 1
+                                       , bool DoGetRootFile = true
+                                       , bool DoGenTextFile = false);
     
-    Int_t Generate_eepp_from_3dGaussian( Int_t run=1);
+    Int_t    DoGenerate_eepp_from_eep ( Int_t run=1);
+    
+    Int_t Generate_eepp_from_3dGaussian ( Int_t run=1);
 
-    void       SetRootTreeAddresses ();
-    void                  SetLimits ( Float_t , Float_t , Float_t , Float_t );
-    void        SetHistThetaHistMag ( TH1F * , TH1F * );
-    void         Set_eep_Parameters ( Float_t , Float_t , Float_t , Float_t , Float_t , Float_t , Float_t , Float_t );
-    void               Set_eeN_tree ( TTree * feeNTree) { eeNTree = feeNTree;};
-    void            OutputInfo2File ();
-    void           OutPutToTextFile ( const int, TVector3*, int*, float*, int*);
-    void          SetInputChain_eep ();
-    void      ReleaseInputChain_eep ();
-    void                  InitEvent ();
+    void          SetMyInputChain_eep ();
+    void         SetRootTreeAddresses ();
+    void                    SetLimits ( Float_t , Float_t , Float_t , Float_t );
+    void          SetHistThetaHistMag ( TH1F * , TH1F * );
+    void           Set_eep_Parameters ( Float_t , Float_t , Float_t , Float_t , Float_t , Float_t , Float_t , Float_t );
+    void                 Set_eeN_tree ( TTree * feeNTree) { eeNTree = feeNTree;};
+    void              OutputInfo2File ();
+    void             OutPutToTextFile ( const int, TVector3*, int*, float*, int*);
+    void            SetInputChain_eep ();
+    void        ReleaseInputChain_eep ();
+    void                    InitEvent ();
+    void                      InitRun ();
+    void   SetAcceptedEventsPmissBins ( float fPmiss3Mag );
+    void   SetEventsLossIn10PmissBins ( float fPmiss3Mag , bool fAcceptEvent );
+    int  GrabEntryInUnfilledPmissBins ( );
+    int             FindWhichPmissBin ( float fPmiss3Mag );
+    int           FindWhichPmiss10Bin ( float fPmiss3Mag );
+    bool           AllPmissBinsFilled ();
     
     
     // simple setters
-    void                   SetNRand ( Int_t fNRand = 1 )                { NRand = fNRand; };
-    void                 SetNPTheta ( Int_t fNPTheta = 10 )             { NPTheta = fNPTheta; };
-    void                 SetNeTheta ( Int_t fNeTheta = 10 )             { NeTheta = fNeTheta; };
-    void       Use_protonAcceptacne ( bool fDo_pAcceptance = false )    {Do_pAcceptance = fDo_pAcceptance;};
-    void       Set_protonAcceptacne ( TH3F * h)                         { h_protonAcceptance = h; };
-    void             ComputeWeights ();
+    void                     SetNRand ( Int_t fNRand = 1 )                { NRand = fNRand; };
+    void                   SetNPTheta ( Int_t fNPTheta = 10 )             { NPTheta = fNPTheta; };
+    void                   SetNeTheta ( Int_t fNeTheta = 10 )             { NeTheta = fNeTheta; };
+    void         Use_protonAcceptacne ( bool fDo_pAcceptance = false )    {Do_pAcceptance = fDo_pAcceptance;};
+    void           SetDo_PrecFiducial ( bool fDo_PrecFiducial = false )   {Do_PrecFiducial = fDo_PrecFiducial;};
+    void             SetDo_PrecMinCut ( bool fDo_PrecMinCut = false )     {Do_PrecMinCut = fDo_PrecMinCut;};
+    void         Set_protonAcceptacne ( TH3F * h)                         { h_protonAcceptance = h; };
+    void               ComputeWeights ();
+    void   MapInputEntriesInPmissBins ();
     
+    // more complicated setters
+    void                 SetNgenMax ( int fNgenMAX = 10000 )               { NgenMAX = fNgenMAX; };
+    
+    // set the desired number of events when the simulation ends in 5 Pmiss bins
+    void      SetNeventsPerPmissBin ( int NWantedPmissBin0=100 , int NWantedPmissBin1=100 , int NWantedPmissBin2=100 , int NWantedPmissBin3=100 , int NWantedPmissBin4=100 ){
+        NWantedPmissBins[0]=NWantedPmissBin0 ;
+        NWantedPmissBins[1]=NWantedPmissBin1 ;
+        NWantedPmissBins[2]=NWantedPmissBin2 ;
+        NWantedPmissBins[3]=NWantedPmissBin3 ;
+        NWantedPmissBins[4]=NWantedPmissBin4 ;
+    };
+
+    void               SetPmissBins () {
+        float fPmissBins[5][2] = { {0.3,0.45}, {0.45,0.55}, {0.55,0.65}, {0.65,0.75}, {0.75,1.0} };
+        for (int i=0;i<5;i++){
+            for (int j=0;j<2;j++){
+                PmissBins[i][j]=fPmissBins[i][j];
+            }
+        }
+        if (debug>5){
+            for (int i=0;i<5;i++){
+                Printf("PmissBin %d: %.2f < p(miss) < %.2f GeV/c",i,PmissBins[i][0],PmissBins[i][1]);
+            }
+        }
+    } ;
+    
+    void        Set10PmissBins () {
+        float fsmall10PmissBins[10][2] = { {0.3,0.4},{0.4,0.5},{0.5,0.6},{0.6,0.7},{0.7,0.8},{0.8,0.9},{0.9,1.0}};
+        for (int i=0;i<10;i++){
+            for (int j=0;j<2;j++){
+                small10PmissBins[i][j]=fsmall10PmissBins[i][j];
+            }
+        }
+    } ;
 
     ofstream    TextFile , OutRunNumberFile , RunsInfoFile;
     
@@ -118,11 +165,21 @@ public:
 
     TRandom3    * gRandom;
  
-    bool        Do_pAcceptance , AcceptEvent;
+    bool        Do_pAcceptance , Do_PrecFiducial, Do_PrecMinCut, AcceptEvent;
     
     Int_t       RunNumber   , Nevents   , NAcceptedEvents;
-    Int_t       NRand       , NPTheta   , NeTheta   ;
-   
+    Int_t       NRand       , NPTheta   , NeTheta,  entry,  InputNentries;
+    // maximal total number of generated events
+    Int_t       NgenMAX;
+    // accepted number of events in 5 Pmiss bins
+    Int_t       NWantedPmissBins[5];
+    Int_t       NAcceptedPmissBins[5];
+    std::vector<int> EntriesInPmissBins[5];
+    // in 10 small Pmiss bins
+    Int_t       NGen10PmissBins[10], NAcc10PmissBins[10];
+    Int_t       NLoss10PmissBins[10];
+    // -- - -- -- - --- - -- - -- - -- -- -- -- -- --- -- - -- - -
+    
     Float_t     Q2      , Xb            , PoverQ    , Mmiss;
     Float_t     ThetaPQ , theta_miss_q   , ThetaPmissPrecoil;
     Float_t     theta_Pmiss , phi_Pmiss;
@@ -132,13 +189,15 @@ public:
     Float_t     Pmin    , Pmax  , Thetamin  , Thetamax;
     Float_t     Pmiss3Mag   , pcmX      , pcmY          , pcmT      , pcmZ  ;
     Float_t     Theta       , Mott      , DipoleFF2                 , rooWeight;
-    const Float_t Ebeam = 5.009 , e2 = 1; // sqaure of e-charge in e-charge units (for simplcity)
+    Float_t     q_Phi, Pmiss_theta, Pmiss_phi;
+
+    const Float_t Ebeam = 5.014 , e2 = 1; // sqaure of e-charge in e-charge units (for simplcity)
 
     Float_t     Pe[3]       , Pe_size;                                              // electron
     Float_t     Ep[2]       , Rproton[2][3] , Pproton[2][3] ,   Pproton_size[2];    // Proton
     Float_t     Pm[2][3]    , Pm_size[2];                                           // Proton missing momentum magnitude
     Float_t     q[3]        , q_size;                                               // q momentum transfer
-  
+    Float_t     PmissBins[5][2], small10PmissBins[10][2];
     
     
     TVector3    e                          ,       Pp1                     ,   Pp2             , Precoil;
@@ -147,7 +206,7 @@ public:
     TVector3    q3Vector_in_Pmiss_q_system ,       Pmiss_in_Pmiss_q_system ,   Pcm_in_Pmiss_q_system   , Precoil_in_Pmiss_q_system;
     TVector3    q_q_sys                    ,       Pmiss_q_sys             ,   Pcm_q_sys;
 
-    TLorentzVector  Proton  ,       Prec    ,   q4Vector        , m2N       , miss , Pmiss4vec;
+    TLorentzVector  Proton  ,       Prec    ,   q4Vector        , m2N       , miss , Pmiss4vec, Plead4vec;
 
     TString     Path , RunsInfoFileName , txtFilename , rootFilename , runsFilename;
     
