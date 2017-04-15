@@ -1364,8 +1364,23 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
         gen_events = GenerateEvents( path , 0 , debug - 2 )
         gen_events.SetNRand( NRand )
         gen_events.Use_protonAcceptacne( True )
+        gen_events.SetDo_PrecFiducial ( True )
+        gen_events.SetDo_PrecMinCut ( True )
+        
+        gen_events.SetPmissBins()
+        gen_events.Set10PmissBins()
+    
         gen_events.Set_protonAcceptacne( h )
         gen_events.SetInputChain_eep()
+    
+        # set the desired number of events when the simulation ends in 5 Pmiss bins
+        # as a 100 times the number of 12C (e,e'pp) events in each bin
+        Ntimes = hyperparameters['Ntimes']
+        gen_events.SetNeventsPerPmissBin( 71*Ntimes , 143*Ntimes , 132*Ntimes , 96*Ntimes , 56*Ntimes )
+        # if we don't reach these numbers after generating NMAX events, the parameters should be discarded
+        # by Pval = 0, which can be obtained by killing the run and flaggind it as a bad run
+        gen_events.SetNgenMax( hyperparameters['NgenMax'] )
+        gen_events.MapInputEntriesInPmissBins()
     #}
 
     # event generation (and analysis) loop
@@ -1384,18 +1399,15 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             gen_b1  = np.random.uniform( np.min(hyperparameters['range_b1']),np.max(hyperparameters['range_b1']) )
             gen_b2  = np.random.uniform( np.min(hyperparameters['range_b2']),np.max(hyperparameters['range_b2']) )
             
-            if debug: print 'run:',run,',parameters:', gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2
+            if debug: print 'run',run,'gen_SigmaX',gen_SigmaX,'gen_a1',gen_a1,'gen_a2',gen_a2,'gen_b1',gen_b1,'gen_b2',gen_b2
             if a1a2_create_negative_sigma_z( gen_a1 , gen_a2 ):
                 if debug: print 'a1 (%.2f) and a2(%.2f) create together a negative sigma_z, killing run %d'%( gen_a1 , gen_a2 , run )
                 continue
             
             gen_events.Set_eep_Parameters( gen_MeanX , gen_SigmaX , gen_MeanY , gen_SigmaY , gen_b1 , gen_b2 , gen_a1 , gen_a2 )
-            gen_events.DoGenerateRun_eepp( run )
-            
-            # and now scheme them to our desired pp-SRC cuts
-            ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run , ROOT.TCut('') )
-            scheme.SchemeOnTCut( path+'/eg_rootfiles', 'run%d.root'%run ,"anaTree", 'run%d.root'%run , ana_sim.EGppSRCCut + ana_sim.PrecFiducial )
-            ana_sim.CloseFile()
+            gen_events.InitRun()
+            Nevents = gen_events.DoGenerate_eepp_from_eep( run )
+            if debug: print 'Nevents to analyze:',Nevents
         #}
         
         # (2) analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
@@ -1404,61 +1416,64 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             if debug>1: print "analyzing run %d"%run
             
             ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run )
-
-            loss_pmiss_bins , loss_Q2pmiss_bins , loss_thetapmqpmiss_bins = get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins ,
-                                                                                                Q2Bins , evtsgen_Q2pmiss_bins ,
-                                                                                                thetapmqBins , evtsgen_thetapmqpmiss_bins ,
-                                                                                                ana_sim )
-                
-
-            # reconstruct c.m. parameters and fit
-            reco_parameters, do_fits = calc_cm_parameters( ana_sim  , PmissBins )
-            reco_fits = fit_cm_parameters( run , reco_parameters , do_fits=do_fits )
-            ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data )
-
             results = pd.DataFrame({'run':int(run)
                                    ,'time':str(datetime.datetime.now().strftime("%Y%B%d"))
                                    ,'NentriesSimRun':ana_sim.GetEntries()
-                                   
-                                   # generated
                                    ,'gen_MeanX':gen_MeanX, 'gen_SigmaX':gen_SigmaX, 'gen_MeanY':gen_MeanY, 'gen_SigmaY':gen_SigmaY
                                    ,'gen_a1':gen_a1, 'gen_a2':gen_a2, 'gen_b1':gen_b1, 'gen_b2':gen_b2
-                                   
-                                   
-                                   # reconstructed fits - unweighted
-                                   ,'recMeanX':float(reco_fits.MeanX),'recSigmaX':float(reco_fits.SigmaX)
-                                   ,'recMeanY':float(reco_fits.MeanY),'recSigmaY':float(reco_fits.SigmaY)
-                                   ,'rec_a1':float(reco_fits.a1)     ,'rec_a1err':float(reco_fits.a1err)
-                                   ,'rec_a2':float(reco_fits.a2)     ,'rec_a2err':float(reco_fits.a2err)
-                                   ,'rec_b1':float(reco_fits.b1)     ,'rec_b1err':float(reco_fits.b1err)
-                                   ,'rec_b2':float(reco_fits.b2)     ,'rec_b2err':float(reco_fits.b2err)
-
-                                   # events loss
-                                   ,'NLostEvents':(9907*float(NRand) - ana_sim.GetEntries())
-                                   ,'fracLostEvents':(float((9907.0*float(NRand)) - ana_sim.GetEntries())/(9907.0*float(NRand)))
-                                   }
-                                   , index = [int(run)])
-                                   
-            results['parameters_reconstructed_well'] = True if do_fits else False
+                                   }, index = [int(run)])
+            if Nevents!=-1: #{
+                # Nevents==-1 means that the generation of events could not be completed (too bad of acceptance)
                 
-            # reconstructed parameters in 5 big p(miss) bins
-            for i in range(len(PmissBins)):#{
-                pmin , pmax = PmissBins[i][0] , PmissBins[i][1]
-                results['EvtsInBin'+'_bin%d'%i] = reco_parameters.get_value(i,'EvtsInBin')
-                for parname in ['mean','sigma']: #{
-                    for direction in ['x','y','z']: #{
+                loss_pmiss_bins , loss_Q2pmiss_bins , loss_thetapmqpmiss_bins = get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins ,
+                                                                                                    Q2Bins , evtsgen_Q2pmiss_bins ,
+                                                                                                    thetapmqBins , evtsgen_thetapmqpmiss_bins ,
+                                                                                                    ana_sim )
+                # reconstruct c.m. parameters and fit
+                reco_parameters, do_fits = calc_cm_parameters( ana_sim  , PmissBins )
+                reco_fits = fit_cm_parameters( run , reco_parameters , do_fits=do_fits )
+                ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data )
+
+                for fit_parameter in ['MeanX','SigmaX','MeanY','SigmaY','a1','a2','b1','b2']: #{
+                    results['rec'+fit_parameter] = float(reco_fits[fit_parameter])
+                #}
+                results['NLostEvents'] = (9907*float(NRand) - ana_sim.GetEntries())
+                results['fracLostEvents'] = (float((9907.0*float(NRand)) - ana_sim.GetEntries())/(9907.0*float(NRand)))
+
+#            results = pd.DataFrame({                                   # reconstructed fits - unweighted
+#                                   ,'recMeanX':float(reco_fits.MeanX),'recSigmaX':float(reco_fits.SigmaX)
+#                                   ,'recMeanY':float(reco_fits.MeanY),'recSigmaY':float(reco_fits.SigmaY)
+#                                   ,'rec_a1':float(reco_fits.a1)     ,'rec_a1err':float(reco_fits.a1err)
+#                                   ,'rec_a2':float(reco_fits.a2)     ,'rec_a2err':float(reco_fits.a2err)
+#                                   ,'rec_b1':float(reco_fits.b1)     ,'rec_b1err':float(reco_fits.b1err)
+#                                   ,'rec_b2':float(reco_fits.b2)     ,'rec_b2err':float(reco_fits.b2err)
+#
+#                                   # events loss
+#                                   ,'NLostEvents':(9907*float(NRand) - ana_sim.GetEntries())
+#                                   ,'fracLostEvents':(float((9907.0*float(NRand)) - ana_sim.GetEntries())/(9907.0*float(NRand)))
+#                                   }
+#                                   , index = [int(run)])
+
+                results['parameters_reconstructed_well'] = True if do_fits else False
+                
+                # reconstructed parameters in 5 big p(miss) bins
+                for i in range(len(PmissBins)):#{
+                    pmin , pmax = PmissBins[i][0] , PmissBins[i][1]
+                    results['EvtsInBin'+'_bin%d'%i] = reco_parameters.get_value(i,'EvtsInBin')
+                    for parname in ['mean','sigma']: #{
+                        for direction in ['x','y','z']: #{
                         
-                        parnamedir = parname + '_' + direction
-                        recparnamedir = 'rec'+parnamedir+'_bin%d'%i
-                        results[recparnamedir] = float(reco_parameters.get_value(i,parnamedir+'_unweighted')) if do_fits else -100
+                            parnamedir = parname + '_' + direction
+                            recparnamedir = 'rec'+parnamedir+'_bin%d'%i
+                            results[recparnamedir] = float(reco_parameters.get_value(i,parnamedir+'_unweighted')) if do_fits else -100
                             
-                        parnamedirErr = parnamedir+'Err'
-                        recparnamedirErr = 'rec'+parnamedirErr+'_bin%d'%i
-                        results[recparnamedirErr] = float(reco_parameters.get_value(i,parnamedirErr+'_unweighted')) if do_fits else -100
+                            parnamedirErr = parnamedir+'Err'
+                            recparnamedirErr = 'rec'+parnamedirErr+'_bin%d'%i
+                            results[recparnamedirErr] = float(reco_parameters.get_value(i,parnamedirErr+'_unweighted')) if do_fits else -100
             
+                        #}
                     #}
                 #}
-            #}
 
         #            # Pvalues
         #            for target in targets: #{
@@ -1489,41 +1504,77 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
         #                results['PvalTotal_allPvals'] = pval_cm_pars_scores['PvalTotal_allPvals']
         #            #}
 
-            # KS Pvalues
-            for target in targets: #{
-                if debug>2: print '---------------\npluging ks-Pvalue scores for ',target,'\n------------------'
-                for direction in ['X','Y']: #{
-                    results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores[target]['pcm'+direction]
+                # KS Pvalues
+                for target in targets: #{
+                    if debug>2: print '---------------\npluging ks-Pvalue scores for ',target,'\n------------------'
+                    for direction in ['X','Y']: #{
+                        results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores[target]['pcm'+direction]
+                    #}
+                    for bin in range(len(PmissBins)):#{
+                    #                    for direction in ['X','Y','Z']: #{
+                        for direction in ['Z']: #{
+                            results['ks_local_Pval_'+'pcm'+direction+'_bin%d'%bin+'_'+target] = ks_pval_scores[target]['pcm'+direction+'_bin%d'%bin]
+                        #}
+                    #}
+                    if debug>2: print "ks-pval["+target+"]['PvalTotal_allPvals'],ks-pval["+target+"]['PvalTotal']:",ks_pval_scores[target]['PvalTotal_allPvals'],ks_pval_scores[target]['PvalTotal']
+                    results['ks_PvalTot_allPvals'+'_'+target] = ks_pval_scores[target]['PvalTotal_allPvals']
+                    results['ks_PvalTotal'+'_'+target] = ks_pval_scores[target]['PvalTotal'] # with a cutoff on 1e-20
+                    results['ks_PvalTotalTransverse'+'_'+target] = ks_pval_scores[target]['PvalTotalTransverse']
+                    results['ks_PvalTotalLongitudinal'+'_'+target] = ks_pval_scores[target]['PvalTotalLongitudinal']
                 #}
-                for bin in range(len(Pmiss3Bins)):#{
-#                    for direction in ['X','Y','Z']: #{
-                    for direction in ['Z']: #{
-                       results['ks_local_Pval_'+'pcm'+direction+'_bin%d'%bin+'_'+target] = ks_pval_scores[target]['pcm'+direction+'_bin%d'%bin]
+        
+                # events loss in 20 p(miss) bins, for pp/p analysis
+                for i in range( len(pmiss_bins) ):#{
+                    pmin , pmax = pmiss_bins[i][0] , pmiss_bins[i][1]
+                    results['fracLoss_pmiss_%.3f_%.3f'%(pmin , pmax)] = loss_pmiss_bins[i]
+                
+                    # Q2 and p(miss) bins
+                    for j in range( len(Q2Bins) ):#{
+                        Q2min , Q2max = Q2Bins[j][0] , Q2Bins[j][1]
+                        results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmin , pmax , Q2min , Q2max)] = loss_Q2pmiss_bins[i][j]
+                    #}
+
+                    # theta(pm,q) and p(miss) bins
+                    for j in range( len(thetapmqBins) ):#{
+                        thetapmqmin , thetapmqmax = thetapmqBins[j][0] , thetapmqBins[j][1]
+                        results['fracLoss_pmiss_%.3f_%.3f_thetapmq_%.1f_%.1f'%(pmin,pmax,thetapmqmin,thetapmqmax)] = loss_thetapmqpmiss_bins[i][j]
                     #}
                 #}
-                if debug>2: print "ks-pval["+target+"]['PvalTotal_allPvals'],ks-pval["+target+"]['PvalTotal']:",ks_pval_scores[target]['PvalTotal_allPvals'],ks_pval_scores[target]['PvalTotal']
-                results['ks_PvalTot_allPvals'+'_'+target] = ks_pval_scores[target]['PvalTotal_allPvals']
-                results['ks_PvalTotal'+'_'+target] = ks_pval_scores[target]['PvalTotal'] # with a cutoff on 1e-20
-                results['ks_PvalTotalTransverse'+'_'+target] = ks_pval_scores[target]['PvalTotalTransverse']
-                results['ks_PvalTotalLongitudinal'+'_'+target] = ks_pval_scores[target]['PvalTotalLongitudinal']            
             #}
-        
-            # events loss in 20 p(miss) bins, for pp/p analysis
-            for i in range( len(pmiss_bins) ):#{
-                pmin , pmax = pmiss_bins[i][0] , pmiss_bins[i][1]
-                results['fracLoss_pmiss_%.3f_%.3f'%(pmin , pmax)] = loss_pmiss_bins[i]
-                
-                # Q2 and p(miss) bins
-                for j in range( len(Q2Bins) ):#{
-                    Q2min , Q2max = Q2Bins[j][0] , Q2Bins[j][1]
-                    results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmin , pmax , Q2min , Q2max)] = loss_Q2pmiss_bins[i][j]
+            else: #{
+                for target in targets: #{
+                    for bin in range(len(PmissBins)):#{
+                        results['ks_local_Pval_'+'pcmZ_bin%d'%bin+'_'+target] = 0
+                    #}
+                    for direction in ['X','Y']: #{
+                        results['ks_local_Pval_'+'pcm'+direction+'_'+target] = 0
+                    #}
+                    results['ks_PvalTotal'+'_'+target] = results['ks_PvalTot_allPvals'+'_'+target] = results['ks_PvalTotalTransverse'+'_'+target] = results['ks_PvalTotalLongitudinal'+'_'+target] = 0
+                    for i in range( len(pmiss_bins) ):#{
+                        pmin , pmax = pmiss_bins[i][0] , pmiss_bins[i][1]
+                        results['fracLoss_pmiss_%.3f_%.3f'%(pmin , pmax)] = loss_pmiss_bins[i]
+                        for j in range( len(Q2Bins) ):#{
+                            Q2min , Q2max = Q2Bins[j][0] , Q2Bins[j][1]
+                            results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmin , pmax , Q2min , Q2max)] = loss_Q2pmiss_bins[i][j]
+                        #}
+                        for j in range( len(thetapmqBins) ):#{
+                            thetapmqmin , thetapmqmax = thetapmqBins[j][0] , thetapmqBins[j][1]
+                            results['fracLoss_pmiss_%.3f_%.3f_thetapmq_%.1f_%.1f'%(pmin,pmax,thetapmqmin,thetapmqmax)] = loss_thetapmqpmiss_bins[i][j]
+                        #}
+                    #}
                 #}
-
-                # theta(pm,q) and p(miss) bins
-                for j in range( len(thetapmqBins) ):#{
-                    thetapmqmin , thetapmqmax = thetapmqBins[j][0] , thetapmqBins[j][1]
-                    results['fracLoss_pmiss_%.3f_%.3f_thetapmq_%.1f_%.1f'%(pmin,pmax,thetapmqmin,thetapmqmax)] = loss_thetapmqpmiss_bins[i][j]
+                for fit_parameter in ['MeanX','SigmaX','MeanY','SigmaY','a1','a2','b1','b2']: #{
+                    results['rec'+fit_parameter] = -100
                 #}
+                results['NLostEvents'] = 9907*float(NRand)
+                results['fracLostEvents'] = 1
+                results['parameters_reconstructed_well'] = 0
+                for i in range(len(PmissBins)):#{
+                    pmin , pmax = PmissBins[i][0] , PmissBins[i][1]
+                    results['EvtsInBin'+'_bin%d'%i] = reco_parameters.get_value(i,'EvtsInBin')
+                    for parname in ['mean','sigma']: #{
+                        for direction in ['x','y','z']: #{
+                            results['rec'+parname + '_' + direction+'_bin%d'%i] = results['rec'+parname + 'Err_' + direction+'_bin%d'%i] =  -100
             #}
             # ------------------------------------------------------------------------------------------------------------------------------------------------
             

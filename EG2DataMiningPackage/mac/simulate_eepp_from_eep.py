@@ -59,8 +59,10 @@ if 'generate' in flags.option or 'analyse' in flags.option:#{
                            'range_a2':(0.0  , 0.5),         # 0.158
                            'range_b1':(-0.2 , 1.4),         # 0.569
                            'range_b2':(-0.1 , 0.6),         # 0.159
-                           'NRand':20}
-                           )
+                           'NRand':20,
+                           'Ntimes':10,                     # wanted number of events in each Pmiss bin
+                           'NgenMax':100000                 # maximal number of attempts
+                           })
 
     test_name = 'runs_%d_%d'%( hyperparameters['start_run'] , hyperparameters['start_run'] + hyperparameters['Nruns'] )
     full_path = ppPath+'/simulation/'+test_name+'_simulation'
