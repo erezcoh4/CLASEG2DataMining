@@ -1408,6 +1408,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     if debug>2: print "ks-pval["+target+"]['PvalTotal_allPvals'],ks-pval["+target+"]['PvalTotal']:",ks_pval_scores[target]['PvalTotal_allPvals'],ks_pval_scores[target]['PvalTotal']
                     results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY']
                     results['ks_Pval_pcmX_pcmY_pcmZ'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ']
+                    results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1T'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_scaled_1T']
                     results['ks_PvalTot_allPvals'+'_'+target] = ks_pval_scores[target]['PvalTotal_allPvals']
                     results['ks_PvalTotal'+'_'+target] = ks_pval_scores[target]['PvalTotal'] # with a cutoff on 1e-20
                 #}
@@ -1438,8 +1439,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     for direction in ['X','Y','Z']: #{
                         results['ks_local_Pval_pcm'+direction+'_'+target] = 0
                     #}
-                    results['ks_Pval_pcmX_pcmY'+'_'+target] = 0
-                    results['ks_Pval_pcmX_pcmY_pcmZ'+'_'+target] = 0
+                    results['ks_Pval_pcmX_pcmY'+'_'+target] = results['ks_Pval_pcmX_pcmY_pcmZ'+'_'+target] = results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1T'+'_'+target] = 0
                     results['ks_PvalTotal'+'_'+target] = results['ks_PvalTot_allPvals'+'_'+target] = 0
                     for i in range( len(pmiss_bins) ):#{
                         results['fracLoss_pmiss_%.3f_%.3f'%(pmiss_bins[i][0] , pmiss_bins[i][1])] = 1
