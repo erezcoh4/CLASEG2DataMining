@@ -170,13 +170,6 @@ def KStest( PmissBins , ana_sim , ana_data , var , Nbins=20, do_save_plots=False
 # ------------------------------------------------------------------------------- #
 def calc_pval_ks_scores(ana_sim=None, ana_data=dict()):
     
-    
-    
-    
-    
-
-
-
     ks_pval_scores = dict()
     # April-2017, change to Pval using ks-test
     df_sim = tree2array( ana_sim.GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
