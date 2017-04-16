@@ -44,9 +44,7 @@ if 'extractCMparsAllNuclei' in flags.option: #{
 # ----------------------------------------------------------
 if 'generate' in flags.option or 'analyse' in flags.option:#{
     
-    cm_pars , cm_fits = dict() , dict()
-    ana_data = dict()
-
+    cm_pars , cm_fits , ana_data = dict() , dict() , dict()
     for target in targets:
         cm_pars[target] = pd.read_csv( CMParsFname(ppPath+'/DATA/%s_data'%target) )
         cm_fits[target] = pd.read_csv( CMfitsFname(ppPath+'/DATA/data',target ) )
@@ -60,8 +58,9 @@ if 'generate' in flags.option or 'analyse' in flags.option:#{
                            'range_b1':(-0.2 , 1.4),         # 0.569
                            'range_b2':(-0.1 , 0.6),         # 0.159
                            'NRand':20,
-                           'Ntimes':10,                     # wanted number of events in each Pmiss bin
-                           'NgenMax':100000                 # maximal number of attempts
+                           'Ntimes':20,                     # wanted number of events in each Pmiss bin
+                           'NgenMax':100000,                # maximal number of attempts
+                           'do_ks_plots':True
                            })
 
     test_name = 'runs_%d_%d'%( hyperparameters['start_run'] , hyperparameters['start_run'] + hyperparameters['Nruns'] )
