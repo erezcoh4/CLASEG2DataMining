@@ -169,6 +169,14 @@ def KStest( PmissBins , ana_sim , ana_data , var , Nbins=20, do_save_plots=False
 
 # ------------------------------------------------------------------------------- #
 def calc_pval_ks_scores(ana_sim=None, ana_data=dict()):
+    
+    
+    
+    
+    
+
+
+
     ks_pval_scores = dict()
     # April-2017, change to Pval using ks-test
     df_sim = tree2array( ana_sim.GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
@@ -191,6 +199,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict()):
             ks_pval_scores_target_array.append( Pval_KS )
             ks_pval_scores_transverse_target_array.append( Pval_KS )
         #}
+        ks_pval_scores_target['Pval_pcmX_pcmY'] = Fisher_combination_Pvals( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY']] ) # with a cutoff on 1e-20
         
       
         # in z direction - compare in 5 bins of p(miss)
@@ -198,22 +207,25 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict()):
             pmin , pmax = PmissBins[bin][0] , PmissBins[bin][1]
             df_sim_reduced = df_sim[ (pmin < df_sim['Pmiss3Mag']) & (df_sim['Pmiss3Mag'] < pmax) ]
             df_data_reduced = df_data[ (pmin < df_data['Pmiss3Mag']) & (df_data['Pmiss3Mag'] < pmax) ]
-            #            for direction in ['X','Y','Z']: #{
-            for direction in ['Z']: #{
-                D_KS , Pval_KS = ks_2samp( df_sim_reduced['pcm'+direction] , df_data_reduced['pcm'+direction] )
-                ks_pval_scores_target['pcm'+direction+'_bin%d'%bin] = Pval_KS
-                ks_pval_scores_target_array.append( Pval_KS )
-                # local longitudinal and transverse p-values
-                #                if direction is 'X' or direction is 'Y': ks_pval_scores_transverse_target_array.append( Pval_KS )
-                #                else:
-                ks_pval_scores_longitudinal_target_array.append( Pval_KS )
+            D_KS , Pval_KS = ks_2samp( df_sim_reduced['pcmZ'] , df_data_reduced['pcm'+direction] )
+            ks_pval_scores_target['pcmZ_bin%d'%bin] = Pval_KS
+            ks_pval_scores_target_array.append( Pval_KS )
+            hist , bin_edges = np.histogram (df_sim_reduced['pcm'+direction] , bins=np.linspace(-0.5,2,50))
+            x_bins = (bin_edges[1:]+bin_edges[:-1])/2 # for len(x)==len(y)
+            params,cov=curve_fit(gauss,x_bins,hist,(np.mean(df_sim_reduced['pcm'+direction]),np.std(df_sim_reduced['pcm'+direction]),len(df_sim_reduced)))
+            fit_sigma_std_ratio = params[1]/np.std(df_sim_reduced['pcm'+direction])
+            if fit_sigma_std_ratio<0.75:
+                if debug: print 'fit_sigma_std_ratio = ' , fit_sigma_std_ratio,', implying more than a single Gaussian peak. substituting Pval=0'
+                Pval_KS = 0
+            ks_pval_scores_longitudinal_target_array.append( Pval_KS )
             #}
         #}
-        
+        ks_pval_scores_target['pcmZ'] = Fisher_combination_Pvals( ks_pval_scores_longitudinal_target_array ) # with a cutoff on 1e-20
+    
+        ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ'] = FisherMethodPvals( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY'],ks_pval_scores_target['pcmZ']] )
         ks_pval_scores_target['PvalTotal'] = Fisher_combination_Pvals( ks_pval_scores_target_array ) # with a cutoff on 1e-20
         ks_pval_scores_target['PvalTotal_allPvals'] = FisherMethodPvals( ks_pval_scores_target_array )
-        ks_pval_scores_target['PvalTotalTransverse'] = Fisher_combination_Pvals( ks_pval_scores_transverse_target_array ) # with a cutoff on 1e-20
-        ks_pval_scores_target['PvalTotalLongitudinal'] = Fisher_combination_Pvals( ks_pval_scores_longitudinal_target_array ) # with a cutoff on 1e-20
+
         ks_pval_scores[target] = ks_pval_scores_target
     #}
     if debug>2: print 'ks_pval_scores:',ks_pval_scores
@@ -254,12 +266,13 @@ def get_KS_scores( PmissBins ,ana_sim , ana_data , h3_pcm_data ):
 # ------------------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------------------- #
-# define fitting functions
+# fitting functions
 def linear(x, slope, intercept):
     return slope * ( x ) + intercept
-
 def linear_06(x, slope, intercept):
     return slope * ( x - 0.6 ) + intercept
+def gauss(x,mu_0,sigma_0,A_0):
+    return A_0*np.exp(-np.square(x-mu_0)/(2.*np.square(sigma_0)))
 # ------------------------------------------------------------------------------- #
 
 
@@ -847,33 +860,6 @@ def get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins , Q2Bins , evtsgen_Q2pm
     return loss_pmiss_bins , loss_Q2pmiss_bins , loss_thetapmqpmiss_bins
 # ------------------------------------------------------------------------------- #
 
-## ------------------------------------------------------------------------------- #
-#def calc_Pval_scores( data_fits , reco_fits , name='' ): #{
-#    # XX delete by April 15
-#    # No Mott/FF - weighting (un - weighted roofit results)
-#    pval_scores = compute_Pval_parameters( target=None,
-#                                         reco_fits=reco_fits, reco_parameters=reco_parameters,
-#                                         cm_pars_as_gaussians=fits_pars_as_gaussians, fits_pars_as_gaussians=fits_pars_as_gaussians)
-#
-#    #        Pval_array = compute_Pval_parameters( data_fits , reco_fits , weighting='' )
-#    #    [Pval_mean_x, Pval_mean_y ,Pval_sigma_x, Pval_sigma_y ,
-#    #     Pval_a1 , Pval_a2 , Pval_b1 , Pval_b2 ] = Pval_array
-#
-##    PvalTotal = Fisher_combination_Pvals( Pval_array ) # with a cutoff on 1e-20
-##    PvalTotal_allPvals = FisherMethodPvals( Pval_array )
-##    
-##    Pval_scores = pd.DataFrame({'Pval_mean_x':Pval_mean_x,'Pval_mean_y':Pval_mean_y,
-##                               'Pval_sigma_x':Pval_sigma_x,'Pval_sigma_y':Pval_sigma_y,
-##                               'Pval_a1':Pval_a1,'Pval_a2':Pval_a2,'Pval_b1':Pval_b1,'Pval_b2':Pval_b2,
-##                               'global_Pval':PvalTotal,'PvalTotal_allPvals':PvalTotal_allPvals}
-##                               ,index=[0])
-##                               
-##    if debug>2: print "calculated Pval scores " + name ; print Pval_scores
-##    
-##    return Pval_scores
-##}
-## ------------------------------------------------------------------------------- #
-#
 # ------------------------------------------------------------------------------- #
 def get_Pval_scores( data_fits , reco_fits , name='' ):
     # XX delete by April 30
@@ -1228,96 +1214,6 @@ def stream_dataframe_to_root( df , filename , treename='tree' ):
 
 
 
-
-#
-## ------------------------------------------------------------------------------- #
-#def get_cm_parameters_as_gaussians( cm_pars=None ):
-#    cm_parameters_as_gaussians = dict() # dictionary that has 4 entries - 4 targets - each entry contains an array of 5 pmiss bins
-#    for target in targets:#{
-#        extracted_parameters_as_gaussians_in_Pmiss_Bins = [] # array in 5 Pmiss bins that includes the fitted mean and width of each gaussian
-#        for i in range(len(PmissBins)):#{
-#            cm_par_as_gaussian = dict() # each Pmiss bin has a different dictionary - in which the entries are different cm-parameters
-#            for parameter in ['mean','sigma']:#{
-#                for direction in ['x','y','z']:#{
-#                    cm_par = cm_pars[target].get_value( i , parameter + '_' + direction + '_unweighted' )
-#                    cm_parErr = cm_pars[target].get_value( i , parameter + '_' + direction + 'Err_unweighted' )
-#                    Nevents = cm_pars[target].get_value( i , 'EvtsInBin' )
-#                    cm_par_as_gaussian[parameter + '_' + direction] = [ np.random.normal( cm_par , cm_parErr ) for n in range(10*Nevents) ]
-#                #}
-#            #}
-#            extracted_parameters_as_gaussians_in_Pmiss_Bins.append(cm_par_as_gaussian)
-#        #}
-#        cm_parameters_as_gaussians[target] = extracted_parameters_as_gaussians_in_Pmiss_Bins
-#    #}
-#    return cm_parameters_as_gaussians
-##}
-## ------------------------------------------------------------------------------- #
-#
-## ------------------------------------------------------------------------------- #
-#def get_fit_parameters_as_gaussians( cm_fits=None ):
-#    fits_parameters_as_gaussians = dict() # dictionary that has 4 entries - 4 targets - each entry contains an array of 5 pmiss bins
-#    for target in targets: #{
-#        fit_par_as_gaussian = dict() # dictionary in which the entries are different fit-parameters
-#        for parameter in ['MeanX','MeanY','SigmaX','SigmaY','a1','a2','b1','b2']:#{
-#            fit_par_as_gaussian[parameter] = [ np.random.normal( cm_fits[target][parameter] , cm_fits[target][parameter+'err'] ) for i in range(10*cm_fits[target]['Nevents']) ]
-#        #}
-#        fits_parameters_as_gaussians[target] = fit_par_as_gaussian
-#    #}
-#    return fits_parameters_as_gaussians
-## ------------------------------------------------------------------------------- #
-#
-#
-#
-## ------------------------------------------------------------------------------- #
-#def get_cm_pars_and_fit_pars_as_gaussians( cm_pars=None, cm_fits=None , do_plots=False ):
-#    
-#    cm_parameters_as_gaussians = get_cm_parameters_as_gaussians( cm_pars )
-#    fits_parameters_as_gaussians = get_fit_parameters_as_gaussians( cm_fits )
-#    
-#    # plot the cm parameters and fit parameters as Gaussians,
-#    # to monitor the procedure
-#    if do_plots:#{
-#        print 'plotting cm_parameters_as_gaussians and fits_parameters_as_gaussians'
-#        
-#        for target in targets: #{
-#            fig = plt.figure(figsize=(20,10))
-#            for i,parameter in enumerate(['MeanX','MeanY','SigmaX','SigmaY','a1','a2','b1','b2']):#{
-#                ax = fig.add_subplot(2,4,i+1)
-#                plt.hist( fits_parameters_as_gaussians[target][parameter] )
-#                extracted_par = cm_fits[target][parameter]
-#                mean_gaussian = np.mean( fits_parameters_as_gaussians[target][parameter] )
-#                set_axes( ax , x_label=parameter , fontsize=20 )
-#                ax.set_title( '(%.3f/%.3f)'%(mean_gaussian,extracted_par) , fontsize=20, y=1.02)
-#                ax.xaxis.set_major_locator(LinearLocator(3));ax.yaxis.set_major_locator(LinearLocator(4))
-#            #}
-#            fig.set_tight_layout(True)
-#            fig.savefig('/Users/erezcohen/Desktop/TmpPlots/fits_parameters_as_gaussians_'+target)
-#            print 'completed plotting fits_parameters_as_gaussians for '+target
-#
-#            fig2 = plt.figure(figsize=(24,20))
-#            j = 0
-#            for bin in range(len(PmissBins)):#{
-#                for parameter in ['mean','sigma']:#{
-#                    for direction in ['x','y','z']:#{
-#                        ax = fig2.add_subplot(5,6,j+1)
-#                        plt.hist( cm_parameters_as_gaussians[target][bin][parameter + '_' + direction] )
-#                        set_axes( ax , x_label=parameter+'_'+direction , fontsize=20 )
-#                        extracted_par = cm_pars[target].get_value( bin , parameter + '_' + direction + '_unweighted' )
-#                        mean_gaussian = np.mean(cm_parameters_as_gaussians[target][bin][parameter + '_' + direction])
-#                        ax.set_title( '$p_{miss}$ %d (%.3f/%.3f)'%(bin,mean_gaussian,extracted_par) , fontsize=20, y=1.02)
-#                        ax.xaxis.set_major_locator(LinearLocator(3));ax.yaxis.set_major_locator(LinearLocator(4))
-#                        j += 1
-#            #}
-#            fig2.set_tight_layout(True)
-#            fig2.savefig('/Users/erezcohen/Desktop/TmpPlots/cm_parameters_as_gaussians_'+target)
-#            print 'completed plotting cm_parameters_as_gaussians for '+target
-#        #}
-#    #}
-#    
-#    return cm_parameters_as_gaussians, fits_parameters_as_gaussians
-## ------------------------------------------------------------------------------- #
-#
-
 # ------------------------------------------------------------------------------- #
 def a1a2_create_negative_sigma_z( a1 , a2 ):
     '''
@@ -1439,21 +1335,6 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                 #}
                 results['NLostEvents'] = (9907*float(NRand) - ana_sim.GetEntries())
                 results['fracLostEvents'] = (float((9907.0*float(NRand)) - ana_sim.GetEntries())/(9907.0*float(NRand)))
-
-#            results = pd.DataFrame({                                   # reconstructed fits - unweighted
-#                                   ,'recMeanX':float(reco_fits.MeanX),'recSigmaX':float(reco_fits.SigmaX)
-#                                   ,'recMeanY':float(reco_fits.MeanY),'recSigmaY':float(reco_fits.SigmaY)
-#                                   ,'rec_a1':float(reco_fits.a1)     ,'rec_a1err':float(reco_fits.a1err)
-#                                   ,'rec_a2':float(reco_fits.a2)     ,'rec_a2err':float(reco_fits.a2err)
-#                                   ,'rec_b1':float(reco_fits.b1)     ,'rec_b1err':float(reco_fits.b1err)
-#                                   ,'rec_b2':float(reco_fits.b2)     ,'rec_b2err':float(reco_fits.b2err)
-#
-#                                   # events loss
-#                                   ,'NLostEvents':(9907*float(NRand) - ana_sim.GetEntries())
-#                                   ,'fracLostEvents':(float((9907.0*float(NRand)) - ana_sim.GetEntries())/(9907.0*float(NRand)))
-#                                   }
-#                                   , index = [int(run)])
-
                 results['parameters_reconstructed_well'] = True if do_fits else False
                 
                 # reconstructed parameters in 5 big p(miss) bins
@@ -1474,53 +1355,20 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                         #}
                     #}
                 #}
-
-        #            # Pvalues
-        #            for target in targets: #{
-        #                #print '---------------\ncalculating Pvalue for ',target,'\n------------------'
-        #                pval_fits_scores, pval_cm_pars_scores = compute_Pval_parameters(data_cm_pars=cm_pars[target], data_fits=cm_fits[target], reco_fits=reco_fits, reco_parameters=reco_parameters)
-        ##                pval_fits_scores, pval_cm_pars_scores = compute_Pval_parameters( target=target,
-        ##                                                                                reco_fits=reco_fits,
-        ##                                                                                reco_parameters=reco_parameters,
-        ##                                                                                cm_pars_as_gaussians=cm_pars_as_gaussians,
-        ##                                                                                fits_pars_as_gaussians=fits_pars_as_gaussians)
-        #
-        #                for parameter in ['MeanX','MeanY','SigmaX','SigmaY','a1','a2','b1','b2']:#{
-        #                    results['local_Pval_'+parameter+'_'+target] = pval_fits_scores[parameter]
-        #                #}
-        #                results['PvalTotal'] = pval_fits_scores['PvalTotal']
-        #                results['PvalTotal_allPvals'] = pval_fits_scores['PvalTotal_allPvals']
-        #
-        #                for bin in range(len(PmissBins)):#{
-        #                    for parameter in ['mean','sigma']:#{
-        #                        for direction in ['x','y','z']:#{
-        #                            parname = parameter + '_' + direction
-        #                            parnamebin = parname+'_bin%d'%bin
-        #                            results['local_Pval_'+parnamebin+'_'+target] = pval_cm_pars_scores[parname+'_bin%d'%bin]
-        #                        #}
-        #                    #}
-        #                #}
-        #                results['PvalTotal'] = pval_cm_pars_scores['PvalTotal']
-        #                results['PvalTotal_allPvals'] = pval_cm_pars_scores['PvalTotal_allPvals']
-        #            #}
-
                 # KS Pvalues
                 for target in targets: #{
-                    if debug>2: print '---------------\npluging ks-Pvalue scores for ',target,'\n------------------'
-                    for direction in ['X','Y']: #{
+                    #                    if debug>2: print '---------------\npluging ks-Pvalue scores for ',target,'\n------------------'
+                    for bin in range(len(PmissBins)):#{
+                        results['ks_local_Pval_'+'pcmZ_bin%d'%bin+'_'+target] = ks_pval_scores[target]['pcmZ_bin%d'%bin]
+                    #}
+                    for direction in ['X','Y','Z']: #{
                         results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores[target]['pcm'+direction]
                     #}
-                    for bin in range(len(PmissBins)):#{
-                    #                    for direction in ['X','Y','Z']: #{
-                        for direction in ['Z']: #{
-                            results['ks_local_Pval_'+'pcm'+direction+'_bin%d'%bin+'_'+target] = ks_pval_scores[target]['pcm'+direction+'_bin%d'%bin]
-                        #}
-                    #}
                     if debug>2: print "ks-pval["+target+"]['PvalTotal_allPvals'],ks-pval["+target+"]['PvalTotal']:",ks_pval_scores[target]['PvalTotal_allPvals'],ks_pval_scores[target]['PvalTotal']
+                    results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY']
+                    results['ks_Pval_pcmX_pcmY_pcmZ'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ']
                     results['ks_PvalTot_allPvals'+'_'+target] = ks_pval_scores[target]['PvalTotal_allPvals']
                     results['ks_PvalTotal'+'_'+target] = ks_pval_scores[target]['PvalTotal'] # with a cutoff on 1e-20
-                    results['ks_PvalTotalTransverse'+'_'+target] = ks_pval_scores[target]['PvalTotalTransverse']
-                    results['ks_PvalTotalLongitudinal'+'_'+target] = ks_pval_scores[target]['PvalTotalLongitudinal']
                 #}
         
                 # events loss in 20 p(miss) bins, for pp/p analysis
@@ -1544,23 +1392,18 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             else: #{
                 for target in targets: #{
                     for bin in range(len(PmissBins)):#{
-                        results['ks_local_Pval_'+'pcmZ_bin%d'%bin+'_'+target] = 0
+                        results['ks_local_Pval_pcmZ_bin%d'%bin+'_'+target] = 0
                     #}
-                    for direction in ['X','Y']: #{
-                        results['ks_local_Pval_'+'pcm'+direction+'_'+target] = 0
+                    for direction in ['X','Y','Z']: #{
+                        results['ks_local_Pval_pcm'+direction+'_'+target] = 0
                     #}
-                    results['ks_PvalTotal'+'_'+target] = results['ks_PvalTot_allPvals'+'_'+target] = results['ks_PvalTotalTransverse'+'_'+target] = results['ks_PvalTotalLongitudinal'+'_'+target] = 0
+                    results['ks_Pval_pcmX_pcmY'+'_'+target] = 0
+                    results['ks_Pval_pcmX_pcmY_pcmZ'+'_'+target] = 0
+                    results['ks_PvalTotal'+'_'+target] = results['ks_PvalTot_allPvals'+'_'+target] = 0
                     for i in range( len(pmiss_bins) ):#{
-                        pmin , pmax = pmiss_bins[i][0] , pmiss_bins[i][1]
-                        results['fracLoss_pmiss_%.3f_%.3f'%(pmin , pmax)] = loss_pmiss_bins[i]
-                        for j in range( len(Q2Bins) ):#{
-                            Q2min , Q2max = Q2Bins[j][0] , Q2Bins[j][1]
-                            results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmin , pmax , Q2min , Q2max)] = loss_Q2pmiss_bins[i][j]
-                        #}
-                        for j in range( len(thetapmqBins) ):#{
-                            thetapmqmin , thetapmqmax = thetapmqBins[j][0] , thetapmqBins[j][1]
-                            results['fracLoss_pmiss_%.3f_%.3f_thetapmq_%.1f_%.1f'%(pmin,pmax,thetapmqmin,thetapmqmax)] = loss_thetapmqpmiss_bins[i][j]
-                        #}
+                        results['fracLoss_pmiss_%.3f_%.3f'%(pmiss_bins[i][0] , pmiss_bins[i][1])] = 1
+                        for j in range( len(Q2Bins) ): results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmiss_bins[i][0] , pmiss_bins[i][1] , Q2min , Q2max)] = 1
+                        for j in range( len(thetapmqBins) ): results['fracLoss_pmiss_%.3f_%.3f_thetapmq_%.1f_%.1f'%(pmiss_bins[i][0] , pmiss_bins[i][1] ,thetapmqBins[j][0] , thetapmqBins[j][1])] = 1
                     #}
                 #}
                 for fit_parameter in ['MeanX','SigmaX','MeanY','SigmaY','a1','a2','b1','b2']: #{
@@ -1570,12 +1413,13 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                 results['fracLostEvents'] = 1
                 results['parameters_reconstructed_well'] = 0
                 for i in range(len(PmissBins)):#{
-                    pmin , pmax = PmissBins[i][0] , PmissBins[i][1]
                     results['EvtsInBin'+'_bin%d'%i] = reco_parameters.get_value(i,'EvtsInBin')
                     for parname in ['mean','sigma']: #{
                         for direction in ['x','y','z']: #{
                             results['rec'+parname + '_' + direction+'_bin%d'%i] = results['rec'+parname + 'Err_' + direction+'_bin%d'%i] =  -100
-            #}
+                        #}
+                    #}
+                #}
             # ------------------------------------------------------------------------------------------------------------------------------------------------
             
             
@@ -1609,5 +1453,32 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
 # ------------------------------------------------------------------------------- #
 
 
-
+#            # Pvalues
+#            for target in targets: #{
+#                #print '---------------\ncalculating Pvalue for ',target,'\n------------------'
+#                pval_fits_scores, pval_cm_pars_scores = compute_Pval_parameters(data_cm_pars=cm_pars[target], data_fits=cm_fits[target], reco_fits=reco_fits, reco_parameters=reco_parameters)
+##                pval_fits_scores, pval_cm_pars_scores = compute_Pval_parameters( target=target,
+##                                                                                reco_fits=reco_fits,
+##                                                                                reco_parameters=reco_parameters,
+##                                                                                cm_pars_as_gaussians=cm_pars_as_gaussians,
+##                                                                                fits_pars_as_gaussians=fits_pars_as_gaussians)
 #
+#                for parameter in ['MeanX','MeanY','SigmaX','SigmaY','a1','a2','b1','b2']:#{
+#                    results['local_Pval_'+parameter+'_'+target] = pval_fits_scores[parameter]
+#                #}
+#                results['PvalTotal'] = pval_fits_scores['PvalTotal']
+#                results['PvalTotal_allPvals'] = pval_fits_scores['PvalTotal_allPvals']
+#
+#                for bin in range(len(PmissBins)):#{
+#                    for parameter in ['mean','sigma']:#{
+#                        for direction in ['x','y','z']:#{
+#                            parname = parameter + '_' + direction
+#                            parnamebin = parname+'_bin%d'%bin
+#                            results['local_Pval_'+parnamebin+'_'+target] = pval_cm_pars_scores[parname+'_bin%d'%bin]
+#                        #}
+#                    #}
+#                #}
+#                results['PvalTotal'] = pval_cm_pars_scores['PvalTotal']
+#                results['PvalTotal_allPvals'] = pval_cm_pars_scores['PvalTotal_allPvals']
+#            #}
+

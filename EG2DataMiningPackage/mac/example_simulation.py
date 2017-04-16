@@ -33,8 +33,8 @@ hyperparameters = dict({'start_run':2,
                        'range_b1':(-0.2 , 1.4),         # 0.569
                        'range_b2':(-0.1 , 0.6),         # 0.159
                        'NRand':20,
-                       'Ntimes':1,                     # wanted number of events in each Pmiss bin
-                       'NgenMax':5000                 # maximal number of attempts
+                       'Ntimes':20,                     # wanted number of events in each Pmiss bin
+                       'NgenMax':100000                 # maximal number of attempts
                        })
 
 start_run , Nruns = hyperparameters['start_run'], hyperparameters['Nruns']
@@ -67,14 +67,14 @@ gen_events.MapInputEntriesInPmissBins()
 
 
 
-run = 100000
+run = 100001
 gen_MeanX  = gen_MeanY = 0
 # gen_SigmaX = gen_SigmaY = np.random.uniform( np.min(hyperparameters['range_sigma_t']),np.max(hyperparameters['range_sigma_t']) )
-gen_SigmaX = gen_SigmaY = 0.14
-gen_a1  = 0.6#np.random.uniform( np.min(hyperparameters['range_a1']),np.max(hyperparameters['range_a1']) ) # 0.143#
-gen_a2  = 0.2#np.random.uniform( np.min(hyperparameters['range_a2']),np.max(hyperparameters['range_a2']) ) # 0.158#
-gen_b1  = 0.9#np.random.uniform( np.min(hyperparameters['range_b1']),np.max(hyperparameters['range_b1']) ) # 0.569#
-gen_b2  = 0.2#np.random.uniform( np.min(hyperparameters['range_b2']),np.max(hyperparameters['range_b2']) ) # 0.159#
+gen_SigmaX = gen_SigmaY = 0.140412
+gen_a1  = 0.775139#np.random.uniform( np.min(hyperparameters['range_a1']),np.max(hyperparameters['range_a1']) ) # 0.143#
+gen_a2  = 0.261563#np.random.uniform( np.min(hyperparameters['range_a2']),np.max(hyperparameters['range_a2']) ) # 0.158#
+gen_b1  = 1.270352#np.random.uniform( np.min(hyperparameters['range_b1']),np.max(hyperparameters['range_b1']) ) # 0.569#
+gen_b2  = 0.372703#np.random.uniform( np.min(hyperparameters['range_b2']),np.max(hyperparameters['range_b2']) ) # 0.159#
 
 print 'run',run,'gen_SigmaX',gen_SigmaX,'gen_a1',gen_a1,'gen_a2',gen_a2,'gen_b1',gen_b1,'gen_b2',gen_b2
 if a1a2_create_negative_sigma_z( gen_a1 , gen_a2 ) is False:
