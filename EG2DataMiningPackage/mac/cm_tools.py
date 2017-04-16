@@ -1443,7 +1443,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     results['ks_PvalTotal'+'_'+target] = results['ks_PvalTot_allPvals'+'_'+target] = 0
                     for i in range( len(pmiss_bins) ):#{
                         results['fracLoss_pmiss_%.3f_%.3f'%(pmiss_bins[i][0] , pmiss_bins[i][1])] = 1
-                        for j in range( len(Q2Bins) ): results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmiss_bins[i][0] , pmiss_bins[i][1] , Q2Bins[i][0] , Q2Bins[i][1] )] = 1
+                        for j in range( len(Q2Bins) ): results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmiss_bins[i][0] , pmiss_bins[i][1] , Q2Bins[j][0] , Q2Bins[j][1] )] = 1
                         for j in range( len(thetapmqBins) ): results['fracLoss_pmiss_%.3f_%.3f_thetapmq_%.1f_%.1f'%(pmiss_bins[i][0] , pmiss_bins[i][1] ,thetapmqBins[j][0] , thetapmqBins[j][1])] = 1
                     #}
                 #}
