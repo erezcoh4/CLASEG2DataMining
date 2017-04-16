@@ -60,7 +60,7 @@ if 'generate' in flags.option or 'analyse' in flags.option:#{
                            'NRand':20,
                            'Ntimes':20,                     # wanted number of events in each Pmiss bin
                            'NgenMax':100000,                # maximal number of attempts
-                           'do_ks_plots':True
+                           'do_ks_plots':False
                            })
 
     test_name = 'runs_%d_%d'%( hyperparameters['start_run'] , hyperparameters['start_run'] + hyperparameters['Nruns'] )

@@ -176,7 +176,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
         
         if do_plots:  #{
             gen_info = tree2array( ana_sim.GetTree() , branches=['gen_SigmaX','gen_a1','gen_a2','gen_b1','gen_b2'] )
-            print 'gen: SigmaX ',gen_info[0]['gen_SigmaX'],'a1',gen_info[0]['gen_a1'],'a2',gen_info[0]['gen_a2'],'b1',gen_info[0]['gen_b1'],'b2',gen_info[0]['gen_b2']
+            if debug>2: print 'gen: SigmaX ',gen_info[0]['gen_SigmaX'],'a1',gen_info[0]['gen_a1'],'a2',gen_info[0]['gen_a2'],'b1',gen_info[0]['gen_b1'],'b2',gen_info[0]['gen_b2']
             fig_t = plt.figure(figsize=(20,12))
             fig_l = plt.figure(figsize=(30,6))
         #}
@@ -235,7 +235,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
             params,cov=curve_fit(gauss,x_bins,hist,(np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),len(df_sim_reduced)))
             fit_sigma_std_ratio = params[1]/np.std(df_sim_reduced['pcmZ'])
             if fit_sigma_std_ratio<0.75:
-                if debug: print 'fit_sigma_std_ratio = ' , fit_sigma_std_ratio,', implying more than a single Gaussian peak. substituting Pval=0'
+                if debug>2: print 'fit_sigma_std_ratio = ' , fit_sigma_std_ratio,', implying more than a single Gaussian peak. substituting Pval=0'
                 Pval_KS = 0
             ks_pval_scores_longitudinal_target_array.append( Pval_KS )
             #}
@@ -1338,7 +1338,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
 
             if debug: print 'run',run,'gen_SigmaX',gen_SigmaX,'gen_a1',gen_a1,'gen_a2',gen_a2,'gen_b1',gen_b1,'gen_b2',gen_b2
             if a1a2_create_negative_sigma_z( gen_a1 , gen_a2 ):
-                if debug: print 'a1 (%.2f) and a2(%.2f) create together a negative sigma_z, killing run %d'%( gen_a1 , gen_a2 , run )
+                if debug: print 'a1 (%.2f) and a2(%.2f) create together a negative sigma_z, killing run %d'%( gen_a1 , gen_a2 , run );print_line()
                 continue
  
             gen_events.Set_eep_Parameters( gen_MeanX , gen_SigmaX , gen_MeanY , gen_SigmaY , gen_b1 , gen_b2 , gen_a1 , gen_a2 )
@@ -1443,7 +1443,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     results['ks_PvalTotal'+'_'+target] = results['ks_PvalTot_allPvals'+'_'+target] = 0
                     for i in range( len(pmiss_bins) ):#{
                         results['fracLoss_pmiss_%.3f_%.3f'%(pmiss_bins[i][0] , pmiss_bins[i][1])] = 1
-                        for j in range( len(Q2Bins) ): results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmiss_bins[i][0] , pmiss_bins[i][1] , Q2min , Q2max)] = 1
+                        for j in range( len(Q2Bins) ): results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmiss_bins[i][0] , pmiss_bins[i][1] , Q2Bins[i][0] , Q2Bins[i][1] )] = 1
                         for j in range( len(thetapmqBins) ): results['fracLoss_pmiss_%.3f_%.3f_thetapmq_%.1f_%.1f'%(pmiss_bins[i][0] , pmiss_bins[i][1] ,thetapmqBins[j][0] , thetapmqBins[j][1])] = 1
                     #}
                 #}
