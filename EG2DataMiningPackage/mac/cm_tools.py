@@ -227,17 +227,29 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
                 ax_l.set_title('%.2f<$p_{miss}$<%.2f GeV/c, $p_{c.m.}^{z}$ Pval=%f'%(pmin , pmax,Pval_KS),y=1.01,fontsize=15)
                 ax_l.legend(fontsize=15)
             #}
-            
-            ks_pval_scores_target['pcmZ_bin%d'%bin] = Pval_KS
-            ks_pval_scores_target_array.append( Pval_KS )
+            ''' 
+                Check if the distribution of p(c.m.)-z in this bin is indeed Gaussian,
+                and if not - kill it by Pval=0
+                The checking is done by fitting the distribution to a Gaussian
+                and checking if the fit sigma is ~ the standard deviation of the set
+                '''
             hist , bin_edges = np.histogram (df_sim_reduced['pcmZ'] , bins=np.linspace(-0.5,2,50))
             x_bins = (bin_edges[1:]+bin_edges[:-1])/2 # for len(x)==len(y)
-            params,cov=curve_fit(gauss,x_bins,hist,(np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),len(df_sim_reduced)))
-            fit_sigma_std_ratio = params[1]/np.std(df_sim_reduced['pcmZ'])
-            if fit_sigma_std_ratio<0.75:
-                if debug>2: print 'fit_sigma_std_ratio = ' , fit_sigma_std_ratio,', implying more than a single Gaussian peak. substituting Pval=0'
+            try:#{
+                params,cov=curve_fit(gauss,x_bins,hist,(np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),len(df_sim_reduced)),maxfev=5000)
+                fit_sigma_std_ratio = params[1]/np.std(df_sim_reduced['pcmZ'])
+                if fit_sigma_std_ratio<0.75:#{
+                    if debug>2: print 'fit_sigma_std_ratio = ' , fit_sigma_std_ratio,', implying more than a single Gaussian peak. substituting Pval=0'
+                    Pval_KS = 0
+                #}
+            #}
+            except RuntimeError:#{
+                print("Error - curve_fit failed, continuing")
                 Pval_KS = 0
+            #}
             ks_pval_scores_longitudinal_target_array.append( Pval_KS )
+            ks_pval_scores_target['pcmZ_bin%d'%bin] = Pval_KS
+            ks_pval_scores_target_array.append( Pval_KS )
             #}
         #}
         if do_plots:#{
