@@ -44,7 +44,7 @@ pAcceptacneFile = ROOT.TFile( "/Users/erezcohen/Desktop/DataMining/GSIM_DATA/Pre
 path = path + "/Analysis_DATA/ppSRCcm"
 
 h = pAcceptacneFile.Get("hRescaled")
-gen_events = GenerateEvents( path , 0 , debug )
+gen_events = GenerateEvents( path , 0 , debug-1 )
 gen_events.Set_protonAcceptacne( h )
 
 gen_events.SetInputChain_eep()
@@ -72,11 +72,13 @@ run = flags.run
 gen_MeanX = -0.02
 gen_MeanY = 0.0
 # gen_SigmaX = gen_SigmaY = np.random.uniform( np.min(hyperparameters['range_sigma_t']),np.max(hyperparameters['range_sigma_t']) )
-gen_SigmaX = gen_SigmaY = 0.137049
-gen_a1  = 0.510120 #np.random.uniform( np.min(hyperparameters['range_a1']),np.max(hyperparameters['range_a1']) ) # 0.143#
-gen_a2  = 0.257119	 #np.random.uniform( np.min(hyperparameters['range_a2']),np.max(hyperparameters['range_a2']) ) # 0.158#
-gen_b1  = 0.561265 #np.random.uniform( np.min(hyperparameters['range_b1']),np.max(hyperparameters['range_b1']) ) # 0.569#
-gen_b2  = 0.303276 #np.random.uniform( np.min(hyperparameters['range_b2']),np.max(hyperparameters['range_b2']) ) # 0.159#
+gen_SigmaX = gen_SigmaY = 0.155
+gen_a1  = 0.554052 #np.random.uniform( np.min(hyperparameters['range_a1']),np.max(hyperparameters['range_a1']) ) # 0.143#
+gen_a2  = 0.257566	 #np.random.uniform( np.min(hyperparameters['range_a2']),np.max(hyperparameters['range_a2']) ) # 0.158#
+gen_b1  = 0.583563 #np.random.uniform( np.min(hyperparameters['range_b1']),np.max(hyperparameters['range_b1']) ) # 0.569#
+gen_b2  = 0.2  #np.random.uniform( np.min(hyperparameters['range_b2']),np.max(hyperparameters['range_b2']) ) # 0.159#
+
+
 
 print 'run',run,'gen_SigmaX',gen_SigmaX,'gen_a1',gen_a1,'gen_a2',gen_a2,'gen_b1',gen_b1,'gen_b2',gen_b2
 

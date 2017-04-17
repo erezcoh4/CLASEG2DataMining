@@ -5,6 +5,8 @@ from scipy.stats import ks_2samp
 from matplotlib.ticker import LinearLocator
 from math import sqrt
 from scipy.stats.mstats import ttest_onesamp
+from scipy.stats import kurtosis
+from scipy.stats import skew
 sqrt2pi = np.sqrt(2*np.pi)
 
 
@@ -204,7 +206,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
                                  ,histtype='step',linewidth=3,normed=1)
                 ax.hist(x_data , bins=bins,label=target+' data $p_{c.m.}^{%s}$  $\\mu=%.3f, \\sigma=%.3f$'%(direction,np.mean(x_data),np.std(x_data)),histtype='step',linewidth=3,normed=1)
                 if direction=='Y': #{
-                    ax.set_title("gen. $\sigma=%.2f$"%gen_info[0]['gen_SigmaX'],y=1.02,fontsize=20)
+                    ax.set_title("gen. $\sigma=%.3f$"%gen_info[0]['gen_SigmaX'],y=1.02,fontsize=20)
                     ax.legend(loc='best',fontsize=20)
                 #}
             #}
@@ -218,13 +220,19 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
             df_sim_reduced = df_sim[ (pmin < df_sim['Pmiss3Mag']) & (df_sim['Pmiss3Mag'] < pmax) ]
             df_data_reduced = df_data[ (pmin < df_data['Pmiss3Mag']) & (df_data['Pmiss3Mag'] < pmax) ]
             D_KS , Pval_KS = ks_2samp( df_sim_reduced['pcmZ'] , df_data_reduced['pcmZ'] )
+            sim_skew = skew( df_sim_reduced['pcmZ'] )
+            excess_kurt = kurtosis( df_sim_reduced['pcmZ'] ) - 3
+            if np.abs(sim_skew)>2 or np.abs(excess_kurt)>2:#{
+                if debug>2: print '$skew=%.2f$ \n $excess kurt=%.2f$'%(sim_skew,excess_kurt),', implying non-Gaussian. substituting Pval=0'
+                Pval_KS = 0
+            #}
             
-            if do_plots:#{  and target == 'C12'
+            if do_plots:#{
                 ax_l = fig.add_subplot(2 , 5, 5 + bin + 1 ) #fig_l
                 bins=np.linspace(-0.5,2,50)
                 h,bins,_=ax_l.hist(df_sim_reduced['pcmZ'] , bins=np.linspace(-0.5,2,50)
                                    ,histtype='step',linewidth=3,normed=1
-                                   ,label='sim. (%d) \n m=%f,\n s=%f'%(len(df_sim_reduced),np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ'])))
+                                   ,label='sim. (%d) \n m=%f,\n s=%f \n $skew=%.2f$ \n $excess kurt=%.2f$'%(len(df_sim_reduced),np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),sim_skew,excess_kurt))
                 ax_l.hist(df_data_reduced['pcmZ'] , bins=bins
                           ,label=target+' data',histtype='step',linewidth=3,normed=1)
                 ax_l.set_title('%.2f<$p_{miss}$<%.2f GeV/c, $p_{c.m.}^{z}$ Pval=%f'%(pmin , pmax,Pval_KS),y=1.01,fontsize=15)
@@ -242,20 +250,22 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
                 The checking is done by fitting the distribution to a Gaussian
                 and checking if the fit sigma is ~ the standard deviation of the set
                 '''
-            hist , bin_edges = np.histogram (df_sim_reduced['pcmZ'] , bins=np.linspace(-0.5,2,50))
-            x_bins = (bin_edges[1:]+bin_edges[:-1])/2 # for len(x)==len(y)
-            try:#{
-                params,cov=curve_fit(gauss,x_bins,hist,(np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),len(df_sim_reduced)),maxfev=5000)
-                fit_sigma_std_ratio = params[1]/np.std(df_sim_reduced['pcmZ'])
-                if fit_sigma_std_ratio<0.75:#{
-                    if debug>2: print 'fit_sigma_std_ratio = ' , fit_sigma_std_ratio,', implying more than a single Gaussian peak. substituting Pval=0'
-                    Pval_KS = 0
-                #}
-            #}
-            except RuntimeError:#{
-                print("Error - curve_fit failed, continuing")
-                Pval_KS = 0
-            #}
+#            hist , bin_edges = np.histogram (df_sim_reduced['pcmZ'] , bins=np.linspace(-0.5,2,50))
+#            x_bins = (bin_edges[1:]+bin_edges[:-1])/2 # for len(x)==len(y)
+#            fit_sigma_std_ratio1 = 1
+#            try:#{
+#                params,cov=curve_fit(gauss,x_bins,hist,(np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),len(df_sim_reduced)),maxfev=5000)
+#                fit_sigma_std_ratio = params[1]/np.std(df_sim_reduced['pcmZ'])
+#                if fit_sigma_std_ratio<0.75:#{
+#                    if debug>2: print 'fit_sigma_std_ratio = ' , fit_sigma_std_ratio,', implying more than a single Gaussian peak. substituting Pval=0'
+#                    Pval_KS = 0
+#                #}
+#            #}
+#            except RuntimeError:#{
+#                print("Error - curve_fit failed, continuing")
+#                Pval_KS = 0
+#            #}
+#            if debug>2: print 'fit_sigma_std_ratio:',fit_sigma_std_ratio
             ks_pval_scores_longitudinal_target_array.append( Pval_KS )
             ks_pval_scores_target['pcmZ_bin%d'%bin] = Pval_KS
             ks_pval_scores_target_array.append( Pval_KS )
@@ -267,11 +277,12 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
         
         if do_plots:#{
             ax = fig.add_subplot( 2 , 5 , (1,5) )
-            plt.text(-0.6,1 ,"$Pval_{x}=%f$\n$Pval_{y}=%f$\n$Pval_{x-y}=%f$\n$Pval_{z}=%f$\n$Pval_{x-y-z}=%f$"%
+            plt.text(-0.6,1 ,"$Pval_{x}=%f$\n$Pval_{y}=%g$\n$Pval_{x-y}=%g$\n$Pval_{z}=%g$\n$Pval_{x-y-z}=%g$\n$1e20 \\times Pval_{x-y-z}=%g$"%
                          (ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY']
                           ,ks_pval_scores_target['Pval_pcmX_pcmY']
                           ,ks_pval_scores_target['pcmZ']
-                          ,ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']),fontsize=15)
+                          ,ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']
+                          ,ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']*1e20),fontsize=15)
             fig.savefig("/Users/erezcohen/Desktop/TmpPlots/run_%d_%s.pdf"%(run,target))
         #}
 
