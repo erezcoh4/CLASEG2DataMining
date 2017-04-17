@@ -34,7 +34,8 @@ hyperparameters = dict({'start_run':2,
                        'range_b2':(-0.1 , 0.6),         # 0.159
                        'NRand':20,
                        'Ntimes':20,                     # wanted number of events in each Pmiss bin
-                       'NgenMax':100000                 # maximal number of attempts
+                       'NgenMax':100000,                # maximal number of attempts
+                       'do_ks_plots':True
                        })
 
 start_run , Nruns = hyperparameters['start_run'], hyperparameters['Nruns']
@@ -67,21 +68,36 @@ gen_events.MapInputEntriesInPmissBins()
 
 
 
-run = 100006
+run = flags.run
 gen_MeanX = -0.02
 gen_MeanY = 0.0
 # gen_SigmaX = gen_SigmaY = np.random.uniform( np.min(hyperparameters['range_sigma_t']),np.max(hyperparameters['range_sigma_t']) )
-gen_SigmaX = gen_SigmaY = 0.155
-gen_a1  = 0.171854 #np.random.uniform( np.min(hyperparameters['range_a1']),np.max(hyperparameters['range_a1']) ) # 0.143#
-gen_a2  = 0.125626	 #np.random.uniform( np.min(hyperparameters['range_a2']),np.max(hyperparameters['range_a2']) ) # 0.158#
-gen_b1  = 0.6 #np.random.uniform( np.min(hyperparameters['range_b1']),np.max(hyperparameters['range_b1']) ) # 0.569#
-gen_b2  = 0.4 #np.random.uniform( np.min(hyperparameters['range_b2']),np.max(hyperparameters['range_b2']) ) # 0.159#
+gen_SigmaX = gen_SigmaY = 0.137049
+gen_a1  = 0.510120 #np.random.uniform( np.min(hyperparameters['range_a1']),np.max(hyperparameters['range_a1']) ) # 0.143#
+gen_a2  = 0.257119	 #np.random.uniform( np.min(hyperparameters['range_a2']),np.max(hyperparameters['range_a2']) ) # 0.158#
+gen_b1  = 0.561265 #np.random.uniform( np.min(hyperparameters['range_b1']),np.max(hyperparameters['range_b1']) ) # 0.569#
+gen_b2  = 0.303276 #np.random.uniform( np.min(hyperparameters['range_b2']),np.max(hyperparameters['range_b2']) ) # 0.159#
 
 print 'run',run,'gen_SigmaX',gen_SigmaX,'gen_a1',gen_a1,'gen_a2',gen_a2,'gen_b1',gen_b1,'gen_b2',gen_b2
-if a1a2_create_negative_sigma_z( gen_a1 , gen_a2 ) is False:
-    
-    gen_events.Set_eep_Parameters( gen_MeanX, gen_SigmaX, gen_MeanY, gen_SigmaY, gen_b1, gen_b2, gen_a1, gen_a2 )
-    gen_events.InitRun()
-    gen_events.DoGenerate_eepp_from_eep( run )
 
-else: print 'a1 (%.2f) and a2(%.2f) create together a negative sigma_z, killing run %d'%( gen_a1 , gen_a2 , run )
+if 'gen' in flags.option:#{
+    if a1a2_create_negative_sigma_z( gen_a1 , gen_a2 ) is False: #{
+    
+        gen_events.Set_eep_Parameters( gen_MeanX, gen_SigmaX, gen_MeanY, gen_SigmaY, gen_b1, gen_b2, gen_a1, gen_a2 )
+        gen_events.InitRun()
+        Nevents = gen_events.DoGenerate_eepp_from_eep( run )
+    #}
+    else:#{
+        print 'a1 (%.2f) and a2(%.2f) create together a negative sigma_z, killing run %d'%( gen_a1 , gen_a2 , run )
+    #}
+#}
+
+if 'ana' in flags.option:#{
+    print 'analyzing run...'
+    ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run )
+        
+    ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data
+                                             , do_plots=hyperparameters['do_ks_plots'] , run=run )
+    print 'finished calculating ks_pval_scores'
+    ana_sim.CloseFile()
+#}

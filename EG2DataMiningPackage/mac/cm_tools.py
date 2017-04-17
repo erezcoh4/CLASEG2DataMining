@@ -177,8 +177,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
         if do_plots:  #{
             gen_info = tree2array( ana_sim.GetTree() , branches=['gen_SigmaX','gen_a1','gen_a2','gen_b1','gen_b2'] )
             if debug>2: print 'gen: SigmaX ',gen_info[0]['gen_SigmaX'],'a1',gen_info[0]['gen_a1'],'a2',gen_info[0]['gen_a2'],'b1',gen_info[0]['gen_b1'],'b2',gen_info[0]['gen_b2']
-            fig_t = plt.figure(figsize=(20,12))
-            fig_l = plt.figure(figsize=(30,6))
+            fig = plt.figure(figsize=(30,12))
         #}
         ks_pval_scores_target_array , ks_pval_scores_transverse_target_array , ks_pval_scores_longitudinal_target_array = [] , [] , []
         ks_pval_scores_target = dict()
@@ -198,18 +197,20 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
             ks_pval_scores_target_array.append( Pval_KS )
             ks_pval_scores_transverse_target_array.append( Pval_KS )
             if do_plots:#{
-                ax_t = fig_t.add_subplot( 1 , 2 , i_dir+1 )
-                h,bins,_=ax_t.hist(x_sim , bins=25,label='sim. $\\mu=%.3f, \\sigma=%.3f$'%(np.mean(x_sim),np.std(x_sim)),histtype='step',linewidth=3,normed=1)
-                h,bins,_=ax_t.hist(x_data , bins=bins,label=target+' data $\\mu=%.3f, \\sigma=%.3f$'%(np.mean(x_data),np.std(x_data)),histtype='step',linewidth=3,normed=1)
-                ax_t.legend(loc='best',fontsize=10)
-                ax_t.set_title('$p_{c.m.}^{%s}$, Pval=%f'%(direction,Pval_KS),y=1.01,fontsize=15)
+                if direction=='X':#{
+                    ax = fig.add_subplot( 2 , 5 , (1,5) )
+                #}
+                h,bins,_=ax.hist(x_sim , bins=25,label='sim. $p_{c.m.}^{%s}$ $\\mu=%.3f, \\sigma=%.3f, Pval=%f$'%(direction,np.mean(x_sim),np.std(x_sim),Pval_KS)
+                                 ,histtype='step',linewidth=3,normed=1)
+                ax.hist(x_data , bins=bins,label=target+' data $p_{c.m.}^{%s}$  $\\mu=%.3f, \\sigma=%.3f$'%(direction,np.mean(x_data),np.std(x_data)),histtype='step',linewidth=3,normed=1)
+                if direction=='Y': #{
+                    ax.set_title("gen. $\sigma=%.2f$"%gen_info[0]['gen_SigmaX'],y=1.02,fontsize=20)
+                    ax.legend(loc='best',fontsize=20)
+                #}
             #}
         #}
         ks_pval_scores_target['Pval_pcmX_pcmY'] = Fisher_combination_Pvals( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY']] ) # with a cutoff on 1e-20
-        if do_plots:#{
-            fig_t.savefig("/Users/erezcohen/Desktop/TmpPlots/run_%d_pcmT_%s.pdf"%(run,target))
-        #}
-      
+
         # in z direction - compare in 5 bins of p(miss)
         for bin in range(len(PmissBins)):#{
             
@@ -219,13 +220,21 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
             D_KS , Pval_KS = ks_2samp( df_sim_reduced['pcmZ'] , df_data_reduced['pcmZ'] )
             
             if do_plots:#{  and target == 'C12'
-                ax_l = fig_l.add_subplot(1 , 5, bin+1 )
+                ax_l = fig.add_subplot(2 , 5, 5 + bin + 1 ) #fig_l
                 bins=np.linspace(-0.5,2,50)
-                h,bins,_=ax_l.hist(df_sim_reduced['pcmZ'] , bins=np.linspace(-0.5,2,50),histtype='step',linewidth=3,normed=1
+                h,bins,_=ax_l.hist(df_sim_reduced['pcmZ'] , bins=np.linspace(-0.5,2,50)
+                                   ,histtype='step',linewidth=3,normed=1
                                    ,label='sim. (%d) \n m=%f,\n s=%f'%(len(df_sim_reduced),np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ'])))
-                ax_l.hist(df_data_reduced['pcmZ'] , bins=bins,label=target+' data',histtype='step',linewidth=3,normed=1)
+                ax_l.hist(df_data_reduced['pcmZ'] , bins=bins
+                          ,label=target+' data',histtype='step',linewidth=3,normed=1)
                 ax_l.set_title('%.2f<$p_{miss}$<%.2f GeV/c, $p_{c.m.}^{z}$ Pval=%f'%(pmin , pmax,Pval_KS),y=1.01,fontsize=15)
                 ax_l.legend(fontsize=15)
+                set_axes(ax_l,"","",fontsize=15)
+                if bin==0:#{
+                    plt.text(np.mean(df_sim_reduced['pcmZ'])+3*np.std(df_sim_reduced['pcmZ']),0.5*np.max(h)
+                         ,"gen. $a_{1}=%.2f$\n$a_{2}=%.2f$\n$b_{1}=%.2f$\n$b_{2}=%.2f$"%
+                         (gen_info[0]['gen_a1'],gen_info[0]['gen_a2'],gen_info[0]['gen_b1'],gen_info[0]['gen_b2']),fontsize=15)
+                #}
             #}
             ''' 
                 Check if the distribution of p(c.m.)-z in this bin is indeed Gaussian,
@@ -252,26 +261,36 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
             ks_pval_scores_target_array.append( Pval_KS )
             #}
         #}
+        ks_pval_scores_target['pcmZ'] = Fisher_combination_Pvals( ks_pval_scores_longitudinal_target_array ) # with a cutoff on 1e-20
+        
+        ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ'] = FisherMethodPvals( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY'],ks_pval_scores_target['pcmZ']] )
+        
         if do_plots:#{
-            fig_l.savefig("/Users/erezcohen/Desktop/TmpPlots/run_%d_pcmZ_%s.pdf"%(run,target))
+            ax = fig.add_subplot( 2 , 5 , (1,5) )
+            plt.text(-0.6,1 ,"$Pval_{x}=%f$\n$Pval_{y}=%f$\n$Pval_{x-y}=%f$\n$Pval_{z}=%f$\n$Pval_{x-y-z}=%f$"%
+                         (ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY']
+                          ,ks_pval_scores_target['Pval_pcmX_pcmY']
+                          ,ks_pval_scores_target['pcmZ']
+                          ,ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']),fontsize=15)
+            fig.savefig("/Users/erezcohen/Desktop/TmpPlots/run_%d_%s.pdf"%(run,target))
         #}
 
-        ks_pval_scores_target['pcmZ'] = Fisher_combination_Pvals( ks_pval_scores_longitudinal_target_array ) # with a cutoff on 1e-20
-    
-        ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ'] = FisherMethodPvals( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY'],ks_pval_scores_target['pcmZ']] )
-        ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_scaled_1T'] = ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']*1000000000
+        ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_scaled_1T'] = ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']*1e9
+        ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_scaled_1e20'] = ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']*1e20
         ks_pval_scores_target['PvalTotal'] = Fisher_combination_Pvals( ks_pval_scores_target_array ) # with a cutoff on 1e-20
         ks_pval_scores_target['PvalTotal_allPvals'] = FisherMethodPvals( ks_pval_scores_target_array )
 
         ks_pval_scores[target] = ks_pval_scores_target
     #}
-    if debug>2:
+    if debug>2:#{
         print 'ks_pval_scores:'
-        for i in ks_pval_scores:
+        for i in ks_pval_scores:#{
             print i
-            for j in ks_pval_scores[i]:
+            for j in ks_pval_scores[i]:#{
                 print j,ks_pval_scores[i][j]
-
+            #}
+        #}
+    #}
     return ks_pval_scores
 # ------------------------------------------------------------------------------- #
 
@@ -1291,8 +1310,6 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
     # multiple bins for pp/p ratio
     pmiss_bins , evtsgen_pmiss_bins , evtsgen_Q2pmiss_bins  , evtsgen_thetapmqpmiss_bins = get_pmiss_bins( PmissBins , Q2Bins , thetapmqBins , path , int(hyperparameters['NRand']) )
 
-    # cm_pars_as_gaussians, fits_pars_as_gaussians = get_cm_pars_and_fit_pars_as_gaussians( cm_pars=cm_pars, cm_fits=cm_fits , do_plots=False)
-    
     '''
     recoil proton acceptances:
     (a) efficiency and acceptacne from the 'uniform' map i've generated using virtual CLAS
@@ -1332,7 +1349,8 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
         if 'gen' in option: #{
             
             # sample the geneated parameters uniformly within the ranges
-            gen_MeanX  = gen_MeanY = 0
+            gen_MeanX = -0.02
+            gen_MeanY = 0.0
             gen_SigmaX = gen_SigmaY = np.random.uniform( np.min(hyperparameters['range_sigma_t']),np.max(hyperparameters['range_sigma_t']) )
             gen_a1  = np.random.uniform( np.min(hyperparameters['range_a1']),np.max(hyperparameters['range_a1']) )
             gen_a2  = np.random.uniform( np.min(hyperparameters['range_a2']),np.max(hyperparameters['range_a2']) )
@@ -1340,14 +1358,6 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             gen_b2  = np.random.uniform( np.min(hyperparameters['range_b2']),np.max(hyperparameters['range_b2']) )
 
             
-#            gen_MeanX = -0.02
-#            gen_MeanY = 0.0
-#            gen_SigmaX = gen_SigmaY = 0.146739
-#            gen_a1  = 0.871854
-#            gen_a2  = 0.325626
-#            gen_b1  = 0.066809
-#            gen_b2  = 0.116201
-
             if debug: print 'run',run,'gen_SigmaX',gen_SigmaX,'gen_a1',gen_a1,'gen_a2',gen_a2,'gen_b1',gen_b1,'gen_b2',gen_b2
             if a1a2_create_negative_sigma_z( gen_a1 , gen_a2 ):
                 if debug: print 'a1 (%.2f) and a2(%.2f) create together a negative sigma_z, killing run %d'%( gen_a1 , gen_a2 , run );print_line()
@@ -1421,6 +1431,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY']
                     results['ks_Pval_pcmX_pcmY_pcmZ'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ']
                     results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1T'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_scaled_1T']
+                    results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1e20'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_scaled_1e20']
                     results['ks_PvalTot_allPvals'+'_'+target] = ks_pval_scores[target]['PvalTotal_allPvals']
                     results['ks_PvalTotal'+'_'+target] = ks_pval_scores[target]['PvalTotal'] # with a cutoff on 1e-20
                 #}
@@ -1451,7 +1462,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     for direction in ['X','Y','Z']: #{
                         results['ks_local_Pval_pcm'+direction+'_'+target] = 0
                     #}
-                    results['ks_Pval_pcmX_pcmY'+'_'+target] = results['ks_Pval_pcmX_pcmY_pcmZ'+'_'+target] = results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1T'+'_'+target] = 0
+                    results['ks_Pval_pcmX_pcmY'+'_'+target] = results['ks_Pval_pcmX_pcmY_pcmZ'+'_'+target] = results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1T'+'_'+target] = results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1e20'+'_'+target] = 0
                     results['ks_PvalTotal'+'_'+target] = results['ks_PvalTot_allPvals'+'_'+target] = 0
                     for i in range( len(pmiss_bins) ):#{
                         results['fracLoss_pmiss_%.3f_%.3f'%(pmiss_bins[i][0] , pmiss_bins[i][1])] = 1
