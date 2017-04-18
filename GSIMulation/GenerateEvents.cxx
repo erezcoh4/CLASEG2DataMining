@@ -944,7 +944,17 @@ void GenerateEvents::SetRootTreeAddresses(){
 //    RootTree -> Branch("ThetaPmissPrecoil"   ,&ThetaPmissPrecoil     ,"ThetaPmissPrecoil/F");    // angle between the missing and recoil momenta
 //    RootTree -> Branch("PoverQ"              ,&PoverQ                ,"PoverQ/F");               // ratio |p|/|q| for leading proton
 //    RootTree -> Branch("Mmiss"               ,&Mmiss                 ,"Mmiss/F");
-//    
+    
+    // generation
+    RootTree -> Branch("gen_MeanX"              ,&MeanX                 ,"gen_MeanX/F");
+    RootTree -> Branch("gen_MeanY"              ,&MeanY                 ,"gen_MeanY/F");
+    RootTree -> Branch("gen_SigmaX"             ,&SigmaX                ,"gen_SigmaX/F");
+    RootTree -> Branch("gen_SigmaY"             ,&SigmaY                ,"gen_SigmaY/F");
+    RootTree -> Branch("gen_a1"                 ,&a1                    ,"gen_a1/F");
+    RootTree -> Branch("gen_a2"                 ,&a2                    ,"gen_a2/F");
+    RootTree -> Branch("gen_b1"                 ,&b1                    ,"gen_b1/F");
+    RootTree -> Branch("gen_b2"                 ,&b2                    ,"gen_b2/F");
+
     // c.m. analysis
     RootTree -> Branch("pFiducCut"           ,&pFiducCut             );// std::vector<Int_t>
     RootTree -> Branch("Prec"                ,"TLorentzVector"       ,&Prec);
