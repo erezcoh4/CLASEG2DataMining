@@ -65,12 +65,14 @@ gen_events.SetNgenMax( hyperparameters['NgenMax'] )
 gen_events.MapInputEntriesInPmissBins()
 # if we don't reach these numbers after generating NMAX events, the parameters should be discarded
 # by Pval = 0, which can be obtained by killing the run and flaggind it as a bad run
-run = flags.run
-gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2 = 0.141650	,0.413899	,0.202223	,0.886291	,0.293192
+
+run = 51349 # flags.run
+gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2 = 0.142157,0.174203	,0.164589	,0.510874	,0.323553
 gen_MeanX = -0.02
 gen_MeanY = 0.0
-# gen_SigmaX = gen_SigmaY = np.random.uniform( np.min(hyperparameters['range_sigma_t']),np.max(hyperparameters['range_sigma_t']) )
 gen_SigmaY = gen_SigmaX
+
+# gen_SigmaX = gen_SigmaY = np.random.uniform( np.min(hyperparameters['range_sigma_t']),np.max(hyperparameters['range_sigma_t']) )
 #gen_a1  = 0.419716 #np.random.uniform( np.min(hyperparameters['range_a1']),np.max(hyperparameters['range_a1']) ) # 0.143#
 #gen_a2  = 0.315009	 #np.random.uniform( np.min(hyperparameters['range_a2']),np.max(hyperparameters['range_a2']) ) # 0.158#
 #gen_b1  = 0.495495 #np.random.uniform( np.min(hyperparameters['range_b1']),np.max(hyperparameters['range_b1']) ) # 0.569#

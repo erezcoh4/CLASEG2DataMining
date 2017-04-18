@@ -180,7 +180,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
         if do_plots:  #{
             gen_info = tree2array( ana_sim.GetTree() , branches=['gen_SigmaX','gen_a1','gen_a2','gen_b1','gen_b2'] )
             if debug>2: print 'gen: SigmaX ',gen_info[0]['gen_SigmaX'],'a1',gen_info[0]['gen_a1'],'a2',gen_info[0]['gen_a2'],'b1',gen_info[0]['gen_b1'],'b2',gen_info[0]['gen_b2']
-            fig = plt.figure(figsize=(30,12))
+            fig = plt.figure(figsize=(30,24))
         #}
         ks_pval_scores_target_array , ks_pval_scores_transverse_target_array , ks_pval_scores_longitudinal_target_array = [] , [] , []
         ks_pval_scores_target = dict()
@@ -203,9 +203,12 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
                 if direction=='X':#{
                     ax = fig.add_subplot( 2 , 5 , (1,5) )
                 #}
-                h,bins,_=ax.hist(x_sim , bins=25,label='sim. $p_{c.m.}^{%s}$ $\\mu=%.3f, \\sigma=%.3f, Pval=%f$'%(direction,np.mean(x_sim),np.std(x_sim),Pval_KS)
+                h,bins,_=ax.hist(x_sim, bins=25
+                                 ,label='sim. $p_{c.m.}^{%s}$ $\\mu=%.3f, \\sigma=%.3f, Pval=%f$'%(direction,np.mean(x_sim),np.std(x_sim),Pval_KS)
                                  ,histtype='step',linewidth=3,normed=1)
-                ax.hist(x_data , bins=bins,label=target+' data $p_{c.m.}^{%s}$  $\\mu=%.3f, \\sigma=%.3f$'%(direction,np.mean(x_data),np.std(x_data)),histtype='step',linewidth=3,normed=1)
+                ax.hist(x_data , bins=bins
+                        ,label=target+' data $p_{c.m.}^{%s}$  $\\mu=%.3f, \\sigma=%.3f$'%(direction,np.mean(x_data),np.std(x_data))
+                        ,histtype='step',linewidth=3,normed=1)
                 if direction=='Y': #{
                     ax.set_title("gen. $\sigma=%.3f$"%gen_info[0]['gen_SigmaX'],y=1.02,fontsize=20)
                     ax.legend(loc='best',fontsize=20)
@@ -215,6 +218,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
         ks_pval_scores_target['Pval_pcmX_pcmY'] = Fisher_combination_Pvals( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY']] ) # with a cutoff on 1e-20
 
         # in z direction - compare in 5 bins of p(miss)
+        nbins = 15
         for bin in range(len(PmissBins)):#{
             
             pmin , pmax = PmissBins[bin][0] , PmissBins[bin][1]
@@ -240,12 +244,13 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
                 and if not - kill it by Pval=0
                 find number of local maxima. If greated than 1, kill the run
                 '''
-            bins=np.linspace(-0.5,2,15)
-            hist , bin_edges = np.histogram (df_sim_reduced['pcmZ'] , bins=bins)
-            maxima = argrelextrema( hist , np.greater)
+#            bins=np.linspace(-0.5,2,20)
+            hist , bin_edges = np.histogram (df_sim_reduced['pcmZ'] , bins=nbins )
+            maxima = argrelextrema( hist , np.greater )
+            if debug and target=='C12': print 'bin',bin,'hist:\n',hist
             if len(maxima[0])>1:#{
-                if debug: #{
-                    print '$N_{max}=%d$'%len(maxima[0]),', implying non-Gaussian. substituting Pval=0'
+                if debug and target=='C12' : #{
+                    print '$N_{max}^{bin %d}=%d$'%(bin,len(maxima[0])),'(',maxima[0],')',', implying non-Gaussian. substituting Pval=0'
                 #}
                 Pval_KS = 0
             #}
@@ -253,21 +258,23 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
             if do_plots:#{
                 data_skew = skew( df_data_reduced['pcmZ'] )
                 data_excess_kurt = kurtosis( df_data_reduced['pcmZ'] ) - 3
-                ax_l = fig.add_subplot(2 , 5, 5 + bin + 1 ) #fig_l
-                h,bins,_=ax_l.hist(df_sim_reduced['pcmZ'] , bins=bins
-                                   ,histtype='step',linewidth=3,normed=1
-                                   ,label='sim. (%d) \n m=%f,\n s=%f \n $skew=%.2f$ \n $excess kurt=%.2f$ \n $N_{max}=%d$'%(len(df_sim_reduced),np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),sim_skew,excess_kurt,len(maxima[0])))
-                                   
                 hist , bin_edges = np.histogram (df_data_reduced['pcmZ'] , bins=bins)
                 data_maxima = argrelextrema( hist , np.greater )
-
+                
+                ax_l = fig.add_subplot(2 , 5, 5 + bin + 1 )
+                h,bins,_=ax_l.hist(df_sim_reduced['pcmZ'] , bins=nbins
+                                   ,histtype='step',linewidth=3,normed=1
+                                   ,label='sim. (%d) \n m=%f,\n s=%f \n $skew=%.2f$ \n $excess kurt=%.2f$ \n $N_{max}=%d$'
+                                   %(len(df_sim_reduced),np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),sim_skew,excess_kurt,len(maxima[0])))
                 ax_l.hist(df_data_reduced['pcmZ'] , bins=bins
-                          ,label=target+' data \n $skew=%.2f$ \n $excess kurt=%.2f$ \n $N_{max}=%d$'%(data_skew,data_excess_kurt, len(data_maxima[0])),histtype='step',linewidth=3,normed=1)
-                ax_l.set_title('%.2f<$p_{miss}$<%.2f GeV/c, $p_{c.m.}^{z}$ Pval=%f'%(pmin , pmax,Pval_KS),y=1.01,fontsize=15)
+                          ,label=target+' data  (%d) \n m=%f,\n s=%f \n $skew=%.2f$ \n $excess kurt=%.2f$ \n $N_{max}=%d$'
+                          %(len(df_data_reduced),np.mean(df_data_reduced['pcmZ']),np.std(df_data_reduced['pcmZ']),data_skew,data_excess_kurt,len(data_maxima[0])),histtype='step',linewidth=3,normed=1)
+                ax_l.set_title('%.2f<$p_{miss}$<%.2f GeV/c, $p_{c.m.}^{z}$ Pval=%g'%(pmin , pmax,Pval_KS),y=1.01,fontsize=15)
                 ax_l.legend(fontsize=15)
                 set_axes(ax_l,"","",fontsize=15)
+                for bin_max in maxima[0]: plt.plot( [bins[bin_max],bins[bin_max]],ax.get_ylim(),'--',color='black' )
                 if bin==0:#{
-                    plt.text(np.mean(df_sim_reduced['pcmZ'])+3*np.std(df_sim_reduced['pcmZ']),0.1*np.max(h)
+                    plt.text(np.mean(df_sim_reduced['pcmZ'])+0*np.std(df_sim_reduced['pcmZ']),0.1*np.max(h)
                          ,"gen. $a_{1}=%.2f$\n$a_{2}=%.2f$\n$b_{1}=%.2f$\n$b_{2}=%.2f$"%
                          (gen_info[0]['gen_a1'],gen_info[0]['gen_a2'],gen_info[0]['gen_b1'],gen_info[0]['gen_b2']),fontsize=15)
                 #}
@@ -306,12 +313,12 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
         
         if do_plots:#{
             ax = fig.add_subplot( 2 , 5 , (1,5) )
-            plt.text(-0.6,1 ,"$Pval_{x}=%f$\n$Pval_{y}=%g$\n$Pval_{x-y}=%g$\n$Pval_{z}=%g$\n$Pval_{x-y-z}=%g$\n$1e20 \\times Pval_{x-y-z}=%g$"%
+            plt.text(-0.7,1 ,"$Pval_{x}=%f$\n$Pval_{y}=%g$\n$Pval_{x-y}=%g$\n$Pval_{z}=%g$\n$Pval_{x-y-z}=%g$\n$1e20 \\times Pval_{x-y-z}=%g$"%
                          (ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY']
                           ,ks_pval_scores_target['Pval_pcmX_pcmY']
                           ,ks_pval_scores_target['pcmZ']
                           ,ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']
-                          ,ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']*1e20),fontsize=15)
+                          ,ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']*1e20),fontsize=25)
             fig.savefig("/Users/erezcohen/Desktop/TmpPlots/run_%d_%s.pdf"%(run,target))
         #}
 
