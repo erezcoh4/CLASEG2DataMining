@@ -7,6 +7,7 @@ from math import sqrt
 from scipy.stats.mstats import ttest_onesamp
 from scipy.stats import kurtosis
 from scipy.stats import skew
+from scipy.signal import argrelextrema
 sqrt2pi = np.sqrt(2*np.pi)
 
 
@@ -220,36 +221,63 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
             df_sim_reduced = df_sim[ (pmin < df_sim['Pmiss3Mag']) & (df_sim['Pmiss3Mag'] < pmax) ]
             df_data_reduced = df_data[ (pmin < df_data['Pmiss3Mag']) & (df_data['Pmiss3Mag'] < pmax) ]
             D_KS , Pval_KS = ks_2samp( df_sim_reduced['pcmZ'] , df_data_reduced['pcmZ'] )
+#            '''
+#                Check if the distribution of p(c.m.)-z in this bin is indeed Gaussian,
+#                and if not - kill it by Pval=0
+#                The checking is done by looking at the skewness and kurtosis of the set
+#                if |skewness|>2 or |kurtosis-3|>2 kill assign Pval=0
+#                '''
             sim_skew = skew( df_sim_reduced['pcmZ'] )
             excess_kurt = kurtosis( df_sim_reduced['pcmZ'] ) - 3
-            if np.abs(sim_skew)>2 or np.abs(excess_kurt)>2:#{
-                if debug>2: print '$skew=%.2f$ \n $excess kurt=%.2f$'%(sim_skew,excess_kurt),', implying non-Gaussian. substituting Pval=0'
+#            if np.abs(sim_skew)>2 or np.abs(excess_kurt)>2:#{
+#                if debug: #{
+#                    print '$skew=%.2f$ \n $excess kurt=%.2f$'%(sim_skew,excess_kurt),', implying non-Gaussian. substituting Pval=0'
+#                #}
+#                Pval_KS = 0
+#            #}
+            '''
+                Check if the distribution of p(c.m.)-z in this bin is indeed Gaussian,
+                and if not - kill it by Pval=0
+                find number of local maxima. If greated than 1, kill the run
+                '''
+            bins=np.linspace(-0.5,2,15)
+            hist , bin_edges = np.histogram (df_sim_reduced['pcmZ'] , bins=bins)
+            maxima = argrelextrema( hist , np.greater)
+            if len(maxima[0])>1:#{
+                if debug: #{
+                    print '$N_{max}=%d$'%len(maxima[0]),', implying non-Gaussian. substituting Pval=0'
+                #}
                 Pval_KS = 0
             #}
             
             if do_plots:#{
+                data_skew = skew( df_data_reduced['pcmZ'] )
+                data_excess_kurt = kurtosis( df_data_reduced['pcmZ'] ) - 3
                 ax_l = fig.add_subplot(2 , 5, 5 + bin + 1 ) #fig_l
-                bins=np.linspace(-0.5,2,50)
-                h,bins,_=ax_l.hist(df_sim_reduced['pcmZ'] , bins=np.linspace(-0.5,2,50)
+                h,bins,_=ax_l.hist(df_sim_reduced['pcmZ'] , bins=bins
                                    ,histtype='step',linewidth=3,normed=1
-                                   ,label='sim. (%d) \n m=%f,\n s=%f \n $skew=%.2f$ \n $excess kurt=%.2f$'%(len(df_sim_reduced),np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),sim_skew,excess_kurt))
+                                   ,label='sim. (%d) \n m=%f,\n s=%f \n $skew=%.2f$ \n $excess kurt=%.2f$ \n $N_{max}=%d$'%(len(df_sim_reduced),np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),sim_skew,excess_kurt,len(maxima[0])))
+                                   
+                hist , bin_edges = np.histogram (df_data_reduced['pcmZ'] , bins=bins)
+                data_maxima = argrelextrema( hist , np.greater )
+
                 ax_l.hist(df_data_reduced['pcmZ'] , bins=bins
-                          ,label=target+' data',histtype='step',linewidth=3,normed=1)
+                          ,label=target+' data \n $skew=%.2f$ \n $excess kurt=%.2f$ \n $N_{max}=%d$'%(data_skew,data_excess_kurt, len(data_maxima[0])),histtype='step',linewidth=3,normed=1)
                 ax_l.set_title('%.2f<$p_{miss}$<%.2f GeV/c, $p_{c.m.}^{z}$ Pval=%f'%(pmin , pmax,Pval_KS),y=1.01,fontsize=15)
                 ax_l.legend(fontsize=15)
                 set_axes(ax_l,"","",fontsize=15)
                 if bin==0:#{
-                    plt.text(np.mean(df_sim_reduced['pcmZ'])+3*np.std(df_sim_reduced['pcmZ']),0.5*np.max(h)
+                    plt.text(np.mean(df_sim_reduced['pcmZ'])+3*np.std(df_sim_reduced['pcmZ']),0.1*np.max(h)
                          ,"gen. $a_{1}=%.2f$\n$a_{2}=%.2f$\n$b_{1}=%.2f$\n$b_{2}=%.2f$"%
                          (gen_info[0]['gen_a1'],gen_info[0]['gen_a2'],gen_info[0]['gen_b1'],gen_info[0]['gen_b2']),fontsize=15)
                 #}
             #}
-            ''' 
-                Check if the distribution of p(c.m.)-z in this bin is indeed Gaussian,
-                and if not - kill it by Pval=0
-                The checking is done by fitting the distribution to a Gaussian
-                and checking if the fit sigma is ~ the standard deviation of the set
-                '''
+#            ''' 
+#                Check if the distribution of p(c.m.)-z in this bin is indeed Gaussian,
+#                and if not - kill it by Pval=0
+#                The checking is done by fitting the distribution to a Gaussian
+#                and checking if the fit sigma is ~ the standard deviation of the set
+#                '''
 #            hist , bin_edges = np.histogram (df_sim_reduced['pcmZ'] , bins=np.linspace(-0.5,2,50))
 #            x_bins = (bin_edges[1:]+bin_edges[:-1])/2 # for len(x)==len(y)
 #            fit_sigma_std_ratio1 = 1
@@ -266,6 +294,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
 #                Pval_KS = 0
 #            #}
 #            if debug>2: print 'fit_sigma_std_ratio:',fit_sigma_std_ratio
+
             ks_pval_scores_longitudinal_target_array.append( Pval_KS )
             ks_pval_scores_target['pcmZ_bin%d'%bin] = Pval_KS
             ks_pval_scores_target_array.append( Pval_KS )
