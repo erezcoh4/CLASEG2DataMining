@@ -219,32 +219,32 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
 
         # in z direction - compare in 5 bins of p(miss)
         nbins = 15
+        #            bins=np.linspace(-0.5,2,20)
         for bin in range(len(PmissBins)):#{
             
             pmin , pmax = PmissBins[bin][0] , PmissBins[bin][1]
             df_sim_reduced = df_sim[ (pmin < df_sim['Pmiss3Mag']) & (df_sim['Pmiss3Mag'] < pmax) ]
             df_data_reduced = df_data[ (pmin < df_data['Pmiss3Mag']) & (df_data['Pmiss3Mag'] < pmax) ]
             D_KS , Pval_KS = ks_2samp( df_sim_reduced['pcmZ'] , df_data_reduced['pcmZ'] )
-#            '''
-#                Check if the distribution of p(c.m.)-z in this bin is indeed Gaussian,
-#                and if not - kill it by Pval=0
-#                The checking is done by looking at the skewness and kurtosis of the set
-#                if |skewness|>2 or |kurtosis-3|>2 kill assign Pval=0
-#                '''
+            #            '''
+            #                Check if the distribution of p(c.m.)-z in this bin is indeed Gaussian,
+            #                and if not - kill it by Pval=0
+            #                The checking is done by looking at the skewness and kurtosis of the set
+            #                if |skewness|>2 or |kurtosis-3|>2 kill assign Pval=0
+            #                '''
             sim_skew = skew( df_sim_reduced['pcmZ'] )
             excess_kurt = kurtosis( df_sim_reduced['pcmZ'] ) - 3
-#            if np.abs(sim_skew)>2 or np.abs(excess_kurt)>2:#{
-#                if debug: #{
-#                    print '$skew=%.2f$ \n $excess kurt=%.2f$'%(sim_skew,excess_kurt),', implying non-Gaussian. substituting Pval=0'
-#                #}
-#                Pval_KS = 0
-#            #}
+            #            if np.abs(sim_skew)>2 or np.abs(excess_kurt)>2:#{
+            #                if debug: #{
+            #                    print '$skew=%.2f$ \n $excess kurt=%.2f$'%(sim_skew,excess_kurt),', implying non-Gaussian. substituting Pval=0'
+            #                #}
+            #                Pval_KS = 0
+            #            #}
             '''
                 Check if the distribution of p(c.m.)-z in this bin is indeed Gaussian,
                 and if not - kill it by Pval=0
                 find number of local maxima. If greated than 1, kill the run
                 '''
-#            bins=np.linspace(-0.5,2,20)
             hist , bin_edges = np.histogram (df_sim_reduced['pcmZ'] , bins=nbins )
             maxima = argrelextrema( hist , np.greater )
             if debug and target=='C12': print 'bin',bin,'hist:\n',hist
@@ -279,28 +279,28 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
                          (gen_info[0]['gen_a1'],gen_info[0]['gen_a2'],gen_info[0]['gen_b1'],gen_info[0]['gen_b2']),fontsize=15)
                 #}
             #}
-#            ''' 
-#                Check if the distribution of p(c.m.)-z in this bin is indeed Gaussian,
-#                and if not - kill it by Pval=0
-#                The checking is done by fitting the distribution to a Gaussian
-#                and checking if the fit sigma is ~ the standard deviation of the set
-#                '''
-#            hist , bin_edges = np.histogram (df_sim_reduced['pcmZ'] , bins=np.linspace(-0.5,2,50))
-#            x_bins = (bin_edges[1:]+bin_edges[:-1])/2 # for len(x)==len(y)
-#            fit_sigma_std_ratio1 = 1
-#            try:#{
-#                params,cov=curve_fit(gauss,x_bins,hist,(np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),len(df_sim_reduced)),maxfev=5000)
-#                fit_sigma_std_ratio = params[1]/np.std(df_sim_reduced['pcmZ'])
-#                if fit_sigma_std_ratio<0.75:#{
-#                    if debug>2: print 'fit_sigma_std_ratio = ' , fit_sigma_std_ratio,', implying more than a single Gaussian peak. substituting Pval=0'
-#                    Pval_KS = 0
-#                #}
-#            #}
-#            except RuntimeError:#{
-#                print("Error - curve_fit failed, continuing")
-#                Pval_KS = 0
-#            #}
-#            if debug>2: print 'fit_sigma_std_ratio:',fit_sigma_std_ratio
+            #            '''
+            #                Check if the distribution of p(c.m.)-z in this bin is indeed Gaussian,
+            #                and if not - kill it by Pval=0
+            #                The checking is done by fitting the distribution to a Gaussian
+            #                and checking if the fit sigma is ~ the standard deviation of the set
+            #                '''
+            #            hist , bin_edges = np.histogram (df_sim_reduced['pcmZ'] , bins=np.linspace(-0.5,2,50))
+            #            x_bins = (bin_edges[1:]+bin_edges[:-1])/2 # for len(x)==len(y)
+            #            fit_sigma_std_ratio1 = 1
+            #            try:#{
+            #                params,cov=curve_fit(gauss,x_bins,hist,(np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),len(df_sim_reduced)),maxfev=5000)
+            #                fit_sigma_std_ratio = params[1]/np.std(df_sim_reduced['pcmZ'])
+            #                if fit_sigma_std_ratio<0.75:#{
+            #                    if debug>2: print 'fit_sigma_std_ratio = ' , fit_sigma_std_ratio,', implying more than a single Gaussian peak. substituting Pval=0'
+            #                    Pval_KS = 0
+            #                #}
+            #            #}
+            #            except RuntimeError:#{
+            #                print("Error - curve_fit failed, continuing")
+            #                Pval_KS = 0
+            #            #}
+            #            if debug>2: print 'fit_sigma_std_ratio:',fit_sigma_std_ratio
 
             ks_pval_scores_longitudinal_target_array.append( Pval_KS )
             ks_pval_scores_target['pcmZ_bin%d'%bin] = Pval_KS
