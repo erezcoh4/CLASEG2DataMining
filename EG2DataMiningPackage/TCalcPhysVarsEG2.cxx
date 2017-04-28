@@ -122,6 +122,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("neg. particles num." ,&Nnegative             ,"Nnegative/I");
     OutTree -> Branch("pCTOFCut"            ,&pCTOFCut              );// std::vector<Int_t>
     OutTree -> Branch("pFiducCut"           ,&pFiducCut             );// std::vector<Int_t>
+    OutTree -> Branch("pInDeadRegions"      ,&pInDeadRegions        );// std::vector<Int_t> Or' dead regions
 
     
     // Float_t branches
@@ -242,6 +243,7 @@ void TCalcPhysVarsEG2::InitEvent(){
     if (!pCTOF.empty())     pCTOF.clear();
     if (!pCTOFCut.empty())  pCTOFCut.clear();
     if (!pFiducCut.empty()) pFiducCut.clear();
+    if (!pInDeadRegions.empty()) pInDeadRegions.clear();
     if (!pEdep.empty())     pEdep.clear();
     if (!Tp.empty())        Tp.clear();
     if (!proton_angle.empty()) proton_angle.clear();
@@ -297,6 +299,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     q = Beam - e;
     Q2 = -q.Mag2();
+    Xb = Q2/(2. * Mp * q.E());
     if (DataType == "GSIM") {
         Pe = TVector3( Px_e_g , Py_e_g , Pz_e_g );
         e_g.SetVectM( Pe_g , Me );
@@ -313,8 +316,9 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         TVector3 p_3_momentum( PpX[i], PpY[i], PpZ[i] );
         p_3_momentum = CoulombCorrection( p_3_momentum , CoulombDeltaE , Mp , -1 ); // for the protons, the correction is Ep-dE
         p3vec.push_back( p_3_momentum );
-        if ( p_3_momentum.Mag() > Plead.P() )
+        if ( p_3_momentum.Mag() > Plead.P() ){
             Plead.SetVectM( p_3_momentum , Mp ) ;           // Plead is first calculated in Lab-Frame
+        }
     }
     
     if (DataType == "GSIM") {
@@ -396,19 +400,24 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
     // all recoil protons together (just without the leading proton)
     if (protons.size()>0) {
-        Plead       = protons.at(0);            // now Plead is calculated in q-Pmiss frame
+        Plead = protons.at(0);            // now Plead is calculated in q-Pmiss frame
     }
-    Prec        = Pcm - (Plead - q);        // Prec is the 4-vector sum of all recoiling protons
+    // define Precoil:
+    // for 2p-SRC, we want at least one proton above 350 MeV/c, and then call it Precoil
+    // for Np-SRC this is different - we need to revise it
+    Prec = (protons.size()>1) ? protons.at(1) : TLorentzVector();
+    //    Prec = Pcm - (Plead - q);        // Prec is the 4-vector sum of all recoiling protons
+    // for 3p get back to this
     if (debug > 2) Printf("got Prec");
 
     
     // A(e,e'p) missing mass M²(miss) = (q + 2mN - Plead)² , all 4-vectors
-    Mmiss       = (q + 2*NucleonAtRest - Plead).Mag();
+    Mmiss = (q + 2*NucleonAtRest - Plead).Mag();
     if (debug > 2) Printf("got Mmiss");
 
     
     // Bjorken scaling for a moving nucleon
-    XbMoving    = Q2 / ( Wtilde.Mag2() + Q2 - Mp2  ); // = Q2 / 2pq [Q2 / ( 2. * (Pmiss * q) )]
+    XbMoving = Q2 / ( Wtilde.Mag2() + Q2 - Mp2  ); // = Q2 / 2pq [Q2 / ( 2. * (Pmiss * q) )]
     if (debug > 2) Printf("got XbMoving");
  
 
@@ -418,9 +427,9 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         Nmiss = Nlead - q;
         Np = 3;
     }
-//    if (Np==2) {
-//        p12Randomize();
-//    }
+    //    if (Np==2) {
+    //        p12Randomize();
+    //    }
     else if (Np==3) {
         p23Randomize();
         PmissRct    = q - protons.at(1) - protons.at(2);
@@ -479,16 +488,21 @@ void TCalcPhysVarsEG2::SetCuts(){
         && Mmiss < 1.1
         && 0.3 < Pmiss.P() && Pmiss.P() < 1.0
         && -24.5 < pVertex[0].Z() && pVertex[0].Z() < -20.0
-        && -24.5 < eVertex.Z() && eVertex.Z() < -20.0
+        //        && pInDeadRegions[0]==0
+        && -24.5 < eVertex.Z() && eVertex.Z() < -20.0 // automatic cut that comes from target-type==2
         ){
 
         eep_in_ppSRCcut = true;
         
-        if (0.35 < Prec.P()  &&  -24.5 < pVertex[1].Z() && pVertex[1].Z() < -20.0){
+        if (Np>=2
+            && 0.35 < Prec.P()
+            &&  -24.5 < pVertex[1].Z() && pVertex[1].Z() < -20.0
+//            && pInDeadRegions[1]==0
+            ){
         
             ppSRCcut = true;
             
-            if (pFiducCut[1] == 1){
+            if (pFiducCut[1]==1){
                 
                 ppSRCcutFiducial = true;
                 
@@ -588,8 +602,10 @@ void TCalcPhysVarsEG2::loop_protons(){
     for (auto i: sort_pMag( p3vec )){
         if (i>0) {
             // -- - - --- - -- --- - - -- - -- -- ------- - -- -- -- - -- - -- -- -- - -- - - -
-            // DO NOT PERFORM CORRECTION FOR THE LEADING PROTON, ONLY THE RECOILING PROTONS
+            // PERFORM energy loss CORRECTION only FOR PROTONs BELOW 1 GeV/c
+            //            if (p3vec.at(i).Mag()<1.){
             p3vec.at(i) = EnergyLossCorrrection( p3vec.at(i) );
+            //            }
         }
         
         protonsLab.push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );
@@ -599,6 +615,7 @@ void TCalcPhysVarsEG2::loop_protons(){
         
         // proton fiducial cut is calculated in the lab frame, so it must come before we rotate the protons...
         pFiducCut.push_back( protonFiducial( p3vec.at(i) , debug ) );
+        pInDeadRegions.push_back( protonInDeadRegions( p3vec.at(i) , debug ) );
         
         // protons
         if (FrameName == "q(z) - Pmiss(x-z) frame"){
@@ -712,6 +729,7 @@ void TCalcPhysVarsEG2::p23Randomize(){
         std::iter_swap(alpha.begin()+1      ,alpha.begin()+2);
         
         std::iter_swap(pFiducCut.begin()+1  ,pFiducCut.begin()+2);
+        std::iter_swap(pInDeadRegions.begin()+1   ,pInDeadRegions.begin()+2);
         if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
             std::iter_swap(pCTOFCut.begin()+1   ,pCTOFCut.begin()+2);
             std::iter_swap(pCTOF.begin()+1      ,pCTOF.begin()+2);
@@ -731,6 +749,7 @@ void TCalcPhysVarsEG2::p12Randomize(){
         std::iter_swap(alpha.begin()      ,alpha.begin()+1);
         
         std::iter_swap(pFiducCut.begin()  ,pFiducCut.begin()+1);
+        std::iter_swap(pInDeadRegions.begin()+1   ,pInDeadRegions.begin()+2);
         if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
             std::iter_swap(pCTOFCut.begin()   ,pCTOFCut.begin()+1);
             std::iter_swap(pCTOF.begin()      ,pCTOF.begin()+1);
@@ -772,6 +791,7 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOWstdVector(alpha);
     SHOWstdVector(pCTOFCut);
     SHOWstdVector(pFiducCut);
+    SHOWstdVector(pInDeadRegions);
     SHOWstdVector(pEdep);
     SHOWstdVector(Tp);
     SHOWstdVector(proton_angle);

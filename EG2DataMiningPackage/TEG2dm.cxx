@@ -177,6 +177,8 @@ TCutG * TEG2dm::alpha12_vs_XbCut(){
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 Int_t TEG2dm::protonFiducial( TVector3 pMomentum , int debug ){
+    // in good fiducial volume = 1
+    // not in good fiducial volume = 0
     
     // return 1 if proton inside fiducial region, and 0 if it is outside fiducial region
     //--------------------------------------------------------------------
@@ -236,6 +238,64 @@ Int_t TEG2dm::protonFiducial( TVector3 pMomentum , int debug ){
     if (debug > 3) cout << "not in fiducial region...." << endl;
     return 0;
 }
+
+
+
+
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+// April 26, 2017
+Int_t TEG2dm::protonInDeadRegions( TVector3 pMomentum , int debug ){
+    // dead region = 1
+    // good region = 0
+    
+    // return 1 if proton inside fiducial region, and 0 if it is outside fiducial region
+    //--------------------------------------------------------------------
+    // Fiducial cuts from Zana' thesis (p. 67, 4.4)
+    //--------------------------------------------------------------------
+    Double_t theta  = r2d * pMomentum.Theta();
+    Double_t phi    = r2d * pMomentum.Phi();
+    phi = ChangePhiToPhiLab( phi );
+    
+    // Check which sector
+    int sector = (int)((phi+30)/60) + 1;
+    // in contrast to TEG2dm::protonFiducial(),
+    // in which we need the sector between 0 and 5 to index the parameters arrays
+    // here we use sector between 1 and 6
+    // to follow Or Hen' cuts from the analsys note
+    
+    switch (sector) {
+        case 1:
+            if (35.<theta && theta<45.) return 1;
+            else return 0;
+            break;
+        case 2:
+            return 0;
+            break;
+        case 3:
+            if (32.<theta && theta<42.) return 1;
+            else return 0;
+            break;
+        case 4:
+            if (44.<theta && theta<49.) return 1;
+            else return 0;
+            break;
+        case 5:
+            if (32.<theta && theta<42.) return 1;
+            else return 0;
+            break;
+        case 6:
+            if (48.<theta && theta<52.) return 1;
+            else return 0;
+            break;
+
+        default:
+            break;
+    }
+    return 1;
+}
+
 
 #endif
 

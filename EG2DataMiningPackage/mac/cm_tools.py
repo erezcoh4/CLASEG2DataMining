@@ -247,7 +247,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
                 '''
             hist , bin_edges = np.histogram (df_sim_reduced['pcmZ'] , bins=nbins )
             maxima = argrelextrema( hist , np.greater )
-            if debug and target=='C12': print 'bin',bin,'hist:\n',hist
+            if debug>2 and target=='C12': print 'bin',bin,'hist:\n',hist
             if len(maxima[0])>1:#{
                 if debug and target=='C12' : #{
                     print '$N_{max}^{bin %d}=%d$'%(bin,len(maxima[0])),'(',maxima[0],')',', implying non-Gaussian. substituting Pval=0'

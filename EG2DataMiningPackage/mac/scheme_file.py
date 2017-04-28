@@ -1,7 +1,7 @@
 '''
     usage:
     --------
-    python mac/scheme_file.py  --DataType=DATA --option=SRCPmissXb -A12
+    python mac/scheme_file.py  --DataType=DATA --option=SRCXb -A12
     python mac/scheme_file.py -A12  --option="(e,e'pp?)" --DataType=New_NoCTofDATA
     python mac/scheme_file.py -A12  --option=GSIM -r93
 '''
@@ -12,9 +12,16 @@ FileName    = DataType+"_%s"% dm.Target(A)
 scheme      = TSchemeDATA( DataType , eg2_data_path , schemed_eg2_data_path , FileName , "T" , flags.verbose )
 pMin , pMax = 0.3 , 0.7
 
+
+# ------------------------------------------------------------------ #
+if (flags.option=="SRCXb"):
+    scheme.SRCXb( 2 , 1.0 , 1 , 100 , "" , A ) # target-type = 2, Bjorken x > 1.0
+    print "schemed for SRC in nuclear target Xb > 1.0, Nprotons>1"
+# ------------------------------------------------------------------ #
+
 # ------------------------------------------------------------------ #
 if (flags.option=="SRCPmissXb"):
-    scheme.SRCPmissXb( 2 , 0.8 , 1 , 10 , "" , A ) # target-type = 2, Bjorken x > 0.8
+    scheme.SRCPmissXb( 2 , 1.0 , 1 , 20 , "" , A ) # target-type = 2, Bjorken x > 0.8
     print "schemed for SRC in nuclear target (1 > p(miss) > 0.3 GeV/c) and Xb > 0.8, 1-4 protons"
 # ------------------------------------------------------------------ #
 

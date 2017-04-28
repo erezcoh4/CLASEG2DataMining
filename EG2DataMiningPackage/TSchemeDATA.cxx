@@ -99,6 +99,8 @@ void TSchemeDATA::protons_from_nuclei(){
     WriteOutFile();
 }
 
+
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TSchemeDATA::SRCPmissXb(int fTargetType , float fXbMin, int fNpMin, int fNpMax, TString name, Int_t A){
     TargetType      = fTargetType;
@@ -108,7 +110,7 @@ void TSchemeDATA::SRCPmissXb(int fTargetType , float fXbMin, int fNpMin, int fNp
     CreateOutTree   ();
     Beam = TLorentzVector( 0 , 0 , 5.014 , 5.014 );
     TargetAsString( A      , &mA   , &CoulombDeltaE);
-
+    
     if (DataType == "DATA") {
         for (Long64_t i = 0; i < Nentries ; i++) {
             if (i%(Nentries/20)==0) {
@@ -125,40 +127,33 @@ void TSchemeDATA::SRCPmissXb(int fTargetType , float fXbMin, int fNpMin, int fNp
                 e.SetVectM( Pe , Me );
                 q = Beam - e;
                 Plead = TLorentzVector();
+                
+                
                 // protons
                 for (int p = 0 ; p < Np ; p++){
                     TVector3 p_3_momentum( PpX[p], PpY[p], PpZ[p] );
                     p_3_momentum = CoulombCorrection( p_3_momentum , CoulombDeltaE , Mp , -1 ); // for the protons, the correction is Ep-dE
+                    // Energy loss correction should be done only for recoil protons
+                    // and thus we will do it later - when identifying which are the recoil protons
+                    //                    // apply energy loss correction for protons below 1 GeV/c
+                    //                    if (p_3_momentum.Mag() < 1.){
+                    //                        p_3_momentum = EnergyLossCorrrection( p_3_momentum );
+                    //                    }
                     // no energy-loss correction for the leading proton
                     if (p_3_momentum.Mag() > Plead.P()) {   // this is a faster proton
                         Plead.SetVectM( p_3_momentum , Mp ) ;
                     }
                 }
                 Pmiss = Plead - q;
-                if( (0.3 < Pmiss.P()) && (Pmiss.P() < 1.0) ){
+                if( (0.3 < Pmiss.P()) && (Pmiss.P() < 1.0) && (Plead.P()<2.4) ){
                     OutTree -> Fill();
                 }
             }
-            //            if( (fNpMin <= Np &&  Np <= fNpMax) && (targ_type == TargetType) && (Xb > XbMin) ){
-            //                q       = new TVector3( - Px_e , - Py_e , 5.009 - Pz_e );
-            //                Plead   = new TVector3();
-            //                for (int p = 0 ; p < Np ; p++){
-            //                    proton = new TVector3(PpX[p],PpY[p],PpZ[p]);
-            //                    if (proton->Mag() > Plead->Mag()) {   // this is a faster proton
-            //                        Plead = proton;
-            //                    }
-            //
-            //                }
-            //                Pmiss = *Plead - *q;
-            //                if( (0.3 < Pmiss.Mag()) && (Pmiss.Mag() < 1.0) ){
-            //                    OutTree -> Fill();
-            //                }
-            //            }
         }
     }
     else if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
         //         targ_type = 2; // for Al27
-
+        
         for (Long64_t i = 0; i < Nentries ; i++) {
             if (i%(Nentries/20)==0) plot.PrintPercentStr((float)i/Nentries);
             InTree -> GetEntry(i);
@@ -183,7 +178,7 @@ void TSchemeDATA::SRCPmissXb(int fTargetType , float fXbMin, int fNpMin, int fNp
                     OutTree -> Fill();
                 }
             }
-
+            
             
             //            if( (fNpMin <= Np &&  Np <= fNpMax) && (targ_type == TargetType) && (Xb > XbMin) ){
             //                q       = new TVector3( - N_Px[0] , - N_Py[0] , 5.009 - N_Pz[0] );
@@ -203,188 +198,36 @@ void TSchemeDATA::SRCPmissXb(int fTargetType , float fXbMin, int fNpMin, int fNp
             //            }
         }
     }
-
+    
     WriteOutFile();
 }
 
 
-////....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//void TSchemeDATA::TwoSlowProtons(int fTargetType , float fpMin, float fpMax){
-//    
-//    TargetType      = fTargetType;
-//    SetSchemeType   ("TwoSlowProtons");
-//    LoadInTree      ();
-//    CreateOutTree   ();
-//
-//    if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
-//
-//
-//        
-//        for (Long64_t i = 0; i < Nentries ; i++) {
-//            
-//            if (i%(Nentries/20)==0) {
-//                printf("%d events so far, out of ", (int)OutTree -> GetEntries());
-//                plot.PrintPercentStr((float)i/Nentries);
-//            }
-//            NpGood = 0;
-//            InTree -> GetEntry(i);
-//            if (DataType == "New_NoCTofDATA") {targ_type = 2; Ntotal=Nn+Np;} // for 27Al or the new 12C Meytal cooked Aug-2016
-//            
-//            if(debug > 2) SHOW3(Ntotal , Nn , Np);
-//            
-//            // look for events with only one negative particle (electron) and two positive (protons)
-//            if( ( Np == 2 ) && ( Nn == 1 ) && ( Ntotal == 3 ) && (targ_type == TargetType) ) {
-//
-//                // make sure these two positive particles are actually protons
-//                for (int p = 0 ; p < Np ; p++){
-//                    if( P_cut[p] == 1 && P_PID[p] == 1 ){    // this is a proton with momentum |p|<2.8 and 'good' CTOF
-//                        proton = new TVector3(PpX[p],PpY[p],PpZ[p]);
-//                        
-//                        // and that their momenta are in the desired range
-//                        if (fpMin < proton->Mag() && proton->Mag() < fpMax) {
-//                            NpGood++;
-//                        }
-//                    }
-//                }
-//                if( NpGood == 2 ){
-//                    OutTree -> Fill();
-//                }
-//            }
-//        }
-//    }
-//    
-//    WriteOutFile();
-//}
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void TSchemeDATA::SRCXb(int fTargetType , float fXbMin, int fNpMin, int fNpMax, TString name, Int_t A){
+    TargetType      = fTargetType;
+    XbMin           = fXbMin;
+    SetSchemeType   ("SRCXb"+name);
+    LoadInTree      ();
+    CreateOutTree   ();
+    Beam = TLorentzVector( 0 , 0 , 5.014 , 5.014 );
 
+    if (DataType == "DATA") {
+        for (Long64_t i = 0; i < Nentries ; i++) {
+            if (i%(Nentries/20)==0) {
+                printf("schemed %d events so far, out of ", (int)OutTree -> GetEntries());
+                plot.PrintPercentStr((float)i/Nentries);
+            }
+            InTree -> GetEntry(i);
+            // electron
+            if( (fNpMin <= Np &&  Np <= fNpMax) && (targ_type == TargetType) && (Xb > XbMin) ){
+                OutTree -> Fill();
+            }
+        }
+    }
+    WriteOutFile();
+}
 
-
-////....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//void TSchemeDATA::TwoSlowProtons_piminus_p (int fTargetType , float fpMin, float fpMax ){
-//    
-//    TargetType      = fTargetType;
-//    SetSchemeType   ("TwoSlowProtons_piminus_p");
-//    LoadInTree      ();
-//    CreateOutTree   ();
-//    
-//    if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
-//        
-//        if (DataType == "New_NoCTofDATA") {
-//            targ_type = 2; // for 27Al or the new 12C Meytal cooked Aug-2016
-//        }
-//        
-//        
-//        for (Long64_t i = 0; i < Nentries ; i++) {
-//            
-//            if (i%(Nentries/20)==0) {
-//                printf("schemed %d events so far, out of ", (int)OutTree -> GetEntries());
-//                plot.PrintPercentStr((float)i/Nentries);
-//            }
-//            NpGood = Npiminus = 0;
-//            InTree -> GetEntry(i);
-//            
-//        
-//            
-//            // look for events with only one negative particle (electron) and two positive (protons)
-//            if( ( Np == 3 ) && ( Nn > 1 ) && (targ_type == TargetType) ) {
-//                
-//                // ask if we have a π-
-//                for (int n = 0 ; n < Nn ; n++){
-//                    
-//                    negative_particle_momentum = new TVector3(N_Px[n],N_Py[n],N_Pz[n]);
-//                    Float_t Momentum = negative_particle_momentum->Mag();
-//                    Float_t time = (N_TimeSC[n] - STT[n]);
-//                    Float_t Betta = ( N_PathSC[n] / time ) / 30.0 ; // c = 30 cm/ns,  the units for N_PathSC are [cm] and for N_TimeSC are [ns]
-//
-//                    if (TMath::Abs(Betta-Momentum/sqrt(Momentum*Momentum+0.14*0.14))<0.03){ // this is the CTOF of π- according to meytal p.31
-//                        Npiminus++;
-//                    }
-//                }
-//
-//                
-//                // make sure these two positive particles are actually protons
-//                for (int p = 0 ; p < Np ; p++){
-//                    if( P_cut[p] == 1 && P_PID[p] == 1 ){    // this is a proton with momentum |p|<2.8 and 'good' CTOF
-//                        proton = new TVector3(PpX[p],PpY[p],PpZ[p]);
-//                        
-//                        // and that their momenta are in the desired range
-//                        if (fpMin < proton->Mag() && proton->Mag() < fpMax) {
-//                            NpGood++;
-//                        }
-//                    }
-//                }
-//                
-//                if (( NpGood == 2 ) && (Npiminus >= 1) ){
-//                    OutTree -> Fill();
-//                }
-//            }
-//        }
-//    }
-//    
-//    WriteOutFile();
-//}
-
-
-////....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//void TSchemeDATA::TwoSlowProtons_ppp(int fTargetType , float fpMin, float fpMax){
-//    TargetType      = fTargetType;
-//    SetSchemeType   ("TwoSlowProtons_ppp");
-//    LoadInTree      ();
-//    CreateOutTree   ();
-//    int NpSlow , NpFast ;
-//    
-//    if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
-//        //         targ_type = 2; // for Al27
-//        
-//        for (Long64_t i = 0; i < Nentries ; i++) {
-//            if (i%(Nentries/20)==0) plot.PrintPercentStr((float)i/Nentries);
-//            NpFast = 0;
-//            NpSlow = 0;
-//            InTree -> GetEntry(i);
-//            
-//            // look for events with only one negative particle (electron) and two positive (protons) of intermediate momenta, plus one aditional proton with large momentum > 1. GeV/c
-//            
-//            if( ( Np == 3 ) && ( Nn == 1 ) && (targ_type == TargetType) && (Xb > 0.9)){
-//                for (int p = 0 ; p < Np ; p++){
-//                    if( P_cut[p] == 1 && P_PID[p] == 1 ){    // this is a proton with momentum |p|<2.8 and 'good' CTOF
-//                        proton = new TVector3(PpX[p],PpY[p],PpZ[p]);
-//                        if (1. < proton->Mag() ){
-//                            NpFast++;
-//                        }
-//                        if (fpMin < proton->Mag() && proton->Mag() < fpMax) {
-//                            NpSlow++;
-//                        }
-//                    }
-//                }
-//                if( NpFast == 1 && NpSlow == 2 ){
-//                    OutTree -> Fill();
-//                }
-//            }
-//        }
-//    }
-//    
-//    WriteOutFile();
-//}
-//
-////....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//void TSchemeDATA::TwoSlowProtons_npp(float fn_pMin , float fpMin, float fpMax){
-//    SetSchemeType   ("TwoSlowProtons_npp");
-//    LoadInTree      ();
-//    CreateOutTree   ();
-//    
-//    if (DataType == "(e,e'npp)") {
-//        for (Long64_t i = 0; i < Nentries ; i++) {
-//            if (i%(Nentries/20)==0) plot.PrintPercentStr((float)i/Nentries);
-//            InTree -> GetEntry(i);
-//            
-//            // look for events with only one negative particle (electron) and two positive (protons) of intermediate momenta, plus one aditional neutron with large momentum > 1.1 GeV/c
-//            
-//            if ( (Xb > 1.05) && (NMom->Mag() > fn_pMin) && (fpMin < P1Mom->Mag() && ( P1Mom->Mag() < fpMax ) && (fpMin < P2Mom->Mag() && ( P2Mom->Mag() < fpMax )) ) ) {
-//                OutTree -> Fill();
-//            }
-//        }
-//    }
-//    WriteOutFile();
-//}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TSchemeDATA::CreateOutTree(){

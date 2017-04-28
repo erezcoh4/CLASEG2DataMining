@@ -64,6 +64,7 @@ public:
     TCutG          * alpha12_vs_XbCut ();
     
     Int_t              protonFiducial ( TVector3 , int debug = 1 );
+    Int_t         protonInDeadRegions ( TVector3 , int debug = 1 );
 
 
     // proton fiducial parameters
@@ -85,6 +86,9 @@ public:
     const Double_t P5_theta[6] = { -0.1    , -0.651811, -3.1793   , -3.3461 , -1.10808, -0.462045};
     
     Double_t P0 , P1 , P2 , P3 , P4 , P5 , mom , a , b ;
+    
+    
+    
 
 };
 

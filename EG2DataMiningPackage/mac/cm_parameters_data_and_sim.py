@@ -128,11 +128,11 @@ if 'scheme pp-SRC' in flags.option or 'scheme' in flags.option: # scheme to pp-S
     ana     = TAnalysisEG2( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName , flags.cut )
     scheme  = TSchemeDATA()
     SchemedName = "ppSRCCut_%s"% DataName
-    scheme.SchemeOnTCut( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ROOT.TCut("ppSRCcutFiducial") )
+    scheme.SchemeOnTCut( path+"/AnaFiles" , "Ana_SRCXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ROOT.TCut("ppSRCcutFiducial") )
     SchemedName = "eep_in_ppSRCCut_%s"% DataName
-    scheme.SchemeOnTCut( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ROOT.TCut("eep_in_ppSRCcut") )
+    scheme.SchemeOnTCut( path+"/AnaFiles" , "Ana_SRCXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ROOT.TCut("eep_in_ppSRCcut") )
     SchemedName = "ppSRCCut_noFVcuts_%s"% DataName
-    scheme.SchemeOnTCut( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ROOT.TCut("ppSRCcut") )
+    scheme.SchemeOnTCut( path+"/AnaFiles" , "Ana_SRCXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ROOT.TCut("ppSRCcut") )
     print 'schemed to %s'%SchemedName
 
 

@@ -100,6 +100,7 @@ public:
 
     
     void protons_from_nuclei ();
+    void                    SRCXb (int fTargetType = 2 , float fXbMin = 1.05, int fNpMin = 1, int fNpMax= 5, TString name="" , Int_t A=12);
     void               SRCPmissXb (int fTargetType = 2 , float fXbMin = 1.05, int fNpMin = 1, int fNpMax= 5, TString name="" , Int_t A=12);
     void           TwoSlowProtons (int fTargetType = 2 , float fpMin = 0.2 , float fpMax = 3. );
     void       TwoSlowProtons_ppp (int fTargetType = 2 , float fpMin = 0.2 , float fpMax = 3. );
