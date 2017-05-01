@@ -182,11 +182,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
             if debug>2: print 'gen: SigmaX ',gen_info[0]['gen_SigmaX'],'a1',gen_info[0]['gen_a1'],'a2',gen_info[0]['gen_a2'],'b1',gen_info[0]['gen_b1'],'b2',gen_info[0]['gen_b2']
             fig = plt.figure(figsize=(30,24))
         #}
-        ks_pval_scores_target_array , ks_pval_scores_transverse_target_array , ks_pval_scores_longitudinal_target_array = [] , [] , []
-        ks_pval_scores_target = dict()
-        df_data = tree2array( ana_data[target].GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
-        
-        
+
         ks_pval_scores_target_array , ks_pval_scores_transverse_target_array , ks_pval_scores_longitudinal_target_array = [] , [] , []
         ks_pval_scores_target = dict()
         df_data = tree2array( ana_data[target].GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
@@ -1338,7 +1334,7 @@ def a1a2_create_negative_sigma_z( a1 , a2 ):
 # ------------------------------------------------------------------------------- #
 def generate_runs_with_random_parameters( option='', hyperparameters=None,
                                          ana_data=dict(),
-                                         cm_pars=dict(), cm_fits=dict(),
+#                                         cm_pars=dict(), cm_fits=dict(),
                                          debug=0 , PmissBins=None , Q2Bins=None , thetapmqBins=None ,
                                          buildup_resutlsFName='' ,
                                          reco_fitsFName='', root_resutlsFName='' ,

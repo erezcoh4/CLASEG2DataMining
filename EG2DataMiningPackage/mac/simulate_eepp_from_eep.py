@@ -12,29 +12,29 @@ from cm_tools import *
 
 # extract cm-parameters from data for all targets (no acc. correction)
 # ----------------------------------------------------------
-if 'extractCMparsAllNuclei' in flags.option: #{
-    
-    cm_pars , cm_fits = [] , []
-    ana = dict()
-    for target in targets:
-        ana[target] = TAnalysisEG2( path+"/AnaFiles" ,  "Ana_ppSRCCut_DATA_%s"%target )
-        cm_parameters , _ = calc_cm_parameters(ana[target] , PmissBins ,
-                                               CMRooFitsName( ppPath + '/DATA/%s_unweighted'%target ) ,
-                                               CMRooFitsName( ppPath + '/DATA/%s_weighted'%target ) ,
-                                               DoSaveCanvas = True )
-
-        cm_parameters.to_csv( CMParsFname(ppPath+'/DATA/%s_data'%target) , header=True , index=False)
-        cm_pars.append( cm_parameters )
-        fits = fit_cm_parameters( run=target+' data', data=cm_parameters, FigureFName=FigureFName(ppPath+'/DATA/data', target) , DoPlot=True )
-        fits.to_csv( CMfitsFname( ppPath+'/DATA/data' , target ) , header=True , index=False)
-        print_filename( CMfitsFname(ppPath+'/DATA/data' , target )  , target + " data c.m. fits at")
-        cm_fits.append( fits )
-
-    # plot longitudinal width and mean for all nuclei
-    widths_z = fit_widths_z( cm_pars , colors=target_colors , labels=labels , FigureFName = FigureFName(ppPath+'/DATA/widths_z_all_nuclei') )
-    mean_z = fit_means_z( cm_pars , colors=target_colors , labels=labels  , FigureFName = FigureFName(ppPath+'/DATA/means_z_all_nuclei') )
-    print 'done extractCMparsAllNuclei'; print_line()
-    #}
+#if 'extractCMparsAllNuclei' in flags.option: #{
+#    
+#    cm_pars , cm_fits = [] , []
+#    ana = dict()
+#    for target in targets:
+#        ana[target] = TAnalysisEG2( path+"/AnaFiles" ,  "Ana_ppSRCCut_DATA_%s"%target )
+#        cm_parameters , _ = calc_cm_parameters(ana[target] , PmissBins ,
+#                                               CMRooFitsName( ppPath + '/DATA/%s_unweighted'%target ) ,
+#                                               CMRooFitsName( ppPath + '/DATA/%s_weighted'%target ) ,
+#                                               DoSaveCanvas = True )
+#
+#        cm_parameters.to_csv( CMParsFname(ppPath+'/DATA/%s_data'%target) , header=True , index=False)
+#        cm_pars.append( cm_parameters )
+#        fits = fit_cm_parameters( run=target+' data', data=cm_parameters, FigureFName=FigureFName(ppPath+'/DATA/data', target) , DoPlot=True )
+#        fits.to_csv( CMfitsFname( ppPath+'/DATA/data' , target ) , header=True , index=False)
+#        print_filename( CMfitsFname(ppPath+'/DATA/data' , target )  , target + " data c.m. fits at")
+#        cm_fits.append( fits )
+#
+#    # plot longitudinal width and mean for all nuclei
+#    widths_z = fit_widths_z( cm_pars , colors=target_colors , labels=labels , FigureFName = FigureFName(ppPath+'/DATA/widths_z_all_nuclei') )
+#    mean_z = fit_means_z( cm_pars , colors=target_colors , labels=labels  , FigureFName = FigureFName(ppPath+'/DATA/means_z_all_nuclei') )
+#    print 'done extractCMparsAllNuclei'; print_line()
+#    #}
 
 
 
@@ -43,12 +43,6 @@ if 'extractCMparsAllNuclei' in flags.option: #{
 # generate and analyse runs
 # ----------------------------------------------------------
 if 'generate' in flags.option or 'analyse' in flags.option:#{
-    
-    cm_pars , cm_fits , ana_data = dict() , dict() , dict()
-    for target in targets:
-        cm_pars[target] = pd.read_csv( CMParsFname(ppPath+'/DATA/%s_data'%target) )
-        cm_fits[target] = pd.read_csv( CMfitsFname(ppPath+'/DATA/data',target ) )
-        ana_data[target] = TAnalysisEG2( path+"/AnaFiles" ,  "Ana_ppSRCCut_DATA_%s"%target )
     
     hyperparameters = dict({'start_run':flags.run,
                            'Nruns':flags.NumberOfRuns,
@@ -62,13 +56,22 @@ if 'generate' in flags.option or 'analyse' in flags.option:#{
                            'NgenMax':100000,                # maximal number of attempts
                            'do_ks_plots':False
                            })
+    
+    cm_pars , cm_fits , ana_data = dict() , dict() , dict()
+    for target in targets:#{
+#        cm_pars[target] = pd.read_csv( CMParsFname(ppPath+'/DATA/%s_data'%target) )
+#        cm_fits[target] = pd.read_csv( CMfitsFname(ppPath+'/DATA/data',target ) )
+#        ana_data[target] = TAnalysisEG2( path+"/AnaFiles" ,  "Ana_ppSRCCut_DATA_%s"%target )
+        ana_data[target] = TAnalysisEG2( "/Users/erezcohen/Desktop/DataMining/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s"%target )
+    #}
+    
 
     test_name = 'runs_%d_%d'%( hyperparameters['start_run'] , hyperparameters['start_run'] + hyperparameters['Nruns'] )
     full_path = ppPath+'/simulation/'+test_name+'_simulation'
 
     generate_runs_with_random_parameters( option=flags.option, hyperparameters=hyperparameters,
                                          ana_data=ana_data,
-                                         cm_pars=cm_pars, cm_fits=cm_fits,
+#                                         cm_pars=cm_pars, cm_fits=cm_fits,
                                          debug=flags.verbose , PmissBins=PmissBins , Q2Bins=Q2Bins , thetapmqBins=thetapmqBins ,
                                          buildup_resutlsFName=buildup_resutlsFName( full_path ),
                                          reco_fitsFName=CMfitsFname( full_path ),
@@ -78,8 +81,9 @@ if 'generate' in flags.option or 'analyse' in flags.option:#{
     
 
     print 'done '+flags.option; print_line()
-
     #}
+
+
 
 print_important( 'done simulate_eepp_from_eep.py' )
 print
