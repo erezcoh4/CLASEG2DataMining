@@ -62,7 +62,7 @@ if 'generate' in flags.option or 'analyse' in flags.option:#{
 #        cm_pars[target] = pd.read_csv( CMParsFname(ppPath+'/DATA/%s_data'%target) )
 #        cm_fits[target] = pd.read_csv( CMfitsFname(ppPath+'/DATA/data',target ) )
 #        ana_data[target] = TAnalysisEG2( path+"/AnaFiles" ,  "Ana_ppSRCCut_DATA_%s"%target )
-        ana_data[target] = TAnalysisEG2( "/Users/erezcohen/Desktop/DataMining/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s"%target )
+        ana_data[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s"%target )
     #}
     
 
