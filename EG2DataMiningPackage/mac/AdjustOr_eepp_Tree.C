@@ -1,4 +1,7 @@
 
+// usage:
+// root -l AdjustOr_eepp_Tree\(\12,true,0\)
+// - --- -- ---- - - -- ---- --- - --- -
 // grab an (e,e'pp) tree from Or
 // and adjust it to my analysis:
 // (1) apply fiducial cuts to the recoil proton
@@ -7,9 +10,10 @@
 
 
 // globals
-Float_t         q_phi, Pmiss_phi, Pmiss_theta;
-TVector3        Pcm3Vector;
-TLorentzVector  Plead, Pmiss, Precoil, q, Pcm;
+Float_t         q_phi, Pmiss_phi, Pmiss_theta, rooWeight, Q2;
+TVector3        Pcm3Vector, Prec3Vector;
+TLorentzVector  Plead, Pmiss, Precoil, q, Pcm, e;
+TLorentzVector  Beam( 0 , 0 , 5.014 , 5.014 );
 TEG2dm * eg2dm = new TEG2dm();
 
 
@@ -30,9 +34,19 @@ void Build_Pmiss_q_frame(){
 }
 
 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void ComputeWeights(){
+    Float_t Theta           = e.Theta();
+    Float_t Mott            = pow( cos(Theta/2.) , 2 ) / pow( sin(Theta/2.) , 4 );
+    Float_t DipoleFF2       = pow( 1./(1. + Q2/0.71) , 4);
+    rooWeight       =  1./ ( Mott * DipoleFF2 ) ;
+}
+
+
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-void AdjustOr_eepp_Tree(int A=12, int debug=1){
+void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, int debug=1){
     
     TString Or_target;
     switch (A) {
@@ -55,12 +69,17 @@ void AdjustOr_eepp_Tree(int A=12, int debug=1){
     
     TFile InFile( Form("/Users/erezcohen/Desktop/DataMining/OrAnalysisTrees/OrOriginalTrees/SRC_e2p_%s_GoodRuns_coulomb.root",Or_target.Data()) );
     TTree * InTree = (TTree * )InFile.Get("T");
-    TFile OutFile( Form("/Users/erezcohen/Desktop/DataMining/OrAnalysisTrees/AdjustedTrees/SRC_e2p_adjusted_%s.root",My_target.Data()) , "recreate");
+    TFile * OutFile;
+    if (DoFiducialCuts){
+        OutFile = new TFile( Form("/Users/erezcohen/Desktop/DataMining/OrAnalysisTrees/AdjustedTrees/SRC_e2p_adjusted_%s.root",My_target.Data()) , "recreate");
+    } else {
+        OutFile = new TFile( Form("/Users/erezcohen/Desktop/DataMining/OrAnalysisTrees/AdjustedTrees/SRC_e2p_adjusted_%s_noFiducials.root",My_target.Data()) , "recreate");
+    }
     TTree * OutTree = new TTree("anaTree","adjusted form Or' tree");
     Int_t Nentries = InTree->GetEntries();
     
     Float_t Rp[20][3], Pp_size[20], Ep[20], Nu;
-    Float_t Pp_components[20][3],q_components[3],Pmiss_components[3];
+    Float_t Pp_components[20][3],q_components[3],Pmiss_components[2][3];
     
     InTree -> SetBranchAddress("Nu", &Nu);
     InTree -> SetBranchAddress("Rp", &Rp);
@@ -76,12 +95,14 @@ void AdjustOr_eepp_Tree(int A=12, int debug=1){
     OutTree -> Branch("pcmX"                ,&pcmX                  , "pcmX/F");
     OutTree -> Branch("pcmY"                ,&pcmY                  , "pcmY/F");
     OutTree -> Branch("pcmZ"                ,&pcmZ                  , "pcmZ/F");
+    OutTree -> Branch("rooWeight"           ,&rooWeight             , "rooWeight/F");
     OutTree -> Branch("Pmiss"               ,&Pmiss);
     OutTree -> Branch("Pcm"                 ,&Pcm);
     OutTree -> Branch("Precoil"             ,&Precoil);
     OutTree -> Branch("Plead"               ,&Plead);
     OutTree -> Branch("q"                   ,&q);
-    
+    OutTree -> Branch("e"                   ,&e);
+
     for (int entry = 0 ; entry < Nentries ; entry++) {
         
         InTree->GetEntry(entry);
@@ -94,13 +115,17 @@ void AdjustOr_eepp_Tree(int A=12, int debug=1){
             )
         {
             q = TLorentzVector( q_components[0] , q_components[1] , q_components[2] , Nu );
+            e = Beam - q;
+            Q2 = -q.Mag2();
+            ComputeWeights();
+            
             Plead = TLorentzVector( Pp_components[0][0] , Pp_components[0][1] , Pp_components[0][2] , Ep[0] );
             Precoil = TLorentzVector( Pp_components[1][0] , Pp_components[1][1] , Pp_components[1][2] , Ep[1] );
-            
+            Prec3Vector = Precoil.Vect();
             
             Int_t PrecoilFiducial = eg2dm->protonFiducial( Precoil.Vect() , debug );
-            if (PrecoilFiducial){
-                Pmiss.SetVectMag( TVector3( Pmiss_components[0] , Pmiss_components[1] , Pmiss_components[2] ) , 0.938 );
+            if ( PrecoilFiducial || DoFiducialCuts==false ){
+                Pmiss.SetVectMag( TVector3( Pmiss_components[0][0] , Pmiss_components[0][1] , Pmiss_components[0][2] ) , 0.938 );
                 Pmiss3Mag = Pmiss.P();
                 
                 Pcm = Pmiss + Precoil;
@@ -108,12 +133,11 @@ void AdjustOr_eepp_Tree(int A=12, int debug=1){
                 
                 
                 Build_Pmiss_q_frame();
-                Printf("before Pcm rotation:");
-                SHOWTVector3(Pcm3Vector);
                 eg2dm->RotVec2_Pm_q_Frame( & Pcm3Vector , Pmiss_phi, Pmiss_theta, q_phi );
-                Printf("after Pcm rotation:");
-                SHOWTVector3(Pcm3Vector);
-                PrintLine();
+                eg2dm->RotVec2_Pm_q_Frame( & Prec3Vector , Pmiss_phi, Pmiss_theta, q_phi );
+                Pcm3Vector = Pmiss.Vect() + Prec3Vector;
+                // SHOWTVector3(Pcm3Vector);
+                
                 
                 pcmX = Pcm3Vector.X();
                 pcmY = Pcm3Vector.Y();
@@ -125,17 +149,18 @@ void AdjustOr_eepp_Tree(int A=12, int debug=1){
                     Printf("p(lead): %.2f",Pp_size[0]);
                     Printf("p(recoil): %.2f",Pp_size[1]);
                     Pcm3Vector.Print();
+                    PrintLine();
                 }
             }
         }
     }
     
-    
+    cout << "wrote to anaTree in " << OutFile->GetName() << endl;
     Printf("OutTree->GetEntries(): %lld",OutTree->GetEntries());
     
     InFile.Close();
     OutTree->Write();
-    OutFile.Close();
+    OutFile->Close();
     Printf("Done");
     gROOT->ProcessLine(".q");
 }

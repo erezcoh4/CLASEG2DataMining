@@ -602,10 +602,8 @@ void TCalcPhysVarsEG2::loop_protons(){
     for (auto i: sort_pMag( p3vec )){
         if (i>0) {
             // -- - - --- - -- --- - - -- - -- -- ------- - -- -- -- - -- - -- -- -- - -- - - -
-            // PERFORM energy loss CORRECTION only FOR PROTONs BELOW 1 GeV/c
-            //            if (p3vec.at(i).Mag()<1.){
+            // PERFORM energy loss CORRECTION only FOR recoil PROTONs
             p3vec.at(i) = EnergyLossCorrrection( p3vec.at(i) );
-            //            }
         }
         
         protonsLab.push_back( TLorentzVector( p3vec.at(i) , sqrt( p3vec.at(i).Mag2() + Mp2 ) ) );

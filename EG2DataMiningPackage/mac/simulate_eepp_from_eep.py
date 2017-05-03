@@ -4,6 +4,7 @@ from cm_tools import *
     usage:
     ---------------
     python mac/simulate_eepp_from_eep.py --option=extractCMparsAllNuclei
+    python mac/simulate_eepp_from_eep.py --option=extractOnly_C12 --DataType=NoFiducials -v2
     python mac/simulate_eepp_from_eep.py --option=generate_analyse -nruns=10
 '''
     
@@ -12,29 +13,37 @@ from cm_tools import *
 
 # extract cm-parameters from data for all targets (no acc. correction)
 # ----------------------------------------------------------
-#if 'extractCMparsAllNuclei' in flags.option: #{
-#    
-#    cm_pars , cm_fits = [] , []
-#    ana = dict()
-#    for target in targets:
+if 'extract' in flags.option: #{
+    
+    cm_pars , cm_fits = [] , []
+    ana = dict()
+    if 'Only' in flags.option or 'only' in flags.option: targets = [flags.option[12:]]
+    
+    for target in targets:#{
 #        ana[target] = TAnalysisEG2( path+"/AnaFiles" ,  "Ana_ppSRCCut_DATA_%s"%target )
-#        cm_parameters , _ = calc_cm_parameters(ana[target] , PmissBins ,
-#                                               CMRooFitsName( ppPath + '/DATA/%s_unweighted'%target ) ,
-#                                               CMRooFitsName( ppPath + '/DATA/%s_weighted'%target ) ,
-#                                               DoSaveCanvas = True )
-#
-#        cm_parameters.to_csv( CMParsFname(ppPath+'/DATA/%s_data'%target) , header=True , index=False)
-#        cm_pars.append( cm_parameters )
-#        fits = fit_cm_parameters( run=target+' data', data=cm_parameters, FigureFName=FigureFName(ppPath+'/DATA/data', target) , DoPlot=True )
-#        fits.to_csv( CMfitsFname( ppPath+'/DATA/data' , target ) , header=True , index=False)
-#        print_filename( CMfitsFname(ppPath+'/DATA/data' , target )  , target + " data c.m. fits at")
-#        cm_fits.append( fits )
-#
-#    # plot longitudinal width and mean for all nuclei
-#    widths_z = fit_widths_z( cm_pars , colors=target_colors , labels=labels , FigureFName = FigureFName(ppPath+'/DATA/widths_z_all_nuclei') )
-#    mean_z = fit_means_z( cm_pars , colors=target_colors , labels=labels  , FigureFName = FigureFName(ppPath+'/DATA/means_z_all_nuclei') )
-#    print 'done extractCMparsAllNuclei'; print_line()
-#    #}
+        if flags.DataType=='NoFiducials': #{
+            ana[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s_noFiducials"%target )
+        #}
+        else: #{
+            ana[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s"%target )
+        #}
+        cm_parameters , _ = calc_cm_parameters(ana[target] , PmissBins ,
+                                               CMRooFitsName( ppPath + '/DATA/%s_unweighted'%target ) ,
+                                               CMRooFitsName( ppPath + '/DATA/%s_weighted'%target ) ,
+                                               DoSaveCanvas = True )
+
+        cm_parameters.to_csv( CMParsFname(ppPath+'/DATA/%s_data'%target) , header=True , index=False )
+        cm_pars.append( cm_parameters )
+        fits = fit_cm_parameters( run=target+' data', data=cm_parameters, FigureFName=FigureFName(ppPath+'/DATA/data', target) , DoPlot=True )
+        fits.to_csv( CMfitsFname( ppPath+'/DATA/data' , target ) , header=True , index=False )
+        print_filename( CMfitsFname(ppPath+'/DATA/data' , target )  , target + " data c.m. fits at" )
+        cm_fits.append( fits )
+    #}
+    # plot longitudinal width and mean for all nuclei
+    # widths_z = fit_widths_z( cm_pars , colors=target_colors , labels=labels , FigureFName = FigureFName(ppPath+'/DATA/widths_z_all_nuclei') )
+    # mean_z = fit_means_z( cm_pars , colors=target_colors , labels=labels  , FigureFName = FigureFName(ppPath+'/DATA/means_z_all_nuclei') )
+    print 'done extractCMparsAllNuclei'; print_line()
+#}
 
 
 

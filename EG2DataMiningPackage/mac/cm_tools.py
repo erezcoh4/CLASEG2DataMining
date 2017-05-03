@@ -386,17 +386,24 @@ def plot_errorbar_and_fit( ax , x , y , xerr , yerr , color , marker , lstyle , 
                           fit_type='const' ,do_plot_fit_pars=False, x_offset=0.6):
     plt.errorbar(x, y, xerr=xerr, yerr=yerr, color=color, marker=marker , linestyle=lstyle , label=None , markersize=15)
     if fit_type=='const':
+        if debug>1: print label + ' (const. fit)'
         const_fit , const_fitErr , const_chi2red = fit_as_a_function_of_pmiss( x , y , yerr=yerr , fit_type=fit_type )
         if do_plot_fit_pars: label=label + "$=%.3f\pm%.3f$"%(const_fit,const_fitErr)
         ax.plot(x, np.ones(len(x))*const_fit , color=color , linestyle='--', label=label,linewidth = 2 , )
-        if debug>1: print 'const fit of ' + label + " : $=%.3f\pm%.3f$"%(const_fit,const_fitErr)
+        if debug>1: #{
+            print 'const_fit: %.3f(%.0f) '%(const_fit , 1000*const_fitErr)
+        #}
         return [ const_fit , const_fitErr , const_chi2red ]
     
     elif fit_type=='linear':
+        if debug>1: print label + ' (linear fit)'
         a1 , a1err , a2 , a2err , chi2red = fit_as_a_function_of_pmiss( x , y ,yerr=yerr, fit_type=fit_type )
         if do_plot_fit_pars: label=label + "$=(%.3f)(p_{miss}-%.1f)+(%.3f)$"%( a1 , x_offset, a2 )
         ax.plot( x , a1 * (x-x_offset) + a2 , color = color ,label=label )
-        if debug>1: print 'linear fit of ' + label + " : $=(%.3f)(p_{miss}-%.1f)+(%.3f)$"%( a1 ,x_offset ,  a2 )
+        if debug>1:#{
+            print 'a1: %.3f(%.0f)'%(a1 , 1000*a1err)
+            print 'a2: %.3f(%.0f)'%(a2 , 1000*a2err)
+        #}
         return [ a1 , a1err ,  a2 , a2err  , chi2red ]
 # ------------------------------------------------------------------------------- #
 
@@ -563,7 +570,7 @@ def fit_par_plot( fig , i_subplot , data , var , weight , title , do_plot_fit_pa
     ax.grid(True,linestyle='-',color='0.95')
     [Xfit,XfitErr,Xchi2red] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_x_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , [data[ var + '_xErr_' + weight ],data[ var + '_xErr_' + weight ]], 'black','v','none',r'$x-direction$' ,'const',do_plot_fit_pars=do_plot_fit_pars)
     [Yfit,YfitErr,Ychi2red] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_y_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , [data[ var + '_yErr_' + weight ],data[ var + '_yErr_' + weight ]], 'red'  ,'o','none',r'$y-direction$' ,'const',do_plot_fit_pars=do_plot_fit_pars)
-    [Za1,Za1err],[Za2,Za2err],Zchi2red = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , data[ var + '_zErr_' + weight ], 'blue' ,'s','none',r'$\vec{p}_{miss}-direction$' ,'linear',do_plot_fit_pars=do_plot_fit_pars)
+    [Za1,Za1err,Za2,Za2err,Zchi2red] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , data[ var + '_zErr_' + weight ], 'blue' ,'s','none',r'$\vec{p}_{miss}-direction$' ,'linear',do_plot_fit_pars=do_plot_fit_pars)
     #    set_frame( ax , r'%s $%s$'%(weight,title) , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left",ncol=2)
     set_frame( ax , '' , r'$p_{miss}$ [GeV/c]' , r'c.m. momentum $%s$ [Gev/c]'%title , "upper left",ncol=1)
     return [Xfit , XfitErr , Yfit , YfitErr , Za1 , Za1err , Za2 , Za2err , Zchi2red , ax]
