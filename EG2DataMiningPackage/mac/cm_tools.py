@@ -323,7 +323,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
                           ,ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']*1e20),fontsize=25)
             if flags.worker == 'erez': figure_path = "/Users/erezcohen/Desktop/TmpPlots"
             elif flags.worker == 'helion': figure_path = "/home/erez/Desktop/TmpPlots"
-            fig.savefig(figure_path = "/run_%d_%s.pdf"%(run,target))
+            fig.savefig(figure_path + "/run_%d_%s.pdf"%(run,target))
         #}
 
         ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_scaled_1T'] = ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']*1e9
