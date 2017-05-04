@@ -46,7 +46,7 @@ hyperparameters = dict({'start_run':2,
 
 start_run , Nruns = hyperparameters['start_run'], hyperparameters['Nruns']
 NRand = hyperparameters['NRand']
-pAcceptacneFile = ROOT.TFile( "/Users/erezcohen/Desktop/DataMining/GSIM_DATA/PrecoilAcceptance.root" )
+pAcceptacneFile = ROOT.TFile( path + "/GSIM_DATA/PrecoilAcceptance.root" )
 path = path + "/Analysis_DATA/ppSRCcm"
 
 h = pAcceptacneFile.Get("hRescaled")
