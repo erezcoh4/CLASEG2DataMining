@@ -310,7 +310,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
         #}
         ks_pval_scores_target['pcmZ'] = Fisher_combination_Pvals( ks_pval_scores_longitudinal_target_array ) # with a cutoff on 1e-20
         
-        ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ'] = FisherMethodPvals( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY'],ks_pval_scores_target['pcmZ']] )
+        ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ'] = Fisher_combination_Pvals( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY'],ks_pval_scores_target['pcmZ']] ) # with a cutoff on 1e-20
         
         if do_plots:#{
             ax = fig.add_subplot( 2 , 5 , (1,5) )
@@ -329,7 +329,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
         ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_scaled_1T'] = ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']*1e9
         ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_scaled_1e20'] = ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']*1e20
         ks_pval_scores_target['PvalTotal'] = Fisher_combination_Pvals( ks_pval_scores_target_array ) # with a cutoff on 1e-20
-        ks_pval_scores_target['PvalTotal_allPvals'] = FisherMethodPvals( ks_pval_scores_target_array )
+        #        ks_pval_scores_target['PvalTotal_allPvals'] = FisherMethodPvals( ks_pval_scores_target_array )
 
         ks_pval_scores[target] = ks_pval_scores_target
     #}
