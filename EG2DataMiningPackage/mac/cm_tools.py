@@ -330,7 +330,8 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
         ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_scaled_1e20'] = ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']*1e20
         ks_pval_scores_target['PvalTotal'] = Fisher_combination_Pvals( ks_pval_scores_target_array ) # with a cutoff on 1e-20
         #        ks_pval_scores_target['PvalTotal_allPvals'] = FisherMethodPvals( ks_pval_scores_target_array )
-
+        if debug: print "ks-pval["+target+"]['PvalTotal']:",ks_pval_scores_target['PvalTotal']
+        
         ks_pval_scores[target] = ks_pval_scores_target
     #}
     if debug>2:#{
@@ -342,6 +343,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
             #}
         #}
     #}
+
     return ks_pval_scores
 # ------------------------------------------------------------------------------- #
 
@@ -1485,7 +1487,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     for direction in ['X','Y','Z']: #{
                         results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores[target]['pcm'+direction]
                     #}
-                    if debug: print "ks-pval["+target+"]['PvalTotal']:",ks_pval_scores[target]['PvalTotal']
+                    if debug>3: print "ks-pval["+target+"]['PvalTotal']:",ks_pval_scores[target]['PvalTotal']
                     results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY']
                     results['ks_Pval_pcmX_pcmY_pcmZ'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ']
                     results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1T'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_scaled_1T']
