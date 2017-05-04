@@ -1485,12 +1485,12 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     for direction in ['X','Y','Z']: #{
                         results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores[target]['pcm'+direction]
                     #}
-                    if debug>2: print "ks-pval["+target+"]['PvalTotal_allPvals'],ks-pval["+target+"]['PvalTotal']:",ks_pval_scores[target]['PvalTotal_allPvals'],ks_pval_scores[target]['PvalTotal']
+                    if debug: print "ks-pval["+target+"]['PvalTotal']:",ks_pval_scores[target]['PvalTotal']
                     results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY']
                     results['ks_Pval_pcmX_pcmY_pcmZ'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ']
                     results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1T'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_scaled_1T']
                     results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1e20'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_scaled_1e20']
-                    results['ks_PvalTot_allPvals'+'_'+target] = ks_pval_scores[target]['PvalTotal_allPvals']
+                    #                    results['ks_PvalTot_allPvals'+'_'+target] = ks_pval_scores[target]['PvalTotal_allPvals']
                     results['ks_PvalTotal'+'_'+target] = ks_pval_scores[target]['PvalTotal'] # with a cutoff on 1e-20
                 #}
         
