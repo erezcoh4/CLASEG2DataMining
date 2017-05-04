@@ -10,7 +10,7 @@ scheme = TSchemeDATA()
 targets = ['C12','Al27','Fe56','Pb208']
 PmissBins   = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65]  , [0.65,0.75] , [0.75,1.0]]
 Pmiss3Bins  = [[0.3,0.52]  , [0.52,0.68]  , [0.68,1.0]]
-path = "/Users/erezcohen/Desktop/DataMining"
+#path = "/Users/erezcohen/Desktop/DataMining"
 ppPath = path + "/Analysis_DATA/ppSRCcm"
 
 cm_pars , cm_fits = dict() , dict()
