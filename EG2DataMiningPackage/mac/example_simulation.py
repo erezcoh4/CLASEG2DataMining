@@ -1,3 +1,8 @@
+'''
+    usage:
+    ---- - -- -- --
+    python mac/example_simulation.py --option=gen_ana -v2
+'''
 import sys
 from cm_tools import *
 
@@ -12,8 +17,9 @@ cm_pars , cm_fits = dict() , dict()
 ana_data = dict()
 
 for target in targets:
-    cm_pars[target] = pd.read_csv( ppPath+'/DATA/%s_dataCMparameters.csv'%target )
-    ana_data[target] = TAnalysisEG2( path+"/AnaFiles" ,  "Ana_ppSRCCut_DATA_%s"%target )
+    # cm_pars[target] = pd.read_csv( ppPath+'/DATA/%s_dataCMparameters.csv'%target )
+    # ana_data[target] = TAnalysisEG2( path+"/AnaFiles" ,  "Ana_ppSRCCut_DATA_%s"%target )
+    ana_data[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s"%target )
 
 def a1a2_create_negative_sigma_z( a1 , a2 ):
     '''
@@ -66,8 +72,8 @@ gen_events.MapInputEntriesInPmissBins()
 # if we don't reach these numbers after generating NMAX events, the parameters should be discarded
 # by Pval = 0, which can be obtained by killing the run and flaggind it as a bad run
 
-run = 10008 # flags.run
-gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2 = 	0.139476	,0.100748	,0.200622	,0.075508	,0.254827
+run = 54850 # flags.run
+gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2 = 	0.150744	,0.423457	,0.230057	,0.628337	,0.359323
 gen_MeanX = -0.02
 gen_MeanY = 0.0
 gen_SigmaY = gen_SigmaX

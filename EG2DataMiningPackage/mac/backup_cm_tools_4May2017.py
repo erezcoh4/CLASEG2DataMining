@@ -3,8 +3,6 @@ from root_numpy import hist2array , tree2array
 from root_pandas import to_root
 from scipy.stats import ks_2samp
 from matplotlib.ticker import LinearLocator
-from matplotlib.ticker import NullFormatter
-
 from math import sqrt
 from scipy.stats.mstats import ttest_onesamp
 from scipy.stats import kurtosis
@@ -200,7 +198,6 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
             if do_plots:#{
                 if direction=='X':#{
                     ax = fig.add_subplot( 2 , 5 , (1,5) )
-                    ax.yaxis.set_major_formatter(NullFormatter())
                 #}
                 h,bins,_=ax.hist(x_sim, bins=25
                                  ,label='sim. $p_{c.m.}^{%s}$ $\\mu=%.3f, \\sigma=%.3f, Pval=%f$'%(direction,np.mean(x_sim),np.std(x_sim),Pval_KS)
@@ -218,6 +215,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
 
         # in z direction - compare in 5 bins of p(miss)
         nbins = 15
+        #            bins=np.linspace(-0.5,2,20)
         for bin in range(len(PmissBins)):#{
             
             pmin , pmax = PmissBins[bin][0] , PmissBins[bin][1]
@@ -245,9 +243,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
                 '''
             hist , bin_edges = np.histogram (df_sim_reduced['pcmZ'] , bins=nbins )
             maxima = argrelextrema( hist , np.greater )
-            if debug>2 and target=='C12': #{
-                print 'bin',bin,'hist:\n',hist
-            #}
+            if debug>2 and target=='C12': print 'bin',bin,'hist:\n',hist
             if len(maxima[0])>1:#{
                 if debug and target=='C12' : #{
                     print '$N_{max}^{bin %d}=%d$'%(bin,len(maxima[0])),'(',maxima[0],')',', implying non-Gaussian. substituting Pval=0'
@@ -272,7 +268,6 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
                 ax_l.set_title('%.2f<$p_{miss}$<%.2f GeV/c, $p_{c.m.}^{z}$ Pval=%g'%(pmin , pmax,Pval_KS),y=1.01,fontsize=15)
                 ax_l.legend(fontsize=15)
                 set_axes(ax_l,"","",fontsize=15)
-                ax_l.yaxis.set_major_formatter(NullFormatter())
                 for bin_max in maxima[0]: plt.plot( [bins[bin_max],bins[bin_max]],ax.get_ylim(),'--',color='black' )
                 if bin==0:#{
                     plt.text(np.mean(df_sim_reduced['pcmZ'])+0*np.std(df_sim_reduced['pcmZ']),0.1*np.max(h)
@@ -314,8 +309,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
         
         if do_plots:#{
             ax = fig.add_subplot( 2 , 5 , (1,5) )
-            xmin,xmax = np.min(ax.get_xlim()),np.max(ax.get_xlim())
-            plt.text(xmin + 0.05*(xmax-xmin),0.7*np.max(ax.get_ylim()) ,"$Pval_{x}=%f$\n$Pval_{y}=%g$\n$Pval_{x-y}=%g$\n$Pval_{z}=%g$\n$Pval_{x-y-z}=%g$\n$1e20 \\times Pval_{x-y-z}=%g$"%
+            plt.text(-0.7,1 ,"$Pval_{x}=%f$\n$Pval_{y}=%g$\n$Pval_{x-y}=%g$\n$Pval_{z}=%g$\n$Pval_{x-y-z}=%g$\n$1e20 \\times Pval_{x-y-z}=%g$"%
                          (ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY']
                           ,ks_pval_scores_target['Pval_pcmX_pcmY']
                           ,ks_pval_scores_target['pcmZ']
