@@ -55,8 +55,12 @@ void GenerateEvents::SetHistThetaHistMag( TH1F * fhistMag , TH1F * fhistTheta ){
 void GenerateEvents::SetInputChain_eep(){
     InputT  = new TChain("T");
     // Take 12C(e,e'p) SRC tree data
-    InputT -> Add( Path + "/DATA/SRC_e1_C.root");
-    InputT -> Add( Path + "/DATA/SRC_e2_C.root");
+//    InputT -> Add( Path + "/DATA/SRC_e1_C.root");
+//    InputT -> Add( Path + "/DATA/SRC_e2_C.root");
+    SHOW(Path);
+    InputT -> Add( Path + "/DATA/SRC_e1p_C_GoodRuns_coulomb.root");
+    InputT -> Add( Path + "/DATA/SRC_e2p_C_GoodRuns_coulomb.root");
+    
     
     InputT -> SetBranchAddress("Q2"      ,           &Q2);
     InputT -> SetBranchAddress("Xb"      ,           &Xb);
