@@ -39,9 +39,6 @@ if 'extract' in flags.option: #{
         print_filename( CMfitsFname(ppPath+'/DATA/data' , target )  , target + " data c.m. fits at" )
         cm_fits.append( fits )
     #}
-    # plot longitudinal width and mean for all nuclei
-    # widths_z = fit_widths_z( cm_pars , colors=target_colors , labels=labels , FigureFName = FigureFName(ppPath+'/DATA/widths_z_all_nuclei') )
-    # mean_z = fit_means_z( cm_pars , colors=target_colors , labels=labels  , FigureFName = FigureFName(ppPath+'/DATA/means_z_all_nuclei') )
     print 'done extractCMparsAllNuclei'; print_line()
 #}
 

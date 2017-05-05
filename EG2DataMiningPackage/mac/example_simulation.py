@@ -72,8 +72,8 @@ gen_events.MapInputEntriesInPmissBins()
 # if we don't reach these numbers after generating NMAX events, the parameters should be discarded
 # by Pval = 0, which can be obtained by killing the run and flaggind it as a bad run
 
-run = 54850 # flags.run
-gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2 = 	0.150744	,0.423457	,0.230057	,0.628337	,0.359323
+run = 2889129
+gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2 = 0.173	,0.15	,0.16	,0.55	,0.3
 gen_MeanX = -0.02
 gen_MeanY = 0.0
 gen_SigmaY = gen_SigmaX
