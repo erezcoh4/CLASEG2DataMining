@@ -239,7 +239,13 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
         #}
 
         #        ks_pval_scores_target['PvalTotal_allPvals'] = FisherMethodPvals( ks_pval_scores_target_array )
-        if debug: print "ks-pval["+target+"]['PvalTotal']:",ks_pval_scores_target['PvalTotal']
+        if debug: #{
+            if debug>1:#{
+                print "ks-pval["+target+"]['Pval_pcmX_pcmY']:",ks_pval_scores_target['Pval_pcmX_pcmY']
+                print "ks-pval["+target+"]['pcmZ']:",ks_pval_scores_target['pcmZ']
+            #}
+            print "ks-pval["+target+"]['PvalTotal']:",ks_pval_scores_target['PvalTotal']
+        #}
         
         ks_pval_scores[target] = ks_pval_scores_target
     #}
@@ -857,9 +863,9 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
         gen_events.SetInputChain_eep()
 
         gen_events.SetNRand( NRand )
-        gen_events.Use_protonAcceptacne( True ) # True
-        gen_events.SetDo_PrecFiducial ( True ) # True
-        gen_events.SetDo_PrecMinCut ( True ) # True
+        gen_events.Use_protonAcceptacne( False ) # True )
+        gen_events.SetDo_PrecFiducial ( False ) # True )
+        gen_events.SetDo_PrecMinCut ( False ) # True )
 
         gen_events.SetPmissBins()
         gen_events.Set10PmissBins()
