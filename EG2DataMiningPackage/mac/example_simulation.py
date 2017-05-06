@@ -39,7 +39,7 @@ hyperparameters = dict({'start_run':2,
                        'range_b1':(-0.2 , 1.4),         # 0.569
                        'range_b2':(-0.1 , 0.6),         # 0.159
                        'NRand':20,
-                       'Ntimes':20,                     # wanted number of events in each Pmiss bin
+                       'Ntimes':10,                     # wanted number of events in each Pmiss bin
                        'NgenMax':100000,                # maximal number of attempts
                        'do_ks_plots':True
                        })
@@ -72,8 +72,8 @@ gen_events.MapInputEntriesInPmissBins()
 # if we don't reach these numbers after generating NMAX events, the parameters should be discarded
 # by Pval = 0, which can be obtained by killing the run and flaggind it as a bad run
 
-run = 2889129
-gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2 = 0.173	,0.15	,0.16	,0.55	,0.3
+run = 3
+gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2 = 0.15	,0.1	,0.160	,0.4'0     ,0.25
 gen_MeanX = -0.02
 gen_MeanY = 0.0
 gen_SigmaY = gen_SigmaX
