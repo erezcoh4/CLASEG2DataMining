@@ -16,12 +16,9 @@ ppPath = path + "/Analysis_DATA/ppSRCcm"
 cm_pars , cm_fits = dict() , dict()
 ana_data = dict()
 
-for target in targets:
-    # cm_pars[target] = pd.read_csv( ppPath+'/DATA/%s_dataCMparameters.csv'%target )
-    # ana_data[target] = TAnalysisEG2( path+"/AnaFiles" ,  "Ana_ppSRCCut_DATA_%s"%target )
-    ana_data[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s"%target )
+for target in targets: ana_data[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s"%target )
 
-def a1a2_create_negative_sigma_z( a1 , a2 ):
+def a1a2_create_negative_sigma_z( a1 , a2 ):#{
     '''
         check if a1 and a2 give \sigma_z < 0,
         since we do not want to use those (unreasonable) values.
@@ -30,6 +27,7 @@ def a1a2_create_negative_sigma_z( a1 , a2 ):
     if a1*(0.3 - 0.6) + a2 < 0: return True
     if a1*(1.0 - 0.6) + a2 < 0: return True
     return False
+#}
 
 hyperparameters = dict({'start_run':2,
                        'Nruns':1,
@@ -72,18 +70,11 @@ gen_events.MapInputEntriesInPmissBins()
 # if we don't reach these numbers after generating NMAX events, the parameters should be discarded
 # by Pval = 0, which can be obtained by killing the run and flaggind it as a bad run
 
-run = 3
-gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2 = 0.15	,0.1	,0.160	,0.4'0     ,0.25
+run = 6
+gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2 = 0.21	,0.2	,0.160	,0.50     ,0.2
 gen_MeanX = -0.02
 gen_MeanY = 0.0
 gen_SigmaY = gen_SigmaX
-
-# gen_SigmaX = gen_SigmaY = np.random.uniform( np.min(hyperparameters['range_sigma_t']),np.max(hyperparameters['range_sigma_t']) )
-#gen_a1  = 0.419716 #np.random.uniform( np.min(hyperparameters['range_a1']),np.max(hyperparameters['range_a1']) ) # 0.143#
-#gen_a2  = 0.315009	 #np.random.uniform( np.min(hyperparameters['range_a2']),np.max(hyperparameters['range_a2']) ) # 0.158#
-#gen_b1  = 0.495495 #np.random.uniform( np.min(hyperparameters['range_b1']),np.max(hyperparameters['range_b1']) ) # 0.569#
-#gen_b2  = 0.382599  #np.random.uniform( np.min(hyperparameters['range_b2']),np.max(hyperparameters['range_b2']) ) # 0.159#
-
 
 print 'run',run,'gen_SigmaX',gen_SigmaX,'gen_a1',gen_a1,'gen_a2',gen_a2,'gen_b1',gen_b1,'gen_b2',gen_b2
 

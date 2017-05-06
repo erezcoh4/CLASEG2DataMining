@@ -5,7 +5,7 @@ from cm_tools import *
     ---------------
     python mac/simulate_eepp_from_eep.py --option=extractCMparsAllNuclei
     python mac/simulate_eepp_from_eep.py --option=extractOnly_C12 --DataType=NoFiducials -v2
-    python mac/simulate_eepp_from_eep.py --option=generate_analyse -nruns=10
+    python mac/simulate_eepp_from_eep.py --option=generate_analyse_delete -nruns=10
 '''
     
 
@@ -58,7 +58,7 @@ if 'generate' in flags.option or 'analyse' in flags.option:#{
                            'range_b1':(-0.2 , 1.4),         # 0.569
                            'range_b2':(-0.1 , 0.6),         # 0.159
                            'NRand':20,
-                           'Ntimes':20,                     # wanted number of events in each Pmiss bin
+                           'Ntimes':10,                     # wanted number of events in each Pmiss bin
                            'NgenMax':100000,                # maximal number of attempts
                            'do_ks_plots':False
                            })
