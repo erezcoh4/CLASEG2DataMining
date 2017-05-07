@@ -248,6 +248,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
             if flags.worker == 'erez': figure_path = "/Users/erezcohen/Desktop/TmpPlots"
             elif flags.worker == 'helion': figure_path = "/home/erez/Desktop/TmpPlots"
             fig.savefig(figure_path + "/run_%d_%s.pdf"%(run,target))
+            print 'saved',figure_path + "/run_%d_%s.pdf"%(run,target)
         #}
 
         #        ks_pval_scores_target['PvalTotal_allPvals'] = FisherMethodPvals( ks_pval_scores_target_array )

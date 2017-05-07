@@ -52,10 +52,10 @@ if 'generate' in flags.option or 'analyse' in flags.option:#{
     
     hyperparameters = dict({'start_run':flags.run,
                            'Nruns':flags.NumberOfRuns,
-                           'range_sigma_t':(0.1  , 0.3),    # 0.160
-                           'range_a1':(-0.4 , 1.0),         # 0.143
-                           'range_a2':(0.0  , 0.5),         # 0.158
-                           'range_b1':(-0.2 , 1.4),         # 0.569
+                           'range_sigma_t':(0.17,0.17),# (0.1  , 0.3),    # 0.160
+                           'range_a1':(0.15,0.15),# (-0.4 , 1.0),         # 0.143
+                           'range_a2':(0.14, 0.15), # (0.0  , 0.5),         # 0.158
+                           'range_b1':(0.55,0.56), # (-0.2 , 1.4),         # 0.569
                            'range_b2':(-0.1 , 0.6),         # 0.159
                            'NRand':20,
                            'Ntimes':10,                     # wanted number of events in each Pmiss bin

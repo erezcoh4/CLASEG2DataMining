@@ -71,7 +71,7 @@ gen_events.MapInputEntriesInPmissBins()
 # by Pval = 0, which can be obtained by killing the run and flaggind it as a bad run
 
 run = 6
-gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2 = 0.15	,0.2	,0.160	,0.53     ,0.4
+gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2 = 0.15	,0.2	,0.160	,0.53     ,0.1
 gen_MeanX = -0.02
 gen_MeanY = 0.0
 gen_SigmaY = gen_SigmaX
