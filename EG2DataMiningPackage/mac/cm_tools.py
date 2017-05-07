@@ -202,9 +202,17 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
         ks_pval_scores_target['pcmZ'] = Fisher_combination_Pvals( ks_pval_scores_longitudinal_target_array ) # with a cutoff on 1e-20
         
         ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ'] = Fisher_combination_Pvals( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY'],ks_pval_scores_target['pcmZ']] ) # with a cutoff on 1e-20
-        ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_scaled_1T'] = ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']*1e9
         ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_scaled_1e20'] = ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']*1e20
         ks_pval_scores_target['PvalTotal'] = Fisher_combination_Pvals( ks_pval_scores_target_array ) # with a cutoff on 1e-20
+
+        # give larger weight to the Pval in X and Y directions
+        ks_pval_scores_target['Pval_5pcmX_5pcmY_pcmZ'] = Fisher_combination_Pvals( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmX'],
+                                                                                    ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmX'],
+                                                                                    ks_pval_scores_target['pcmX'],
+                                                                                    ks_pval_scores_target['pcmY'],ks_pval_scores_target['pcmY'],
+                                                                                    ks_pval_scores_target['pcmY'],ks_pval_scores_target['pcmY'],
+                                                                                    ks_pval_scores_target['pcmY'],
+                                                                                    ks_pval_scores_target['pcmZ']] ) # with a cutoff on 1e-20
 
         # methods to combine Pvalue [https://arxiv.org/pdf/1212.4966.pdf]
         # Bonferroni: N * min( P1, P2, P3.... , PN)
@@ -223,15 +231,17 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
                                                                                    ,gen_info[0]['gen_b1']
                                                                                    ,gen_info[0]['gen_b2'])
             text += "$Pval_{x}=%f$\n$Pval_{y}=%g$\n$Pval_{x-y}=%g$\n$Pval_{z}=%g$\
-            \n$Pval_{x-y-z}=%g \\times 10^{-20}$\
-            \n$Pval_{x-y-z}^{Bonferroni}=%g \\times 10^{-20}$\
-            \n$Pval_{x-y-z}^{Ruschendorf}=%g \\times 10^{-20}$"%(ks_pval_scores_target['pcmX']
-                                                                 ,ks_pval_scores_target['pcmY']
-                                                                 ,ks_pval_scores_target['Pval_pcmX_pcmY']
-                                                                 ,ks_pval_scores_target['pcmZ']
-                                                                 ,ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']*1e20
-                                                                 ,ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_Bonferroni']*1e20
-                                                                 ,ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_Ruschendorf']*1e20)
+            \n$Pval_{x-y-z}=%g$\
+            \n$Pval_{5x-5y-z}=%g$\
+            \n$Pval_{x-y-z}^{Bonferroni}=%g$\
+            \n$Pval_{x-y-z}^{Ruschendorf}=%g$"%(ks_pval_scores_target['pcmX']
+                                               ,ks_pval_scores_target['pcmY']
+                                               ,ks_pval_scores_target['Pval_pcmX_pcmY']
+                                               ,ks_pval_scores_target['pcmZ']
+                                               ,ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']
+                                               ,ks_pval_scores_target['Pval_5pcmX_5pcmY_pcmZ']
+                                               ,ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_Bonferroni']
+                                               ,ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_Ruschendorf'])
             plt.text(xmin + 0.05*(xmax-xmin),0.5*np.max(ax.get_ylim()) ,text,fontsize=25)
             if flags.worker == 'erez': figure_path = "/Users/erezcohen/Desktop/TmpPlots"
             elif flags.worker == 'helion': figure_path = "/home/erez/Desktop/TmpPlots"
@@ -973,6 +983,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     if debug>3: print "ks-pval["+target+"]['PvalTotal']:",ks_pval_scores[target]['PvalTotal']
                     results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY']
                     results['ks_Pval_pcmX_pcmY_pcmZ'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ']
+                    results['ks_Pval_5pcmX_5pcmY_pcmZ'+'_'+target] = ks_pval_scores[target]['Pval_5pcmX_5pcmY_pcmZ']
                     results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1e20'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_scaled_1e20']
                     #                    results['ks_PvalTot_allPvals'+'_'+target] = ks_pval_scores[target]['PvalTotal_allPvals']
                     results['ks_PvalTotal'+'_'+target] = ks_pval_scores[target]['PvalTotal'] # with a cutoff on 1e-20
@@ -1010,6 +1021,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     results['ks_local_Pval_pcmZ_Ruschendorf_'+target] = 0
                     
                     results['ks_Pval_pcmX_pcmY'+'_'+target] = results['ks_Pval_pcmX_pcmY_pcmZ'+'_'+target] = 0
+                    results['ks_Pval_5pcmX_5pcmY_pcmZ'+'_'+target] = 0
                     results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1e20'+'_'+target] = 0
                     results['ks_Pval_pcmX_pcmY_pcmZ_Bonferroni_'+target] = 0
                     results['ks_Pval_pcmX_pcmY_pcmZ_Ruschendorf_'+target] = 0
