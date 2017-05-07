@@ -70,8 +70,8 @@ gen_events.MapInputEntriesInPmissBins()
 # if we don't reach these numbers after generating NMAX events, the parameters should be discarded
 # by Pval = 0, which can be obtained by killing the run and flaggind it as a bad run
 
-run = 1
-gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2 = 0.15	,0.2	,0.160	,0.40     ,0.1
+run = 7
+gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2 = 0.15	,0.2	,0.160	,0.40     ,0.3
 gen_MeanX = -0.02
 gen_MeanY = 0.0
 gen_SigmaY = gen_SigmaX
@@ -94,8 +94,7 @@ if 'ana' in flags.option:#{
     print 'analyzing run...'
     ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run )
         
-    ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data
-                                             , do_plots=hyperparameters['do_ks_plots'] , run=run )
+    ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data , do_plots=hyperparameters['do_ks_plots'] , run=run )
     print 'finished calculating ks_pval_scores'
     ana_sim.CloseFile()
 #}

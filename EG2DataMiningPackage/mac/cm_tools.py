@@ -201,7 +201,9 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
         #}
         ks_pval_scores_target['pcmZ'] = Fisher_combination_Pvals( ks_pval_scores_longitudinal_target_array ) # with a cutoff on 1e-20
         
-        ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ'] = Fisher_combination_Pvals( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY'],ks_pval_scores_target['pcmZ']] ) # with a cutoff on 1e-20
+        ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ'] = Fisher_combination_Pvals( [ks_pval_scores_target['pcmX'],
+                                                                                  ks_pval_scores_target['pcmY'],
+                                                                                  ks_pval_scores_target['pcmZ']] ) # with a cutoff on 1e-20
         ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_scaled_1e20'] = ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']*1e20
         ks_pval_scores_target['PvalTotal'] = Fisher_combination_Pvals( ks_pval_scores_target_array ) # with a cutoff on 1e-20
 
@@ -873,9 +875,9 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
         gen_events.SetInputChain_eep()
 
         gen_events.SetNRand( NRand )
-        gen_events.Use_protonAcceptacne( False ) # True )
-        gen_events.SetDo_PrecFiducial ( False ) # True )
-        gen_events.SetDo_PrecMinCut ( False ) # True )
+        gen_events.Use_protonAcceptacne( True )
+        gen_events.SetDo_PrecFiducial ( True )
+        gen_events.SetDo_PrecMinCut ( True )
 
         gen_events.SetPmissBins()
         gen_events.Set10PmissBins()

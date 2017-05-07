@@ -56,7 +56,7 @@ if 'generate' in flags.option or 'analyse' in flags.option:#{
                            'range_a1':(-0.4 , 1.0),         # 0.143
                            'range_a2':(0.0  , 0.5),         # 0.158
                            'range_b1':(-0.2 , 1.4),         # 0.569
-                           'range_b2':(-0.1 , 0.6),         # 0.159
+                           'range_b2':(0.35 , 0.36),         # 0.159 (-0.1 , 0.6),         # 0.159
                            'NRand':20,
                            'Ntimes':10,                     # wanted number of events in each Pmiss bin
                            'NgenMax':100000,                # maximal number of attempts
