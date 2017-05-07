@@ -866,9 +866,6 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
     '''
     if 'gen' in option: #{
         h = pAcceptacneFile.Get("hRescaled")
-#        if flags.worker=='erez': ep_SRC_trees_Path = "/Users/erezcohen/Desktop/DataMining/OrAnalysisTrees/OrOriginalTrees"
-#        elif flags.worker=='helion': ep_SRC_trees_Path = "/extra/Erez/DataMining/OrAnalysisTrees/OrOriginalTrees"
-#        print 'ep_SRC_trees_Path:',ep_SRC_trees_Path
         gen_events = GenerateEvents( path , 0 , debug - 2 )
         gen_events.Set_protonAcceptacne( h )
 
