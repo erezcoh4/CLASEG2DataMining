@@ -1018,6 +1018,8 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                 for target in targets: #{
                     for bin in range(len(PmissBins)):#{
                         results['ks_local_Pval_pcmZ_bin%d'%bin+'_'+target] = 0
+                        results['pcmZ_bin%d_skew'%bin+'_'+target] = 0
+                        results['pcmZ_bin%d_kurt'%bin+'_'+target] = 0
                     #}
                     for direction in ['X','Y','Z']: #{
                         results['ks_local_Pval_pcm'+direction+'_'+target] = 0
