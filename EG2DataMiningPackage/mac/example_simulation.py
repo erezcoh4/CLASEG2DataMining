@@ -1,10 +1,13 @@
 '''
     usage:
     ---- - -- -- --
-    python mac/example_simulation.py --option=gen_ana -v2
+    python mac/example_simulation.py --option=gen_ana -v2 -r1
 '''
 import sys
 from cm_tools import *
+
+
+gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2 = 0.145	,0.2	,0.160	,0.53     ,0.3
 
 scheme = TSchemeDATA()
 targets = ['C12','Al27','Fe56','Pb208']
@@ -54,9 +57,9 @@ gen_events.Set_protonAcceptacne( h )
 gen_events.SetInputChain_eep()
 
 gen_events.SetNRand( NRand )
-gen_events.Use_protonAcceptacne( True )
-gen_events.SetDo_PrecFiducial ( True )
-gen_events.SetDo_PrecMinCut ( True )
+gen_events.Use_protonAcceptacne( False ) #True )
+gen_events.SetDo_PrecFiducial( False ) #True )
+gen_events.SetDo_PrecMinCut( False ) #True )
 
 gen_events.SetPmissBins()
 gen_events.Set10PmissBins()
@@ -70,8 +73,7 @@ gen_events.MapInputEntriesInPmissBins()
 # if we don't reach these numbers after generating NMAX events, the parameters should be discarded
 # by Pval = 0, which can be obtained by killing the run and flaggind it as a bad run
 
-run = 6
-gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2 = 0.15	,0.2	,0.160	,0.53     ,0.4
+run = flags.run
 gen_MeanX = -0.02
 gen_MeanY = 0.0
 gen_SigmaY = gen_SigmaX

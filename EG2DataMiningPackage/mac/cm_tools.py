@@ -63,6 +63,7 @@ def gauss(x,mu_0,sigma_0,A_0):
 def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
     
     nbins = 25 # number of bins for histograms in each direction
+    bins_histograms_l = np.linspace(-0.4,1.2,40)
     
     ks_pval_scores = dict()
     # April-2017, change to Pval using ks-test
@@ -121,7 +122,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
             #                if |skewness|>2 or |kurtosis-3|>2 kill assign Pval=0
             #                '''
             sim_skew = skew( df_sim_reduced['pcmZ'] )
-            excess_kurt = kurtosis( df_sim_reduced['pcmZ'] ) - 3
+            sim_kurt = kurtosis( df_sim_reduced['pcmZ'] )
             #            if np.abs(sim_skew)>2 or np.abs(excess_kurt)>2:#{
             #                if debug: #{
             #                    print '$skew=%.2f$ \n $excess kurt=%.2f$'%(sim_skew,excess_kurt),', implying non-Gaussian. substituting Pval=0'
@@ -148,27 +149,27 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
 
             if do_plots:#{
                 data_skew = skew( df_data_reduced['pcmZ'] )
-                data_excess_kurt = kurtosis( df_data_reduced['pcmZ'] ) - 3
+                data_kurt = kurtosis( df_data_reduced['pcmZ'] )
                 hist , bin_edges = np.histogram (df_data_reduced['pcmZ'] , bins=bins)
 #                data_maxima = argrelextrema( hist , np.greater ) # May-6
 
                 ax_l = fig.add_subplot(2 , 5, 5 + bin + 1 )
-                h,bins,_=ax_l.hist(df_sim_reduced['pcmZ'] , bins=nbins
+                h,bins,_=ax_l.hist(df_sim_reduced['pcmZ'] , bins=bins_histograms_l
                                    ,histtype='step',linewidth=3,normed=1
 #                                   ,label='sim. (%d) \n m=%f,\n s=%f \n $skew=%.2f$ \n $excess kurt=%.2f$ \n $N_{max}=%d$'
 #                                   %(len(df_sim_reduced),np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),sim_skew,excess_kurt,len(maxima[0])))
-                                   ,label='sim. (%d) \n $\\mu=%.3f$ \n $\\sigma=%.3f$ \n $\\mu_3=%.2f$ \n $\\mu_4-3=%.2f$'
-                                   %(len(df_sim_reduced),np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),sim_skew,excess_kurt))
+                                   ,label='sim. (%d) \n $\\mu=%.3f$ \n $\\sigma=%.3f$ \n $\\mu_3=%.2f$ \n $\\mu_4=%.2f$'
+                                   %(len(df_sim_reduced),np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),sim_skew,sim_kurt))
                 ax_l.hist(df_data_reduced['pcmZ'] , bins=bins
 #                          ,label=target+' data  (%d) \n m=%f,\n s=%f \n $skew=%.2f$ \n $excess kurt=%.2f$ \n $N_{max}=%d$'
 #                          %(len(df_data_reduced),np.mean(df_data_reduced['pcmZ']),np.std(df_data_reduced['pcmZ']),data_skew,data_excess_kurt,len(data_maxima[0])),histtype='step',linewidth=3,normed=1)
-                        ,label=target+' data  (%d) \n $\\mu=%.3f$ \n $\\sigma=%.3f$ \n $\\mu_3=%.2f$ \n $\\mu_4-3=%.2f$'
-                        %(len(df_data_reduced),np.mean(df_data_reduced['pcmZ']),np.std(df_data_reduced['pcmZ']),data_skew,data_excess_kurt),histtype='step',linewidth=3,normed=1)
+                        ,label=target+' data  (%d) \n $\\mu=%.3f$ \n $\\sigma=%.3f$ \n $\\mu_3=%.2f$ \n $\\mu_4=%.2f$'
+                        %(len(df_data_reduced),np.mean(df_data_reduced['pcmZ']),np.std(df_data_reduced['pcmZ']),data_skew,data_kurt),histtype='step',linewidth=3,normed=1)
                 ax_l.set_title('%.2f<$p_{miss}$<%.2f GeV/c, $p_{c.m.}^{z}$ Pval=%g'%(pmin , pmax,Pval_KS),y=1.01,fontsize=15)
                 ax_l.legend(fontsize=15,loc='upper left')
                 set_axes(ax_l,"","",fontsize=15)
                 ax_l.yaxis.set_major_formatter(NullFormatter())
-                ax_l.xaxis.set_ticks(np.linspace(np.min(ax_l.get_xlim())+0.1,np.max(ax_l.get_xlim()),3,endpoint=False))
+                ax_l.xaxis.set_ticks(np.linspace(np.min(ax_l.get_xlim())+0.1,np.max(ax_l.get_xlim()),4,endpoint=False))
 #                for bin_max in maxima[0]: plt.plot( [bins[bin_max],bins[bin_max]],ax.get_ylim(),'--',color='black' ) # May-6
             #}
             #            '''
@@ -196,6 +197,8 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
 
             ks_pval_scores_longitudinal_target_array.append( Pval_KS )
             ks_pval_scores_target['pcmZ_bin%d'%bin] = Pval_KS
+            ks_pval_scores_target['pcmZ_bin%d_skew'%bin] = sim_skew
+            ks_pval_scores_target['pcmZ_bin%d_kurt'%bin] = sim_kurt
             ks_pval_scores_target_array.append( Pval_KS )
             #}
         #}
@@ -972,6 +975,8 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     #                    if debug>2: print '---------------\npluging ks-Pvalue scores for ',target,'\n------------------'
                     for bin in range(len(PmissBins)):#{
                         results['ks_local_Pval_'+'pcmZ_bin%d'%bin+'_'+target] = ks_pval_scores[target]['pcmZ_bin%d'%bin]
+                        results['pcmZ_bin%d_skew'%bin+'_'+target] = ks_pval_scores[target]['pcmZ_bin%d_skew'%bin]
+                        results['pcmZ_bin%d_kurt'%bin+'_'+target] = ks_pval_scores[target]['pcmZ_bin%d_kurt'%bin]
                     #}
                     for direction in ['X','Y','Z']: #{
                         results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores[target]['pcm'+direction]
