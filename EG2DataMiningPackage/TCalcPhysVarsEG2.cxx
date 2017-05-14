@@ -166,7 +166,10 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("Pmiss_theta"         ,&Pmiss_theta           , "Pmiss_theta/F");
     OutTree -> Branch("pLab_phi"            ,&pLab_phi              , "pLab_phi/F");
     OutTree -> Branch("pLab_theta"          ,&pLab_theta            , "pLab_theta/F");
-
+    OutTree -> Branch("m23"                 ,&m23                   , "m23/F");
+    OutTree -> Branch("T23"                 ,&T23                   , "T23/F");
+    OutTree -> Branch("k23"                 ,&k23                   , "k23/F");
+    OutTree -> Branch("E_R"                 ,&E_R                   , "E_R/F");
 
     
     // TVector3 branches
@@ -291,6 +294,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     }
     else if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA"){
         Pe = TVector3( N_Px[0] , N_Py[0] , N_Pz[0] );
+        Pe = CoulombCorrection( Pe , CoulombDeltaE , Me , 1 ); // for the electron, the correction is E'+dE
     }
     else if (DataType == "(e,e'npp)"){
         Pe = *e3Vector;
@@ -438,6 +442,11 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         Wmiss       += protons.at(0);
         WmissWithCm += protons.at(0);
         WmissCmEps  += protons.at(0);
+        // Misak' comment [m23.pdf, "Estimation of the recoil mass in the 3N SRC"]
+        m23 = ( protons.at(1) + protons.at(2) ).Mag();
+        T23 = sqrt( m23 * m23 + Pmiss.P() * Pmiss.P() ) - 2 * Mp ;
+        k23 = 0.5*( m23 * m23 - 4 * Mp * Mp );
+        E_R = q.E() - (Plead.E() - Mp);
     }
     thetaLeadRec = Plead.Vect().Angle(Prec.Vect());
     theta_rec_q  = q.Vect().Angle(Prec.Vect());
@@ -497,7 +506,7 @@ void TCalcPhysVarsEG2::SetCuts(){
         if (Np>=2
             && 0.35 < Prec.P()
             &&  -24.5 < pVertex[1].Z() && pVertex[1].Z() < -20.0
-//            && pInDeadRegions[1]==0
+            //            && pInDeadRegions[1]==0
             ){
         
             ppSRCcut = true;

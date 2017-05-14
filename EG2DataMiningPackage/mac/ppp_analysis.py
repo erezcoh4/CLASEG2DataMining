@@ -18,7 +18,7 @@ from ppp_tools import *
 # (1) calculate physical variables
 # ----------------------------------------
 if 'calc. phys. vars.' in flags.option or 'calc' in flags.option:
-    print_important("python mac/calc_phys_vars.py -A%d -werez --option=pppSRC --DataType=NoCTofDATA -evf=1 -p1000"%flags.atomic_mass)
+    print_important("python mac/calc_phys_vars.py -A%d -werez --option=pppSRC -scheme=SRCXb --DataType=NoCTofDATA -evf=1 -p1000"%flags.atomic_mass)
 
 
 
@@ -28,9 +28,25 @@ if 'scheme ppp-SRC' in flags.option or 'scheme' in flags.option: # scheme to ppp
     
     DataName    = "NoCTofDATA_%s"% dm.Target(flags.atomic_mass)
     SchemedName = "pppSRCCut_%s"% DataName
-    ana         = TAnalysisEG2( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName , ROOT.TCut('Xb>1.05') )
+    cutXb = ROOT.TCut('Xb>0.85')
+    ana         = TAnalysisEG2( path+"/AnaFiles" , "Ana_SRCXb_"+DataName , cutXb )
     scheme      = TSchemeDATA()
-    scheme.SchemeOnTCut( path+"/AnaFiles" , "Ana_SRCPmissXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ana.pppSRCCut )
+    scheme.SchemeOnTCut( path+"/AnaFiles" , "Ana_SRCXb_"+DataName+".root", "anaTree", "Ana_"+SchemedName+".root", ana.pppSRCCut )
+    '''
+        pppSRCCut:
+        ---------
+        cutSRC = cutXb 
+        && "theta_pq < 10"
+        && "0.85 < p_over_q && p_over_q < 1.1"
+        && "0.3 < Pmiss.P() && Pmiss.P() < 1.0"
+        && "3<=Np"
+        && cutPmT = "Pmiss.Pt() < 0.4"
+        && cutP1 = "(-24.5 < pVertex[0].Z() && pVertex[0].Z() < -20)"
+        && cutP2 = "0.3 < protons[1].P() && (-24.5 < pVertex[1].Z() && pVertex[1].Z() < -20)"
+        && cutP3 = "0.3 < protons[2].P() && (-24.5 < pVertex[2].Z() && pVertex[2].Z() < -20)"
+        && pppEdepCut = Form("%s && %s && %s",pEdepCut[0]->GetName(),pEdepCut[1]->GetName(),pEdepCut[2]->GetName())
+        && pppCTOFCut = "pCTOFCut[0] && pCTOFCut[1] && pCTOFCut[2]"
+        '''
     print 'schemed to %s'%SchemedName
 
 

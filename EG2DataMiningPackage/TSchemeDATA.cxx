@@ -31,10 +31,10 @@ void TSchemeDATA::LoadInTree(){
     
     InTree -> SetBranchAddress("P_nmb"          , &Np);
     InTree -> SetBranchAddress("N_nmb"          , &Nn);
-    InTree -> SetBranchAddress("T_nmb"          , &Ntotal);
     InTree -> SetBranchAddress("Xb"             , &Xb);
     
     if (DataType == "DATA") {
+        InTree -> SetBranchAddress("T_nmb"          , &Ntotal);
         InTree -> SetBranchAddress("Px"             , &PpX);
         InTree -> SetBranchAddress("Py"             , &PpY);
         InTree -> SetBranchAddress("Pz"             , &PpZ);
@@ -54,7 +54,7 @@ void TSchemeDATA::LoadInTree(){
         InTree -> SetBranchAddress("N_Pz"           , &N_Pz);    // negative particles momenta (electron is the first)
         InTree -> SetBranchAddress("N_PathSC"       , &N_PathSC);    // negative particles path length (electron is the first)
         InTree -> SetBranchAddress("N_TimeSC"       , &N_TimeSC);    // negative particles time (electron is the first)
-        InTree -> SetBranchAddress("STT"            , &STT);
+        // InTree -> SetBranchAddress("STT"            , &STT);
         Printf("set adresses for %s",DataType.Data());
     }
     else if(DataType == "(e,e'npp)") {
@@ -212,14 +212,15 @@ void TSchemeDATA::SRCXb(int fTargetType , float fXbMin, int fNpMin, int fNpMax, 
     CreateOutTree   ();
     Beam = TLorentzVector( 0 , 0 , 5.014 , 5.014 );
 
-    if (DataType == "DATA") {
+    if (DataType == "DATA" || DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") {
         for (Long64_t i = 0; i < Nentries ; i++) {
             if (i%(Nentries/20)==0) {
                 printf("schemed %d events so far, out of ", (int)OutTree -> GetEntries());
                 plot.PrintPercentStr((float)i/Nentries);
             }
             InTree -> GetEntry(i);
-            // electron
+            // SHOW3(Np,targ_type,Xb);
+            if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") targ_type = TargetType;
             if( (fNpMin <= Np &&  Np <= fNpMax) && (targ_type == TargetType) && (Xb > XbMin) ){
                 OutTree -> Fill();
             }

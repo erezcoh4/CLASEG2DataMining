@@ -1,6 +1,7 @@
 '''
     usage:
     --------
+    python mac/scheme_file.py  --DataType=NoCTofDATA --option=SRCXb3p -A12
     python mac/scheme_file.py --option=SchemeOrTrees --DataType=C -A12
     python mac/scheme_file.py  --DataType=DATA --option=SRCXb -A12
     python mac/scheme_file.py -A12  --option="(e,e'pp?)" --DataType=New_NoCTofDATA
@@ -12,7 +13,7 @@ DataType    = flags.DataType
 FileName    = DataType+"_%s"% dm.Target(A)
 scheme      = TSchemeDATA( DataType , eg2_data_path , schemed_eg2_data_path , FileName , "T" , flags.verbose )
 pMin , pMax = 0.3 , 0.7
-
+XbMin = 0.8
 
 # ------------------------------------------------------------------ #
 # May-1
@@ -37,10 +38,18 @@ if (flags.option=="SchemeOrTrees"):
 # ------------------------------------------------------------------ #
 
 
+
+# ------------------------------------------------------------------ #
+elif (flags.option=="SRCXb3p"):
+    NpMin , NpMax = 3 , 10
+    scheme.SRCXb( 2 , XbMin ,  NpMin , NpMax , "" , A ) # target-type = 2, Bjorken x > XbMin
+    print "schemed for SRC in nuclear target Xb > %d, %d<Np<%d"%(XbMin,NpMin , NpMax)
+# ------------------------------------------------------------------ #
+
 # ------------------------------------------------------------------ #
 elif (flags.option=="SRCXb"):
-    scheme.SRCXb( 2 , 1.0 , 1 , 100 , "" , A ) # target-type = 2, Bjorken x > 1.0
-    print "schemed for SRC in nuclear target Xb > 1.0, Nprotons>1"
+    scheme.SRCXb( 2 , XbMin , 1 , 100 , "" , A ) # target-type = 2, Bjorken x > XbMin
+    print "schemed for SRC in nuclear target Xb > %d, Np>0"%(XbMin)
 # ------------------------------------------------------------------ #
 
 # ------------------------------------------------------------------ #
