@@ -43,8 +43,8 @@ void TCalcPhysVarsEG2::InitInputTree(){
     InTree -> SetBranchAddress("N_nmb"              , &Nnegative);
   
     if (DataType == "DATA" || DataType == "GSIM") {
-        InTree -> SetBranchAddress("Q2"                 , &Q2);
-        InTree -> SetBranchAddress("T_nmb"              , &Ntotal);
+        InTree -> SetBranchAddress("Q2"             , &Q2);
+        InTree -> SetBranchAddress("T_nmb"          , &Ntotal);
         InTree -> SetBranchAddress("Nu"             , &Nu);
         InTree -> SetBranchAddress("Px_e"           , &Px_e);
         InTree -> SetBranchAddress("Py_e"           , &Py_e);
@@ -77,15 +77,6 @@ void TCalcPhysVarsEG2::InitInputTree(){
         InTree -> SetBranchAddress("P_Edep"         , &uns_pEdep);
     }
 
-    else if(DataType == "(e,e'npp)") {
-        NMom = P1Mom = P2Mom = e3Vector = 0;
-        
-        InTree -> SetBranchAddress("e3Vector"       , &e3Vector);
-        InTree -> SetBranchAddress("NMom"           , &NMom);
-        InTree -> SetBranchAddress("P1Mom"          , &P1Mom);
-        InTree -> SetBranchAddress("P2Mom"          , &P2Mom);
-    }
-    
     if(DataType == "GSIM") {
         InTree -> SetBranchAddress("Q2_g"           , &Q2_g);
         InTree -> SetBranchAddress("Nu_g"           , &Nu_g);
@@ -294,10 +285,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     }
     else if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA"){
         Pe = TVector3( N_Px[0] , N_Py[0] , N_Pz[0] );
-        Pe = CoulombCorrection( Pe , CoulombDeltaE , Me , 1 ); // for the electron, the correction is E'+dE
-    }
-    else if (DataType == "(e,e'npp)"){
-        Pe = *e3Vector;
+//        Pe = CoulombCorrection( Pe , CoulombDeltaE , Me , 1 ); // for the electron, the correction is E'+dE
     }
     e.SetVectM( Pe , Me );
     
@@ -334,15 +322,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
                 Plead_g.SetVectM( p3vec_g.back() , Mp ) ;           // Plead is first calculated in Lab-Frame
         }
     }
-    if (DataType == "(e,e'npp)"){
-        // momenta corrections have already performed
-        p3vec.push_back(*NMom);
-        Plead.SetVectM( p3vec.back() , Mn ) ;           
-        p3vec.push_back(*P1Mom);
-        p3vec.push_back(*P2Mom);
-    }
-    if (p3vec.size()==3)
-        PmRctLab3   = q.Vect() - p3vec.at(1) - p3vec.at(2);
+    if (p3vec.size()==3) PmRctLab3 = q.Vect() - p3vec.at(1) - p3vec.at(2);
     if (debug > 2) Printf("extracted protons' kinematics");
 
     
@@ -425,16 +405,11 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     if (debug > 2) Printf("got XbMoving");
  
 
-    // if we have 3 protons, randomize protons 2 and 3
-    if(DataType == "(e,e'npp)"){
-        Nlead = Plead; // the leader is a n
-        Nmiss = Nlead - q;
-        Np = 3;
-    }
     //    if (Np==2) {
     //        p12Randomize();
     //    }
-    else if (Np==3) {
+    // if we have 3 protons, randomize protons 2 and 3
+    if (Np==3) {
         p23Randomize();
         PmissRct    = q - protons.at(1) - protons.at(2);
         thetaMiss23 = r2d*Pmiss.Vect().Angle(Prec.Vect());

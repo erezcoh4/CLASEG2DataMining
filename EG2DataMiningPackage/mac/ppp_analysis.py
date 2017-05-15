@@ -2,7 +2,7 @@ from ppp_tools import *
 '''
     usage:
     ---------
-    python mac/ppp_analysis.py --option=cuts
+    python mac/ppp_analysis.py --option=scheme
     
     options (can be ran simultaneously):
     calc    {"calc. phys. vars."}

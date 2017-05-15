@@ -100,8 +100,8 @@ void TAnalysisEG2::SetSRCCuts(TCut MainCut){ // last editted March-22 for pppSRC
     pppCutPmTMm = pppCutPmT && cutMmiss;
     
     // pppSRCCut   = cutSRC && "(3<=Np)" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut && cutPmT;
-//    pppSRCCut = MainCut && "theta_pq < 10" && "0.85 < p_over_q && p_over_q < 1.1" && cutPmiss && "3<=Np" && cutPmT && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut;
-    pppSRCCut = MainCut  && "theta_pq < 10" && "(0.85 < p_over_q) && (p_over_q < 1.1)" && cutPmiss && "3<=Np" && cutPmT && cutP1 && cutP2 && cutP3  && pppCTOFCut && pppEdepCut ;
+//    pppSRCCut = MainCut  && "theta_pq < 10" && "(0.85 < p_over_q) && (p_over_q < 1.1)" && cutPmiss && "3<=Np" && cutPmT && cutP1 && cutP2 && cutP3  && pppCTOFCut && pppEdepCut ;
+    pppSRCCut = MainCut && cutPmiss && "(3<=Np)" && pppEdepCut && pppCTOFCut;
     // && cutMmiss && cutAngles3p;
     //    pppSRCMmiss = pppSRCCut && cutMmiss;
     //    Final3pCut  = pppSRCMmiss && cutAngles3p;

@@ -41,7 +41,7 @@ if (flags.option=="SchemeOrTrees"):
 
 # ------------------------------------------------------------------ #
 elif (flags.option=="SRCXb3p"):
-    NpMin , NpMax = 3 , 10
+    NpMin , NpMax = 1 , 4
     scheme.SRCXb( 2 , XbMin ,  NpMin , NpMax , "" , A ) # target-type = 2, Bjorken x > XbMin
     print "schemed for SRC in nuclear target Xb > %d, %d<Np<%d"%(XbMin,NpMin , NpMax)
 # ------------------------------------------------------------------ #
