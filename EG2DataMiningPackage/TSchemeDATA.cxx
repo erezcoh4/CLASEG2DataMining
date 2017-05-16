@@ -55,6 +55,7 @@ void TSchemeDATA::LoadInTree(){
         InTree -> SetBranchAddress("N_PathSC"       , &N_PathSC);    // negative particles path length (electron is the first)
         InTree -> SetBranchAddress("N_TimeSC"       , &N_TimeSC);    // negative particles time (electron is the first)
         // InTree -> SetBranchAddress("STT"            , &STT);
+        InTree -> SetBranchAddress("targ_type"      , &targ_type); // for Al27 remove this
         Printf("set adresses for %s",DataType.Data());
     }
     else if(DataType == "(e,e'npp)") {
@@ -220,7 +221,7 @@ void TSchemeDATA::SRCXb(int fTargetType , float fXbMin, int fNpMin, int fNpMax, 
             }
             InTree -> GetEntry(i);
             // SHOW3(Np,targ_type,Xb);
-            if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") targ_type = TargetType;
+            // if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA") targ_type = TargetType;
             if( (fNpMin <= Np &&  Np <= fNpMax) && (targ_type == TargetType) && (Xb > XbMin) ){
                 OutTree -> Fill();
             }

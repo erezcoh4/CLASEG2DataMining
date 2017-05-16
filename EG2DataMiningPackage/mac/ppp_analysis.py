@@ -36,14 +36,14 @@ if 'scheme ppp-SRC' in flags.option or 'scheme' in flags.option: # scheme to ppp
         pppSRCCut:
         ---------
         cutSRC = cutXb 
-        && "theta_pq < 10"
-        && "0.85 < p_over_q && p_over_q < 1.1"
+        && "theta_pq < 25"
+        && "0.52 < p_over_q && p_over_q < 0.93"
         && "0.3 < Pmiss.P() && Pmiss.P() < 1.0"
         && "3<=Np"
         && cutPmT = "Pmiss.Pt() < 0.4"
-        && cutP1 = "(-24.5 < pVertex[0].Z() && pVertex[0].Z() < -20)"
-        && cutP2 = "0.3 < protons[1].P() && (-24.5 < pVertex[1].Z() && pVertex[1].Z() < -20)"
-        && cutP3 = "0.3 < protons[2].P() && (-24.5 < pVertex[2].Z() && pVertex[2].Z() < -20)"
+        && cutP1 = "(-27 < pVertex[0].Z() && pVertex[0].Z() < -20)"
+        && cutP2 = "0.3 < protons[1].P() && (-27 < pVertex[1].Z() && pVertex[1].Z() < -20)"
+        && cutP3 = "0.3 < protons[2].P() && (-27 < pVertex[2].Z() && pVertex[2].Z() < -20)"
         && pppEdepCut = Form("%s && %s && %s",pEdepCut[0]->GetName(),pEdepCut[1]->GetName(),pEdepCut[2]->GetName())
         && pppCTOFCut = "pCTOFCut[0] && pCTOFCut[1] && pCTOFCut[2]"
         '''

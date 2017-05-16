@@ -193,12 +193,6 @@ void TCalcPhysVarsEG2::InitOutputTree(){
         OutTree -> Branch("pFiducCut_g"             ,&pFiducCut_g);     // std::vector<Int_t>
 
     }
-    if(DataType == "(e,e'npp)"){
-        OutTree -> Branch("Nlead"               ,"TLorentzVector"       ,&Plead);
-        OutTree -> Branch("Nmiss"               ,"TLorentzVector"       ,&Nmiss);
-    }
-    
-    
     
     
     // cuts
@@ -285,7 +279,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     }
     else if (DataType == "NoCTofDATA" || DataType == "New_NoCTofDATA"){
         Pe = TVector3( N_Px[0] , N_Py[0] , N_Pz[0] );
-//        Pe = CoulombCorrection( Pe , CoulombDeltaE , Me , 1 ); // for the electron, the correction is E'+dE
+        Pe = CoulombCorrection( Pe , CoulombDeltaE , Me , 1 ); // for the electron, the correction is E'+dE
     }
     e.SetVectM( Pe , Me );
     
@@ -302,11 +296,12 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
 
     
     
-    // get protons - energy loss correction and Coulomb corrections
+    // protons
     for (int i = 0 ; i < Np ; i++ ){
         
         TVector3 p_3_momentum( PpX[i], PpY[i], PpZ[i] );
-        p_3_momentum = CoulombCorrection( p_3_momentum , CoulombDeltaE , Mp , -1 ); // for the protons, the correction is Ep-dE
+        // for all the protons, a correction of Ep-dE is performed
+        p_3_momentum = CoulombCorrection( p_3_momentum , CoulombDeltaE , Mp , -1 );
         p3vec.push_back( p_3_momentum );
         if ( p_3_momentum.Mag() > Plead.P() ){
             Plead.SetVectM( p_3_momentum , Mp ) ;           // Plead is first calculated in Lab-Frame
@@ -339,15 +334,12 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     M_p_init    = Mp;
     TpMiss      = E_p_init - M_p_init; // should be < 0, since the nucleon is bound - the p is off the energy shell
 
-    theta_pq    = r2d * Plead.Vect().Angle(q.Vect());
-    p_over_q    = Plead.P() / q.P();
-    if (debug > 2) Printf("computed Pmiss , p/q , 𝜃(p,q) , p(A-1)");
-
     
     // Bjorken scaling for a moving nucleon
     // Invariant mass of the system produced in the interaction of balancing nucleon with a virtual photon
     pA_Np_1.SetVectM( TVector3() , Mp * (A - Np + 1)  );
     Wtilde      = pA - pA_Np_1 + q ;
+    if (debug > 2) Printf("computed Pmiss , p/q , 𝜃(p,q) , p(A-1)");
     
     
     // move to prefered axes frame
@@ -385,10 +377,13 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     // all recoil protons together (just without the leading proton)
     if (protons.size()>0) {
         Plead = protons.at(0);            // now Plead is calculated in q-Pmiss frame
+        theta_pq = r2d * Plead.Vect().Angle(q.Vect());
+        p_over_q = Plead.P() / q.P();
     }
     // define Precoil:
     // for 2p-SRC, we want at least one proton above 350 MeV/c, and then call it Precoil
     // for Np-SRC this is different - we need to revise it
+    
     Prec = (protons.size()>1) ? protons.at(1) : TLorentzVector();
     //    Prec = Pcm - (Plead - q);        // Prec is the 4-vector sum of all recoiling protons
     // for 3p get back to this
@@ -420,7 +415,7 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         // Misak' comment [m23.pdf, "Estimation of the recoil mass in the 3N SRC"]
         m23 = ( protons.at(1) + protons.at(2) ).Mag();
         T23 = sqrt( m23 * m23 + Pmiss.P() * Pmiss.P() ) - 2 * Mp ;
-        k23 = 0.5*( m23 * m23 - 4 * Mp * Mp );
+        k23 = 0.5*sqrt( m23 * m23 - 4 * Mp * Mp );
         E_R = q.E() - (Plead.E() - Mp);
     }
     thetaLeadRec = Plead.Vect().Angle(Prec.Vect());
@@ -761,8 +756,7 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     cout << "\033[35m"<< "\t [" << 100*(float)entry/Nentries  << "%]" << "\033[0m"<< endl;
     PrintLine();
     SHOW3(Xb , Q2 , alpha_q);
-    SHOW(M_p_init);
-    SHOW(E_p_init);
+    SHOW2(M_p_init,E_p_init);
     SHOWTLorentzVector(e);
     SHOWTLorentzVector(q);
     if(DataType=="GSIM") SHOWvectorTLorentzVector(protons_g);
@@ -773,10 +767,10 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOWstdVector(alpha);
     SHOWstdVector(pCTOFCut);
     SHOWstdVector(pFiducCut);
-    SHOWstdVector(pInDeadRegions);
+    // SHOWstdVector(pInDeadRegions);
     SHOWstdVector(pEdep);
-    SHOWstdVector(Tp);
-    SHOWstdVector(proton_angle);
+    // SHOWstdVector(Tp);
+    // SHOWstdVector(proton_angle);
     SHOWTLorentzVector(Plead);
     SHOW(sum_alpha);
     SHOWTLorentzVector(Pmiss);
@@ -786,9 +780,8 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOWTLorentzVector(Prec);
     SHOWTLorentzVector(Pcm);
     SHOW3(TpMiss , theta_pq , p_over_q);
-    SHOW3(NpBack , NpCumulative , NpCumulativeSRC );
-    SHOW3(pcmX , pcmY , pcmT);
-    SHOW(pcmZ);
+    // SHOW3(NpBack , NpCumulative , NpCumulativeSRC );
+    //    SHOW3(pcmX , pcmY , pcmZ);
     EndEventBlock();
 }
 

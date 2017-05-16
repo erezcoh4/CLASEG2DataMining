@@ -100,8 +100,8 @@ void TAnalysisEG2::SetSRCCuts(TCut MainCut){ // last editted March-22 for pppSRC
     pppCutPmTMm = pppCutPmT && cutMmiss;
     
     // pppSRCCut   = cutSRC && "(3<=Np)" && cutP1 && cutP2 && cutP3 && pppEdepCut && pppCTOFCut && cutPmT;
-//    pppSRCCut = MainCut  && "theta_pq < 10" && "(0.85 < p_over_q) && (p_over_q < 1.1)" && cutPmiss && "3<=Np" && cutPmT && cutP1 && cutP2 && cutP3  && pppCTOFCut && pppEdepCut ;
-    pppSRCCut = MainCut && cutPmiss && "(3<=Np)" && pppEdepCut && pppCTOFCut;
+    pppSRCCut = MainCut  && "theta_pq < 25" && "(0.52 < p_over_q) && (p_over_q < 0.93)" && cutPmiss && "3<=Np" && cutPmT && cutP1 && cutP2 && cutP3  && pppCTOFCut && pppEdepCut ;
+//    pppSRCCut = MainCut && cutPmiss && "(3<=Np)" && pppEdepCut && pppCTOFCut;
     // && cutMmiss && cutAngles3p;
     //    pppSRCMmiss = pppSRCCut && cutMmiss;
     //    Final3pCut  = pppSRCMmiss && cutAngles3p;
@@ -408,7 +408,6 @@ void TAnalysisEG2::MixEvents(TTree * OutTree, bool DoPrint){
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TAnalysisEG2::Mix_pp_pairs(TTree * OutTree, bool DoPrint){
-    int Np;
     Float_t         phi_q   , phi_Pmiss , theta_Pmiss , q_phi   , Pmiss_phi , Pmiss_theta;
     TVector3        pcm3vec , prel3vec;
     TLorentzVector  *Pm = 0, *Pr = 0, *q4 = 0, Pmiss, q, Pcm, Prec , Prel;
