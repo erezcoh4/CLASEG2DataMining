@@ -74,7 +74,7 @@ public:
     Float_t p_over_q    , theta_pq  ;
     Float_t q_phi       , q_theta   , Pmiss_phi , Pmiss_theta;
     Float_t q_phi_g     , q_theta_g , Pmiss_phi_g, Pmiss_theta_g;
-    Float_t Emiss       , Mmiss;
+    Float_t Emiss       , Mmiss     , Mmiss2    , Mmiss3    ;
     Float_t mA          , CoulombDeltaE         , A_over_mA ;
     Float_t Mrec        , Trec      , theta_rec_q  , theta_miss_q;   // protons kinetic energy, recoil mass & kinetic energy
     Float_t uns_pCTOF[20], uns_pEdep[20]     ;
@@ -85,10 +85,10 @@ public:
     Float_t m23         , T23       , k23           , E_R;
     
     
-    Double_t k0         , kCMmag    , Px    , Py    ,Pz ;
+    Double_t            k0          , kCMmag        , Px            , Py        , Pz ;
     
     Float_t             Pmiss3Mag   , pcmX          , pcmY          , pcmT      , pcmZ          ;
-    Float_t             prelX,      prelY,          prelZ;
+    Float_t             prelX       , prelY         , prelZ         ;
     Float_t             TpMiss      , m_A_1         , E_p_init      , M_p_init  , pq            ;
     vector<Float_t>     alpha       , pEdep         , pCTOF         , Tp        , proton_angle  ;
     vector<Int_t>       pCTOFCut    , pFiducCut     , pFiducCut_g   , pInDeadRegions;

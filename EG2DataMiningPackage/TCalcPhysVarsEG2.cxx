@@ -106,6 +106,7 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("target atomic mass"  ,&A                     ,"A/I");
     OutTree -> Branch("Np_g"                ,&Np_g                  ,"Np_g/I");
     OutTree -> Branch("Np"                  ,&Np                    ,"Np/I");
+    OutTree -> Branch("Nnegative"           ,&Nnegative             ,"Nnegative/I");
     OutTree -> Branch("NpBack"              ,&NpBack                ,"NpBack/I"); // number of backward going protons
     OutTree -> Branch("NpCumulative"        ,&NpCumulative          ,"NpCumulative/I"); // number of backward going protons with 0.3<p
     OutTree -> Branch("NpCumulativeSRC"     ,&NpCumulativeSRC       ,"NpCumulativeSRC/I"); // number of backward going protons with 0.3<p<0.7
@@ -121,6 +122,8 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("Bjorken x (moving p)",&XbMoving              , "XbMoving/F");
     OutTree -> Branch("Q2"                  ,&Q2                    , "Q2/F");
     OutTree -> Branch("Mmiss"               ,&Mmiss                 , "Mmiss/F");
+    OutTree -> Branch("Mmiss2"              ,&Mmiss2                , "Mmiss2/F");
+    OutTree -> Branch("Mmiss3"              ,&Mmiss3                , "Mmiss3/F");
     
     // p(cm) for RooFit
     OutTree -> Branch("Pmiss3Mag"           ,&Pmiss3Mag             , "Pmiss3Mag/F");
@@ -392,6 +395,8 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     
     // A(e,e'p) missing mass M²(miss) = (q + 2mN - Plead)² , all 4-vectors
     Mmiss = (q + 2*NucleonAtRest - Plead).Mag();
+    Mmiss2 = (q + 2*NucleonAtRest - Plead).Mag();
+    Mmiss3 = (q + 3*NucleonAtRest - Plead).Mag();
     if (debug > 2) Printf("got Mmiss");
 
     
