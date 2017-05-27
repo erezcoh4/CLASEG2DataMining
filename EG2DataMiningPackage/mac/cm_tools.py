@@ -42,7 +42,7 @@ def GeneParsFName( path ):
     return path+"GeneratedParameters.csv"
 def resutlsFName( path ):
     return path+"EG_simulated_runs_results_cm_parameters.csv"
-def buildup_resutlsFName( path ):
+def buildup_resultsFName( path ):
     return path+"runs_results.csv"
 def root_resutlsFName( path ):
     return path+"runs_results.root"
@@ -444,6 +444,76 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
     del garbage_list
 
     return df_pMissBins , do_fits
+# ------------------------------------------------------------------------------- #
+
+
+
+# ------------------------------------------------------------------------------- #
+# May-27, 2017
+def calc_cm_pars_sigma( fana , unweightedRoofitsFName = '' , DoSaveCanvas = False ):
+    '''
+            Return: pd.DataFrame ({mean_x , sigma_x ,mean_y , sigma_y , mean_z , sigma_z})
+            '''
+    df_result = pd.DataFrame()
+
+    if fana.GetEntries()==0:#{
+        print 'no entries in anaTree of',fana.GetFileName()
+        print 'leaving calc_cm_parameters'
+        return pd.DataFrame() , False
+    #}
+    ana = read_root( str(fana.GetFileName()) , key='anaTree' , columns=['pcmX','pcmY','pcmZ','Pmiss3Mag','rooWeight']  )
+
+    if DoSaveCanvas:#{
+        canvas_unweighted = fana.CreateCanvas( "RooFit plots - unweighted" , "Divide" , 3 , 1 )
+        unweighted = fana.RooFitCM( 0.3 , 0.6 , False , True, flags.verbose, canvas_unweighted, 1 )
+        df_result = pd.DataFrame({'Nevts':len(ana)
+                                 ,'mean_x_unweighted':unweighted[0],'mean_xErr_unweighted':unweighted[1],'sigma_x_unweighted':unweighted[2],'sigma_xErr_unweighted':unweighted[3]
+                                 ,'mean_y_unweighted':unweighted[4],'mean_yErr_unweighted':unweighted[5],'sigma_y_unweighted':unweighted[6],'sigma_yErr_unweighted':unweighted[7]
+                                 ,'mean_z_unweighted':unweighted[12],'mean_zErr_unweighted':unweighted[13],'sigma_z_unweighted':unweighted[14],'sigma_zErr_unweighted':unweighted[15]
+                                 }
+                                 , index=[0])
+    #}
+    else:#{
+        if len(ana)>0 and sum(ana.rooWeight)>0:#{
+            sqrtN = sqrt(len(ana))
+            mean_x_unweighted , mean_x_weighted     = np.average( ana.pcmX ) , np.average( ana.pcmX , weights=ana.rooWeight )
+            sigma_x_unweighted, sigma_x_weighted    = np.sqrt(np.average( np.square( ana.pcmX-mean_x_unweighted) )) , np.sqrt(np.average( np.square(ana.pcmX-mean_x_weighted) , weights=ana.rooWeight  ))
+            mean_y_unweighted , mean_y_weighted     = np.average( ana.pcmY ) , np.average( ana.pcmY , weights=ana.rooWeight )
+            sigma_y_unweighted, sigma_y_weighted    = np.sqrt(np.average( np.square( ana.pcmY-mean_y_unweighted) )) , np.sqrt(np.average( np.square(ana.pcmY-mean_y_weighted) , weights=ana.rooWeight  ))
+            mean_z_unweighted , mean_z_weighted     = np.average( ana.pcmZ ) , np.average( ana.pcmZ , weights=ana.rooWeight )
+            sigma_z_unweighted, sigma_z_weighted    = np.sqrt(np.average( np.square( ana.pcmZ-mean_z_unweighted) )) , np.sqrt(np.average( np.square(ana.pcmZ-mean_z_weighted) , weights=ana.rooWeight  ))
+        #}
+        else:#{
+            sqrtN  = 1
+            mean_x_unweighted , mean_x_weighted     = -100,-100
+            sigma_x_unweighted, sigma_x_weighted    = -100,-100
+            mean_y_unweighted , mean_y_weighted     = -100,-100
+            sigma_y_unweighted, sigma_y_weighted    = -100,-100
+            mean_z_unweighted , mean_z_weighted     = -100,-100
+            sigma_z_unweighted, sigma_z_weighted    = -100,-100
+        #}
+        df_result = pd.DataFrame({'Nevts':len(ana)
+                                 ,'mean_x_unweighted':mean_x_unweighted   ,'mean_xErr_unweighted':sigma_x_unweighted/sqrtN ,'sigma_x_unweighted':sigma_x_unweighted,'sigma_xErr_unweighted':0.02 # resolution uncertainty
+                                 ,'mean_y_unweighted':mean_y_unweighted   ,'mean_yErr_unweighted':sigma_y_unweighted/sqrtN ,'sigma_y_unweighted':sigma_y_unweighted,'sigma_yErr_unweighted':0.02 # resolution uncertainty0
+                                 ,'mean_z_unweighted':mean_z_unweighted   ,'mean_zErr_unweighted':sigma_z_unweighted/sqrtN ,'sigma_z_unweighted':sigma_z_unweighted,'sigma_zErr_unweighted':0.02 # resolution uncertainty
+                                 }
+                                 , index=[0])
+    #}
+
+    if DoSaveCanvas:#{
+        canvas_unweighted.SaveAs(unweightedRoofitsFName)
+        print_filename(unweightedRoofitsFName,"unweighted rooFits at")
+        print_line()
+    #}
+    print "calculated cm parameters for " + fana.InFileName
+    if debug>1:
+        print "reconstructed cm parameters"
+        if debug>5:
+            print 'df_result:',df_result
+
+    garbage_list = [ ana ]
+    del garbage_list
+    return df_result
 # ------------------------------------------------------------------------------- #
 
 
@@ -1082,6 +1152,121 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
         if do_root_file:        print_filename( root_resutlsFName , "results converted also to root format " )
     #}
 
+    print_important("done...") ; print_line()
+#}
+# ------------------------------------------------------------------------------- #
+
+
+
+
+
+# ------------------------------------------------------------------------------- #
+# May-27, 2017
+def generate_runs_with_random_sigma( option='generate analyze delete',
+                                    hyperparameters=None,
+                                    ana_data=dict(),
+                                    debug=0,
+                                    buildup_resultsFName='' ,
+                                    reco_fitsFName='',
+                                    do_results_file=True
+                                    ):#{
+    
+    from definitions import path
+    if debug: print hyperparameters
+    start_run , Nruns = hyperparameters['start_run'], hyperparameters['Nruns']
+    NRand = hyperparameters['NRand']
+    
+    pAcceptacneFile = ROOT.TFile( path + "/GSIM_DATA/PrecoilAcceptance.root" )
+    path = path + "/Analysis_DATA/ppSRCcm"
+    if 'helion' in flags.worker: path = "/extra/Erez/DataMining/Analysis_DATA/ppSRCcm"
+    
+    '''
+        recoil proton acceptances:
+        (a) efficiency and acceptacne from the 'uniform' map i've generated using virtual CLAS
+        (b) proton fiducial cuts (coded inside the event generator class)
+        '''
+    if 'gen' in option: #{
+        h = pAcceptacneFile.Get("hRescaled")
+        gen_events = GenerateEvents( path , 0 , debug - 2 )
+        gen_events.Set_protonAcceptacne( h )
+        
+        gen_events.AddInputChain_eep("300<p(miss)<600 MeV/c")
+        gen_events.SetInputChain_eep()
+        
+        gen_events.SetNRand( NRand )
+        gen_events.Use_protonAcceptacne( True )
+        gen_events.SetDo_PrecFiducial ( True )
+        gen_events.SetDo_PrecMinCut ( True )
+        
+        gen_events.SetPmissBins()
+        gen_events.Set10PmissBins()
+        # set the desired number of events when the simulation ends in 5 Pmiss bins
+        # as a 100 times the number of 12C (e,e'pp) events in each bin
+        gen_events.SetNAcceptedEvents( hyperparameters['Ntimes'] * ana_data['C12'].GetEntries() )
+        # if we don't reach these numbers after generating NMAX events, the parameters should be discarded
+        gen_events.SetNgenMax( hyperparameters['NgenMax'] )
+        gen_events.MapInputEntriesInPmissBins()
+    #}
+    
+    # event generation (and analysis) loop
+    irun=0
+    for run in range( start_run , start_run + Nruns ): #{
+        
+        # (1) generate the simulated data (the 'run')
+        # ----------------------------
+        if 'gen' in option: #{
+            
+            # sample the geneated parameters uniformly within the ranges
+            gen_MeanX = 0.0
+            gen_MeanY = 0.0
+            gen_MeanZ = 0.1
+            gen_Sigma = np.random.uniform( np.min(hyperparameters['range_sigma_t']),np.max(hyperparameters['range_sigma_t']) )
+            
+            if debug: print 'run',run,'gen_Sigma',gen_Sigma
+            gen_events.Set_eep_Parameters_MeanXYZ_Sigma( gen_MeanX , gen_MeanY , gen_MeanZ , gen_Sigma )
+            gen_events.InitRun()
+            Nevents = gen_events.DoGenerate_eepp_from_eep_SingleParameterSigma( run )
+            if debug: print 'Nevents to analyze:',Nevents
+        #}
+        
+        # (2) analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
+        # ----------------------------
+        if 'ana' in option: #{
+            if debug>1: print "analyzing run %d"%run
+            
+            ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run )
+            results = pd.DataFrame({'run':int(run)
+                                   ,'time':str(datetime.datetime.now().strftime("%Y%B%d"))
+                                   ,'NentriesSimRun':ana_sim.GetEntries()
+                                   ,'gen_MeanX':gen_MeanX, 'gen_MeanY':gen_MeanY, 'gen_MeanZ':gen_MeanZ, 'gen_Sigma':gen_Sigma
+                                   }
+                                   , index = [int(run)])
+
+            if Nevents!=-1: #{  Nevents==-1 means that the generation of events could not be completed (too bad of acceptance)
+                reco_parameters = calc_cm_pars_sigma( ana_sim )
+                for reco_parameter_name in ['mean','sigma']: #{
+                    for direction in ['x','y','z']: #{
+                        results['rec' + '_' + reco_parameter_name + '_' + direction] = reco_parameters.get_value(0,reco_parameter_name + '_' + direction + '_unweighted')
+                        if debug>2: print "results[rec+'_'"+reco_parameter_name+" + '_' + "+direction+"]:",results['rec' + '_' + reco_parameter_name + '_' + direction]
+                    #}
+                #}
+            #}
+            ana_sim.CloseFile()
+            if do_results_file: stream_dataframe_to_file( results, buildup_resultsFName , float_format='%f' )
+        #}
+        if 'delete' in option:#{
+            delete_file( path + '/eg_rootfiles/run%d.root'%run  , debug )
+        #}
+        irun += 1
+        print_important("completed run %d [%.0f"%(run,100.*float(irun)/Nruns) + "%]"+" at %4d-%02d-%02d %d:%d:%d"%time.localtime()[0:6] )
+        print_line()
+    #}
+
+    if 'gen' in option: #{
+        gen_events.ReleaseInputChain_eep()
+    #}
+
+    if do_results_file:  print_filename( buildup_resultsFName , "results wrote to " )
     print_important("done...") ; print_line()
 #}
 # ------------------------------------------------------------------------------- #

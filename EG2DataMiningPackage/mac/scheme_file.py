@@ -23,17 +23,33 @@ if (flags.option=="SchemeOrTrees"):
     scheme.SchemeOnTCut( "/Users/erezcohen/Desktop/DataMining/OrAnalysisTrees/OrOriginalTrees"
                         , "SRC_e1p_%s_GoodRuns_coulomb.root"%Or_target
                         , "T"
-                        , "SRC_e1p_adjusted_%s.root"%My_target
+                        , "SRC_e1p_schemed_%s.root"%My_target
                         , ROOT.TCut("TMath::Abs(Rp[0][2]+22.25)<2.25 && Pp_size[0]<2.4")
                         )
     print "schemed Or' "+Or_target+"(e,e'p) tree"
     scheme.SchemeOnTCut( "/Users/erezcohen/Desktop/DataMining/OrAnalysisTrees/OrOriginalTrees"
                         , "SRC_e2p_%s_GoodRuns_coulomb.root"%Or_target
                         , "T"
-                        , "SRC_e2p_adjusted_%s.root"%My_target
+                        , "SRC_e2p_schemed_%s.root"%My_target
                         , ROOT.TCut("TMath::Abs(Rp[0][2]+22.25)<2.25 && Pp_size[0]<2.4 && TMath::Abs(Rp[1][2]+22.25)<2.25 && Pp_size[1]>0.35")
                         )
     print "schemed Or' "+Or_target+"(e,e'pp) tree"
+
+    scheme.SchemeOnTCut( "/Users/erezcohen/Desktop/DataMining/OrAnalysisTrees/OrOriginalTrees"
+                    , "SRC_e1p_%s_GoodRuns_coulomb.root"%Or_target
+                    , "T"
+                    , "SRC_e1p_schemed_%s.root"%My_target
+                    , ROOT.TCut("TMath::Abs(Rp[0][2]+22.25)<2.25 && Pp_size[0]<2.4 && Pmiss_size[0]<0.6")
+                    )
+    print "schemed Or' "+Or_target+"(e,e'p) tree with 300<p(miss)<600 MeV/c"
+    scheme.SchemeOnTCut( "/Users/erezcohen/Desktop/DataMining/OrAnalysisTrees/OrOriginalTrees"
+                        , "SRC_e2p_%s_GoodRuns_coulomb.root"%Or_target
+                        , "T"
+                        , "SRC_e2p_schemed_%s.root"%My_target
+                        , ROOT.TCut("TMath::Abs(Rp[0][2]+22.25)<2.25 && Pp_size[0]<2.4 && TMath::Abs(Rp[1][2]+22.25)<2.25 && Pp_size[1]>0.35 && Pmiss_size[0]<0.6")
+                        )
+    print "schemed Or' "+Or_target+"(e,e'pp) tree with 300<p(miss)<600 MeV/c"
+
     print_line()
 # ------------------------------------------------------------------ #
 

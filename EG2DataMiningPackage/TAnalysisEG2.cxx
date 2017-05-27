@@ -522,6 +522,43 @@ std::vector<Double_t> TAnalysisEG2::RooFitCM( Float_t PmissMin, Float_t PmissMax
 
 
 
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+std::vector<Double_t> TAnalysisEG2::RooFitCM_1bin( Float_t PmissMin, Float_t PmissMax, bool DoWeight , bool PlotFits, int debug, TCanvas * c ){
+    // returns a parameter matrix: (μ-x,𝜎-x,μ-y,𝜎-y,μ-z,𝜎-z) and their uncertainties (𝚫μ-x,𝚫𝜎-x,𝚫μ-y,𝚫𝜎-y,𝚫μ-z,𝚫𝜎-z)
+    // if PlotFits=true, it also plots the RooFits into three pads: start_cd, start_cd1 , start_cd2
+    
+    Double_t    PcmPars[2] = { 0 , 0.14 } ,   PcmParsErr[2] = { 0 , 0 };
+    std::vector<Double_t> results;
+    
+    TCut cut = Form("%f < Pmiss3Mag && Pmiss3Mag < %f" , PmissMin , PmissMax);
+    
+    // x direction
+    RooFit1D( Tree , "pcmX", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(1) : nullptr , Form("#bf{X} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , "rooWeight" );
+    results.push_back(PcmPars[0]); // mean
+    results.push_back(PcmParsErr[0]); // mean - err
+    results.push_back(PcmPars[1]); // sigma
+    results.push_back(PcmParsErr[1]); // sigma - err
+    
+    // y direction
+    RooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(2) : nullptr , Form("#bf{Y} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , "rooWeight"  );
+    results.push_back(PcmPars[0]); // mean
+    results.push_back(PcmParsErr[0]); // mean - err
+    results.push_back(PcmPars[1]); // sigma
+    results.push_back(PcmParsErr[1]); // sigma - err
+    
+    // longitudinal direction
+    RooFit1D( Tree , "pcmZ", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(3) : nullptr , Form("#bf{Z} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , "rooWeight"  );
+    results.push_back(PcmPars[0]); // mean
+    results.push_back(PcmParsErr[0]); // mean - err
+    results.push_back(PcmPars[1]); // sigma
+    results.push_back(PcmParsErr[1]); // sigma - err
+    
+    return results;
+}
+
+
 //
 ////....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //std::vector<Double_t> TAnalysisEG2::FastRooFitCM( Float_t PmissMin, Float_t PmissMax, bool DoWeight , bool PlotFits, int debug, TCanvas * c, Int_t start_cd ){
