@@ -33,6 +33,15 @@ void GenerateEvents::Set_eep_Parameters(Float_t fMeanX, Float_t fSigmaX,
 }
 
 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void GenerateEvents::Set_eep_Parameters_MeanXYZ_Sigma(Float_t fMeanX, Float_t fMeanY, Float_t fMeanZ, Float_t fSigma ) {
+    MeanX = fMeanX;
+    MeanY = fMeanY;
+    MeanZ = fMeanZ;
+    Sigma = fSigma;
+}
+
+
 
 
 
@@ -51,17 +60,31 @@ void GenerateEvents::SetHistThetaHistMag( TH1F * fhistMag , TH1F * fhistTheta ){
     histTheta = fhistTheta;
 }
 
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void GenerateEvents::AddInputChain_eep(TString ChainOption){
+    InputT  = new TChain("T");
+    
+    // Take 12C(e,e'p) SRC tree data
+    if  (ChainOption == "Or' original trees"){
+        InputT -> Add( Path + "/DATA/SRC_e1_C.root");
+        InputT -> Add( Path + "/DATA/SRC_e2_C.root");
+    }
+    else if  (ChainOption == "Or' coulomb trees"){
+        InputT -> Add( Path + "/DATA/SRC_e1p_C_GoodRuns_coulomb.root");
+        InputT -> Add( Path + "/DATA/SRC_e2p_C_GoodRuns_coulomb.root");
+    }
+    else if (ChainOption == "300<p(miss)<600 MeV/c"){
+        InputT -> Add( Path + "/DATA/SRC_e1p_C_GoodRuns_coulomb.root");
+        InputT -> Add( Path + "/DATA/SRC_e2p_C_GoodRuns_coulomb.root");
+    }
+    InputNentries = InputT -> GetEntries();
+
+}
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void GenerateEvents::SetInputChain_eep(){
-    InputT  = new TChain("T");
-    // Take 12C(e,e'p) SRC tree data
-//    InputT -> Add( Path + "/DATA/SRC_e1_C.root");
-//    InputT -> Add( Path + "/DATA/SRC_e2_C.root");
-    SHOW(Path);
-    InputT -> Add( Path + "/DATA/SRC_e1p_C_GoodRuns_coulomb.root");
-    InputT -> Add( Path + "/DATA/SRC_e2p_C_GoodRuns_coulomb.root");
-    
-    
     InputT -> SetBranchAddress("Q2"      ,           &Q2);
     InputT -> SetBranchAddress("Xb"      ,           &Xb);
     InputT -> SetBranchAddress("Pe"      ,           &Pe);
@@ -79,8 +102,6 @@ void GenerateEvents::SetInputChain_eep(){
     InputT -> SetBranchAddress("q"       ,           &q);
     InputT -> SetBranchAddress("q_size"  ,           &q_size);
     InputT -> SetBranchAddress("Pmiss_q_angle",      &theta_miss_q);
-
-    InputNentries = InputT -> GetEntries();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -102,9 +123,9 @@ void GenerateEvents::InitRun(){
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void GenerateEvents::InitEvent(){
+    Debug(3,"GenerateEvents::InitEvent()");
     if (!pFiducCut.empty()) pFiducCut.clear();
     if (!pVertex.empty())   pVertex.clear();
-
 }
 
 
@@ -158,7 +179,6 @@ Int_t GenerateEvents::DoGenerateRun_eepp( Int_t fRunNumber, bool DoGetRootFile, 
     }
     RootTree = new TTree("anaTree","generated events");
     SetRootTreeAddresses();
-    int InputNentries = InputT -> GetEntries();
     
     TVector3 * momentum = new TVector3[3];
     int charge[3] = { -1          , 1         , 1     };
@@ -512,6 +532,166 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep( Int_t fRunNumber ){
 }
 
 
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+Int_t GenerateEvents::DoGenerate_eepp_from_eep_SingleParameterSigma( Int_t fRunNumber ){
+    
+    RunNumber = fRunNumber ;
+    NAcceptedEvents = Nevents = 0;
+    rootFilename = Form("%s/eg_rootfiles/run%d.root",Path.Data(),RunNumber);
+    if (debug>2) cout << "Generating " <<  rootFilename << endl;
+    RootFile = new TFile( rootFilename ,"recreate" );
+    RootTree = new TTree("anaTree","generated events");
+    SetRootTreeAddresses();
+    int attempt=0;
+    
+    // generate events up to NgenMAX
+    while (     (attempt < NgenMAX)
+           &&   (NAcceptedEvents < NWantedEvents)
+           ) {
+        if ( debug>0 && attempt%(NgenMAX/100) == 0 ) {
+            Printf("NWantedEvents=%d , NAcceptedEvents=%d",NWantedEvents,NAcceptedEvents);
+            PrintLine();
+        }
+        InitEvent();
+        entry = (int)( InputNentries * gRandom->Uniform() );
+        InputT -> GetEntry( entry );
+        if (debug>2) SHOW(entry);
+        
+        theta_miss_q = TMath::DegToRad()*theta_miss_q;
+        double PmissMag = Pm_size[0];
+        if (debug>2) SHOW(PmissMag);
+        
+        e.SetXYZ            ( Pe[0]         , Pe[1]         , Pe[2]);
+        q3Vector.SetXYZ     ( q[0]          , q[1]          , q[2] );
+        Pmiss.SetXYZ        ( Pm[0][0]      , Pm[0][1]      , Pm[0][2]);
+        Pp1.SetXYZ          ( Pproton[0][0] , Pproton[0][1] , Pproton[0][2]);
+        
+        if(debug > 2) cout << "rotate to Pmiss-q frame" << endl;
+        // rotate to Pmiss-q frame: Pmiss is the z axis, q is in x-z plane: q=(q[x],0,q[Pmiss])
+        double Pmiss_phi = Pmiss.Phi() , Pmiss_theta = Pmiss.Theta() ;
+        q3Vector_in_Pmiss_q_system = q3Vector;
+        q3Vector_in_Pmiss_q_system.RotateZ(-Pmiss_phi);
+        q3Vector_in_Pmiss_q_system.RotateY(-Pmiss_theta);
+        double q_Phi = q3Vector_in_Pmiss_q_system.Phi();
+        q3Vector_in_Pmiss_q_system.RotateZ(-q_Phi);
+        Pmiss_in_Pmiss_q_system = Pmiss;
+        Pmiss_in_Pmiss_q_system.RotateZ(-Pmiss_phi);
+        Pmiss_in_Pmiss_q_system.RotateY(-Pmiss_theta);
+        // - -- -- -- - ---- - -- - -- -- -- - -- - -- - -- - -- - -- - -- -- - - -- - - - -- - - - - - - - --
+        double omega    = 5.014 - sqrt( 0.000511*0.000511 + e.Mag()*e.Mag() );
+        ThetaPQ         = (180/TMath::Pi())*(Pp1.Angle(q3Vector));
+        PoverQ          = Pp1.Mag()/q3Vector.Mag();
+        Proton          .SetVectM   ( Pp1 , 0.938 ); // struck proton
+        q4Vector        .SetXYZT    ( q3Vector.x() , q3Vector.y() , q3Vector.z() , omega );
+        m2N             .SetVectM   ( TVector3(0,0,0) , 2.*0.938 );
+        miss            = q4Vector + m2N - Proton;
+        Mmiss           = miss.Mag();
+        Rp1             .SetXYZ(Rproton[0][0],Rproton[0][1],Rproton[0][2]);
+        Rp2 = Rp1;// since there is no actual Rp2....
+        if(debug > 2) SHOW3( Mmiss , PoverQ , theta_miss_q );
+        // struck proton fiducial cut and vertex
+        pFiducCut.push_back( eg2dm->protonFiducial( Pmiss+q3Vector , debug ) );
+        pVertex.push_back( Rp1 );
+        pVertex.push_back( Rp2 );
+        
+        for( int j = 0 ; j < NRand  ;  j++ ){    //MC event generation
+            
+            if(debug > 3) SHOW( j );
+            float Px = gRandom -> Gaus( MeanX  , Sigma );
+            float Py = gRandom -> Gaus( MeanY  , Sigma );
+            float Pz = gRandom -> Gaus( MeanZ  , Sigma );
+            
+            Pcm_in_Pmiss_q_system.SetXYZ ( Px , Py , Pz );
+            Precoil_in_Pmiss_q_system = Pcm_in_Pmiss_q_system - Pmiss_in_Pmiss_q_system;
+            
+            // for RooFits
+            Pmiss3Mag = PmissMag;
+            // here we already work in the Pmiss(z) - q(x-z) frame
+            pcmX = Px ;
+            pcmY = Py ;
+            pcmZ = Pz ;
+            ComputeWeights();
+            
+            // now, rotate back to lab frame
+            Pcm = Pcm_in_Pmiss_q_system;
+            Pcm.RotateZ  ( q_Phi );
+            Pcm.RotateY  ( Pmiss_theta );
+            Pcm.RotateZ  ( Pmiss_phi );
+            Precoil =   Pp2     = Pcm - Pmiss;
+            ThetaPmissPrecoil   = (180/TMath::Pi())*(Pmiss.Angle(Precoil));
+            Prec.SetVectM( Precoil , Mp );
+            
+            // finish
+            Nevents++;
+            if(debug > 3) SHOW( Nevents );
+            
+            // recoil proton acceptance
+            // ------------------------------------------------
+            // decide if this event is accepted as a legitimate (e,e'pp) event based on the recoiling proton acceptance
+            AcceptEvent = false;
+            if ( !Do_pAcceptance )  AcceptEvent = true; // in case we do not want to use the proton acceptances
+            
+            
+            // recoil proton fiducial cut
+            pFiducCut.push_back( eg2dm->protonFiducial( Precoil , debug ) );
+            
+            
+            // #IMPORTANT: the acceptance map that i've created i given in the lab frame
+            Double_t PrecoilMag = Precoil.Mag() , PrecoilTheta = r2d*Precoil.Theta() , PrecoilPhi = r2d*Precoil.Phi();
+            PrecoilPhi =  eg2dm->ChangePhiToPhiLab( PrecoilPhi ) ; // rescale phi angle to the range [-30,330]
+            if(debug > 3) SHOW3( PrecoilMag , PrecoilTheta , PrecoilPhi );
+            if ( PrecoilTheta <= 120 ){
+                Debug(3 , "in if ( PrecoilTheta <= 120 )");
+                if (    h_protonAcceptance->GetXaxis()->GetBinCenter(1) < PrecoilMag   && PrecoilMag   < h_protonAcceptance->GetXaxis()->GetBinCenter(h_protonAcceptance->GetNbinsX())
+                    && h_protonAcceptance->GetYaxis()->GetBinCenter(1) < PrecoilTheta && PrecoilTheta < h_protonAcceptance->GetYaxis()->GetBinCenter(h_protonAcceptance->GetNbinsY())
+                    && h_protonAcceptance->GetZaxis()->GetBinCenter(1) < PrecoilPhi   && PrecoilPhi   < h_protonAcceptance->GetZaxis()->GetBinCenter(h_protonAcceptance->GetNbinsZ())    ) {
+                    Double_t PrecoilAcceptance = h_protonAcceptance -> Interpolate( PrecoilMag , PrecoilTheta , PrecoilPhi ) / 100.;
+                    if(debug > 3) SHOW( PrecoilAcceptance );
+                    if( gRandom->Uniform() <= PrecoilAcceptance ){ // event is accepted in PrecoilAcceptance %
+                        AcceptEvent = true;
+                        if (debug>3) SHOW(AcceptEvent);
+                    }
+                }
+            }
+            Debug(4,"passed  if ( PrecoilTheta <= 120 )");
+            
+            
+            if ( Do_PrecFiducial )  AcceptEvent = (pFiducCut[1]==1) ? AcceptEvent : false;
+            if ( Do_PrecMinCut )    AcceptEvent = (Prec.P()>0.35) ? AcceptEvent : false;
+            
+            
+            if (AcceptEvent){
+                Debug( 3 , Form("event in j=%d was accepted",j) );
+                RootTree -> Fill();
+                NAcceptedEvents++ ;
+            } else {
+                Debug( 3 , Form("event in j=%d was not accepted",j) );
+            }
+            if(debug > 3) SHOW( NAcceptedEvents );
+            attempt++;
+        }
+    }
+    RootFile -> Write();
+    RootFile -> Close();
+    
+    if ( NAcceptedEvents >= NWantedEvents ) {
+        Printf("done generating %d (e,e'pp) events (out of %d attempts) to %s",NAcceptedEvents,attempt,rootFilename.Data());
+        return NAcceptedEvents;
+    }
+    else if ( attempt == NgenMAX ) {
+        Printf("could not fulfill desired quantites in PmissBins (accepted %d (e,e'pp) events out of %d attempts)",NAcceptedEvents,attempt);
+        return -1;
+    }
+    else {
+        SHOW2(entry,attempt);
+        return -1;
+    }
+}
+
+
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 bool GenerateEvents::AllPmissBinsFilled(){
     for (int PmissBin=0;PmissBin<5;PmissBin++){
@@ -585,19 +765,6 @@ int GenerateEvents::FindWhichPmiss10Bin(float fPmiss3Mag){
 }
 
 
-//
-////....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//void GenerateEvents::SetINanaTree(){
-//    InputT  = new TChain("anaTree");
-//    // Take 12C(e,e'p) SRC tree data
-//    InputT -> Add( Path + "/../../AnaFiles/Ana_eep_in_ppSRCCut_DATA_C12.root");
-//    InputT -> Add( Path + "/../../AnaFiles/Ana_ppSRCCut_DATA_C12.root");
-//    InputT -> SetBranchAddress("Q2"      ,           &Q2);
-//    InputT -> SetBranchAddress("Xb"      ,           &Xb);
-//    InputT -> SetBranchAddress("Pmiss"   ,           &Pmiss4vec);
-//
-//}
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 Int_t GenerateEvents::Generate_eepp_from_3dGaussian( Int_t fRunNumber){
     
@@ -608,7 +775,6 @@ Int_t GenerateEvents::Generate_eepp_from_3dGaussian( Int_t fRunNumber){
     RootFile = new TFile( rootFilename ,"recreate" );
     RootTree = new TTree("anaTree","generated events");
     SetRootTreeAddresses();
-    int InputNentries = InputT -> GetEntries();
     
     
     float sigma_cm = SigmaX;

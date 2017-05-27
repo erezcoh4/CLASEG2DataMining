@@ -86,18 +86,21 @@ public:
                                        , bool DoGetRootFile = true
                                        , bool DoGenTextFile = false);
     
-    Int_t    DoGenerate_eepp_from_eep ( Int_t run=1);
-    
-    Int_t Generate_eepp_from_3dGaussian ( Int_t run=1);
+    Int_t                        DoGenerate_eepp_from_eep ( Int_t run=1);
+    Int_t   DoGenerate_eepp_from_eep_SingleParameterSigma ( Int_t run=1);
+    Int_t                   Generate_eepp_from_3dGaussian ( Int_t run=1);
 
     void          SetMyInputChain_eep ();
     void         SetRootTreeAddresses ();
     void                    SetLimits ( Float_t , Float_t , Float_t , Float_t );
     void          SetHistThetaHistMag ( TH1F * , TH1F * );
     void           Set_eep_Parameters ( Float_t , Float_t , Float_t , Float_t , Float_t , Float_t , Float_t , Float_t );
+    void Set_eep_Parameters_MeanXYZ_Sigma (Float_t, Float_t, Float_t, Float_t );
+    
     void                 Set_eeN_tree ( TTree * feeNTree) { eeNTree = feeNTree;};
     void              OutputInfo2File ();
     void             OutPutToTextFile ( const int, TVector3*, int*, float*, int*);
+    void            AddInputChain_eep (TString ChainOption="300<p(miss)<600 MeV/c");
     void            SetInputChain_eep ();
     void        ReleaseInputChain_eep ();
     void                    InitEvent ();
@@ -133,6 +136,9 @@ public:
         NWantedPmissBins[4]=NWantedPmissBin4 ;
     };
 
+    
+    void         SetNAcceptedEvents ( int fNWantedEvents=100 ) { NWantedEvents=fNWantedEvents ;};
+    
     void               SetPmissBins () {
         float fPmissBins[5][2] = { {0.3,0.45}, {0.45,0.55}, {0.55,0.65}, {0.65,0.75}, {0.75,1.0} };
         for (int i=0;i<5;i++){
@@ -167,7 +173,7 @@ public:
  
     bool        Do_pAcceptance , Do_PrecFiducial, Do_PrecMinCut, AcceptEvent;
     
-    Int_t       RunNumber   , Nevents   , NAcceptedEvents;
+    Int_t       RunNumber   , Nevents   , NAcceptedEvents,  NWantedEvents;
     Int_t       NRand       , NPTheta   , NeTheta,  entry,  InputNentries;
     // maximal total number of generated events
     Int_t       NgenMAX;
@@ -184,8 +190,8 @@ public:
     Float_t     ThetaPQ , theta_miss_q   , ThetaPmissPrecoil;
     Float_t     theta_Pmiss , phi_Pmiss;
     Float_t     theta_e ;
-    Float_t     MeanX   , MeanY , SigmaX    , SigmaY;
-    Float_t     a1       , a2 , b1  , b2  ;
+    Float_t     MeanX   , MeanY, MeanZ, SigmaX, SigmaY, SigmaZ, Sigma;
+    Float_t     a1      , a2 , b1  , b2  ;
     Float_t     Pmin    , Pmax  , Thetamin  , Thetamax;
     Float_t     Pmiss3Mag   , pcmX      , pcmY          , pcmT      , pcmZ  ;
     Float_t     Theta       , Mott      , DipoleFF2                 , rooWeight;
