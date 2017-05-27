@@ -1,6 +1,6 @@
 
 // usage:
-// root -l AdjustOr_eepp_Tree.C\(\12,true,0\)
+// root -l AdjustOr_eepp_Tree.C\(\12,false,0\)
 // - --- -- ---- - - -- ---- --- - --- -
 // grab an (e,e'pp) tree from Or
 // and adjust it to my analysis:
@@ -10,7 +10,7 @@
 
 
 // globals
-Float_t         q_phi, Pmiss_phi, Pmiss_theta, rooWeight, Q2;
+Float_t         q_phi, Pmiss_phi, Pmiss_theta, rooWeight, Q2, theta_e;
 TVector3        Pcm3Vector, Prec3Vector;
 TLorentzVector  Plead, Pmiss, Precoil, q, Pcm, e;
 TLorentzVector  Beam( 0 , 0 , 5.014 , 5.014 );
@@ -36,9 +36,10 @@ void Build_Pmiss_q_frame(){
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void ComputeWeights(){
-    Float_t Theta           = e.Theta();
-    Float_t Mott            = pow( cos(Theta/2.) , 2 ) / pow( sin(Theta/2.) , 4 );
+    theta_e = TMath::DegToRad()*theta_e ;
+    Float_t Mott            = pow( cos(theta_e/2.) , 2 ) / pow( sin(theta_e/2.) , 4 );
     Float_t DipoleFF2       = pow( 1./(1. + Q2/0.71) , 4);
+//    Float_t DipoleFF2       = pow( 1./Q2 , 4);
     rooWeight       =  1./ ( Mott * DipoleFF2 ) ;
 }
 
@@ -90,7 +91,10 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, int debug=1){
     InTree -> SetBranchAddress("Pp_size", &Pp_size);
     InTree -> SetBranchAddress("Pmiss_size", &Pmiss_size);
     InTree -> SetBranchAddress("q"      , &q_components);
+    InTree -> SetBranchAddress("Q2"     , &Q2);
     InTree -> SetBranchAddress("Pmiss"  , &Pmiss_components);
+    InTree -> SetBranchAddress("theta_e", &theta_e);
+    
     
     
     Float_t Pmiss3Mag, pcmX, pcmY, pcmZ;
@@ -120,7 +124,6 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, int debug=1){
         {
             q = TLorentzVector( q_components[0] , q_components[1] , q_components[2] , Nu );
             e = Beam - q;
-            Q2 = -q.Mag2();
             ComputeWeights();
             
             Plead = TLorentzVector( Pp_components[0][0] , Pp_components[0][1] , Pp_components[0][2] , Ep[0] );

@@ -28,6 +28,7 @@ if 'extract' in flags.option: #{
         #}
         cm_parameters = calc_cm_pars_sigma(ana[target],
                                            CMRooFitsName( ppPath + '/300Pmiss600/%s_unweighted'%target ) ,
+                                           CMRooFitsName( ppPath + '/300Pmiss600/%s_weighted'%target ) ,
                                            DoSaveCanvas = True )
         cm_parameters['target'] = label
         cm_parameters['A'] = A

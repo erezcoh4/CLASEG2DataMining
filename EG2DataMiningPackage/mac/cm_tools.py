@@ -450,7 +450,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
 
 # ------------------------------------------------------------------------------- #
 # May-27, 2017
-def calc_cm_pars_sigma( fana , unweightedRoofitsFName = '' , DoSaveCanvas = False ):
+def calc_cm_pars_sigma( fana , unweightedRoofitsFName = '' , weightedRoofitsFName = '' , DoSaveCanvas = False ):
     '''
             Return: pd.DataFrame ({mean_x , sigma_x ,mean_y , sigma_y , mean_z , sigma_z})
             '''
@@ -465,11 +465,17 @@ def calc_cm_pars_sigma( fana , unweightedRoofitsFName = '' , DoSaveCanvas = Fals
 
     if DoSaveCanvas:#{
         canvas_unweighted = fana.CreateCanvas( "RooFit plots - unweighted" , "Divide" , 3 , 1 )
-        unweighted = fana.RooFitCM( 0.3 , 0.6 , False , True, flags.verbose, canvas_unweighted, 1 )
+        unweighted = fana.RooFitCM_1bin( 0.3 , 0.6 , False , True, flags.verbose, canvas_unweighted )
+        canvas_weighted = fana.CreateCanvas( "RooFit plots - Mott weighted" , "Divide" , 3 , 1 )
+        weighted = fana.RooFitCM_1bin( 0.3 , 0.6 , True , True, flags.verbose, canvas_weighted )
+
         df_result = pd.DataFrame({'Nevts':len(ana)
                                  ,'mean_x_unweighted':unweighted[0],'mean_xErr_unweighted':unweighted[1],'sigma_x_unweighted':unweighted[2],'sigma_xErr_unweighted':unweighted[3]
                                  ,'mean_y_unweighted':unweighted[4],'mean_yErr_unweighted':unweighted[5],'sigma_y_unweighted':unweighted[6],'sigma_yErr_unweighted':unweighted[7]
-                                 ,'mean_z_unweighted':unweighted[12],'mean_zErr_unweighted':unweighted[13],'sigma_z_unweighted':unweighted[14],'sigma_zErr_unweighted':unweighted[15]
+                                 ,'mean_z_unweighted':unweighted[8],'mean_zErr_unweighted':unweighted[9],'sigma_z_unweighted':unweighted[10],'sigma_zErr_unweighted':unweighted[11]
+                                 ,'mean_x_weighted':weighted[0],'mean_xErr_weighted':weighted[1],'sigma_x_weighted':weighted[2],'sigma_xErr_weighted':weighted[3]
+                                 ,'mean_y_weighted':weighted[4],'mean_yErr_weighted':weighted[5],'sigma_y_weighted':weighted[6],'sigma_yErr_weighted':weighted[7]
+                                 ,'mean_z_weighted':weighted[8],'mean_zErr_weighted':weighted[9],'sigma_z_weighted':weighted[10],'sigma_zErr_weighted':weighted[11]
                                  }
                                  , index=[0])
     #}
@@ -496,6 +502,9 @@ def calc_cm_pars_sigma( fana , unweightedRoofitsFName = '' , DoSaveCanvas = Fals
                                  ,'mean_x_unweighted':mean_x_unweighted   ,'mean_xErr_unweighted':sigma_x_unweighted/sqrtN ,'sigma_x_unweighted':sigma_x_unweighted,'sigma_xErr_unweighted':0.02 # resolution uncertainty
                                  ,'mean_y_unweighted':mean_y_unweighted   ,'mean_yErr_unweighted':sigma_y_unweighted/sqrtN ,'sigma_y_unweighted':sigma_y_unweighted,'sigma_yErr_unweighted':0.02 # resolution uncertainty0
                                  ,'mean_z_unweighted':mean_z_unweighted   ,'mean_zErr_unweighted':sigma_z_unweighted/sqrtN ,'sigma_z_unweighted':sigma_z_unweighted,'sigma_zErr_unweighted':0.02 # resolution uncertainty
+                                 ,'mean_x_weighted':mean_x_weighted   ,'mean_xErr_weighted':sigma_x_weighted/sqrtN ,'sigma_x_weighted':sigma_x_weighted,'sigma_xErr_weighted':0.02 # resolution uncertainty
+                                 ,'mean_y_weighted':mean_y_weighted   ,'mean_yErr_weighted':sigma_y_weighted/sqrtN ,'sigma_y_weighted':sigma_y_weighted,'sigma_yErr_weighted':0.02 # resolution uncertainty0
+                                 ,'mean_z_weighted':mean_z_weighted   ,'mean_zErr_weighted':sigma_z_weighted/sqrtN ,'sigma_z_weighted':sigma_z_weighted,'sigma_zErr_weighted':0.02 # resolution uncertainty
                                  }
                                  , index=[0])
     #}
@@ -503,6 +512,8 @@ def calc_cm_pars_sigma( fana , unweightedRoofitsFName = '' , DoSaveCanvas = Fals
     if DoSaveCanvas:#{
         canvas_unweighted.SaveAs(unweightedRoofitsFName)
         print_filename(unweightedRoofitsFName,"unweighted rooFits at")
+        canvas_weighted.SaveAs(weightedRoofitsFName)
+        print_filename(weightedRoofitsFName,"Mott-weighted rooFits at")
         print_line()
     #}
     print "calculated cm parameters for " + fana.InFileName
@@ -914,7 +925,6 @@ def a1a2_create_negative_sigma_z( a1 , a2 ):
 # ------------------------------------------------------------------------------- #
 def generate_runs_with_random_parameters( option='', hyperparameters=None,
                                          ana_data=dict(),
-#                                         cm_pars=dict(), cm_fits=dict(),
                                          debug=0 , PmissBins=None , Q2Bins=None , thetapmqBins=None ,
                                          buildup_resutlsFName='' ,
                                          reco_fitsFName='', root_resutlsFName='' ,
