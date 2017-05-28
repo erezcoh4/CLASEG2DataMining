@@ -6,6 +6,7 @@ from cm_tools import *
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=NoFiducials -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=generate_analyze_delete -nruns=10 -v1
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extractOnly_C12 --DataType=NoFiducials -v2
+    python mac/simulate_eepp_from_eep_sigma_t.py --option=generate_analyze -nruns=1 -v1
 '''
     
 
@@ -48,7 +49,7 @@ if 'generate' in flags.option: #{
     
     hyperparameters = dict({'start_run':flags.run,
                            'Nruns':flags.NumberOfRuns,
-                           'range_sigma_t':(0.144,0.146),       # around 0.160 (0,0.3)
+                           'range_sigma_t':(0.189,0.191),       # around 0.160 (0,0.3)
                            'NRand':20,
                            'Ntimes':50,                     # wanted number of events, multiplied by the number of data events in 12C
                            'NgenMax':100000,                # maximal number of attempts
