@@ -48,11 +48,15 @@ if 'generate' in flags.option: #{
     
     hyperparameters = dict({'start_run':flags.run,
                            'Nruns':flags.NumberOfRuns,
-                           'range_sigma_t':(0.0,0.3),       # around 0.160 (0,0.3)
+                           'range_sigma_t':(0.144,0.146),       # around 0.160 (0,0.3)
                            'NRand':20,
                            'Ntimes':50,                     # wanted number of events, multiplied by the number of data events in 12C
                            'NgenMax':100000,                # maximal number of attempts
-                           'do_ks_plots':False
+                           'do proton acceptance':True,
+                           'do p(rec)>0.35 cut':True,
+                           'do p(rec) FV cuts':False,
+                           'do p(rec) resolution smearing':True,
+                           'p(rec) resolution smearing':0.020 # [GeV/c] momentum resolution
                            })
         
     ana_data = dict()

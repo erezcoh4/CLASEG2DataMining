@@ -1204,10 +1204,10 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
         gen_events.SetInputChain_eep()
         
         gen_events.SetNRand( NRand )
-        gen_events.Use_protonAcceptacne( True )
-        gen_events.SetDo_PrecMinCut ( True )
-        gen_events.SetDo_PrecFiducial ( False ) # in the data we do not apply FV for p(recoil)
-        gen_events.Use_PrecResolution( True , 0.020 )
+        gen_events.Use_protonAcceptacne( hyperparameters['do proton acceptance'] )
+        gen_events.SetDo_PrecMinCut ( hyperparameters['do p(rec)>0.35 cut'] )
+        gen_events.SetDo_PrecFiducial ( hyperparameters['do p(rec) FV cuts'] ) # in the data we do not apply FV for p(recoil)
+        gen_events.Use_PrecResolution ( hyperparameters['do p(rec) resolution smearing'] , hyperparameters['p(rec) resolution smearing'] )
         
         gen_events.SetPmissBins()
         gen_events.Set10PmissBins()
