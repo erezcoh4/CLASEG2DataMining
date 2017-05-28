@@ -120,6 +120,7 @@ public:
     void         Use_protonAcceptacne ( bool fDo_pAcceptance = false )    {Do_pAcceptance = fDo_pAcceptance;};
     void           SetDo_PrecFiducial ( bool fDo_PrecFiducial = false )   {Do_PrecFiducial = fDo_PrecFiducial;};
     void             SetDo_PrecMinCut ( bool fDo_PrecMinCut = false )     {Do_PrecMinCut = fDo_PrecMinCut;};
+    void Use_PrecResolution ( bool fDoPrecResolution = true , float fPrecResolution = 0.020 ) { DoPrecResolution = fDoPrecResolution; PrecResolution = fPrecResolution;} ;
     void         Set_protonAcceptacne ( TH3F * h)                         { h_protonAcceptance = h; };
     void               ComputeWeights ();
     void   MapInputEntriesInPmissBins ();
@@ -172,6 +173,8 @@ public:
     TRandom3    * gRandom;
  
     bool        Do_pAcceptance , Do_PrecFiducial, Do_PrecMinCut, AcceptEvent;
+    bool        DoPrecResolution;
+    
     
     Int_t       RunNumber   , Nevents   , NAcceptedEvents,  NWantedEvents;
     Int_t       NRand       , NPTheta   , NeTheta,  entry,  InputNentries;
@@ -204,7 +207,7 @@ public:
     Float_t     Pm[2][3]    , Pm_size[2];                                           // Proton missing momentum magnitude
     Float_t     q[3]        , q_size;                                               // q momentum transfer
     Float_t     PmissBins[5][2], small10PmissBins[10][2];
-    
+    Float_t     PrecResolution;
     
     TVector3    e                          ,       Pp1                     ,   Pp2             , Precoil;
     TVector3    Rp1                        ,       Rp2;                                                    // proton vertex

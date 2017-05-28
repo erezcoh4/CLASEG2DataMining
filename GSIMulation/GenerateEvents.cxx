@@ -620,6 +620,10 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep_SingleParameterSigma( Int_t fRunN
             Pcm.RotateY  ( Pmiss_theta );
             Pcm.RotateZ  ( Pmiss_phi );
             Precoil =   Pp2     = Pcm - Pmiss;
+            if (DoPrecResolution){ // smear the reconstructed momentum of the recoil proton by the CLAS resolution (20 MeV/c)
+                Precoil.SetMag( gRandom->Gaus( Precoil.Mag() , PrecResolution ) );
+            }
+            
             ThetaPmissPrecoil   = (180/TMath::Pi())*(Pmiss.Angle(Precoil));
             Prec.SetVectM( Precoil , Mp );
             
