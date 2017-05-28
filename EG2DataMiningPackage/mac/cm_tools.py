@@ -1205,8 +1205,9 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
         
         gen_events.SetNRand( NRand )
         gen_events.Use_protonAcceptacne( True )
-        gen_events.SetDo_PrecFiducial ( True )
         gen_events.SetDo_PrecMinCut ( True )
+        gen_events.SetDo_PrecFiducial ( False ) # in the data we do not apply FV for p(recoil)
+        gen_events.Use_PrecResolution( True , 0.020 )
         
         gen_events.SetPmissBins()
         gen_events.Set10PmissBins()
