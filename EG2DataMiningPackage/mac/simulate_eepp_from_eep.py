@@ -3,7 +3,7 @@ from cm_tools import *
 '''
     usage:
     ---------------
-    python mac/simulate_eepp_from_eep.py --option=extractCMparsAllNuclei
+    python mac/simulate_eepp_from_eep.py --option=extractCMparsAllNuclei --DataType=NoFiducials
     python mac/simulate_eepp_from_eep.py --option=extractOnly_C12 --DataType=NoFiducials -v2
     python mac/simulate_eepp_from_eep.py --option=generate_analyse_delete -nruns=10
 '''
@@ -20,7 +20,6 @@ if 'extract' in flags.option: #{
     if 'Only' in flags.option or 'only' in flags.option: targets = [flags.option[12:]]
     
     for target in targets:#{
-#        ana[target] = TAnalysisEG2( path+"/AnaFiles" ,  "Ana_ppSRCCut_DATA_%s"%target )
         if flags.DataType=='NoFiducials': #{
             ana[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s_noFiducials"%target )
         #}

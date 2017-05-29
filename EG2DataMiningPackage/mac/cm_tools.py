@@ -366,7 +366,8 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
         print 'leaving calc_cm_parameters'
         return pd.DataFrame() , False
 
-    ana = read_root( str(fana.GetFileName()) , key='anaTree' , columns=['pcmX','pcmY','pcmZ','Pmiss3Mag','rooWeight']  )
+    print 'fana.GetFileName():',fana.GetFileName()
+    ana = read_root( str(fana.GetFileName()) , key='anaTree' , columns=['pcmX','pcmY','pcmZ','Pmiss3Mag','rooWeight','Mott']  )
 
     for i in range(len(PmissBins)):
         pMiss_min , pMiss_max = PmissBins[i][0] , PmissBins[i][1]
@@ -450,7 +451,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
 
 # ------------------------------------------------------------------------------- #
 # May-27, 2017
-def calc_cm_pars_sigma( fana , unweightedRoofitsFName = '' , weightedRoofitsFName = '' , DoSaveCanvas = False ):
+def calc_cm_pars_sigma( fana , unweightedRoofitsFName = '' , weightedRoofitsFName = '' , DoSaveCanvas = False , pMiss_max = 0.6 ):
     '''
             Return: pd.DataFrame ({mean_x , sigma_x ,mean_y , sigma_y , mean_z , sigma_z})
             '''
@@ -465,9 +466,9 @@ def calc_cm_pars_sigma( fana , unweightedRoofitsFName = '' , weightedRoofitsFNam
 
     if DoSaveCanvas:#{
         canvas_unweighted = fana.CreateCanvas( "RooFit plots - unweighted" , "Divide" , 3 , 1 )
-        unweighted = fana.RooFitCM_1bin( 0.3 , 0.6 , False , True, flags.verbose, canvas_unweighted )
+        unweighted = fana.RooFitCM_1bin( 0.3 , pMiss_max , False , True, flags.verbose, canvas_unweighted )
         canvas_weighted = fana.CreateCanvas( "RooFit plots - Mott weighted" , "Divide" , 3 , 1 )
-        weighted = fana.RooFitCM_1bin( 0.3 , 0.6 , True , True, flags.verbose, canvas_weighted )
+        weighted = fana.RooFitCM_1bin( 0.3 , pMiss_max , True , True, flags.verbose, canvas_weighted )
 
         df_result = pd.DataFrame({'Nevts':len(ana)
                                  ,'mean_x_unweighted':unweighted[0],'mean_xErr_unweighted':unweighted[1],'sigma_x_unweighted':unweighted[2],'sigma_xErr_unweighted':unweighted[3]
@@ -607,6 +608,8 @@ def fit_cm_parameters( run , data , do_fits=True , FigureFName = '' , DoPlot = F
         fig = plt.figure(figsize=(40,20)) # four plots, two unweighted and two weighted
 
     if DoPlot: #{
+#        width_fits = fit_par_plot ( fig, 221, data, 'sigma', 'unweighted', '\sigma' , do_plot_fit_pars=True )
+#        mean_fits = fit_par_plot( fig, 222, data, 'mean', 'unweighted', 'mean')
         width_fits = fit_par_plot ( fig, 221, data, 'sigma', 'unweighted', '\sigma' , do_plot_fit_pars=True )
         mean_fits = fit_par_plot( fig, 222, data, 'mean', 'unweighted', 'mean')
     #}

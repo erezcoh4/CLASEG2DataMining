@@ -489,29 +489,32 @@ std::vector<Double_t> TAnalysisEG2::RooFitCM( Float_t PmissMin, Float_t PmissMax
     
     TCut cut = Form("%f < Pmiss3Mag && Pmiss3Mag < %f" , PmissMin , PmissMax);
     
+//    TString WeightName = "rooWeight";
+    TString WeightName = "Mott"; // Or' weight
+    
     // x direction
-    RooFit1D( Tree , "pcmX", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(start_cd) : nullptr , Form("#bf{X} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , "rooWeight" );
+    RooFit1D( Tree , "pcmX", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(start_cd) : nullptr , Form("#bf{X} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , WeightName );
     results.push_back(PcmPars[0]); // mean
     results.push_back(PcmParsErr[0]); // mean - err
     results.push_back(PcmPars[1]); // sigma
     results.push_back(PcmParsErr[1]); // sigma - err
     
     // y direction
-    RooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(start_cd+1) : nullptr , Form("#bf{Y} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , "rooWeight"  );
+    RooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(start_cd+1) : nullptr , Form("#bf{Y} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , WeightName  );
     results.push_back(PcmPars[0]); // mean
     results.push_back(PcmParsErr[0]); // mean - err
     results.push_back(PcmPars[1]); // sigma
     results.push_back(PcmParsErr[1]); // sigma - err
     
     // transverse direction
-    RooFit1D( Tree , "pcmT", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(start_cd+2) : nullptr , Form("transverse {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , "rooWeight"  );
+    RooFit1D( Tree , "pcmT", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(start_cd+2) : nullptr , Form("transverse {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) ,DoWeight , WeightName);
     results.push_back(PcmPars[0]); // mean
     results.push_back(PcmParsErr[0]); // mean - err
     results.push_back(PcmPars[1]); // sigma
     results.push_back(PcmParsErr[1]); // sigma - err
     
     // longitudinal direction
-    RooFit1D( Tree , "pcmZ", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(start_cd+3) : nullptr , Form("#bf{Z} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , "rooWeight"  );
+    RooFit1D( Tree , "pcmZ", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(start_cd+3) : nullptr , Form("#bf{Z} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , WeightName );
     results.push_back(PcmPars[0]); // mean
     results.push_back(PcmParsErr[0]); // mean - err
     results.push_back(PcmPars[1]); // sigma

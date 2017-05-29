@@ -3,9 +3,10 @@ from cm_tools import *
 '''
     usage:
     ---------------
-    python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=NoFiducials -v2
+    python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=NoFiducials_300Pmiss600 -v2
+    python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=NoFiducials_allPmiss -v2
+    python mac/simulate_eepp_from_eep_sigma_t.py --option=extractOnly_C12 --DataType=NoFiducials_allPmiss -v6
     python mac/simulate_eepp_from_eep_sigma_t.py --option=generate_analyze_delete -nruns=10 -v1
-    python mac/simulate_eepp_from_eep_sigma_t.py --option=extractOnly_C12 --DataType=NoFiducials -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=generate_analyze -nruns=1 -v1
 '''
     
@@ -21,22 +22,37 @@ if 'extract' in flags.option: #{
     if 'Only' in flags.option or 'only' in flags.option: targets = [flags.option[12:]]
     
     for target,label,A in zip(targets,labels,[12,27,56,208]):#{
-        if flags.DataType=='NoFiducials': #{
+        if 'NoFiducials' in flags.DataType and '300Pmiss600' in flags.DataType: #{
+            directory_name = '300Pmiss600'
+            pMiss_max = 0.6
             ana[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_300Pmiss600_%s_noFiducials"%target )
         #}
-        else: #{
+        elif 'NoFiducials' not in flags.DataType and '300Pmiss600' in flags.DataType: #{
+            directory_name = '300Pmiss600'
+            pMiss_max = 0.6
             ana[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_300Pmiss600_%s"%target )
         #}
+        elif 'NoFiducials' in flags.DataType and 'allPmiss' in flags.DataType:#{
+            directory_name = 'OrDataTrees'
+            pMiss_max = 1.0
+            ana[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s_noFiducials"%target )
+        #}
+        elif 'NoFiducials' not in flags.DataType and 'allPmiss' in flags.DataType: #{
+            directory_name = 'OrDataTrees'
+            pMiss_max = 1.0
+            ana[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s"%target )
+        #}
         cm_parameters = calc_cm_pars_sigma(ana[target],
-                                           CMRooFitsName( ppPath + '/300Pmiss600/%s_unweighted'%target ) ,
-                                           CMRooFitsName( ppPath + '/300Pmiss600/%s_weighted'%target ) ,
-                                           DoSaveCanvas = True )
+                                           CMRooFitsName( ppPath + '/'+directory_name+'/%s_unweighted'%target ) ,
+                                           CMRooFitsName( ppPath + '/'+directory_name+'/%s_weighted'%target ) ,
+                                           DoSaveCanvas = True ,
+                                           pMiss_max = pMiss_max )
         cm_parameters['target'] = label
         cm_parameters['A'] = A
         cm_pars = cm_pars.append( cm_parameters )
     #}
-    cm_pars.to_csv( CMParsFname(ppPath+'/300Pmiss600/alltargets_data') , header=True , index=False )
-    print_filename( CMParsFname(ppPath+'/300Pmiss600/alltargets_data') , "c.m. parameters for %s "%target )
+    cm_pars.to_csv( CMParsFname(ppPath+'/'+directory_name+'/alltargets_data') , header=True , index=False )
+    print_filename( CMParsFname(ppPath+'/'+directory_name+'/alltargets_data') , "c.m. parameters" )
     print 'done extractCMparsAllNuclei'; print_line()
 #}
 
