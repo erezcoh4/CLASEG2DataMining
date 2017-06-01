@@ -60,7 +60,7 @@ def gauss(x,mu_0,sigma_0,A_0):
 
 
 # ------------------------------------------------------------------------------- #
-def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
+def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1, Nattempts=1):
     
     nbins = 25 # number of bins for histograms in each direction
     bins_histograms_l = np.linspace(-0.4,1.2,40)
@@ -115,54 +115,25 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
             df_sim_reduced = df_sim[ (pmin < df_sim['Pmiss3Mag']) & (df_sim['Pmiss3Mag'] < pmax) ]
             df_data_reduced = df_data[ (pmin < df_data['Pmiss3Mag']) & (df_data['Pmiss3Mag'] < pmax) ]
             D_KS , Pval_KS = ks_2samp( df_sim_reduced['pcmZ'] , df_data_reduced['pcmZ'] )
-            #            '''
-            #                Check if the distribution of p(c.m.)-z in this bin is indeed Gaussian,
-            #                and if not - kill it by Pval=0
-            #                The checking is done by looking at the skewness and kurtosis of the set
-            #                if |skewness|>2 or |kurtosis-3|>2 kill assign Pval=0
-            #                '''
             sim_skew = skew( df_sim_reduced['pcmZ'] )
             sim_kurt = kurtosis( df_sim_reduced['pcmZ'] )
-            #            if np.abs(sim_skew)>2 or np.abs(excess_kurt)>2:#{
-            #                if debug: #{
-            #                    print '$skew=%.2f$ \n $excess kurt=%.2f$'%(sim_skew,excess_kurt),', implying non-Gaussian. substituting Pval=0'
-            #                #}
-            #                Pval_KS = 0
-            #            #}
             '''
                 Check if the distribution of p(c.m.)-z in this bin is indeed Gaussian,
                 and if not - kill it by Pval=0
                 find number of local maxima. If greated than 1, kill the run
                 '''
             # May-6
-#            hist , bin_edges = np.histogram (df_sim_reduced['pcmZ'] , bins=nbins )
-#            maxima = argrelextrema( hist , np.greater )
-#            if debug>2 and target=='C12': #{
-#                print 'bin',bin,'hist:\n',hist
-#            #}
-#            if len(maxima[0])>1:#{
-#                if debug and target=='C12' : #{
-#                    print '$N_{max}^{bin %d}=%d$'%(bin,len(maxima[0])),'(',maxima[0],')',', implying non-Gaussian. substituting Pval=0'
-#                #}
-#                Pval_KS = 0
-#            #}
-
             if do_plots:#{
                 data_skew = skew( df_data_reduced['pcmZ'] )
                 data_kurt = kurtosis( df_data_reduced['pcmZ'] )
                 hist , bin_edges = np.histogram (df_data_reduced['pcmZ'] , bins=bins)
-#                data_maxima = argrelextrema( hist , np.greater ) # May-6
 
                 ax_l = fig.add_subplot(2 , 5, 5 + bin + 1 )
                 h,bins,_=ax_l.hist(df_sim_reduced['pcmZ'] , bins=bins_histograms_l
                                    ,histtype='step',linewidth=3,normed=1
-#                                   ,label='sim. (%d) \n m=%f,\n s=%f \n $skew=%.2f$ \n $excess kurt=%.2f$ \n $N_{max}=%d$'
-#                                   %(len(df_sim_reduced),np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),sim_skew,excess_kurt,len(maxima[0])))
                                    ,label='sim. (%d) \n $\\mu=%.3f$ \n $\\sigma=%.3f$ \n $\\mu_3=%.2f$ \n $\\mu_4=%.2f$'
                                    %(len(df_sim_reduced),np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),sim_skew,sim_kurt))
                 ax_l.hist(df_data_reduced['pcmZ'] , bins=bins
-#                          ,label=target+' data  (%d) \n m=%f,\n s=%f \n $skew=%.2f$ \n $excess kurt=%.2f$ \n $N_{max}=%d$'
-#                          %(len(df_data_reduced),np.mean(df_data_reduced['pcmZ']),np.std(df_data_reduced['pcmZ']),data_skew,data_excess_kurt,len(data_maxima[0])),histtype='step',linewidth=3,normed=1)
                         ,label=target+' data  (%d) \n $\\mu=%.3f$ \n $\\sigma=%.3f$ \n $\\mu_3=%.2f$ \n $\\mu_4=%.2f$'
                         %(len(df_data_reduced),np.mean(df_data_reduced['pcmZ']),np.std(df_data_reduced['pcmZ']),data_skew,data_kurt),histtype='step',linewidth=3,normed=1)
                 ax_l.set_title('%.2f<$p_{miss}$<%.2f GeV/c, $p_{c.m.}^{z}$ Pval=%g'%(pmin , pmax,Pval_KS),y=1.01,fontsize=15)
@@ -170,30 +141,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
                 set_axes(ax_l,"","",fontsize=15)
                 ax_l.yaxis.set_major_formatter(NullFormatter())
                 ax_l.xaxis.set_ticks(np.linspace(np.min(ax_l.get_xlim())+0.1,np.max(ax_l.get_xlim()),4,endpoint=False))
-#                for bin_max in maxima[0]: plt.plot( [bins[bin_max],bins[bin_max]],ax.get_ylim(),'--',color='black' ) # May-6
-            #}
-            #            '''
-            #                Check if the distribution of p(c.m.)-z in this bin is indeed Gaussian,
-            #                and if not - kill it by Pval=0
-            #                The checking is done by fitting the distribution to a Gaussian
-            #                and checking if the fit sigma is ~ the standard deviation of the set
-            #                '''
-            #            hist , bin_edges = np.histogram (df_sim_reduced['pcmZ'] , bins=np.linspace(-0.5,2,50))
-            #            x_bins = (bin_edges[1:]+bin_edges[:-1])/2 # for len(x)==len(y)
-            #            fit_sigma_std_ratio1 = 1
-            #            try:#{
-            #                params,cov=curve_fit(gauss,x_bins,hist,(np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),len(df_sim_reduced)),maxfev=5000)
-            #                fit_sigma_std_ratio = params[1]/np.std(df_sim_reduced['pcmZ'])
-            #                if fit_sigma_std_ratio<0.75:#{
-            #                    if debug>2: print 'fit_sigma_std_ratio = ' , fit_sigma_std_ratio,', implying more than a single Gaussian peak. substituting Pval=0'
-            #                    Pval_KS = 0
-            #                #}
-            #            #}
-            #            except RuntimeError:#{
-            #                print("Error - curve_fit failed, continuing")
-            #                Pval_KS = 0
-            #            #}
-            #            if debug>2: print 'fit_sigma_std_ratio:',fit_sigma_std_ratio
+
 
             ks_pval_scores_longitudinal_target_array.append( Pval_KS )
             ks_pval_scores_target['pcmZ_bin%d'%bin] = Pval_KS
@@ -235,6 +183,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1):
                                                                                    ,gen_info[0]['gen_a2']
                                                                                    ,gen_info[0]['gen_b1']
                                                                                    ,gen_info[0]['gen_b2'])
+            text += "$N_{attempts} = %d$\n"%Nattempts
             text += "$Pval_{x}=%f$\n$Pval_{y}=%g$\n$Pval_{x-y}=%g$\n$Pval_{z}=%g$\
             \n$Pval_{x-y-z}=%g$\
             \n$Pval_{5x-5y-z}=%g$\
@@ -929,7 +878,7 @@ def a1a2_create_negative_sigma_z( a1 , a2 ):
 def generate_runs_with_random_parameters( option='', hyperparameters=None,
                                          ana_data=dict(),
                                          debug=0 , PmissBins=None , Q2Bins=None , thetapmqBins=None ,
-                                         buildup_resutlsFName='' ,
+                                         buildup_resultsFName='' ,
                                          reco_fitsFName='', root_resutlsFName='' ,
                                          do_root_file=False, do_reco_fits_file=False, do_resutls_file=True, do_add_plots=False,
                                          ):#{
@@ -956,12 +905,14 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
         gen_events = GenerateEvents( path , 0 , debug - 2 )
         gen_events.Set_protonAcceptacne( h )
 
+        gen_events.AddInputChain_eep("Or' coulomb trees")
         gen_events.SetInputChain_eep()
 
         gen_events.SetNRand( NRand )
-        gen_events.Use_protonAcceptacne( True )
-        gen_events.SetDo_PrecFiducial ( True )
-        gen_events.SetDo_PrecMinCut ( True )
+        gen_events.Use_protonAcceptacne( hyperparameters['do proton acceptance'] )
+        gen_events.SetDo_PrecMinCut ( hyperparameters['do p(rec)>0.35 cut'] )
+        gen_events.SetDo_PrecFiducial ( hyperparameters['do p(rec) FV cuts'] ) # in the data we do not apply FV for p(recoil)
+        gen_events.Use_PrecResolution ( hyperparameters['do p(rec) resolution smearing'] , hyperparameters['p(rec) resolution smearing'] )
 
         gen_events.SetPmissBins()
         gen_events.Set10PmissBins()
@@ -1002,6 +953,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             gen_events.Set_eep_Parameters( gen_MeanX , gen_SigmaX , gen_MeanY , gen_SigmaY , gen_b1 , gen_b2 , gen_a1 , gen_a2 )
             gen_events.InitRun()
             Nevents = gen_events.DoGenerate_eepp_from_eep( run )
+            Nattempts = gen_events.GetNattempts()
             if debug: print 'Nevents to analyze:',Nevents
         #}
         
@@ -1013,7 +965,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run )
             results = pd.DataFrame({'run':int(run)
                                    ,'time':str(datetime.datetime.now().strftime("%Y%B%d"))
-                                   ,'NentriesSimRun':ana_sim.GetEntries()
+                                   ,'NentriesSimRun':ana_sim.GetEntries(), 'Nattempts':Nattempts
                                    ,'gen_MeanX':gen_MeanX, 'gen_SigmaX':gen_SigmaX, 'gen_MeanY':gen_MeanY, 'gen_SigmaY':gen_SigmaY
                                    ,'gen_a1':gen_a1, 'gen_a2':gen_a2, 'gen_b1':gen_b1, 'gen_b2':gen_b2
                                    }, index = [int(run)])
@@ -1027,7 +979,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                 # reconstruct c.m. parameters and fit
                 reco_parameters, do_fits = calc_cm_parameters( ana_sim  , PmissBins )
                 reco_fits = fit_cm_parameters( run , reco_parameters , do_fits=do_fits )
-                ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data , do_plots=hyperparameters['do_ks_plots'] , run=run )
+                ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data , do_plots=hyperparameters['do_ks_plots'] , run=run , Nattempts=Nattempts )
 
                 for fit_parameter in ['MeanX','SigmaX','MeanY','SigmaY','a1','a2','b1','b2']: #{
                     results['rec'+fit_parameter] = float(reco_fits[fit_parameter])
@@ -1142,7 +1094,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             
             
             if do_reco_fits_file:   stream_dataframe_to_file( reco_fits, reco_fitsFName  )
-            if do_resutls_file:     stream_dataframe_to_file( results, buildup_resutlsFName , float_format='%f' )
+            if do_resutls_file:     stream_dataframe_to_file( results, buildup_resultsFName , float_format='%f' )
             if do_root_file:        stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
             ana_sim.CloseFile()
         #}

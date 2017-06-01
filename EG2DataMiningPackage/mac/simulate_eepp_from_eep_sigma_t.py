@@ -5,6 +5,7 @@ from cm_tools import *
     ---------------
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=NoFiducials_300Pmiss600 -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=NoFiducials_allPmiss -v2
+    python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=allPmiss -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extractOnly_C12 --DataType=NoFiducials_allPmiss -v6
     python mac/simulate_eepp_from_eep_sigma_t.py --option=generate_analyze_delete -nruns=10 -v1
     python mac/simulate_eepp_from_eep_sigma_t.py --option=generate_analyze -nruns=1 -v1

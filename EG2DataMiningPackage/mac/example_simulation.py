@@ -7,19 +7,20 @@ import sys
 from cm_tools import *
 
 
-gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2 = 0.145	,0.2	,0.160	,0.53     ,0.3
+gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2 = 0.170, 0.2, 0.160, 0.53, 0.3
+name = "SigmaX_%.3f_a1_%.3f_a2_%.3f_b1_%.3f_b2_%.3f"%(gen_SigmaX , gen_a1 , gen_a2 , gen_b1 , gen_b2)
 
 scheme = TSchemeDATA()
 targets = ['C12','Al27','Fe56','Pb208']
 PmissBins   = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65]  , [0.65,0.75] , [0.75,1.0]]
 Pmiss3Bins  = [[0.3,0.52]  , [0.52,0.68]  , [0.68,1.0]]
-#path = "/Users/erezcohen/Desktop/DataMining"
 ppPath = path + "/Analysis_DATA/ppSRCcm"
 
 cm_pars , cm_fits = dict() , dict()
 ana_data = dict()
 
 for target in targets: ana_data[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s"%target )
+
 
 def a1a2_create_negative_sigma_z( a1 , a2 ):#{
     '''
@@ -42,24 +43,34 @@ hyperparameters = dict({'start_run':2,
                        'NRand':20,
                        'Ntimes':10,                     # wanted number of events in each Pmiss bin
                        'NgenMax':100000,                # maximal number of attempts
-                       'do_ks_plots':True
+                       'do_ks_plots':True,
+                       'do proton acceptance':True,
+                       'do p(rec)>0.35 cut':True,
+                       'do p(rec) FV cuts':False,
+                       'do p(rec) resolution smearing':True,
+                       'p(rec) resolution smearing':0.020 # [GeV/c] momentum resolution
                        })
+
+print "collected hyperparameters"
 
 start_run , Nruns = hyperparameters['start_run'], hyperparameters['Nruns']
 NRand = hyperparameters['NRand']
 pAcceptacneFile = ROOT.TFile( path + "/GSIM_DATA/PrecoilAcceptance.root" )
 path = path + "/Analysis_DATA/ppSRCcm"
 
+
 h = pAcceptacneFile.Get("hRescaled")
 gen_events = GenerateEvents( path , 0 , debug-1 )
 gen_events.Set_protonAcceptacne( h )
 
+gen_events.AddInputChain_eep("Or' coulomb trees")
 gen_events.SetInputChain_eep()
 
 gen_events.SetNRand( NRand )
-gen_events.Use_protonAcceptacne( False ) #True )
-gen_events.SetDo_PrecFiducial( False ) #True )
-gen_events.SetDo_PrecMinCut( False ) #True )
+gen_events.Use_protonAcceptacne( hyperparameters['do proton acceptance'] )
+gen_events.SetDo_PrecMinCut ( hyperparameters['do p(rec)>0.35 cut'] )
+gen_events.SetDo_PrecFiducial ( hyperparameters['do p(rec) FV cuts'] ) # in the data we do not apply FV for p(recoil)
+gen_events.Use_PrecResolution ( hyperparameters['do p(rec) resolution smearing'] , hyperparameters['p(rec) resolution smearing'] )
 
 gen_events.SetPmissBins()
 gen_events.Set10PmissBins()
@@ -86,6 +97,7 @@ if 'gen' in flags.option:#{
         gen_events.Set_eep_Parameters( gen_MeanX, gen_SigmaX, gen_MeanY, gen_SigmaY, gen_b1, gen_b2, gen_a1, gen_a2 )
         gen_events.InitRun()
         Nevents = gen_events.DoGenerate_eepp_from_eep( run )
+        Nattempts = gen_events.GetNattempts()
     #}
     else:#{
         print 'a1 (%.2f) and a2(%.2f) create together a negative sigma_z, killing run %d'%( gen_a1 , gen_a2 , run )
@@ -96,7 +108,10 @@ if 'ana' in flags.option:#{
     print 'analyzing run...'
     ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run )
         
-    ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data , do_plots=hyperparameters['do_ks_plots'] , run=run )
+    ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data , do_plots=hyperparameters['do_ks_plots'] , run=run , Nattempts=Nattempts )
     print 'finished calculating ks_pval_scores'
     ana_sim.CloseFile()
 #}
+
+print 'done running', name
+

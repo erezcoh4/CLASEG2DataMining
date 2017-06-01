@@ -59,7 +59,12 @@ if 'generate' in flags.option or 'analyse' in flags.option:#{
                            'NRand':20,
                            'Ntimes':10,                     # wanted number of events in each Pmiss bin
                            'NgenMax':100000,                # maximal number of attempts
-                           'do_ks_plots':False
+                           'do_ks_plots':False,
+                           'do proton acceptance':True,
+                           'do p(rec)>0.35 cut':True,
+                           'do p(rec) FV cuts':False,
+                           'do p(rec) resolution smearing':True,
+                           'p(rec) resolution smearing':0.020 # [GeV/c] momentum resolution
                            })
     
     cm_pars , cm_fits , ana_data = dict() , dict() , dict()
@@ -73,9 +78,8 @@ if 'generate' in flags.option or 'analyse' in flags.option:#{
 
     generate_runs_with_random_parameters( option=flags.option, hyperparameters=hyperparameters,
                                          ana_data=ana_data,
-#                                         cm_pars=cm_pars, cm_fits=cm_fits,
                                          debug=flags.verbose , PmissBins=PmissBins , Q2Bins=Q2Bins , thetapmqBins=thetapmqBins ,
-                                         buildup_resutlsFName=buildup_resutlsFName( full_path ),
+                                         buildup_resultsFName=buildup_resultsFName( full_path ),
                                          reco_fitsFName=CMfitsFname( full_path ),
                                          root_resutlsFName=root_resutlsFName( full_path ),
                                          do_root_file=False, do_reco_fits_file=False, do_resutls_file=True, do_add_plots=False
