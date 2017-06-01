@@ -1113,7 +1113,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
 
     if 'ana' in option:#{
         if do_reco_fits_file:   print_filename( reco_fitsFName , "reconstructed parameters fits wrote to" )
-        if do_resutls_file:     print_filename( buildup_resutlsFName , "results wrote to " )
+        if do_resutls_file:     print_filename( buildup_resultsFName , "results wrote to " )
         if do_root_file:        print_filename( root_resutlsFName , "results converted also to root format " )
     #}
 
