@@ -62,7 +62,7 @@ if 'generate' in flags.option or 'analyse' in flags.option:#{
                            'do_ks_plots':False,
                            'do proton acceptance':True,
                            'do p(rec)>0.35 cut':True,
-                           'do p(rec) FV cuts':False,
+                           'do p(rec) FV cuts':True,
                            'do p(rec) resolution smearing':True,
                            'p(rec) resolution smearing':0.020 # [GeV/c] momentum resolution
                            })

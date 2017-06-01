@@ -1080,7 +1080,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                 #}
                 results['NLostEvents'] = 9907*float(NRand)
                 results['fracLostEvents'] = 1
-                results['parameters_reconstructed_well'] = 0
+                results['parameters_reconstructed_well'] = False
                 for i in range(len(PmissBins)):#{
                     results['EvtsInBin'+'_bin%d'%i] = reco_parameters.get_value(i,'EvtsInBin')
                     for parname in ['mean','sigma']: #{
