@@ -61,7 +61,6 @@ void GenerateEvents::SetHistThetaHistMag( TH1F * fhistMag , TH1F * fhistTheta ){
 }
 
 
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void GenerateEvents::AddInputChain_eep(TString ChainOption){
     InputT  = new TChain("T");
@@ -374,6 +373,7 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep( Int_t fRunNumber ){
     RootTree = new TTree("anaTree","generated events");
     SetRootTreeAddresses();
     int attempt=0;
+    Nattempts = 0;
     
     // generate events up to NgenMAX
     while (attempt < NgenMAX) {
@@ -455,6 +455,9 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep( Int_t fRunNumber ){
             Pcm.RotateY  ( Pmiss_theta );
             Pcm.RotateZ  ( Pmiss_phi );
             Precoil =   Pp2     = Pcm - Pmiss;
+            if (DoPrecResolution){ // smear the reconstructed momentum of the recoil proton by the CLAS resolution (20 MeV/c)
+                Precoil.SetMag( gRandom->Gaus( Precoil.Mag() , PrecResolution ) );
+            }
             ThetaPmissPrecoil   = (180/TMath::Pi())*(Pmiss.Angle(Precoil));
             Prec.SetVectM( Precoil , Mp );
             
@@ -517,6 +520,7 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep( Int_t fRunNumber ){
     RootFile -> Write();
     RootFile -> Close();
     
+    Nattempts = attempt;
     if ( entry==-1 ) {
         Printf("done generating %d (e,e'pp) events (out of %d attempts) to %s",NAcceptedEvents,attempt,rootFilename.Data());
         return NAcceptedEvents;
@@ -1145,6 +1149,7 @@ void GenerateEvents::SetRootTreeAddresses(){
     RootTree -> Branch("pcmT"                ,&pcmT                  , "pcmT/F");
     RootTree -> Branch("pcmZ"                ,&pcmZ                  , "pcmZ/F");
     RootTree -> Branch("rooWeight"           ,&rooWeight             , "rooWeight/F");
+    RootTree -> Branch("Mott"                ,&OrMott                , "Mott/F"); // Or weight
 
 
 }
@@ -1156,6 +1161,18 @@ void GenerateEvents::ComputeWeights(){
     Mott            = pow( cos(Theta/2.) , 2 ) / pow( sin(Theta/2.) , 4 );
     DipoleFF2       = pow( 1./(1. + Q2/0.71) , 4);
     rooWeight       =  1./ ( Mott * DipoleFF2 ) ;
+    
+    OrMott = 1./ ( (1./3500) *
+                  (
+                   (
+                    cos(theta_e/2)
+                    /
+                    pow(  pow(   sin(theta_e/2)    ,2)     ,2)
+                    )
+                   )
+                  * pow((10./Q2),4)
+                  );
+
 }
 
 

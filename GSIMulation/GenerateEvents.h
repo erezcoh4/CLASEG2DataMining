@@ -111,16 +111,16 @@ public:
     int             FindWhichPmissBin ( float fPmiss3Mag );
     int           FindWhichPmiss10Bin ( float fPmiss3Mag );
     bool           AllPmissBinsFilled ();
-    
+    Int_t                GetNattempts () { return Nattempts; } ;
     
     // simple setters
     void                     SetNRand ( Int_t fNRand = 1 )                { NRand = fNRand; };
     void                   SetNPTheta ( Int_t fNPTheta = 10 )             { NPTheta = fNPTheta; };
     void                   SetNeTheta ( Int_t fNeTheta = 10 )             { NeTheta = fNeTheta; };
-    void         Use_protonAcceptacne ( bool fDo_pAcceptance = false )    {Do_pAcceptance = fDo_pAcceptance;};
-    void           SetDo_PrecFiducial ( bool fDo_PrecFiducial = false )   {Do_PrecFiducial = fDo_PrecFiducial;};
-    void             SetDo_PrecMinCut ( bool fDo_PrecMinCut = false )     {Do_PrecMinCut = fDo_PrecMinCut;};
-    void Use_PrecResolution ( bool fDoPrecResolution = true , float fPrecResolution = 0.020 ) { DoPrecResolution = fDoPrecResolution; PrecResolution = fPrecResolution;} ;
+    void         Use_protonAcceptacne ( bool fDo_pAcceptance = false )    { Do_pAcceptance = fDo_pAcceptance;};
+    void           SetDo_PrecFiducial ( bool fDo_PrecFiducial = false )   { Do_PrecFiducial = fDo_PrecFiducial;};
+    void             SetDo_PrecMinCut ( bool fDo_PrecMinCut = false )     { Do_PrecMinCut = fDo_PrecMinCut;};
+    void           Use_PrecResolution ( bool dores=true,float fres=0.020) { DoPrecResolution = dores; PrecResolution = fres;} ;
     void         Set_protonAcceptacne ( TH3F * h)                         { h_protonAcceptance = h; };
     void               ComputeWeights ();
     void   MapInputEntriesInPmissBins ();
@@ -176,7 +176,7 @@ public:
     bool        DoPrecResolution;
     
     
-    Int_t       RunNumber   , Nevents   , NAcceptedEvents,  NWantedEvents;
+    Int_t       RunNumber   , Nevents   , NAcceptedEvents,  NWantedEvents, Nattempts;
     Int_t       NRand       , NPTheta   , NeTheta,  entry,  InputNentries;
     // maximal total number of generated events
     Int_t       NgenMAX;
@@ -189,7 +189,7 @@ public:
     Int_t       NLoss10PmissBins[10];
     // -- - -- -- - --- - -- - -- - -- -- -- -- -- --- -- - -- - -
     
-    Float_t     Q2      , Xb            , PoverQ    , Mmiss;
+    Float_t     Q2      , Xb            , PoverQ    , Mmiss,    OrMott;
     Float_t     ThetaPQ , theta_miss_q   , ThetaPmissPrecoil;
     Float_t     theta_Pmiss , phi_Pmiss;
     Float_t     theta_e ;
