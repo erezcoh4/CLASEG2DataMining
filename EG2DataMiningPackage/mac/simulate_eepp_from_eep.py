@@ -3,6 +3,7 @@ from cm_tools import *
 '''
     usage:
     ---------------
+    python mac/simulate_eepp_from_eep.py --option=extractCMparsAllNuclei --DataType=PrecFiducials
     python mac/simulate_eepp_from_eep.py --option=extractCMparsAllNuclei --DataType=NoFiducials
     python mac/simulate_eepp_from_eep.py --option=extractOnly_C12 --DataType=NoFiducials -v2
     python mac/simulate_eepp_from_eep.py --option=generate_analyse_delete -nruns=10
@@ -15,11 +16,13 @@ from cm_tools import *
 # ----------------------------------------------------------
 if 'extract' in flags.option: #{
     
-    cm_pars , cm_fits = [] , []
+    cm_pars = []
+    cm_fits = pd.DataFrame()
+    
     ana = dict()
     if 'Only' in flags.option or 'only' in flags.option: targets = [flags.option[12:]]
     
-    for target in targets:#{
+    for target,label,A in zip(targets,labels,[12,27,56,208]):#{
         if flags.DataType=='NoFiducials': #{
             ana[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s_noFiducials"%target )
         #}
@@ -36,8 +39,15 @@ if 'extract' in flags.option: #{
         fits = fit_cm_parameters( run=target+' data', data=cm_parameters, FigureFName=FigureFName(ppPath+'/DATA/data', target) , DoPlot=True )
         fits.to_csv( CMfitsFname( ppPath+'/DATA/data' , target ) , header=True , index=False )
         print_filename( CMfitsFname(ppPath+'/DATA/data' , target )  , target + " data c.m. fits at" )
-        cm_fits.append( fits )
+        
+        
+        fits['target'] = label
+        fits['A'] = A
+        cm_fits = cm_fits.append( fits )
+
     #}
+    cm_fits.to_csv( ppPath+'/DATA/alltargets_dataCMfits.csv' , header=True , index=False )
+    print_filename( ppPath+'/DATA/alltargets_dataCMfits.csv' , "c.m. fits" )
     print 'done extractCMparsAllNuclei'; print_line()
 #}
 
