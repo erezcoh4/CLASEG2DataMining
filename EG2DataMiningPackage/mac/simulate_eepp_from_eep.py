@@ -74,7 +74,8 @@ if 'generate' in flags.option or 'analyse' in flags.option:#{
                            'do p(rec)>0.35 cut':True,
                            'do p(rec) FV cuts':True,
                            'do p(rec) resolution smearing':True,
-                           'p(rec) resolution smearing':0.020 # [GeV/c] momentum resolution
+                           'p(rec) resolution smearing':0.020, # [GeV/c] momentum resolution
+                           'binom_p':0.33 # average approximate acceptance
                            })
     
     cm_pars , cm_fits , ana_data = dict() , dict() , dict()
