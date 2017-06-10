@@ -972,14 +972,14 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                                    ,'gen_a1':gen_a1, 'gen_a2':gen_a2, 'gen_b1':gen_b1, 'gen_b2':gen_b2
                                    }, index = [int(run)])
                                    
-            # N(attempts) is used as an indicator using a binomial test of number of successes
-            NentriesSimRun , Nattempts =  ana_sim.GetEntries()/100, Nattempts/100
-            # division by a factor of 100 to soften the Pvalue distribution
-            binom_test_Pval = binom_test( x=NentriesSimRun ,n=Nattempts , p=hyperparameters['binom_p'] )
-            results['Pval_binom_test_Nsucsseses'] = binom_test_Pval
             
             if Nevents!=-1: #{
                 # Nevents==-1 means that the generation of events could not be completed (too bad of acceptance)
+                
+                # N(attempts) is used as an indicator using a binomial test of number of successes
+                binom_test_Pval = binom_test( x=Nevents/100 ,n=Nattempts/100 , p=hyperparameters['binom_p'] )
+                # divide by a factor of 100 to soften the Pvalue distribution
+                results['Pval_binom_test_Nsucsseses'] = binom_test_Pval
                 
                 loss_pmiss_bins , loss_Q2pmiss_bins , loss_thetapmqpmiss_bins = get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins ,
                                                                                                     Q2Bins , evtsgen_Q2pmiss_bins ,
@@ -1061,6 +1061,8 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                 #}
             #}
             else: #{
+                results['parameters_reconstructed_well'] = False
+                results['Pval_binom_test_Nsucsseses'] = 0
                 for target in targets: #{
                     for bin in range(len(PmissBins)):#{
                         results['ks_local_Pval_pcmZ_bin%d'%bin+'_'+target] = 0
@@ -1094,7 +1096,6 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                 #}
                 results['NLostEvents'] = 9907*float(NRand)
                 results['fracLostEvents'] = 1
-                results['parameters_reconstructed_well'] = False
                 for i in range(len(PmissBins)):#{
                     results['EvtsInBin'+'_bin%d'%i] = reco_parameters.get_value(i,'EvtsInBin')
                     for parname in ['mean','sigma']: #{
