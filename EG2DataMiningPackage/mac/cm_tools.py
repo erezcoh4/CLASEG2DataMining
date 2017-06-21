@@ -11,6 +11,7 @@ from scipy.stats import kurtosis
 from scipy.stats import skew
 from scipy.signal import argrelextrema
 from scipy.stats import binom_test
+from ndtest import *
 
 sqrt2pi = np.sqrt(2*np.pi)
 
@@ -24,6 +25,13 @@ thetapmqBins= [[100,135]   , [135,145]   , [145,155]    , [155,180]]
 targets         = ['C12'        , 'Al27'        , 'Fe56'        , 'Pb208'       ]
 labels          = ['$^{12}$C'   , '$^{27}$Al'   , '$^{56}$Fe'   , '$^{208}$Pb'  ]
 target_colors   = ['black'      , 'red'         , 'green'       , 'blue'        ]
+PvalZ_calculation_methods = ['Fisher','AverageBins','KS2D']
+
+
+PmissBinsPerTarget = dict( {'C12':[[0.3,0.45]  , [0.45,0.55] , [0.55,0.65]  , [0.65,0.75] , [0.75,1.0]]
+                            ,'Al27':[[0.3,0.5]  , [0.5,0.7] , [0.7,1.0]]
+                            ,'Fe56':[[0.3,0.45]  , [0.45,0.55] , [0.55,0.65]  , [0.65,0.75] , [0.75,1.0]]
+                            ,'Pb208':[[0.3,0.6]  , [0.6,1.0]]})
 
 
 
@@ -110,7 +118,7 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1, 
         #}
         ks_pval_scores_target['Pval_pcmX_pcmY'] = Fisher_combination_Pvals( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY']] ) # with a cutoff on 1e-20
 
-        # in z direction - compare in 5 bins of p(miss)
+        # in z direction - compare in N bins of p(miss)
         for bin in range(len(PmissBins)):#{
             
             pmin , pmax = PmissBins[bin][0] , PmissBins[bin][1]
@@ -152,22 +160,25 @@ def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1, 
             ks_pval_scores_target_array.append( Pval_KS )
             #}
         #}
-        ks_pval_scores_target['pcmZ'] = Fisher_combination_Pvals( ks_pval_scores_longitudinal_target_array ) # with a cutoff on 1e-20
         
-        ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ'] = Fisher_combination_Pvals( [ks_pval_scores_target['pcmX'],
-                                                                                  ks_pval_scores_target['pcmY'],
-                                                                                  ks_pval_scores_target['pcmZ']] ) # with a cutoff on 1e-20
-        ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_scaled_1e20'] = ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']*1e20
+        # --- global Pval from combination of all scores together --- #
         ks_pval_scores_target['PvalTotal'] = Fisher_combination_Pvals( ks_pval_scores_target_array ) # with a cutoff on 1e-20
-
-        # give larger weight to the Pval in X and Y directions
-        ks_pval_scores_target['Pval_5pcmX_5pcmY_pcmZ'] = Fisher_combination_Pvals( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmX'],
-                                                                                    ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmX'],
-                                                                                    ks_pval_scores_target['pcmX'],
-                                                                                    ks_pval_scores_target['pcmY'],ks_pval_scores_target['pcmY'],
-                                                                                    ks_pval_scores_target['pcmY'],ks_pval_scores_target['pcmY'],
-                                                                                    ks_pval_scores_target['pcmY'],
-                                                                                    ks_pval_scores_target['pcmZ']] ) # with a cutoff on 1e-20
+        # --- global Pval with the Fisher combination of the Pvalues in the z direction along N bins in Pmiss --- #
+        ks_pval_scores_target['pcmZ_Fisher'] = Fisher_combination_Pvals( ks_pval_scores_longitudinal_target_array ) # with a cutoff on 1e-20
+        # --- global Pval with the average local Pval in the z direction along N bins in Pmiss --- #
+        ks_pval_scores_target['pcmZ_AverageBins'] = np.average( ks_pval_scores_longitudinal_target_array )
+        # --- global Pval with the Fisher combination of the Pvalues in the z direction along N bins in Pmiss --- #
+        ks_pval_scores_target['pcmZ_KS2D'] = ks2d2s( df_sim['Pmiss3Mag'] , df_sim['pcmZ'] , df_data['Pmiss3Mag'] , df_data['pcmZ'] )
+        
+        for method in PvalZ_calculation_methods: #{
+            ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_'+method] = Fisher_combination_Pvals( [ks_pval_scores_target['pcmX'],
+                                                                                              ks_pval_scores_target['pcmY'],
+                                                                                              ks_pval_scores_target['pcmZ_'+method]] ) # with a cutoff on 1e-20
+            ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method] = ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_'+method]*1e20
+            ks_pval_scores_target['Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method] = Fisher_combination_Pvals( np.concatenate( [ ks_pval_scores_target['pcmX']*np.ones(len(PmissBins))
+                                                                                                                             ,ks_pval_scores_target['pcmY']*np.ones(len(PmissBins))
+                                                                                                                             ,ks_pval_scores_target['pcmZ_'+method] ]) )
+        #}
 
         # methods to combine Pvalue [https://arxiv.org/pdf/1212.4966.pdf]
         # Bonferroni: N * min( P1, P2, P3.... , PN)
@@ -260,32 +271,26 @@ def plot_errorbar_and_fit( ax , x , y , xerr , yerr , color , marker , lstyle , 
 
 
 # ------------------------------------------------------------------------------- #
-def fit_as_a_function_of_pmiss( x , y , yerr=None, fit_type='const' , title='', x_offset=0.6): # the main fitting routine
+def fit_as_a_function_of_pmiss( x , y , yerr=None, fit_type='const' , title='', x_offset=0.6): #{ # the main fitting routine
     
     if fit_type=='const':
-        if len(x)<3:
-            return -100 , 0
-
+#        if len(x)<3: return -100 , 0
         p1,v1 = np.polyfit( x , y , 0 , cov=True)
+        v1[0,0] = np.var( y )
         chi2red = -100
-        if debug>4:
-            print 'p1:',p1,',\tv1:',v1
+        if debug>4: print 'x:',x,'\ny:',y,'\np1:',p1,',\tv1:',v1
 
         if not p1 or not v1 or len(p1)==0 or len(v1)==0:
-            return -100 , 0
+            return -100 , 0 , 0
         else:
             return p1[0] , sqrt(v1[0,0]) , chi2red
-    
     #        p2,v2 = np.polyfit( x , y , 1 , cov=True)        # fit a polynomial p2(x) = p2[0] * x + p2[1]
     elif fit_type=='linear':
 
-        if len(x)<4:
-            return -100 , 0 , -100 , 0
-
-        if x_offset==0:
-            f = linear
-        else:
-            f = linear_06
+#        if len(x)<4:
+#            return -100 , 0 , -100 , 0
+        if x_offset==0: f = linear
+        else: f = linear_06
         p2, v2 = curve_fit(f, xdata=x, ydata=y,sigma=yerr)# fit data using SciPy's Levenberg-Marquart method
         chi2red = (np.sum( np.square( (np.polyval(p2, x) - y) / yerr ) ))/(len(x) - 2)
 
@@ -298,10 +303,11 @@ def fit_as_a_function_of_pmiss( x , y , yerr=None, fit_type='const' , title='', 
             return -100 , 0 , -100 , 0 , 0
         else:
             return p2[0] , sqrt(float(v2[0,0])) , p2[1] , sqrt(float(v2[1,1])) , chi2red
+#}
 # ------------------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------------------- #
-def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weightedRoofitsFName = '' , DoSaveCanvas = False ):
+def calc_cm_parameters( fana  , fPmissBins , unweightedRoofitsFName = '' , weightedRoofitsFName = '' , DoSaveCanvas = False ):
     '''
         Return: df_pMissBin , do_fits (continue or not)
         '''
@@ -309,7 +315,7 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
     df_pMissBins = pd.DataFrame()
     
     if DoSaveCanvas:
-        canvas_unweighted , canvas_weighted = fana.CreateCanvas( "RooFit plots - unweighted" , "Divide" , 4 , len(PmissBins) ) , fana.CreateCanvas( "RooFit plots - weighted" , "Divide" , 4 , len(PmissBins) )
+        canvas_unweighted , canvas_weighted = fana.CreateCanvas( "RooFit plots - unweighted" , "Divide" , 4 , len(fPmissBins) ) , fana.CreateCanvas( "RooFit plots - weighted" , "Divide" , 4 , len(fPmissBins) )
 
     # Jan 2017, changing to a (weighted) average and variance using numpy
     if fana.GetEntries()==0:
@@ -320,8 +326,8 @@ def calc_cm_parameters( fana  , PmissBins , unweightedRoofitsFName = '' , weight
     print 'fana.GetFileName():',fana.GetFileName()
     ana = read_root( str(fana.GetFileName()) , key='anaTree' , columns=['pcmX','pcmY','pcmZ','Pmiss3Mag','rooWeight','Mott']  )
 
-    for i in range(len(PmissBins)):
-        pMiss_min , pMiss_max = PmissBins[i][0] , PmissBins[i][1]
+    for i in range(len(fPmissBins)):
+        pMiss_min , pMiss_max = fPmissBins[i][0] , fPmissBins[i][1]
         ana_reduced = ana[ (pMiss_min < ana.Pmiss3Mag) & (ana.Pmiss3Mag < pMiss_max) ]
         good_bin = True if len(ana_reduced)>0 else False
         
@@ -527,40 +533,20 @@ def fit_cm_parameters( run , data , do_fits=True , FigureFName = '' , DoPlot = F
     '''
         Return: df_fit_parameters
         '''
-    if do_fits==False:
+    if do_fits==False:#{
         print 'nothing in cm-paramteres input as data to fit_cm_parameters()'
         print 'leaving fit_cm_parameters by appending -100 to all'
-#        return pd.DataFrame({ 'run':run
-#                            ,'SigmaX_unweighted':-100      ,'SigmaXerr_unweighted':0
-#                            ,'SigmaY_unweighted':-100      ,'SigmaYerr_unweighted':0
-#                            ,'SigmaZa1_unweighted':-100    ,'SigmaZa1err_unweighted':0
-#                            ,'SigmaZa2_unweighted':-100    ,'SigmaZa2err_unweighted':0
-#                            ,'MeanX_unweighted':-100       ,'MeanXerr_unweighted':0
-#                            ,'MeanY_unweighted':-100       ,'MeanYerr_unweighted':0
-#                            ,'MeanZa1_unweighted':-100     ,'MeanZa1err_unweighted':0
-#                            ,'MeanZa2_unweighted':-100     ,'MeanZa2err_unweighted':0
-#                            ,'SigmaX_weighted':-100        ,'SigmaXerr_weighted':0
-#                            ,'SigmaY_weighted':-100        ,'SigmaYerr_weighted':0
-#                            ,'SigmaZa1_weighted':-100      ,'SigmaZa1err_weighted':0
-#                            ,'SigmaZa2_weighted':-100      ,'SigmaZa2err_weighted':0
-#                            ,'MeanX_weighted':-100         ,'MeanXerr_weighted':0
-#                            ,'MeanY_weighted':-100         ,'MeanYerr_weighted':0
-#                            ,'MeanZa1_weighted':-100       ,'MeanZa1err_weighted':0
-#                            ,'MeanZa2_weighted':-100       ,'MeanZa2err_weighted':0 }
-#                            , index=[0] )
         return pd.DataFrame({ 'run':run,'Nevents':-100
                             ,'SigmaX':-100,'SigmaXerr':0,'MeanX':-100, 'MeanXerr':0
                             ,'SigmaY':-100,'SigmaYerr':0,'MeanY':-100,'MeanYerr':0
                             ,'a1':-100,'a1err':0,'a2':-100,'a2err':0,'a_chi2red':-100
                             ,'b1':-100,'b1err':0,'b2':-100,'b2err':0,'b_chi2red':-100
                             }, index=[0] )
-
-    if DoPlot: # this means we want plots
+    #}
+    if DoPlot: #{ # this means we want plots
         fig = plt.figure(figsize=(40,20)) # four plots, two unweighted and two weighted
-
+    #}
     if DoPlot: #{
-#        width_fits = fit_par_plot ( fig, 221, data, 'sigma', 'unweighted', '\sigma' , do_plot_fit_pars=True )
-#        mean_fits = fit_par_plot( fig, 222, data, 'mean', 'unweighted', 'mean')
         width_fits = fit_par_plot ( fig, 221, data, 'sigma', 'unweighted', '\sigma' , do_plot_fit_pars=True )
         mean_fits = fit_par_plot( fig, 222, data, 'mean', 'unweighted', 'mean')
     #}
@@ -579,57 +565,17 @@ def fit_cm_parameters( run , data , do_fits=True , FigureFName = '' , DoPlot = F
                                      ,'b1':b1,'b1err':b1err,'b2':b2,'b2err':b2err,'b_chi2red':b_chi2red
                                      }, index=[0] )
 
-#
-#    [SigmaX_unweighted  , SigmaXerr_unweighted,
-#     SigmaY_unweighted  , SigmaYerr_unweighted,
-#     SigmaZa1_unweighted, SigmaZa1err_unweighted,
-#     SigmaZa2_unweighted, SigmaZa2err_unweighted, ax ] = fit_par_plot ( fig, 221, data, 'sigma', 'unweighted', '\sigma' , do_plot_fit_pars=True ) if DoPlot else fit_par_noplot ( data,'sigma','unweighted','\sigma' )
-#
-#    [MeanX_unweighted   , MeanXerr_unweighted,
-#     MeanY_unweighted   , MeanYerr_unweighted,
-#     MeanZa1_unweighted , MeanZa1err_unweighted,
-#     MeanZa2_unweighted , MeanZa2err_unweighted, ax ] = fit_par_plot( fig, 222, data, 'mean', 'unweighted', 'mean') if DoPlot else fit_par_noplot( data, 'mean','unweighted','mean')
-#
-#    [SigmaX_weighted  , SigmaXerr_weighted,
-#     SigmaY_weighted  , SigmaYerr_weighted,
-#     SigmaZa1_weighted, SigmaZa1err_weighted,
-#     SigmaZa2_weighted, SigmaZa2err_weighted, ax ] = fit_par_plot ( fig, 223, data, 'sigma', 'weighted', '\sigma'  , do_plot_fit_pars=True ) if DoPlot else fit_par_noplot ( data,'sigma','weighted','\sigma')
-#
-#    [MeanX_weighted   , MeanXerr_weighted,
-#     MeanY_weighted   , MeanYerr_weighted,
-#     MeanZa1_weighted , MeanZa1err_weighted,
-#     MeanZa2_weighted , MeanZa2err_weighted, ax ] = fit_par_plot( fig, 224, data, 'mean', 'weighted', 'mean') if DoPlot else fit_par_noplot( data, 'mean','weighted','mean')
-#
-
-#    df_fit_parameters = pd.DataFrame({ 'run':run
-#                                      ,'SigmaX_unweighted':SigmaX_unweighted     ,'SigmaXerr_unweighted':SigmaXerr_unweighted
-#                                      ,'SigmaY_unweighted':SigmaY_unweighted     ,'SigmaYerr_unweighted':SigmaYerr_unweighted
-#                                      ,'SigmaZa1_unweighted':SigmaZa1_unweighted ,'SigmaZa1err_unweighted':SigmaZa1err_unweighted
-#                                      ,'SigmaZa2_unweighted':SigmaZa2_unweighted ,'SigmaZa2err_unweighted':SigmaZa2err_unweighted
-#                                      ,'MeanX_unweighted':MeanX_unweighted       ,'MeanXerr_unweighted':MeanXerr_unweighted
-#                                      ,'MeanY_unweighted':MeanY_unweighted       ,'MeanYerr_unweighted':MeanYerr_unweighted
-#                                      ,'MeanZa1_unweighted':MeanZa1_unweighted   ,'MeanZa1err_unweighted':MeanZa1err_unweighted
-#                                      ,'MeanZa2_unweighted':MeanZa2_unweighted   ,'MeanZa2err_unweighted':MeanZa2err_unweighted
-#                                      ,'SigmaX_weighted':SigmaX_weighted         ,'SigmaXerr_weighted':SigmaXerr_weighted
-#                                      ,'SigmaY_weighted':SigmaY_weighted         ,'SigmaYerr_weighted':SigmaYerr_weighted
-#                                      ,'SigmaZa1_weighted':SigmaZa1_weighted     ,'SigmaZa1err_weighted':SigmaZa1err_weighted
-#                                      ,'SigmaZa2_weighted':SigmaZa2_weighted     ,'SigmaZa2err_weighted':SigmaZa2err_weighted
-#                                      ,'MeanX_weighted':MeanX_weighted           ,'MeanXerr_weighted':MeanXerr_weighted
-#                                      ,'MeanY_weighted':MeanY_weighted           ,'MeanYerr_weighted':MeanYerr_weighted
-#                                      ,'MeanZa1_weighted':MeanZa1_weighted       ,'MeanZa1err_weighted':MeanZa1err_weighted
-#                                      ,'MeanZa2_weighted':MeanZa2_weighted       ,'MeanZa2err_weighted':MeanZa2err_weighted }
-#                                      , index=[0] )
-
-    if DoPlot:
+    if DoPlot:#{
         plt.savefig(FigureFName)
         print_filename( FigureFName , "and plot can be found at" )
         print_line()
+    #}
     print "computed fit parameters for run ",run
-    if debug>1:
+    if debug>1:#{
         print "completed fiting processes"
         if debug>4:
             print "df_fit_parameters: ",df_fit_parameters
-
+    #}
     return df_fit_parameters
 # ------------------------------------------------------------------------------- #
 
@@ -879,7 +825,7 @@ def a1a2_create_negative_sigma_z( a1 , a2 ):
 # ------------------------------------------------------------------------------- #
 def generate_runs_with_random_parameters( option='', hyperparameters=None,
                                          ana_data=dict(),
-                                         debug=0 , PmissBins=None , Q2Bins=None , thetapmqBins=None ,
+                                         debug=0 , Q2Bins=None , thetapmqBins=None ,
                                          buildup_resultsFName='' ,
                                          reco_fitsFName='', root_resutlsFName='' ,
                                          do_root_file=False, do_reco_fits_file=False, do_resutls_file=True, do_add_plots=False,
@@ -973,73 +919,84 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                                    }, index = [int(run)])
                                    
             
-            if Nevents!=-1: #{
-                # Nevents==-1 means that the generation of events could not be completed (too bad of acceptance)
+            if Nevents!=-1: #{  Nevents==-1 means that the generation of events could not be completed (too bad of acceptance)
                 
                 # N(attempts) is used as an indicator using a binomial test of number of successes
-                binom_test_Pval = binom_test( x=Nevents/100 ,n=Nattempts/100 , p=hyperparameters['binom_p'] )
-                # divide by a factor of 100 to soften the Pvalue distribution
-                results['Pval_binom_test_Nsucsseses'] = binom_test_Pval
+                binom_test_Pval = []
+                for i,p in enumerate([0.2,0.25,0.33,0.4,0.5]):#{
+                    binom_test_Pval.append(binom_test( x=Nevents/100 ,n=Nattempts/100 , p=p )) # divide by a factor of 100 to soften the Pvalue distribution
+                    results['Pval_binom_%.2f_test_Nsucsseses'%p] = binom_test_Pval[i]
+                #}
                 
                 loss_pmiss_bins , loss_Q2pmiss_bins , loss_thetapmqpmiss_bins = get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins ,
                                                                                                     Q2Bins , evtsgen_Q2pmiss_bins ,
                                                                                                     thetapmqBins , evtsgen_thetapmqpmiss_bins ,
                                                                                                     ana_sim )
-                # reconstruct c.m. parameters and fit
-                reco_parameters, do_fits = calc_cm_parameters( ana_sim  , PmissBins )
-                reco_fits = fit_cm_parameters( run , reco_parameters , do_fits=do_fits )
-                ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data , do_plots=hyperparameters['do_ks_plots'] , run=run , Nattempts=Nattempts )
 
-                for fit_parameter in ['MeanX','SigmaX','MeanY','SigmaY','a1','a2','b1','b2']: #{
-                    results['rec'+fit_parameter] = float(reco_fits[fit_parameter])
-                #}
-                results['NLostEvents'] = (9907*float(NRand) - ana_sim.GetEntries())
-                results['fracLostEvents'] = (float((9907.0*float(NRand)) - ana_sim.GetEntries())/(9907.0*float(NRand)))
-                results['parameters_reconstructed_well'] = True if do_fits else False
+                # from now on we work in 4 targets - since each has its own Pmiss binning
+                for target in targets: #{
+                                                                                                    
+                # reconstruct c.m. parameters and fit
+                #                reco_parameters, do_fits = calc_cm_parameters( ana_sim  , PmissBins ) # delete by June-30
+                    reco_parameters, do_fits = calc_cm_parameters( ana_sim  , PmissBinsPerTarget[target] )
+                    reco_fits = fit_cm_parameters( run , reco_parameters , do_fits=do_fits )
+                    ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data , do_plots=hyperparameters['do_ks_plots'] , run=run , Nattempts=Nattempts )
+
+                    for fit_parameter in ['MeanX','SigmaX','MeanY','SigmaY','a1','a2','b1','b2']: #{
+                        results['rec'+fit_parameter] = float(reco_fits[fit_parameter])
+                    #}
+                    results['NLostEvents'] = (9907*float(NRand) - ana_sim.GetEntries())
+                    results['fracLostEvents'] = (float((9907.0*float(NRand)) - ana_sim.GetEntries())/(9907.0*float(NRand)))
+                    results['parameters_reconstructed_well'] = True if do_fits else False
                 
-                # reconstructed parameters in 5 big p(miss) bins
-                for i in range(len(PmissBins)):#{
-                    pmin , pmax = PmissBins[i][0] , PmissBins[i][1]
-                    results['EvtsInBin'+'_bin%d'%i] = reco_parameters.get_value(i,'EvtsInBin')
-                    for parname in ['mean','sigma']: #{
-                        for direction in ['x','y','z']: #{
+                    # reconstructed parameters in N p(miss) bins
+                    for i in range(len(PmissBinsPerTarget[target])):#{
+                        pmin , pmax = PmissBinsPerTarget[target][i][0] , PmissBinsPerTarget[target][i][1]
+                        results['EvtsInBin'+'_bin%d'%i] = reco_parameters.get_value(i,'EvtsInBin')
+                        for parname in ['mean','sigma']: #{
+                            for direction in ['x','y','z']: #{
                         
-                            parnamedir = parname + '_' + direction
-                            recparnamedir = 'rec'+parnamedir+'_bin%d'%i
-                            results[recparnamedir] = float(reco_parameters.get_value(i,parnamedir+'_unweighted')) if do_fits else -100
+                                parnamedir = parname + '_' + direction
+                                recparnamedir = 'rec'+parnamedir+'_bin%d'%i
+                                results[recparnamedir] = float(reco_parameters.get_value(i,parnamedir+'_unweighted')) if do_fits else -100
                             
-                            parnamedirErr = parnamedir+'Err'
-                            recparnamedirErr = 'rec'+parnamedirErr+'_bin%d'%i
-                            results[recparnamedirErr] = float(reco_parameters.get_value(i,parnamedirErr+'_unweighted')) if do_fits else -100
-            
+                                parnamedirErr = parnamedir+'Err'
+                                recparnamedirErr = 'rec'+parnamedirErr+'_bin%d'%i
+                                results[recparnamedirErr] = float(reco_parameters.get_value(i,parnamedirErr+'_unweighted')) if do_fits else -100
+                            #}
                         #}
                     #}
-                #}
-                # KS Pvalues
-                for target in targets: #{
-                    #                    if debug>2: print '---------------\npluging ks-Pvalue scores for ',target,'\n------------------'
+                    # KS Pvalues
+                    #                for target in targets: #{ location of for loop in June-21 (delete by June-30)
                     for bin in range(len(PmissBins)):#{
                         results['ks_local_Pval_'+'pcmZ_bin%d'%bin+'_'+target] = ks_pval_scores[target]['pcmZ_bin%d'%bin]
-                        results['pcmZ_bin%d_skew'%bin+'_'+target] = ks_pval_scores[target]['pcmZ_bin%d_skew'%bin]
-                        results['pcmZ_bin%d_kurt'%bin+'_'+target] = ks_pval_scores[target]['pcmZ_bin%d_kurt'%bin]
+                    #                        results['pcmZ_bin%d_skew'%bin+'_'+target] = ks_pval_scores[target]['pcmZ_bin%d_skew'%bin]
+                    #                        results['pcmZ_bin%d_kurt'%bin+'_'+target] = ks_pval_scores[target]['pcmZ_bin%d_kurt'%bin]
                     #}
-                    for direction in ['X','Y','Z']: #{
+                    for direction in ['X','Y']: #{
                         results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores[target]['pcm'+direction]
                     #}
-                    results['ks_local_Pval_pcmZ_Bonferroni_'+target] = ks_pval_scores[target]['pcmZ_Bonferroni']
-                    results['ks_local_Pval_pcmZ_Ruschendorf_'+target] = ks_pval_scores[target]['pcmZ_Ruschendorf']
-                    
-                    if debug>3: print "ks-pval["+target+"]['PvalTotal']:",ks_pval_scores[target]['PvalTotal']
                     results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY']
-                    results['ks_Pval_pcmX_pcmY_pcmZ'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ']
-                    results['ks_Pval_5pcmX_5pcmY_pcmZ'+'_'+target] = ks_pval_scores[target]['Pval_5pcmX_5pcmY_pcmZ']
-                    results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1e20'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_scaled_1e20']
+                    
+                    #                    results['ks_local_Pval_pcmZ_Bonferroni_'+target] = ks_pval_scores[target]['pcmZ_Bonferroni']
+                    #                    results['ks_local_Pval_pcmZ_Ruschendorf_'+target] = ks_pval_scores[target]['pcmZ_Ruschendorf']
+
+                    # --- global Pval from combination of all scores together --- #
                     results['ks_PvalTotal'+'_'+target] = ks_pval_scores[target]['PvalTotal'] # with a cutoff on 1e-20
-                    results['ks_Pval_pcmX_pcmY_pcmZ_Bonferroni'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_Bonferroni']
-                    results['ks_Pval_pcmX_pcmY_pcmZ_Ruschendorf'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_Ruschendorf']
-                        
-                    results['Pval_pcmXYZ_binom_'+target] = Fisher_combination_Pvals( [ binom_test_Pval , ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ' ] ] )
-                    results['PvalTotal_binom_'+target] = Fisher_combination_Pvals( [ binom_test_Pval , ks_pval_scores[target]['PvalTotal' ] ] )
+                    for method in PvalZ_calculation_methods: #{
+                        results['ks_local_Pval_'+'pcmZ_'+method+'_'+target] = ks_pval_scores['pcmZ_'+method]
+                        results['ks_Pval_pcmX_pcmY_pcmZ_'+method+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY_pcmZ_'+method]
+                        results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method]
+                        results['ks_Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method+'_'+target] = ks_pval_scores['Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method]
+                    #}
+                    #                    results['ks_Pval_pcmX_pcmY_pcmZ_Bonferroni'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_Bonferroni']
+                    #                    results['ks_Pval_pcmX_pcmY_pcmZ_Ruschendorf'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_Ruschendorf']
+
+                    
+                    for i,p in enumerate([0.2,0.25,0.33,0.4,0.5]):#{
+                        results['Pval_pcmXYZ_binom_%.2f_'+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ' ] ] )
+                        results['PvalTotal_binom_%.2f_'+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores[target]['PvalTotal' ] ] )
+                    #}
                 #}
         
                 # events loss in 20 p(miss) bins, for pp/p analysis
@@ -1062,28 +1019,38 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             #}
             else: #{
                 results['parameters_reconstructed_well'] = False
-                results['Pval_binom_test_Nsucsseses'] = 0
+                for i,p in enumerate([0.2,0.25,0.33,0.4,0.5]):#{
+                    results['Pval_binom_%.2f_test_Nsucsseses'%p] = 0
+                #}
                 for target in targets: #{
                     for bin in range(len(PmissBins)):#{
                         results['ks_local_Pval_pcmZ_bin%d'%bin+'_'+target] = 0
-                        results['pcmZ_bin%d_skew'%bin+'_'+target] = 0
-                        results['pcmZ_bin%d_kurt'%bin+'_'+target] = 0
+                    #                        results['pcmZ_bin%d_skew'%bin+'_'+target] = 0
+                    #                        results['pcmZ_bin%d_kurt'%bin+'_'+target] = 0
                     #}
-                    for direction in ['X','Y','Z']: #{
-                        results['ks_local_Pval_pcm'+direction+'_'+target] = 0
+                    for direction in ['X','Y']: #{
+                        results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores[target]['pcm'+direction]
                     #}
-                    results['ks_local_Pval_pcmZ_Bonferroni_'+target] = 0
-                    results['ks_local_Pval_pcmZ_Ruschendorf_'+target] = 0
-                    
-                    results['ks_Pval_pcmX_pcmY'+'_'+target] = results['ks_Pval_pcmX_pcmY_pcmZ'+'_'+target] = 0
-                    results['ks_Pval_5pcmX_5pcmY_pcmZ'+'_'+target] = 0
-                    results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1e20'+'_'+target] = 0
-                    results['ks_Pval_pcmX_pcmY_pcmZ_Bonferroni_'+target] = 0
-                    results['ks_Pval_pcmX_pcmY_pcmZ_Ruschendorf_'+target] = 0
-                    
+                    results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY']
+
+                    #                    results['ks_local_Pval_pcmZ_Bonferroni_'+target] = ks_pval_scores[target]['pcmZ_Bonferroni']
+                    #                    results['ks_local_Pval_pcmZ_Ruschendorf_'+target] = ks_pval_scores[target]['pcmZ_Ruschendorf']
+
+
                     results['ks_PvalTotal'+'_'+target] = 0
-                    results['Pval_pcmXYZ_binom_'+target] = 0
-                    results['PvalTotal_binom_'+target] = 0
+                    for method in PvalZ_calculation_methods: #{
+                        results['ks_local_Pval_'+'pcmZ_'+method+'_'+target] = 0
+                        results['ks_Pval_pcmX_pcmY_pcmZ_'+method+'_'+target] = 0
+                        results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method+'_'+target] = 0
+                        results['ks_Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method+'_'+target] = 0
+                    #}
+                    #                    results['ks_Pval_pcmX_pcmY_pcmZ_Bonferroni'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_Bonferroni']
+                    #                    results['ks_Pval_pcmX_pcmY_pcmZ_Ruschendorf'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_Ruschendorf']
+
+                    for i,p in enumerate([0.2,0.25,0.33,0.4,0.5]):#{
+                        results['Pval_pcmXYZ_binom_%.2f_'+target] = 0
+                        results['PvalTotal_binom_%.2f_'+target] = 0
+                    #}
 
                     for i in range( len(pmiss_bins) ):#{
                         results['fracLoss_pmiss_%.3f_%.3f'%(pmiss_bins[i][0] , pmiss_bins[i][1])] = 1

@@ -5,6 +5,7 @@ from cm_tools import *
     ---------------
     python mac/simulate_eepp_from_eep.py --option=extractCMparsAllNuclei --DataType=PrecFiducials
     python mac/simulate_eepp_from_eep.py --option=extractCMparsAllNuclei --DataType=NoFiducials
+    python mac/simulate_eepp_from_eep.py --option=extractOnly_C12 --DataType=PrecFiducials
     python mac/simulate_eepp_from_eep.py --option=extractOnly_C12 --DataType=NoFiducials -v2
     python mac/simulate_eepp_from_eep.py --option=generate_analyse_delete -nruns=10
 '''
@@ -29,7 +30,7 @@ if 'extract' in flags.option: #{
         else: #{
             ana[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s"%target )
         #}
-        cm_parameters , _ = calc_cm_parameters(ana[target] , PmissBins ,
+        cm_parameters , _ = calc_cm_parameters(ana[target] , PmissBinsPerTarget[target] ,
                                                CMRooFitsName( ppPath + '/DATA/%s_unweighted'%target ) ,
                                                CMRooFitsName( ppPath + '/DATA/%s_weighted'%target ) ,
                                                DoSaveCanvas = True )
@@ -89,7 +90,7 @@ if 'generate' in flags.option or 'analyse' in flags.option:#{
 
     generate_runs_with_random_parameters( option=flags.option, hyperparameters=hyperparameters,
                                          ana_data=ana_data,
-                                         debug=flags.verbose , PmissBins=PmissBins , Q2Bins=Q2Bins , thetapmqBins=thetapmqBins ,
+                                         debug=flags.verbose , Q2Bins=Q2Bins , thetapmqBins=thetapmqBins ,
                                          buildup_resultsFName=buildup_resultsFName( full_path ),
                                          reco_fitsFName=CMfitsFname( full_path ),
                                          root_resutlsFName=root_resutlsFName( full_path ),
