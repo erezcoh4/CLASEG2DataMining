@@ -3,7 +3,8 @@ from cm_tools import *
 '''
     usage:
     ---------------
-    python mac/simulate_eepp_from_eep.py --option=extractCMparsAllNuclei --DataType=PrecFiducials
+    python mac/simulate_eepp_from_eep.py --option=extract_all --DataType=PrecFiducials
+    python mac/simulate_eepp_from_eep.py --option=extract_all --DataType=PrecFiducials -whelion
     python mac/simulate_eepp_from_eep.py --option=extractCMparsAllNuclei --DataType=NoFiducials
     python mac/simulate_eepp_from_eep.py --option=extractOnly_C12 --DataType=PrecFiducials
     python mac/simulate_eepp_from_eep.py --option=extractOnly_C12 --DataType=NoFiducials -v2
