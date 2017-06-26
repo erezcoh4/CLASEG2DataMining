@@ -70,175 +70,179 @@ def gauss(x,mu_0,sigma_0,A_0):
 
 
 # ------------------------------------------------------------------------------- #
-def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1, Nattempts=1):
+def calc_pval_ks_scores(ana_sim=None, ana_data=dict(), do_plots=False , run=-1, Nattempts=1, target=''):
     
     nbins = 25 # number of bins for histograms in each direction
     bins_histograms_l = np.linspace(-0.4,1.2,40)
     
-    ks_pval_scores = dict()
+#    ks_pval_scores = dict()
     # April-2017, change to Pval using ks-test
     df_sim = tree2array( ana_sim.GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
-    for target in targets: #{
-        
-        if do_plots:  #{
-            gen_info = tree2array( ana_sim.GetTree() , branches=['gen_SigmaX','gen_a1','gen_a2','gen_b1','gen_b2'] )
-            if debug>2: print 'gen: SigmaX ',gen_info[0]['gen_SigmaX'],'a1',gen_info[0]['gen_a1'],'a2',gen_info[0]['gen_a2'],'b1',gen_info[0]['gen_b1'],'b2',gen_info[0]['gen_b2']
-            fig = plt.figure(figsize=(36,24))
-        #}
+#    for target in targets: #{
 
-        ks_pval_scores_target_array , ks_pval_scores_longitudinal_target_array = [] , []
-        ks_pval_scores_target = dict()
-        df_data = tree2array( ana_data[target].GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
+    if do_plots:  #{
+        gen_info = tree2array( ana_sim.GetTree() , branches=['gen_SigmaX','gen_a1','gen_a2','gen_b1','gen_b2'] )
+        if debug>2: print 'gen: SigmaX ',gen_info[0]['gen_SigmaX'],'a1',gen_info[0]['gen_a1'],'a2',gen_info[0]['gen_a2'],'b1',gen_info[0]['gen_b1'],'b2',gen_info[0]['gen_b2']
+        fig = plt.figure(figsize=(36,24))
+    #}
+
+    ks_pval_scores_target_array , ks_pval_scores_longitudinal_target_array = [] , []
+    ks_pval_scores_target = dict()
+    df_data = tree2array( ana_data[target].GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
         
-        # compare x & y directions in 1 p(miss) bin - since there is no p(miss) dependence
-        for i_dir,direction in enumerate(['X','Y']): #{
-            x_data = df_data['pcm'+direction]
-            x_sim = df_sim['pcm'+direction]
-            D_KS , Pval_KS = ks_2samp( x_data , x_sim )
-            ks_pval_scores_target['pcm'+direction] = Pval_KS
-            ks_pval_scores_target_array.append( Pval_KS )
-            if do_plots:#{
-                if direction=='X':#{
-                    ax = fig.add_subplot( 2 , 5 , (1,5) )
-                    ax.yaxis.set_major_formatter(NullFormatter())
-                #}
-                h,bins,_=ax.hist(x_sim, bins=nbins
-                                 ,label='sim. $p_{c.m.}^{%s}$ $\\mu=%.3f, \\sigma=%.3f, Pval=%f$'%(direction,np.mean(x_sim),np.std(x_sim),Pval_KS)
-                                 ,histtype='step',linewidth=3,normed=1)
-                ax.hist(x_data , bins=bins
+    # compare x & y directions in 1 p(miss) bin - since there is no p(miss) dependence
+    for i_dir,direction in enumerate(['X','Y']): #{
+        x_data = df_data['pcm'+direction]
+        x_sim = df_sim['pcm'+direction]
+        D_KS , Pval_KS = ks_2samp( x_data , x_sim )
+        ks_pval_scores_target['pcm'+direction] = Pval_KS
+        ks_pval_scores_target_array.append( Pval_KS )
+        if do_plots:#{
+            if direction=='X':#{
+                ax = fig.add_subplot( 2 , 5 , (1,5) )
+                ax.yaxis.set_major_formatter(NullFormatter())
+            #}
+            h,bins,_=ax.hist(x_sim, bins=nbins
+                                ,label='sim. $p_{c.m.}^{%s}$ $\\mu=%.3f, \\sigma=%.3f, Pval=%f$'%(direction,np.mean(x_sim),np.std(x_sim),Pval_KS)
+                                ,histtype='step',linewidth=3,normed=1)
+            ax.hist(x_data , bins=bins
                         ,label=target+' data $p_{c.m.}^{%s}$  $\\mu=%.3f, \\sigma=%.3f$'%(direction,np.mean(x_data),np.std(x_data))
                         ,histtype='step'
                         ,linewidth=3
                         ,normed=1)
-                if direction=='Y': #{
-                    ax.set_title("gen. $\sigma=%.3f$"%gen_info[0]['gen_SigmaX'],y=1.02,fontsize=20)
-                    ax.legend(loc='best',fontsize=20)
-                #}
+            if direction=='Y': #{
+                ax.set_title("gen. $\sigma=%.3f$"%gen_info[0]['gen_SigmaX'],y=1.02,fontsize=20)
+                ax.legend(loc='best',fontsize=20)
             #}
         #}
-        ks_pval_scores_target['Pval_pcmX_pcmY'] = Fisher_combination_Pvals( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY']] ) # with a cutoff on 1e-20
+    #}
+    ks_pval_scores_target['Pval_pcmX_pcmY'] = Fisher_combination_Pvals( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY']] ) # with a cutoff on 1e-20
 
-        # in z direction - compare in N bins of p(miss)
-        for bin in range(len(PmissBins)):#{
+    # in z direction - compare in N bins of p(miss)
+    for bin in range(len(PmissBins)):#{
             
-            pmin , pmax = PmissBins[bin][0] , PmissBins[bin][1]
-            df_sim_reduced = df_sim[ (pmin < df_sim['Pmiss3Mag']) & (df_sim['Pmiss3Mag'] < pmax) ]
-            df_data_reduced = df_data[ (pmin < df_data['Pmiss3Mag']) & (df_data['Pmiss3Mag'] < pmax) ]
-            D_KS , Pval_KS = ks_2samp( df_sim_reduced['pcmZ'] , df_data_reduced['pcmZ'] )
-            sim_skew = skew( df_sim_reduced['pcmZ'] )
-            sim_kurt = kurtosis( df_sim_reduced['pcmZ'] )
-            '''
+        pmin , pmax = PmissBins[bin][0] , PmissBins[bin][1]
+        df_sim_reduced = df_sim[ (pmin < df_sim['Pmiss3Mag']) & (df_sim['Pmiss3Mag'] < pmax) ]
+        df_data_reduced = df_data[ (pmin < df_data['Pmiss3Mag']) & (df_data['Pmiss3Mag'] < pmax) ]
+        D_KS , Pval_KS = ks_2samp( df_sim_reduced['pcmZ'] , df_data_reduced['pcmZ'] )
+        sim_skew = skew( df_sim_reduced['pcmZ'] )
+        sim_kurt = kurtosis( df_sim_reduced['pcmZ'] )
+        '''
                 Check if the distribution of p(c.m.)-z in this bin is indeed Gaussian,
                 and if not - kill it by Pval=0
                 find number of local maxima. If greated than 1, kill the run
                 '''
-            # May-6
-            if do_plots:#{
-                data_skew = skew( df_data_reduced['pcmZ'] )
-                data_kurt = kurtosis( df_data_reduced['pcmZ'] )
-                hist , bin_edges = np.histogram (df_data_reduced['pcmZ'] , bins=bins)
-
-                ax_l = fig.add_subplot(2 , 5, 5 + bin + 1 )
-                h,bins,_=ax_l.hist(df_sim_reduced['pcmZ'] , bins=bins_histograms_l
+        # May-6
+        if do_plots:#{
+            data_skew = skew( df_data_reduced['pcmZ'] )
+            data_kurt = kurtosis( df_data_reduced['pcmZ'] )
+            hist , bin_edges = np.histogram (df_data_reduced['pcmZ'] , bins=bins)
+            ax_l = fig.add_subplot(2 , 5, 5 + bin + 1 )
+            h,bins,_=ax_l.hist(df_sim_reduced['pcmZ'] , bins=bins_histograms_l
                                    ,histtype='step',linewidth=3,normed=1
                                    ,label='sim. (%d) \n $\\mu=%.3f$ \n $\\sigma=%.3f$ \n $\\mu_3=%.2f$ \n $\\mu_4=%.2f$'
                                    %(len(df_sim_reduced),np.mean(df_sim_reduced['pcmZ']),np.std(df_sim_reduced['pcmZ']),sim_skew,sim_kurt))
-                ax_l.hist(df_data_reduced['pcmZ'] , bins=bins
+            ax_l.hist(df_data_reduced['pcmZ'] , bins=bins
                         ,label=target+' data  (%d) \n $\\mu=%.3f$ \n $\\sigma=%.3f$ \n $\\mu_3=%.2f$ \n $\\mu_4=%.2f$'
                         %(len(df_data_reduced),np.mean(df_data_reduced['pcmZ']),np.std(df_data_reduced['pcmZ']),data_skew,data_kurt),histtype='step',linewidth=3,normed=1)
-                ax_l.set_title('%.2f<$p_{miss}$<%.2f GeV/c, $p_{c.m.}^{z}$ Pval=%g'%(pmin , pmax,Pval_KS),y=1.01,fontsize=15)
-                ax_l.legend(fontsize=15,loc='upper left')
-                set_axes(ax_l,"","",fontsize=15)
-                ax_l.yaxis.set_major_formatter(NullFormatter())
-                ax_l.xaxis.set_ticks(np.linspace(np.min(ax_l.get_xlim())+0.1,np.max(ax_l.get_xlim()),4,endpoint=False))
+            ax_l.set_title('%.2f<$p_{miss}$<%.2f GeV/c, $p_{c.m.}^{z}$ Pval=%g'%(pmin , pmax,Pval_KS),y=1.01,fontsize=15)
+            ax_l.legend(fontsize=15,loc='upper left')
+            set_axes(ax_l,"","",fontsize=15)
+            ax_l.yaxis.set_major_formatter(NullFormatter())
+            ax_l.xaxis.set_ticks(np.linspace(np.min(ax_l.get_xlim())+0.1,np.max(ax_l.get_xlim()),4,endpoint=False))
 
-
-            ks_pval_scores_longitudinal_target_array.append( Pval_KS )
-            ks_pval_scores_target['pcmZ_bin%d'%bin] = Pval_KS
-            ks_pval_scores_target['pcmZ_bin%d_skew'%bin] = sim_skew
-            ks_pval_scores_target['pcmZ_bin%d_kurt'%bin] = sim_kurt
-            ks_pval_scores_target_array.append( Pval_KS )
-            #}
         #}
         
-        # --- global Pval from combination of all scores together --- #
-        ks_pval_scores_target['PvalTotal'] = Fisher_combination_Pvals( ks_pval_scores_target_array ) # with a cutoff on 1e-20
-        # --- global Pval with the Fisher combination of the Pvalues in the z direction along N bins in Pmiss --- #
-        ks_pval_scores_target['pcmZ_Fisher'] = Fisher_combination_Pvals( ks_pval_scores_longitudinal_target_array ) # with a cutoff on 1e-20
-        # --- global Pval with the average local Pval in the z direction along N bins in Pmiss --- #
-        ks_pval_scores_target['pcmZ_AverageBins'] = np.average( ks_pval_scores_longitudinal_target_array )
-        # --- global Pval with the Fisher combination of the Pvalues in the z direction along N bins in Pmiss --- #
-        ks_pval_scores_target['pcmZ_KS2D'] = ks2d2s( df_sim['Pmiss3Mag'] , df_sim['pcmZ'] , df_data['Pmiss3Mag'] , df_data['pcmZ'] )
+        ks_pval_scores_longitudinal_target_array.append( Pval_KS )
+        ks_pval_scores_target['pcmZ_bin%d'%bin] = Pval_KS
+        ks_pval_scores_target['pcmZ_bin%d_skew'%bin] = sim_skew
+        ks_pval_scores_target['pcmZ_bin%d_kurt'%bin] = sim_kurt
+        ks_pval_scores_target_array.append( Pval_KS )
+
+    #}
         
-        for method in PvalZ_calculation_methods: #{
-            ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_'+method] = Fisher_combination_Pvals( [ks_pval_scores_target['pcmX'],
+    # --- global Pval from combination of all scores together --- #
+    ks_pval_scores_target['PvalTotal'] = Fisher_combination_Pvals( ks_pval_scores_target_array ) # with a cutoff on 1e-20
+    # --- global Pval with the Fisher combination of the Pvalues in the z direction along N bins in Pmiss --- #
+    ks_pval_scores_target['pcmZ_Fisher'] = Fisher_combination_Pvals( ks_pval_scores_longitudinal_target_array ) # with a cutoff on 1e-20
+    # --- global Pval with the average local Pval in the z direction along N bins in Pmiss --- #
+    ks_pval_scores_target['pcmZ_AverageBins'] = np.average( ks_pval_scores_longitudinal_target_array )
+    # --- global Pval with the Fisher combination of the Pvalues in the z direction along N bins in Pmiss --- #
+    ks_pval_scores_target['pcmZ_KS2D'] = ks2d2s( df_sim['Pmiss3Mag'] , df_sim['pcmZ'] , df_data['Pmiss3Mag'] , df_data['pcmZ'] )
+    
+    for method in PvalZ_calculation_methods: #{
+        ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_'+method] = Fisher_combination_Pvals( [ks_pval_scores_target['pcmX'],
                                                                                               ks_pval_scores_target['pcmY'],
                                                                                               ks_pval_scores_target['pcmZ_'+method]] ) # with a cutoff on 1e-20
-            ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method] = ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_'+method]*1e20
-            ks_pval_scores_target['Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method] = Fisher_combination_Pvals( np.concatenate( [ ks_pval_scores_target['pcmX']*np.ones(len(PmissBins))
-                                                                                                                             ,ks_pval_scores_target['pcmY']*np.ones(len(PmissBins))
-                                                                                                                             ,ks_pval_scores_target['pcmZ_'+method] ]) )
+        ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method] = ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_'+method]*1e20
+            
+        powered_array = np.concatenate( [ ks_pval_scores_target['pcmX']*np.ones(len(PmissBins))
+                                             ,ks_pval_scores_target['pcmY']*np.ones(len(PmissBins)) ] )
+        powered_array = np.append( powered_array , ks_pval_scores_target['pcmZ_'+method])
+        if debug>3: #{
+            print "powered_array:",powered_array
         #}
+        ks_pval_scores_target['Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method] = Fisher_combination_Pvals( powered_array )
+    #}
+    # methods to combine Pvalue [https://arxiv.org/pdf/1212.4966.pdf]
+    # Bonferroni: N * min( P1, P2, P3.... , PN)
+#    ks_pval_scores_target['pcmZ_Bonferroni'] = 5*np.min( ks_pval_scores_longitudinal_target_array )
+#    ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_Bonferroni'] = 3*np.min( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY'],ks_pval_scores_target['pcmZ_Bonferroni']] )
+    # Ruschendorf: average
+#    ks_pval_scores_target['pcmZ_Ruschendorf'] = np.average( ks_pval_scores_longitudinal_target_array )
+#    ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_Ruschendorf'] = np.average( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY'],ks_pval_scores_target['pcmZ_Ruschendorf']] )
 
-        # methods to combine Pvalue [https://arxiv.org/pdf/1212.4966.pdf]
-        # Bonferroni: N * min( P1, P2, P3.... , PN)
-        ks_pval_scores_target['pcmZ_Bonferroni'] = 5*np.min( ks_pval_scores_longitudinal_target_array )
-        ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_Bonferroni'] = 3*np.min( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY'],ks_pval_scores_target['pcmZ_Bonferroni']] )
-        # Ruschendorf: average
-        ks_pval_scores_target['pcmZ_Ruschendorf'] = np.average( ks_pval_scores_longitudinal_target_array )
-        ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_Ruschendorf'] = np.average( [ks_pval_scores_target['pcmX'],ks_pval_scores_target['pcmY'],ks_pval_scores_target['pcmZ_Ruschendorf']] )
 
-
-        if do_plots:#{
-            ax = fig.add_subplot( 2 , 5 , (1,5) )
-            xmin,xmax = np.min(ax.get_xlim()),np.max(ax.get_xlim())
-            text = "gen.: $a_{1}=%.2f , a_{2}=%.2f , b_{1}=%.2f , b_{2}=%.2f$\n"% (gen_info[0]['gen_a1']
+    if do_plots:#{
+        ax = fig.add_subplot( 2 , 5 , (1,5) )
+        xmin,xmax = np.min(ax.get_xlim()),np.max(ax.get_xlim())
+        text = "gen.: $a_{1}=%.2f , a_{2}=%.2f , b_{1}=%.2f , b_{2}=%.2f$\n"% (gen_info[0]['gen_a1']
                                                                                    ,gen_info[0]['gen_a2']
                                                                                    ,gen_info[0]['gen_b1']
                                                                                    ,gen_info[0]['gen_b2'])
-            text += "$N_{attempts} = %d$\n"%Nattempts
-            text += "$Pval_{x}=%f$\n$Pval_{y}=%g$\n$Pval_{x-y}=%g$\n$Pval_{z}=%g$\
+        text += "$N_{attempts} = %d$\n"%Nattempts
+        text += "$Pval_{x}=%f$\n$Pval_{y}=%g$\n$Pval_{x-y}=%g$\n$Pval_{z}=%g$\
             \n$Pval_{x-y-z}=%g$\
-            \n$Pval_{5x-5y-z}=%g$\
-            \n$Pval_{x-y-z}^{Bonferroni}=%g$\
-            \n$Pval_{x-y-z}^{Ruschendorf}=%g$"%(ks_pval_scores_target['pcmX']
+            \n$Pval_{5x-5y-z}=%g$"%(ks_pval_scores_target['pcmX']
                                                ,ks_pval_scores_target['pcmY']
                                                ,ks_pval_scores_target['Pval_pcmX_pcmY']
-                                               ,ks_pval_scores_target['pcmZ']
-                                               ,ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ']
-                                               ,ks_pval_scores_target['Pval_5pcmX_5pcmY_pcmZ']
-                                               ,ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_Bonferroni']
-                                               ,ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_Ruschendorf'])
-            plt.text(xmin + 0.05*(xmax-xmin),0.5*np.max(ax.get_ylim()) ,text,fontsize=25)
-            if flags.worker == 'erez': figure_path = "/Users/erezcohen/Desktop/TmpPlots"
-            elif flags.worker == 'helion': figure_path = "/home/erez/Desktop/TmpPlots"
-            fig.savefig(figure_path + "/run_%d_%s.pdf"%(run,target))
-            print 'saved',figure_path + "/run_%d_%s.pdf"%(run,target)
-        #}
-
-        #        ks_pval_scores_target['PvalTotal_allPvals'] = FisherMethodPvals( ks_pval_scores_target_array )
-        if debug: #{
-            if debug>1:#{
-                print "ks-pval["+target+"]['Pval_pcmX_pcmY']:",ks_pval_scores_target['Pval_pcmX_pcmY']
-                print "ks-pval["+target+"]['pcmZ']:",ks_pval_scores_target['pcmZ']
-            #}
-            print "ks-pval["+target+"]['PvalTotal']:",ks_pval_scores_target['PvalTotal']
-        #}
-        
-        ks_pval_scores[target] = ks_pval_scores_target
-    #}
-    if debug>2:#{
-        print 'ks_pval_scores:'
-        for i in ks_pval_scores:#{
-            print i
-            for j in ks_pval_scores[i]:#{
-                print j,ks_pval_scores[i][j]
-            #}
-        #}
+                                               ,ks_pval_scores_target['pcmZ_Fisher']
+                                               ,ks_pval_scores_target['Pval_pcmX_pcmY_pcmZ_Fisher']
+                                               ,ks_pval_scores_target['Pval_5pcmX_5pcmY_pcmZ_Fisher'])
+        plt.text(xmin + 0.05*(xmax-xmin),0.5*np.max(ax.get_ylim()) ,text,fontsize=25)
+        if flags.worker == 'erez': figure_path = "/Users/erezcohen/Desktop/TmpPlots"
+        elif flags.worker == 'helion': figure_path = "/home/erez/Desktop/TmpPlots"
+        fig.savefig(figure_path + "/run_%d_%s.pdf"%(run,target))
+        print 'saved',figure_path + "/run_%d_%s.pdf"%(run,target)
     #}
 
-    return ks_pval_scores
+    #        ks_pval_scores_target['PvalTotal_allPvals'] = FisherMethodPvals( ks_pval_scores_target_array )
+    if debug: #{
+        if debug>1:#{
+            print "ks-pval["+target+"]['Pval_pcmX_pcmY']:",ks_pval_scores_target['Pval_pcmX_pcmY']
+            print "ks-pval["+target+"]['pcmZ_Fisher']:",ks_pval_scores_target['pcmZ_Fisher']
+        #}
+        print "ks-pval["+target+"]['PvalTotal']:",ks_pval_scores_target['PvalTotal']
+    #}
+
+    return ks_pval_scores_target
+#        ks_pval_scores[target] = ks_pval_scores_target
+    #}
+#    if debug>2:#{
+#        print 'ks_pval_scores:'
+#        for i in ks_pval_scores:#{
+#            print i
+#            for j in ks_pval_scores[i]:#{
+#                print j,ks_pval_scores[i][j]
+#            #}
+#        #}
+#    #}
+#
+#    return ks_pval_scores
 # ------------------------------------------------------------------------------- #
+
+
+
 
 
 
@@ -505,6 +509,7 @@ def fit_par_plot( fig , i_subplot , data , var , weight , title , do_plot_fit_pa
     pMissUpErr , pMissLowErr = data.pMiss_max - Pmiss , Pmiss - data.pMiss_min
     ax = fig.add_subplot( i_subplot )
     ax.grid(True,linestyle='-',color='0.95')
+    ax.set_xlim(0.3,1.0)
     [Xfit,XfitErr,Xchi2red] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_x_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , [data[ var + '_xErr_' + weight ],data[ var + '_xErr_' + weight ]], 'black','v','none',r'$x-direction$' ,'const',do_plot_fit_pars=do_plot_fit_pars)
     [Yfit,YfitErr,Ychi2red] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_y_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , [data[ var + '_yErr_' + weight ],data[ var + '_yErr_' + weight ]], 'red'  ,'o','none',r'$y-direction$' ,'const',do_plot_fit_pars=do_plot_fit_pars)
     [Za1,Za1err,Za2,Za2err,Zchi2red] = plot_errorbar_and_fit( ax , Pmiss, data[ var + '_z_' + weight] , [np.zeros(len(pMissLowErr)),np.zeros(len(pMissLowErr))] , data[ var + '_zErr_' + weight ], 'blue' ,'s','none',r'$\vec{p}_{miss}-direction$' ,'linear',do_plot_fit_pars=do_plot_fit_pars)
@@ -904,7 +909,13 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             Nattempts = gen_events.GetNattempts()
             if debug: print 'Nevents to analyze:',Nevents
         #}
-        
+        else: #{ for debugging...
+            Nevents=Nattempts=1
+            gen_MeanX = gen_MeanY = gen_SigmaX = gen_SigmaY = 0.
+            gen_a1  = gen_a2  = gen_b1  = gen_b2  = 0.
+        #}
+
+
         # (2) analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
         # ----------------------------
         if 'ana' in option: #{
@@ -940,7 +951,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                 #                reco_parameters, do_fits = calc_cm_parameters( ana_sim  , PmissBins ) # delete by June-30
                     reco_parameters, do_fits = calc_cm_parameters( ana_sim  , PmissBinsPerTarget[target] )
                     reco_fits = fit_cm_parameters( run , reco_parameters , do_fits=do_fits )
-                    ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data , do_plots=hyperparameters['do_ks_plots'] , run=run , Nattempts=Nattempts )
+                    ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data , do_plots=hyperparameters['do_ks_plots'] , run=run , Nattempts=Nattempts , target=target)
 
                     for fit_parameter in ['MeanX','SigmaX','MeanY','SigmaY','a1','a2','b1','b2']: #{
                         results['rec'+fit_parameter] = float(reco_fits[fit_parameter])
@@ -969,34 +980,40 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     # KS Pvalues
                     #                for target in targets: #{ location of for loop in June-21 (delete by June-30)
                     for bin in range(len(PmissBins)):#{
-                        results['ks_local_Pval_'+'pcmZ_bin%d'%bin+'_'+target] = ks_pval_scores[target]['pcmZ_bin%d'%bin]
+                        results['ks_local_Pval_'+'pcmZ_bin%d'%bin+'_'+target] = ks_pval_scores['pcmZ_bin%d'%bin]
+#                        results['ks_local_Pval_'+'pcmZ_bin%d'%bin+'_'+target] = ks_pval_scores[target]['pcmZ_bin%d'%bin]
                     #                        results['pcmZ_bin%d_skew'%bin+'_'+target] = ks_pval_scores[target]['pcmZ_bin%d_skew'%bin]
                     #                        results['pcmZ_bin%d_kurt'%bin+'_'+target] = ks_pval_scores[target]['pcmZ_bin%d_kurt'%bin]
                     #}
                     for direction in ['X','Y']: #{
-                        results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores[target]['pcm'+direction]
+                        results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores['pcm'+direction]
+#                        results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores[target]['pcm'+direction]
                     #}
-                    results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY']
-                    
+                    results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY']
+#                    results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY']
                     #                    results['ks_local_Pval_pcmZ_Bonferroni_'+target] = ks_pval_scores[target]['pcmZ_Bonferroni']
                     #                    results['ks_local_Pval_pcmZ_Ruschendorf_'+target] = ks_pval_scores[target]['pcmZ_Ruschendorf']
 
                     # --- global Pval from combination of all scores together --- #
-                    results['ks_PvalTotal'+'_'+target] = ks_pval_scores[target]['PvalTotal'] # with a cutoff on 1e-20
+                    results['ks_PvalTotal'+'_'+target] = ks_pval_scores['PvalTotal'] # with a cutoff on 1e-20
+#                    results['ks_PvalTotal'+'_'+target] = ks_pval_scores[target]['PvalTotal'] # with a cutoff on 1e-20
                     for method in PvalZ_calculation_methods: #{
                         results['ks_local_Pval_'+'pcmZ_'+method+'_'+target] = ks_pval_scores['pcmZ_'+method]
                         results['ks_Pval_pcmX_pcmY_pcmZ_'+method+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY_pcmZ_'+method]
                         results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method]
                         results['ks_Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method+'_'+target] = ks_pval_scores['Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method]
+
+                        for i,p in enumerate([0.2,0.25,0.33,0.4,0.5]):#{
+    #                        results['Pval_pcmXYZ_binom_%.2f_'+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ' ] ] )
+    #                        results['PvalTotal_binom_%.2f_'+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores[target]['PvalTotal' ] ] )
+                            results['Pval_pcmXYZ_'+method+'_binom_%.2f_'+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['Pval_pcmX_pcmY_pcmZ_'+method ] ] )
+                            results['PvalTotal_'+method+'_binom_%.2f_'+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['PvalTotal' ] ] )
+                        #}
                     #}
                     #                    results['ks_Pval_pcmX_pcmY_pcmZ_Bonferroni'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_Bonferroni']
                     #                    results['ks_Pval_pcmX_pcmY_pcmZ_Ruschendorf'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_Ruschendorf']
 
                     
-                    for i,p in enumerate([0.2,0.25,0.33,0.4,0.5]):#{
-                        results['Pval_pcmXYZ_binom_%.2f_'+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ' ] ] )
-                        results['PvalTotal_binom_%.2f_'+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores[target]['PvalTotal' ] ] )
-                    #}
                 #}
         
                 # events loss in 20 p(miss) bins, for pp/p analysis
@@ -1043,15 +1060,15 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                         results['ks_Pval_pcmX_pcmY_pcmZ_'+method+'_'+target] = 0
                         results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method+'_'+target] = 0
                         results['ks_Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method+'_'+target] = 0
-                    #}
+                
                     #                    results['ks_Pval_pcmX_pcmY_pcmZ_Bonferroni'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_Bonferroni']
                     #                    results['ks_Pval_pcmX_pcmY_pcmZ_Ruschendorf'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_Ruschendorf']
 
-                    for i,p in enumerate([0.2,0.25,0.33,0.4,0.5]):#{
-                        results['Pval_pcmXYZ_binom_%.2f_'+target] = 0
-                        results['PvalTotal_binom_%.2f_'+target] = 0
+                        for i,p in enumerate([0.2,0.25,0.33,0.4,0.5]):#{
+                            results['Pval_pcmXYZ_'+method+'_binom_%.2f_'+target] = 0
+                            results['PvalTotal_'+method+'_binom_%.2f_'+target] = 0
+                        #}
                     #}
-
                     for i in range( len(pmiss_bins) ):#{
                         results['fracLoss_pmiss_%.3f_%.3f'%(pmiss_bins[i][0] , pmiss_bins[i][1])] = 1
                         for j in range( len(Q2Bins) ): results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmiss_bins[i][0] , pmiss_bins[i][1] , Q2Bins[j][0] , Q2Bins[j][1] )] = 1
