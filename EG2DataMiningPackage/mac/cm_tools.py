@@ -390,18 +390,18 @@ def calc_cm_parameters( fana  , fPmissBins , unweightedRoofitsFName = '' , weigh
 
         df_pMissBins = df_pMissBins.append(df_pMissBin)
 
-    if DoSaveCanvas:
+    if DoSaveCanvas:#{
         canvas_unweighted.SaveAs(unweightedRoofitsFName)
         print_filename(unweightedRoofitsFName,"unweighted rooFits at")
         canvas_weighted.SaveAs(weightedRoofitsFName)
         print_filename(weightedRoofitsFName,"weighted rooFits at")
         print_line()
-    print "computed cm parameters for "+fana.InFileName
-    if debug>1:
+    #}
+    if debug>1:#{
+        print "computed cm parameters for "+fana.InFileName
         print "reconstructed cm parameters"
-        if debug>5:
-            print 'df_pMissBins:',df_pMissBins
-
+        if debug>5: print 'df_pMissBins:',df_pMissBins
+    #}
     garbage_list = [ ana ]
     del garbage_list
 
@@ -575,8 +575,8 @@ def fit_cm_parameters( run , data , do_fits=True , FigureFName = '' , DoPlot = F
         print_filename( FigureFName , "and plot can be found at" )
         print_line()
     #}
-    print "computed fit parameters for run ",run
     if debug>1:#{
+        print "computed fit parameters for run ",run
         print "completed fiting processes"
         if debug>4:
             print "df_fit_parameters: ",df_fit_parameters
@@ -1006,8 +1006,8 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                         for i,p in enumerate([0.2,0.25,0.33,0.4,0.5]):#{
     #                        results['Pval_pcmXYZ_binom_%.2f_'+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ' ] ] )
     #                        results['PvalTotal_binom_%.2f_'+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores[target]['PvalTotal' ] ] )
-                            results['Pval_pcmXYZ_'+method+'_binom_%.2f_'+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['Pval_pcmX_pcmY_pcmZ_'+method ] ] )
-                            results['PvalTotal_'+method+'_binom_%.2f_'+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['PvalTotal' ] ] )
+                            results['Pval_pcmXYZ_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['Pval_pcmX_pcmY_pcmZ_'+method ] ] )
+                            results['PvalTotal_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['PvalTotal' ] ] )
                         #}
                     #}
                     #                    results['ks_Pval_pcmX_pcmY_pcmZ_Bonferroni'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_Bonferroni']
@@ -1065,8 +1065,8 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     #                    results['ks_Pval_pcmX_pcmY_pcmZ_Ruschendorf'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_Ruschendorf']
 
                         for i,p in enumerate([0.2,0.25,0.33,0.4,0.5]):#{
-                            results['Pval_pcmXYZ_'+method+'_binom_%.2f_'+target] = 0
-                            results['PvalTotal_'+method+'_binom_%.2f_'+target] = 0
+                            results['Pval_pcmXYZ_'+method+'_binom_%.2f_'%p+target] = 0
+                            results['PvalTotal_'+method+'_binom_%.2f_'%p+target] = 0
                         #}
                     #}
                     for i in range( len(pmiss_bins) ):#{
