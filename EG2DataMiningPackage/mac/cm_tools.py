@@ -1068,6 +1068,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                         for i,p in enumerate([0.2,0.25,0.33,0.4,0.5]):#{
                             results['Pval_pcmXYZ_'+method+'_binom_%.2f_'%p+target] = 0
                             results['PvalTotal_'+method+'_binom_%.2f_'%p+target] = 0
+                            results['Pval_Powered_pcmXY_pcmZ_'+method+'_binom_%.2f_'%p+target] = 0
                         #}
                     #}
                     for i in range( len(pmiss_bins) ):#{
