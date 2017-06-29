@@ -1046,9 +1046,9 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     #                        results['pcmZ_bin%d_kurt'%bin+'_'+target] = 0
                     #}
                     for direction in ['X','Y']: #{
-                        results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores[target]['pcm'+direction]
+                        results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores['pcm'+direction]
                     #}
-                    results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY']
+                    results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY']
 
                     #                    results['ks_local_Pval_pcmZ_Bonferroni_'+target] = ks_pval_scores[target]['pcmZ_Bonferroni']
                     #                    results['ks_local_Pval_pcmZ_Ruschendorf_'+target] = ks_pval_scores[target]['pcmZ_Ruschendorf']
