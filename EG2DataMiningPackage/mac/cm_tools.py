@@ -1047,9 +1047,9 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     #                        results['pcmZ_bin%d_kurt'%bin+'_'+target] = 0
                     #}
                     for direction in ['X','Y']: #{
-                        results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores['pcm'+direction]
+                        results['ks_local_Pval_'+'pcm'+direction+'_'+target] = 0
                     #}
-                    results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY']
+                    results['ks_Pval_pcmX_pcmY'+'_'+target] = 0
 
                     #                    results['ks_local_Pval_pcmZ_Bonferroni_'+target] = ks_pval_scores[target]['pcmZ_Bonferroni']
                     #                    results['ks_local_Pval_pcmZ_Ruschendorf_'+target] = ks_pval_scores[target]['pcmZ_Ruschendorf']
@@ -1083,7 +1083,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                 results['NLostEvents'] = 9907*float(NRand)
                 results['fracLostEvents'] = 1
                 for i in range(len(PmissBins)):#{
-                    results['EvtsInBin'+'_bin%d'%i] = reco_parameters.get_value(i,'EvtsInBin')
+                    results['EvtsInBin'+'_bin%d'%i] = 0
                     for parname in ['mean','sigma']: #{
                         for direction in ['x','y','z']: #{
                             results['rec'+parname + '_' + direction+'_bin%d'%i] = results['rec'+parname + 'Err_' + direction+'_bin%d'%i] =  -100
