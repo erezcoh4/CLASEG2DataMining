@@ -32,7 +32,7 @@ PmissBinsPerTarget = dict( {'C12':[[0.3,0.45]  , [0.45,0.55] , [0.55,0.65]  , [0
                             ,'Al27':[[0.3,0.5]  , [0.5,0.7] , [0.7,1.0]]
                             ,'Fe56':[[0.3,0.45]  , [0.45,0.55] , [0.55,0.65]  , [0.65,0.75] , [0.75,1.0]]
                             ,'Pb208':[[0.3,0.6]  , [0.6,1.0]]})
-
+p_binom_array = [0.2,0.225,0.25,0.3,0.33,0.36,0.4,0.45,0.5]
 
 
 # file names
@@ -934,7 +934,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                 
                 # N(attempts) is used as an indicator using a binomial test of number of successes
                 binom_test_Pval = []
-                for i,p in enumerate([0.2,0.25,0.33,0.4,0.5]):#{
+                for i,p in enumerate(p_binom_array):#{
                     binom_test_Pval.append(binom_test( x=Nevents/100 ,n=Nattempts/100 , p=p )) # divide by a factor of 100 to soften the Pvalue distribution
                     results['Pval_binom_%.2f_test_Nsucsseses'%p] = binom_test_Pval[i]
                 #}
@@ -1003,7 +1003,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                         results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method]
                         results['ks_Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method+'_'+target] = ks_pval_scores['Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method]
 
-                        for i,p in enumerate([0.2,0.25,0.33,0.4,0.5]):#{
+                        for i,p in enumerate(p_binom_array):#{
     #                        results['Pval_pcmXYZ_binom_%.2f_'+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ' ] ] )
     #                        results['PvalTotal_binom_%.2f_'+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores[target]['PvalTotal' ] ] )
                             results['Pval_pcmXYZ_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['Pval_pcmX_pcmY_pcmZ_'+method ] ] )
@@ -1037,7 +1037,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
             #}
             else: #{
                 results['parameters_reconstructed_well'] = False
-                for i,p in enumerate([0.2,0.25,0.33,0.4,0.5]):#{
+                for i,p in enumerate(p_binom_array):#{
                     results['Pval_binom_%.2f_test_Nsucsseses'%p] = 0
                 #}
                 for target in targets: #{
@@ -1065,7 +1065,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     #                    results['ks_Pval_pcmX_pcmY_pcmZ_Bonferroni'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_Bonferroni']
                     #                    results['ks_Pval_pcmX_pcmY_pcmZ_Ruschendorf'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_Ruschendorf']
 
-                        for i,p in enumerate([0.2,0.25,0.33,0.4,0.5]):#{
+                        for i,p in enumerate(p_binom_array):#{
                             results['Pval_pcmXYZ_'+method+'_binom_%.2f_'%p+target] = 0
                             results['PvalTotal_'+method+'_binom_%.2f_'%p+target] = 0
                             results['Pval_Powered_pcmXY_pcmZ_'+method+'_binom_%.2f_'%p+target] = 0
