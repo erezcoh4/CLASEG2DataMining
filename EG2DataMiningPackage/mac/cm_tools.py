@@ -996,7 +996,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     #}
                     # KS Pvalues
                     #                for target in targets: #{ location of for loop in June-21 (delete by June-30)
-                    for bin in range(len(PmissBins)):#{
+                    for bin in range(len(PmissBinsPerTarget[target])):#{
                         results['ks_local_Pval_'+'pcmZ_bin%d'%bin+'_'+target] = ks_pval_scores['pcmZ_bin%d'%bin]
 #                        results['ks_local_Pval_'+'pcmZ_bin%d'%bin+'_'+target] = ks_pval_scores[target]['pcmZ_bin%d'%bin]
                     #                        results['pcmZ_bin%d_skew'%bin+'_'+target] = ks_pval_scores[target]['pcmZ_bin%d_skew'%bin]
@@ -1035,8 +1035,8 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                 #}
         
                 # events loss in 20 p(miss) bins, for pp/p analysis
-                for i in range( len(pmiss_bins) ):#{
-                    pmin , pmax = pmiss_bins[i][0] , pmiss_bins[i][1]
+                for i in range( len(PmissBinsPerTarget[target]) ):#{
+                    pmin , pmax = PmissBinsPerTarget[target][i][0] , PmissBinsPerTarget[target][i][1]
                     results['fracLoss_pmiss_%.3f_%.3f'%(pmin , pmax)] = loss_pmiss_bins[i]
                 
                     # Q2 and p(miss) bins
@@ -1099,7 +1099,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                 #}
                 results['NLostEvents'] = 9907*float(NRand)
                 results['fracLostEvents'] = 1
-                for i in range(len(PmissBins)):#{
+                for i in range(len(PmissBinsPerTarget[target])):#{
                     results['EvtsInBin'+'_bin%d'%i] = 0
                     for parname in ['mean','sigma']: #{
                         for direction in ['x','y','z']: #{
