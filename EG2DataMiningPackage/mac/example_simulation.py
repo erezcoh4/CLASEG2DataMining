@@ -103,12 +103,17 @@ if 'gen' in flags.option:#{
         print 'a1 (%.2f) and a2(%.2f) create together a negative sigma_z, killing run %d'%( gen_a1 , gen_a2 , run )
     #}
 #}
+else: #{
+    Nattempts = 1
+#}
 
 if 'ana' in flags.option:#{
     print 'analyzing run...'
     ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run )
-        
-    ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data , do_plots=hyperparameters['do_ks_plots'] , run=run , Nattempts=Nattempts )
+    
+    for target in targets: #{
+        ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data , do_plots=hyperparameters['do_ks_plots'] , run=run , Nattempts=Nattempts , target=target )
+    #}
     print 'finished calculating ks_pval_scores'
     ana_sim.CloseFile()
 #}
