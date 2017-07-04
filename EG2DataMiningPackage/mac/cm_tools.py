@@ -935,7 +935,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
 
         # (2) analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
         # ----------------------------
-        if 'ana' in option: #{
+        if 'ana' in option and Nevents!=-1: #{
             if debug>1: print "analyzing run %d"%run
             
             ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run )
@@ -947,9 +947,9 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                                    }, index = [int(run)])
                                 
             # Nevents==-1 means that the generation of events could not be completed (too bad of acceptance)
-            if Nevents==-1: continue
-            if Nevents!=-1: #{
-                
+#            if Nevents==-1: continue
+#            if Nevents!=-1: #{
+
                 # N(attempts) is used as an indicator using a binomial test of number of successes
                 binom_test_Pval = []
                 for i,p in enumerate(p_binom_array):#{
