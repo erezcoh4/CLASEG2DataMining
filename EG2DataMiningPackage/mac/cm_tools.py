@@ -951,94 +951,94 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
 #            if Nevents!=-1: #{
 
                 # N(attempts) is used as an indicator using a binomial test of number of successes
-                binom_test_Pval = []
-                for i,p in enumerate(p_binom_array):#{
-                    binom_test_Pval.append(binom_test( x=Nevents/100 ,n=Nattempts/100 , p=p )) # divide by a factor of 100 to soften the Pvalue distribution
-                    results['Pval_binom_%.2f_test_Nsucsseses'%p] = binom_test_Pval[i]
-                #}
+            binom_test_Pval = []
+            for i,p in enumerate(p_binom_array):#{
+                binom_test_Pval.append(binom_test( x=Nevents/100 ,n=Nattempts/100 , p=p )) # divide by a factor of 100 to soften the Pvalue distribution
+                results['Pval_binom_%.2f_test_Nsucsseses'%p] = binom_test_Pval[i]
+            #}
                 
-                loss_pmiss_bins , loss_Q2pmiss_bins , loss_thetapmqpmiss_bins = get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins ,
+            loss_pmiss_bins , loss_Q2pmiss_bins , loss_thetapmqpmiss_bins = get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins ,
                                                                                                     Q2Bins , evtsgen_Q2pmiss_bins ,
                                                                                                     thetapmqBins , evtsgen_thetapmqpmiss_bins ,
                                                                                                     ana_sim )
 
-                # from now on we work in 4 targets - since each has its own Pmiss binning
-                for target in targets: #{
-                # reconstruct c.m. parameters and fit
-                    reco_parameters, do_fits = calc_cm_parameters( ana_sim  , PmissBinsPerTarget[target] )
-                    reco_fits = fit_cm_parameters( run , reco_parameters , do_fits=do_fits )
-                    ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data , do_plots=hyperparameters['do_ks_plots'] , run=run , Nattempts=Nattempts , target=target)
+            # from now on we work in 4 targets - since each has its own Pmiss binning
+            for target in targets: #{
+            # reconstruct c.m. parameters and fit
+                reco_parameters, do_fits = calc_cm_parameters( ana_sim  , PmissBinsPerTarget[target] )
+                reco_fits = fit_cm_parameters( run , reco_parameters , do_fits=do_fits )
+                ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data , do_plots=hyperparameters['do_ks_plots'] , run=run , Nattempts=Nattempts , target=target)
 
-                    for fit_parameter in ['MeanX','SigmaX','MeanY','SigmaY','a1','a2','b1','b2']: #{
-                        results['rec'+fit_parameter+'_'+target] = float(reco_fits[fit_parameter])
-                    #}
-                    results['NLostEvents'] = (9907*float(NRand) - ana_sim.GetEntries())
-                    results['fracLostEvents'] = (float((9907.0*float(NRand)) - ana_sim.GetEntries())/(9907.0*float(NRand)))
-                    results['parameters_reconstructed_well'] = True if do_fits else False
-                
-                    # reconstructed parameters in N p(miss) bins
-                    for i in range(len(PmissBinsPerTarget[target])):#{
-                        pmin , pmax = PmissBinsPerTarget[target][i][0] , PmissBinsPerTarget[target][i][1]
-                        results['EvtsInBin'+'_bin%d'%i] = reco_parameters.get_value(i,'EvtsInBin')
-                        for parname in ['mean','sigma']: #{
-                            for direction in ['x','y','z']: #{
-                        
-                                parnamedir = parname + '_' + direction
-                                recparnamedir = 'rec'+parnamedir+'_bin%d'%i
-                                results[recparnamedir] = float(reco_parameters.get_value(i,parnamedir+'_unweighted')) if do_fits else -100
-                                parnamedirErr = parnamedir+'Err'
-                                recparnamedirErr = 'rec'+parnamedirErr+'_bin%d'%i
-                                results[recparnamedirErr] = float(reco_parameters.get_value(i,parnamedirErr+'_unweighted')) if do_fits else -100
-                            #}
-                        #}
-                    #}
-                    # KS Pvalues
-                    for bin in range(len(PmissBinsPerTarget[target])):#{
-                        results['ks_local_Pval_'+'pcmZ_bin%d'%bin+'_'+target] = ks_pval_scores['pcmZ_bin%d'%bin]
-                    #}
-                    for direction in ['X','Y']: #{
-                        results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores['pcm'+direction]
-                    #}
-                    results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY']
-
-                    # --- global Pval from combination of all scores together --- #
-                    results['ks_PvalTotal'+'_'+target] = ks_pval_scores['PvalTotal'] # with a cutoff on 1e-20
-                    for method in PvalZ_calculation_methods: #{
-                        results['ks_local_Pval_'+'pcmZ_'+method+'_'+target] = ks_pval_scores['pcmZ_'+method]
-                        results['ks_Pval_pcmX_pcmY_pcmZ_'+method+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY_pcmZ_'+method]
-                        results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method]
-                        results['ks_Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method+'_'+target] = ks_pval_scores['Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method]
-
-                        for i,p in enumerate(p_binom_array):#{
-
-                            results['Pval_pcmXYZ_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['Pval_pcmX_pcmY_pcmZ_'+method ] ] )
-                            results['PvalTotal_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['PvalTotal' ] ] )
-                            results['Pval_Powered_pcmXY_pcmZ_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method ] ] )
-                        #}
-                    #}
+                for fit_parameter in ['MeanX','SigmaX','MeanY','SigmaY','a1','a2','b1','b2']: #{
+                    results['rec'+fit_parameter+'_'+target] = float(reco_fits[fit_parameter])
                 #}
-        
-                # events loss in 20 p(miss) bins, for pp/p analysis
-                for i in range( len(PmissBinsPerTarget[target]) ):#{
+                results['NLostEvents'] = (9907*float(NRand) - ana_sim.GetEntries())
+                results['fracLostEvents'] = (float((9907.0*float(NRand)) - ana_sim.GetEntries())/(9907.0*float(NRand)))
+                results['parameters_reconstructed_well'] = True if do_fits else False
+                
+                # reconstructed parameters in N p(miss) bins
+                for i in range(len(PmissBinsPerTarget[target])):#{
                     pmin , pmax = PmissBinsPerTarget[target][i][0] , PmissBinsPerTarget[target][i][1]
-                    results['fracLoss_pmiss_%.3f_%.3f'%(pmin , pmax)] = loss_pmiss_bins[i]
-                
-                    # Q2 and p(miss) bins
-                    for j in range( len(Q2Bins) ):#{
-                        Q2min , Q2max = Q2Bins[j][0] , Q2Bins[j][1]
-                        results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmin , pmax , Q2min , Q2max)] = loss_Q2pmiss_bins[i][j]
-                    #}
-
-                    # theta(pm,q) and p(miss) bins
-                    for j in range( len(thetapmqBins) ):#{
-                        thetapmqmin , thetapmqmax = thetapmqBins[j][0] , thetapmqBins[j][1]
-                        results['fracLoss_pmiss_%.3f_%.3f_thetapmq_%.1f_%.1f'%(pmin,pmax,thetapmqmin,thetapmqmax)] = loss_thetapmqpmiss_bins[i][j]
+                    results['EvtsInBin'+'_bin%d'%i] = reco_parameters.get_value(i,'EvtsInBin')
+                    for parname in ['mean','sigma']: #{
+                        for direction in ['x','y','z']: #{
+                        
+                            parnamedir = parname + '_' + direction
+                            recparnamedir = 'rec'+parnamedir+'_bin%d'%i
+                            results[recparnamedir] = float(reco_parameters.get_value(i,parnamedir+'_unweighted')) if do_fits else -100
+                            parnamedirErr = parnamedir+'Err'
+                            recparnamedirErr = 'rec'+parnamedirErr+'_bin%d'%i
+                            results[recparnamedirErr] = float(reco_parameters.get_value(i,parnamedirErr+'_unweighted')) if do_fits else -100
+                        #}
                     #}
                 #}
-                if do_reco_fits_file:   stream_dataframe_to_file( reco_fits, reco_fitsFName  )
-                if do_resutls_file:     stream_dataframe_to_file( results, buildup_resultsFName , float_format='%f' )
-                if do_root_file:        stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')                
+                # KS Pvalues
+                for bin in range(len(PmissBinsPerTarget[target])):#{
+                    results['ks_local_Pval_'+'pcmZ_bin%d'%bin+'_'+target] = ks_pval_scores['pcmZ_bin%d'%bin]
+                #}
+                for direction in ['X','Y']: #{
+                    results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores['pcm'+direction]
+                #}
+                results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY']
+
+                # --- global Pval from combination of all scores together --- #
+                results['ks_PvalTotal'+'_'+target] = ks_pval_scores['PvalTotal'] # with a cutoff on 1e-20
+                for method in PvalZ_calculation_methods: #{
+                    results['ks_local_Pval_'+'pcmZ_'+method+'_'+target] = ks_pval_scores['pcmZ_'+method]
+                    results['ks_Pval_pcmX_pcmY_pcmZ_'+method+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY_pcmZ_'+method]
+                    results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method]
+                    results['ks_Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method+'_'+target] = ks_pval_scores['Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method]
+
+                    for i,p in enumerate(p_binom_array):#{
+
+                        results['Pval_pcmXYZ_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['Pval_pcmX_pcmY_pcmZ_'+method ] ] )
+                        results['PvalTotal_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['PvalTotal' ] ] )
+                        results['Pval_Powered_pcmXY_pcmZ_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method ] ] )
+                    #}
+                #}
             #}
+        
+            # events loss in 20 p(miss) bins, for pp/p analysis
+            for i in range( len(PmissBinsPerTarget[target]) ):#{
+                pmin , pmax = PmissBinsPerTarget[target][i][0] , PmissBinsPerTarget[target][i][1]
+                results['fracLoss_pmiss_%.3f_%.3f'%(pmin , pmax)] = loss_pmiss_bins[i]
+                
+                # Q2 and p(miss) bins
+                for j in range( len(Q2Bins) ):#{
+                    Q2min , Q2max = Q2Bins[j][0] , Q2Bins[j][1]
+                    results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmin , pmax , Q2min , Q2max)] = loss_Q2pmiss_bins[i][j]
+                #}
+
+                # theta(pm,q) and p(miss) bins
+                for j in range( len(thetapmqBins) ):#{
+                    thetapmqmin , thetapmqmax = thetapmqBins[j][0] , thetapmqBins[j][1]
+                    results['fracLoss_pmiss_%.3f_%.3f_thetapmq_%.1f_%.1f'%(pmin,pmax,thetapmqmin,thetapmqmax)] = loss_thetapmqpmiss_bins[i][j]
+                #}
+            #}
+            if do_reco_fits_file:   stream_dataframe_to_file( reco_fits, reco_fitsFName  )
+            if do_resutls_file:     stream_dataframe_to_file( results, buildup_resultsFName , float_format='%f' )
+            if do_root_file:        stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
+#        #}
 #            else: #{
 #                for i,p in enumerate(p_binom_array):#{
 #                    results['Pval_binom_%.2f_test_Nsucsseses'%p] = 0
