@@ -945,9 +945,10 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                                    ,'gen_MeanX':gen_MeanX, 'gen_SigmaX':gen_SigmaX, 'gen_MeanY':gen_MeanY, 'gen_SigmaY':gen_SigmaY
                                    ,'gen_a1':gen_a1, 'gen_a2':gen_a2, 'gen_b1':gen_b1, 'gen_b2':gen_b2
                                    }, index = [int(run)])
-                                   
-            
-            if Nevents!=-1: #{  Nevents==-1 means that the generation of events could not be completed (too bad of acceptance)
+                                
+            # Nevents==-1 means that the generation of events could not be completed (too bad of acceptance)
+            if Nevents==-1: continue
+            if Nevents!=-1: #{
                 
                 # N(attempts) is used as an indicator using a binomial test of number of successes
                 binom_test_Pval = []
@@ -963,15 +964,13 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
 
                 # from now on we work in 4 targets - since each has its own Pmiss binning
                 for target in targets: #{
-                                                                                                    
                 # reconstruct c.m. parameters and fit
-                #                reco_parameters, do_fits = calc_cm_parameters( ana_sim  , PmissBins ) # delete by June-30
                     reco_parameters, do_fits = calc_cm_parameters( ana_sim  , PmissBinsPerTarget[target] )
                     reco_fits = fit_cm_parameters( run , reco_parameters , do_fits=do_fits )
                     ks_pval_scores = calc_pval_ks_scores( ana_sim , ana_data , do_plots=hyperparameters['do_ks_plots'] , run=run , Nattempts=Nattempts , target=target)
 
                     for fit_parameter in ['MeanX','SigmaX','MeanY','SigmaY','a1','a2','b1','b2']: #{
-                        results['rec'+fit_parameter] = float(reco_fits[fit_parameter])
+                        results['rec'+fit_parameter+'_'+target] = float(reco_fits[fit_parameter])
                     #}
                     results['NLostEvents'] = (9907*float(NRand) - ana_sim.GetEntries())
                     results['fracLostEvents'] = (float((9907.0*float(NRand)) - ana_sim.GetEntries())/(9907.0*float(NRand)))
@@ -987,7 +986,6 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                                 parnamedir = parname + '_' + direction
                                 recparnamedir = 'rec'+parnamedir+'_bin%d'%i
                                 results[recparnamedir] = float(reco_parameters.get_value(i,parnamedir+'_unweighted')) if do_fits else -100
-                            
                                 parnamedirErr = parnamedir+'Err'
                                 recparnamedirErr = 'rec'+parnamedirErr+'_bin%d'%i
                                 results[recparnamedirErr] = float(reco_parameters.get_value(i,parnamedirErr+'_unweighted')) if do_fits else -100
@@ -995,25 +993,16 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                         #}
                     #}
                     # KS Pvalues
-                    #                for target in targets: #{ location of for loop in June-21 (delete by June-30)
                     for bin in range(len(PmissBinsPerTarget[target])):#{
                         results['ks_local_Pval_'+'pcmZ_bin%d'%bin+'_'+target] = ks_pval_scores['pcmZ_bin%d'%bin]
-#                        results['ks_local_Pval_'+'pcmZ_bin%d'%bin+'_'+target] = ks_pval_scores[target]['pcmZ_bin%d'%bin]
-                    #                        results['pcmZ_bin%d_skew'%bin+'_'+target] = ks_pval_scores[target]['pcmZ_bin%d_skew'%bin]
-                    #                        results['pcmZ_bin%d_kurt'%bin+'_'+target] = ks_pval_scores[target]['pcmZ_bin%d_kurt'%bin]
                     #}
                     for direction in ['X','Y']: #{
                         results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores['pcm'+direction]
-#                        results['ks_local_Pval_'+'pcm'+direction+'_'+target] = ks_pval_scores[target]['pcm'+direction]
                     #}
                     results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY']
-#                    results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY']
-                    #                    results['ks_local_Pval_pcmZ_Bonferroni_'+target] = ks_pval_scores[target]['pcmZ_Bonferroni']
-                    #                    results['ks_local_Pval_pcmZ_Ruschendorf_'+target] = ks_pval_scores[target]['pcmZ_Ruschendorf']
 
                     # --- global Pval from combination of all scores together --- #
                     results['ks_PvalTotal'+'_'+target] = ks_pval_scores['PvalTotal'] # with a cutoff on 1e-20
-#                    results['ks_PvalTotal'+'_'+target] = ks_pval_scores[target]['PvalTotal'] # with a cutoff on 1e-20
                     for method in PvalZ_calculation_methods: #{
                         results['ks_local_Pval_'+'pcmZ_'+method+'_'+target] = ks_pval_scores['pcmZ_'+method]
                         results['ks_Pval_pcmX_pcmY_pcmZ_'+method+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY_pcmZ_'+method]
@@ -1021,17 +1010,12 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                         results['ks_Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method+'_'+target] = ks_pval_scores['Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method]
 
                         for i,p in enumerate(p_binom_array):#{
-    #                        results['Pval_pcmXYZ_binom_%.2f_'+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ' ] ] )
-    #                        results['PvalTotal_binom_%.2f_'+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores[target]['PvalTotal' ] ] )
+
                             results['Pval_pcmXYZ_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['Pval_pcmX_pcmY_pcmZ_'+method ] ] )
                             results['PvalTotal_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['PvalTotal' ] ] )
                             results['Pval_Powered_pcmXY_pcmZ_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method ] ] )
                         #}
                     #}
-                    #                    results['ks_Pval_pcmX_pcmY_pcmZ_Bonferroni'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_Bonferroni']
-                    #                    results['ks_Pval_pcmX_pcmY_pcmZ_Ruschendorf'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_Ruschendorf']
-
-                    
                 #}
         
                 # events loss in 20 p(miss) bins, for pp/p analysis
@@ -1051,69 +1035,72 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                         results['fracLoss_pmiss_%.3f_%.3f_thetapmq_%.1f_%.1f'%(pmin,pmax,thetapmqmin,thetapmqmax)] = loss_thetapmqpmiss_bins[i][j]
                     #}
                 #}
+                if do_reco_fits_file:   stream_dataframe_to_file( reco_fits, reco_fitsFName  )
+                if do_resutls_file:     stream_dataframe_to_file( results, buildup_resultsFName , float_format='%f' )
+                if do_root_file:        stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')                
             #}
-            else: #{
-                results['parameters_reconstructed_well'] = False
-                for i,p in enumerate(p_binom_array):#{
-                    results['Pval_binom_%.2f_test_Nsucsseses'%p] = 0
-                #}
-                for target in targets: #{
-                    for bin in range(len(PmissBins)):#{
-                        results['ks_local_Pval_pcmZ_bin%d'%bin+'_'+target] = 0
-                    #                        results['pcmZ_bin%d_skew'%bin+'_'+target] = 0
-                    #                        results['pcmZ_bin%d_kurt'%bin+'_'+target] = 0
-                    #}
-                    for direction in ['X','Y']: #{
-                        results['ks_local_Pval_'+'pcm'+direction+'_'+target] = 0
-                    #}
-                    results['ks_Pval_pcmX_pcmY'+'_'+target] = 0
+#            else: #{
+#                for i,p in enumerate(p_binom_array):#{
+#                    results['Pval_binom_%.2f_test_Nsucsseses'%p] = 0
+#                #}
+#                for fit_parameter in ['MeanX','SigmaX','MeanY','SigmaY','a1','a2','b1','b2']: #{
+#                    results['rec'+fit_parameter] = float(reco_fits[fit_parameter])
+#                #}
+#                for target in targets: #{
+#                    for fit_parameter in ['MeanX','SigmaX','MeanY','SigmaY','a1','a2','b1','b2']: #{
+#                        results['rec'+fit_parameter+'_'+target] = 0
+#                    #}
+#                    results['NLostEvents'] = 0
+#                    results['fracLostEvents'] = 0
+#                    results['parameters_reconstructed_well'] = False
+#
+#                    for bin in range(len(PmissBinsPerTarget[target])):#{
+#                        results['ks_local_Pval_pcmZ_bin%d'%bin+'_'+target] = 0
+#                    #}
+#                    for direction in ['X','Y']: #{
+#                        results['ks_local_Pval_'+'pcm'+direction+'_'+target] = 0
+#                    #}
+#                    results['ks_Pval_pcmX_pcmY'+'_'+target] = 0
+#
+#                    results['ks_PvalTotal'+'_'+target] = 0
+#                    for method in PvalZ_calculation_methods: #{
+#                        results['ks_local_Pval_'+'pcmZ_'+method+'_'+target] = 0
+#                        results['ks_Pval_pcmX_pcmY_pcmZ_'+method+'_'+target] = 0
+#                        results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method+'_'+target] = 0
+#                        results['ks_Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method+'_'+target] = 0
+#
+#                        for i,p in enumerate(p_binom_array):#{
+#                            results['Pval_pcmXYZ_'+method+'_binom_%.2f_'%p+target] = 0
+#                            results['PvalTotal_'+method+'_binom_%.2f_'%p+target] = 0
+#                            results['Pval_Powered_pcmXY_pcmZ_'+method+'_binom_%.2f_'%p+target] = 0
+#                        #}
+#                    #}
+#                    for i in range( len(pmiss_bins) ):#{
+#                        results['fracLoss_pmiss_%.3f_%.3f'%(pmiss_bins[i][0] , pmiss_bins[i][1])] = 1
+#                        for j in range( len(Q2Bins) ): results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmiss_bins[i][0] , pmiss_bins[i][1] , Q2Bins[j][0] , Q2Bins[j][1] )] = 1
+#                        for j in range( len(thetapmqBins) ): results['fracLoss_pmiss_%.3f_%.3f_thetapmq_%.1f_%.1f'%(pmiss_bins[i][0] , pmiss_bins[i][1] ,thetapmqBins[j][0] , thetapmqBins[j][1])] = 1
+#                    #}
+#                #}
+#                for fit_parameter in ['MeanX','SigmaX','MeanY','SigmaY','a1','a2','b1','b2']: #{
+#                    results['rec'+fit_parameter] = -100
+#                #}
+#                results['NLostEvents'] = 9907*float(NRand)
+#                results['fracLostEvents'] = 1
+#                for i in range(len(PmissBinsPerTarget[target])):#{
+#                    results['EvtsInBin'+'_bin%d'%i] = 0
+#                    for parname in ['mean','sigma']: #{
+#                        for direction in ['x','y','z']: #{
+#                            results['rec'+parname + '_' + direction+'_bin%d'%i] = results['rec'+parname + 'Err_' + direction+'_bin%d'%i] =  -100
+#                        #}
+#                    #}
+#                #}
+#            # ------------------------------------------------------------------------------------------------------------------------------------------------
 
-                    #                    results['ks_local_Pval_pcmZ_Bonferroni_'+target] = ks_pval_scores[target]['pcmZ_Bonferroni']
-                    #                    results['ks_local_Pval_pcmZ_Ruschendorf_'+target] = ks_pval_scores[target]['pcmZ_Ruschendorf']
-
-
-                    results['ks_PvalTotal'+'_'+target] = 0
-                    for method in PvalZ_calculation_methods: #{
-                        results['ks_local_Pval_'+'pcmZ_'+method+'_'+target] = 0
-                        results['ks_Pval_pcmX_pcmY_pcmZ_'+method+'_'+target] = 0
-                        results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method+'_'+target] = 0
-                        results['ks_Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method+'_'+target] = 0
-                
-                    #                    results['ks_Pval_pcmX_pcmY_pcmZ_Bonferroni'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_Bonferroni']
-                    #                    results['ks_Pval_pcmX_pcmY_pcmZ_Ruschendorf'+'_'+target] = ks_pval_scores[target]['Pval_pcmX_pcmY_pcmZ_Ruschendorf']
-
-                        for i,p in enumerate(p_binom_array):#{
-                            results['Pval_pcmXYZ_'+method+'_binom_%.2f_'%p+target] = 0
-                            results['PvalTotal_'+method+'_binom_%.2f_'%p+target] = 0
-                            results['Pval_Powered_pcmXY_pcmZ_'+method+'_binom_%.2f_'%p+target] = 0
-                        #}
-                    #}
-                    for i in range( len(pmiss_bins) ):#{
-                        results['fracLoss_pmiss_%.3f_%.3f'%(pmiss_bins[i][0] , pmiss_bins[i][1])] = 1
-                        for j in range( len(Q2Bins) ): results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmiss_bins[i][0] , pmiss_bins[i][1] , Q2Bins[j][0] , Q2Bins[j][1] )] = 1
-                        for j in range( len(thetapmqBins) ): results['fracLoss_pmiss_%.3f_%.3f_thetapmq_%.1f_%.1f'%(pmiss_bins[i][0] , pmiss_bins[i][1] ,thetapmqBins[j][0] , thetapmqBins[j][1])] = 1
-                    #}
-                #}
-                for fit_parameter in ['MeanX','SigmaX','MeanY','SigmaY','a1','a2','b1','b2']: #{
-                    results['rec'+fit_parameter] = -100
-                #}
-                results['NLostEvents'] = 9907*float(NRand)
-                results['fracLostEvents'] = 1
-                for i in range(len(PmissBinsPerTarget[target])):#{
-                    results['EvtsInBin'+'_bin%d'%i] = 0
-                    for parname in ['mean','sigma']: #{
-                        for direction in ['x','y','z']: #{
-                            results['rec'+parname + '_' + direction+'_bin%d'%i] = results['rec'+parname + 'Err_' + direction+'_bin%d'%i] =  -100
-                        #}
-                    #}
-                #}
-            # ------------------------------------------------------------------------------------------------------------------------------------------------
             
             
-            
-            if do_reco_fits_file:   stream_dataframe_to_file( reco_fits, reco_fitsFName  )
-            if do_resutls_file:     stream_dataframe_to_file( results, buildup_resultsFName , float_format='%f' )
-            if do_root_file:        stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
+#            if do_reco_fits_file:   stream_dataframe_to_file( reco_fits, reco_fitsFName  )
+#            if do_resutls_file:     stream_dataframe_to_file( results, buildup_resultsFName , float_format='%f' )
+#            if do_root_file:        stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
             ana_sim.CloseFile()
         #}
         if 'delete' in option:#{
