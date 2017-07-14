@@ -18,10 +18,7 @@ sqrt2pi = np.sqrt(2*np.pi)
 
 # ------------------------------------------------------------------------------- #
 # definitions
-PmissBins   = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65]  , [0.65,0.75] , [0.75,1.0]]
-Pmiss3Bins  = [[0.3,0.52]  , [0.52,0.68]  , [0.68,1.0]]
-Q2Bins      = [[0,1.5]     , [1.5,2]     , [2,2.5]      , [2.5,6]]
-thetapmqBins= [[100,135]   , [135,145]   , [145,155]    , [155,180]]
+PmissBins       = [[0.3,0.45]  , [0.45,0.55] , [0.55,0.65]  , [0.65,0.75] , [0.75,1.0]]
 targets         = ['C12'        , 'Al27'        , 'Fe56'        , 'Pb208'       ]
 labels          = ['$^{12}$C'   , '$^{27}$Al'   , '$^{56}$Fe'   , '$^{208}$Pb'  ]
 target_colors   = ['black'      , 'red'         , 'green'       , 'blue'        ]
@@ -32,6 +29,11 @@ PmissBinsPerTarget = dict( {'C12':[[0.3,0.45]  , [0.45,0.55] , [0.55,0.65]  , [0
                             ,'Al27':[[0.3,0.5]  , [0.5,0.7] , [0.7,1.0]]
                             ,'Fe56':[[0.3,0.45]  , [0.45,0.55] , [0.55,0.65]  , [0.65,0.75] , [0.75,1.0]]
                             ,'Pb208':[[0.3,0.6]  , [0.6,1.0]]})
+
+small10PmissBins = [[0.3,0.4] , [0.4,0.5] , [0.5,0.6] , [0.6,0.7] , [0.7,0.8] , [0.8,0.9] , [0.9,1.0] ]
+Q2Bins           = [[0,1.5]     , [1.5,2]     , [2,2.5]      , [2.5,6]]
+theta_Pm_qBins   = [[100,135]   , [135,145]   , [145,155]    , [155,180]]
+
 p_binom_array = [0.2,0.225,0.25,0.3,0.33,0.36,0.4,0.45,0.5]
 
 
@@ -344,7 +346,7 @@ def calc_cm_parameters( fana  , fPmissBins , unweightedRoofitsFName = '' , weigh
         print 'leaving calc_cm_parameters'
         return pd.DataFrame() , False
 
-    print 'fana.GetFileName():',fana.GetFileName()
+    if debug>2: print 'fana.GetFileName():',fana.GetFileName()
     ana = read_root( str(fana.GetFileName()) , key='anaTree' , columns=['pcmX','pcmY','pcmZ','Pmiss3Mag','rooWeight','Mott']  )
 
     for i in range(len(fPmissBins)):
@@ -649,26 +651,28 @@ def fit_means_z( cm_pars_list , colors , labels , FigureFName = '' ): # all para
 
 
 # ------------------------------------------------------------------------------- #
-def get_pmiss_bins( PmissBins , Q2Bins , thetapmqBins , path , NRand ): # for pp/p analysis
+def get_pmiss_bins( path , NRand ): # for pp/p analysis
 
     # define the bins - 4 bins in each large p(miss) bin that we have in the analysis
-    pmiss_bins = []
+    twenty_pmiss_bins = []
 
-    for i in range(len(PmissBins)):
+    for i in range(len(PmissBins)):#{
         pmin , pmax = PmissBins[i][0] , PmissBins[i][1]
-        for j in range(4):
-            pmiss_bins.append( [ pmin + float(j*(pmax-pmin))/4 , pmin + float((j+1)*(pmax-pmin))/4 ])
+        for j in range(4):#{
+            twenty_pmiss_bins.append( [ pmin + float(j*(pmax-pmin))/4 , pmin + float((j+1)*(pmax-pmin))/4 ])
+        #}
+    #}
 
     # get the number of generated events per bin
     evtsgen_pmiss_bins = []
-    evtsgen_Q2pmiss_bins = np.zeros( (len(pmiss_bins) , len(Q2Bins)) )
-    evtsgen_thetapmqpmiss_bins = np.zeros( (len(pmiss_bins) , len(thetapmqBins)) )
+    evtsgen_Q2pmiss_bins = np.zeros( (len(twenty_pmiss_bins) , len(Q2Bins)) )
+    evtsgen_thetapmqpmiss_bins = np.zeros( (len(twenty_pmiss_bins) , len(thetapmqBins)) )
 
-    p1 = TPlots(path + '/DATA/SRC_e1_C.root' , 'T')
-    p2 = TPlots(path + '/DATA/SRC_e2_C.root' , 'T')
+    p1 = TPlots(path + '/DATA/SRC_e1p_C_GoodRuns_coulomb.root' , 'T')
+    p2 = TPlots(path + '/DATA/SRC_e2p_C_GoodRuns_coulomb.root' , 'T')
 
-    for i in range( len(pmiss_bins) ):
-        pmin , pmax = pmiss_bins[i][0] , pmiss_bins[i][1]
+    for i in range( len(twenty_pmiss_bins) ):
+        pmin , pmax = twenty_pmiss_bins[i][0] , twenty_pmiss_bins[i][1]
         p_cut = ROOT.TCut("%f<Pmiss_size && Pmiss_size<%f"%(pmin , pmax))
         evtsgen_pmiss_bins.append( NRand * (p1.GetEntries(p_cut) + p2.GetEntries(p_cut)) )
         
@@ -847,7 +851,7 @@ def a1a2_create_negative_sigma_z( a1 , a2 ):
 # ------------------------------------------------------------------------------- #
 def generate_runs_with_random_parameters( option='', hyperparameters=None,
                                          ana_data=dict(),
-                                         debug=0 , Q2Bins=None , thetapmqBins=None ,
+                                         debug=0 ,
                                          buildup_resultsFName='' ,
                                          reco_fitsFName='', root_resutlsFName='' ,
                                          do_root_file=False, do_reco_fits_file=False, do_resutls_file=True, do_add_plots=False,
@@ -862,8 +866,8 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
     path = path + "/Analysis_DATA/ppSRCcm"
     if 'helion' in flags.worker: path = "/extra/Erez/DataMining/Analysis_DATA/ppSRCcm"
 
-    # multiple bins for pp/p ratio
-    pmiss_bins , evtsgen_pmiss_bins , evtsgen_Q2pmiss_bins  , evtsgen_thetapmqpmiss_bins = get_pmiss_bins( PmissBins , Q2Bins , thetapmqBins , path , int(hyperparameters['NRand']) )
+#    # multiple bins for pp/p ratio
+#    twenty_pmiss_bins , evtsgen_pmiss_bins , evtsgen_Q2pmiss_bins  , evtsgen_thetapmqpmiss_bins = get_pmiss_bins( path , int(hyperparameters['NRand']) )
 
     '''
     recoil proton acceptances:
@@ -886,6 +890,8 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
 
         gen_events.SetPmissBins()
         gen_events.Set10PmissBins()
+        gen_events.Set4Q2Bins()
+        gen_events.Set4theta_Pm_qBins()
     
         # set the desired number of events when the simulation ends in 5 Pmiss bins
         # as a 100 times the number of 12C (e,e'pp) events in each bin
@@ -946,21 +952,17 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                                    ,'gen_a1':gen_a1, 'gen_a2':gen_a2, 'gen_b1':gen_b1, 'gen_b2':gen_b2
                                    }, index = [int(run)])
                                 
-            # Nevents==-1 means that the generation of events could not be completed (too bad of acceptance)
-#            if Nevents==-1: continue
-#            if Nevents!=-1: #{
-
-                # N(attempts) is used as an indicator using a binomial test of number of successes
+            # N(attempts) is used as an indicator using a binomial test of number of successes
             binom_test_Pval = []
             for i,p in enumerate(p_binom_array):#{
                 binom_test_Pval.append(binom_test( x=Nevents/100 ,n=Nattempts/100 , p=p )) # divide by a factor of 100 to soften the Pvalue distribution
                 results['Pval_binom_%.2f_test_Nsucsseses'%p] = binom_test_Pval[i]
             #}
                 
-            loss_pmiss_bins , loss_Q2pmiss_bins , loss_thetapmqpmiss_bins = get_loss_pmiss_bins( pmiss_bins , evtsgen_pmiss_bins ,
-                                                                                                    Q2Bins , evtsgen_Q2pmiss_bins ,
-                                                                                                    thetapmqBins , evtsgen_thetapmqpmiss_bins ,
-                                                                                                    ana_sim )
+#            loss_pmiss_bins , loss_Q2pmiss_bins , loss_thetapmqpmiss_bins = get_loss_pmiss_bins( twenty_pmiss_bins, evtsgen_pmiss_bins ,
+#                                                                                                Q2Bins , evtsgen_Q2pmiss_bins ,
+#                                                                                                thetapmqBins, evtsgen_thetapmqpmiss_bins ,
+#                                                                                                ana_sim )
 
             # from now on we work in 4 targets - since each has its own Pmiss binning
             for target in targets: #{
@@ -1001,106 +1003,69 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                 #}
                 results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY']
 
+
                 # --- global Pval from combination of all scores together --- #
-                results['ks_PvalTotal'+'_'+target] = ks_pval_scores['PvalTotal_'+method] # with a cutoff on 1e-20
+                results['ks_PvalTotal'+'_'+target] = ks_pval_scores['PvalTotal'] # with a cutoff on 1e-20
+                
                 for method in PvalZ_calculation_methods: #{
                     results['ks_local_Pval_'+'pcmZ_'+method+'_'+target] = ks_pval_scores['pcmZ_'+method]
                     results['ks_Pval_pcmX_pcmY_pcmZ_'+method+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY_pcmZ_'+method]
                     results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method]
                     results['ks_Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method+'_'+target] = ks_pval_scores['Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method]
+                    
+                    
 
                     for i,p in enumerate(p_binom_array):#{
 
                         results['Pval_pcmXYZ_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['Pval_pcmX_pcmY_pcmZ_'+method ] ] )
-                        results['PvalTotal_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['PvalTotal_'+method ] ] )
+                        results['PvalTotal_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['PvalTotal' ] ] )
                         results['Pval_Powered_pcmXY_pcmZ_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method ] ] )
                     #}
                 #}
             #}
         
-            # events loss in 20 p(miss) bins, for pp/p analysis
-            for i in range( len(PmissBinsPerTarget[target]) ):#{
-                pmin , pmax = PmissBinsPerTarget[target][i][0] , PmissBinsPerTarget[target][i][1]
-                results['fracLoss_pmiss_%.3f_%.3f'%(pmin , pmax)] = loss_pmiss_bins[i]
+        
+            # events loss in 10 p(miss) bins, for pp/p analysis
+            # -- - -- -- -- - -- - -- - - -- - -- -- -- -- -- - -- -
+            for i in range( len(small10PmissBins) ):#{
+                pmin , pmax = small10PmissBins[i][0] , small10PmissBins[i][1]
+                fracAcc_pmiss_bin = float( gen_events.NAcc10PmissBins[i] )/gen_events.NGen10PmissBins[i]
+                results['fracAcc_pmiss_%.3f_%.3f'%(pmin , pmax)] = fracAcc_pmiss_bin
+                fracLoss_pmiss_bin = float( gen_events.NLoss10PmissBins[i] )/gen_events.NGen10PmissBins[i]
+                results['fracLoss_pmiss_%.3f_%.3f'%(pmin , pmax)] = fracLoss_pmiss_bin
                 
                 # Q2 and p(miss) bins
                 for j in range( len(Q2Bins) ):#{
                     Q2min , Q2max = Q2Bins[j][0] , Q2Bins[j][1]
-                    results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmin , pmax , Q2min , Q2max)] = loss_Q2pmiss_bins[i][j]
+                    if gen_events.GetNGen10PmissBins_4Q2Bins(i,j):#{
+                        fracAcc_pmiss_Q2_bin = float( gen_events.GetNAcc10PmissBins_4Q2Bins(i,j) )/gen_events.GetNGen10PmissBins_4Q2Bins(i,j)
+                        fracLoss_pmiss_Q2_bin = float( gen_events.GetNLoss10PmissBins_4Q2Bins(i,j))/gen_events.GetNGen10PmissBins_4Q2Bins(i,j)
+                    else: #{
+                        fracAcc_pmiss_Q2_bin = 1
+                        fracLoss_pmiss_Q2_bin = 0
+                    #}
+                    results['fracAcc_pmiss_%.3f_%.3f_Q2_%.1f_%.1f'%(pmin , pmax , Q2min , Q2max)] = fracAcc_pmiss_Q2_bin
+                    results['fracLoss_pmiss_%.3f_%.3f_Q2_%.1f_%.1f'%(pmin , pmax , Q2min , Q2max)] = fracLoss_pmiss_Q2_bin
                 #}
 
                 # theta(pm,q) and p(miss) bins
-                for j in range( len(thetapmqBins) ):#{
-                    thetapmqmin , thetapmqmax = thetapmqBins[j][0] , thetapmqBins[j][1]
-                    results['fracLoss_pmiss_%.3f_%.3f_thetapmq_%.1f_%.1f'%(pmin,pmax,thetapmqmin,thetapmqmax)] = loss_thetapmqpmiss_bins[i][j]
+                for j in range( len(theta_Pm_qBins) ):#{
+                    theta_Pm_q_min , theta_Pm_q_max = theta_Pm_qBins[j][0] , theta_Pm_qBins[j][1]
+                    if gen_events.GetNGen10PmissBins_4theta_Pm_qBins(i,j):#{
+                        fracAcc_pmiss_theta_Pm_q_bin = float( gen_events.GetNAcc10PmissBins_4theta_Pm_qBins(i,j) )/gen_events.GetNGen10PmissBins_4theta_Pm_qBins(i,j)
+                        fracLoss_pmiss_theta_Pm_q_bin = float( gen_events.GetNLoss10PmissBins_4theta_Pm_qBins(i,j) )/gen_events.GetNGen10PmissBins_4theta_Pm_qBins(i,j)
+                    #}
+                    else: #{
+                        fracAcc_pmiss_theta_Pm_q_bin = 1
+                        fracLoss_pmiss_theta_Pm_q_bin = 0
+                    #}
+                    results['fracAcc_pmiss_%.3f_%.3f_theta_Pm_q_%.1f_%.1f'%(pmin , pmax , theta_Pm_q_min , theta_Pm_q_max)] = fracAcc_pmiss_theta_Pm_q_bin
+                    results['fracLoss_pmiss_%.3f_%.3f_theta_Pm_q_%.1f_%.1f'%(pmin , pmax , theta_Pm_q_min , theta_Pm_q_max)] = fracLoss_pmiss_theta_Pm_q_bin
                 #}
             #}
             if do_reco_fits_file:   stream_dataframe_to_file( reco_fits, reco_fitsFName  )
             if do_resutls_file:     stream_dataframe_to_file( results, buildup_resultsFName , float_format='%f' )
             if do_root_file:        stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
-#        #}
-#            else: #{
-#                for i,p in enumerate(p_binom_array):#{
-#                    results['Pval_binom_%.2f_test_Nsucsseses'%p] = 0
-#                #}
-#                for fit_parameter in ['MeanX','SigmaX','MeanY','SigmaY','a1','a2','b1','b2']: #{
-#                    results['rec'+fit_parameter] = float(reco_fits[fit_parameter])
-#                #}
-#                for target in targets: #{
-#                    for fit_parameter in ['MeanX','SigmaX','MeanY','SigmaY','a1','a2','b1','b2']: #{
-#                        results['rec'+fit_parameter+'_'+target] = 0
-#                    #}
-#                    results['NLostEvents'] = 0
-#                    results['fracLostEvents'] = 0
-#                    results['parameters_reconstructed_well'] = False
-#
-#                    for bin in range(len(PmissBinsPerTarget[target])):#{
-#                        results['ks_local_Pval_pcmZ_bin%d'%bin+'_'+target] = 0
-#                    #}
-#                    for direction in ['X','Y']: #{
-#                        results['ks_local_Pval_'+'pcm'+direction+'_'+target] = 0
-#                    #}
-#                    results['ks_Pval_pcmX_pcmY'+'_'+target] = 0
-#
-#                    results['ks_PvalTotal'+'_'+target] = 0
-#                    for method in PvalZ_calculation_methods: #{
-#                        results['ks_local_Pval_'+'pcmZ_'+method+'_'+target] = 0
-#                        results['ks_Pval_pcmX_pcmY_pcmZ_'+method+'_'+target] = 0
-#                        results['ks_Pval_pcmX_pcmY_pcmZ_scaled_1e20_'+method+'_'+target] = 0
-#                        results['ks_Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method+'_'+target] = 0
-#
-#                        for i,p in enumerate(p_binom_array):#{
-#                            results['Pval_pcmXYZ_'+method+'_binom_%.2f_'%p+target] = 0
-#                            results['PvalTotal_'+method+'_binom_%.2f_'%p+target] = 0
-#                            results['Pval_Powered_pcmXY_pcmZ_'+method+'_binom_%.2f_'%p+target] = 0
-#                        #}
-#                    #}
-#                    for i in range( len(pmiss_bins) ):#{
-#                        results['fracLoss_pmiss_%.3f_%.3f'%(pmiss_bins[i][0] , pmiss_bins[i][1])] = 1
-#                        for j in range( len(Q2Bins) ): results['fracLoss_pmiss_%.3f_%.3f_Q2bin_%.1f_%.1f'%(pmiss_bins[i][0] , pmiss_bins[i][1] , Q2Bins[j][0] , Q2Bins[j][1] )] = 1
-#                        for j in range( len(thetapmqBins) ): results['fracLoss_pmiss_%.3f_%.3f_thetapmq_%.1f_%.1f'%(pmiss_bins[i][0] , pmiss_bins[i][1] ,thetapmqBins[j][0] , thetapmqBins[j][1])] = 1
-#                    #}
-#                #}
-#                for fit_parameter in ['MeanX','SigmaX','MeanY','SigmaY','a1','a2','b1','b2']: #{
-#                    results['rec'+fit_parameter] = -100
-#                #}
-#                results['NLostEvents'] = 9907*float(NRand)
-#                results['fracLostEvents'] = 1
-#                for i in range(len(PmissBinsPerTarget[target])):#{
-#                    results['EvtsInBin'+'_bin%d'%i] = 0
-#                    for parname in ['mean','sigma']: #{
-#                        for direction in ['x','y','z']: #{
-#                            results['rec'+parname + '_' + direction+'_bin%d'%i] = results['rec'+parname + 'Err_' + direction+'_bin%d'%i] =  -100
-#                        #}
-#                    #}
-#                #}
-#            # ------------------------------------------------------------------------------------------------------------------------------------------------
-
-            
-            
-#            if do_reco_fits_file:   stream_dataframe_to_file( reco_fits, reco_fitsFName  )
-#            if do_resutls_file:     stream_dataframe_to_file( results, buildup_resultsFName , float_format='%f' )
-#            if do_root_file:        stream_dataframe_to_root( results, root_resutlsFName, 'ppSRCsimanaTree')
             ana_sim.CloseFile()
         #}
         if 'delete' in option:#{

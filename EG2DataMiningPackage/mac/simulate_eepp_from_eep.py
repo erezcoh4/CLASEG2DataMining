@@ -91,7 +91,7 @@ if 'generate' in flags.option or 'analyse' in flags.option:#{
 
     generate_runs_with_random_parameters( option=flags.option, hyperparameters=hyperparameters,
                                          ana_data=ana_data,
-                                         debug=flags.verbose , Q2Bins=Q2Bins , thetapmqBins=thetapmqBins ,
+                                         debug=flags.verbose ,
                                          buildup_resultsFName=buildup_resultsFName( full_path ),
                                          reco_fitsFName=CMfitsFname( full_path ),
                                          root_resutlsFName=root_resutlsFName( full_path ),
