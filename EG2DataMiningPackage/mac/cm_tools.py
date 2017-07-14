@@ -1002,7 +1002,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                 results['ks_Pval_pcmX_pcmY'+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY']
 
                 # --- global Pval from combination of all scores together --- #
-                results['ks_PvalTotal'+'_'+target] = ks_pval_scores['PvalTotal'] # with a cutoff on 1e-20
+                results['ks_PvalTotal'+'_'+target] = ks_pval_scores['PvalTotal_'+method] # with a cutoff on 1e-20
                 for method in PvalZ_calculation_methods: #{
                     results['ks_local_Pval_'+'pcmZ_'+method+'_'+target] = ks_pval_scores['pcmZ_'+method]
                     results['ks_Pval_pcmX_pcmY_pcmZ_'+method+'_'+target] = ks_pval_scores['Pval_pcmX_pcmY_pcmZ_'+method]
@@ -1012,7 +1012,7 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
                     for i,p in enumerate(p_binom_array):#{
 
                         results['Pval_pcmXYZ_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['Pval_pcmX_pcmY_pcmZ_'+method ] ] )
-                        results['PvalTotal_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['PvalTotal' ] ] )
+                        results['PvalTotal_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['PvalTotal_'+method ] ] )
                         results['Pval_Powered_pcmXY_pcmZ_'+method+'_binom_%.2f_'%p+target] = Fisher_combination_Pvals( [ binom_test_Pval[i] , ks_pval_scores['Pval_Powered_pcmX_Powered_pcmY_pcmZ_'+method ] ] )
                     #}
                 #}
