@@ -106,12 +106,18 @@ public:
     void                    InitEvent ();
     void                      InitRun ();
     void   SetAcceptedEventsPmissBins ( float fPmiss3Mag );
-    void   SetEventsLossIn10PmissBins ( float fPmiss3Mag , bool fAcceptEvent );
     int  GrabEntryInUnfilledPmissBins ( );
     int             FindWhichPmissBin ( float fPmiss3Mag );
     int           FindWhichPmiss10Bin ( float fPmiss3Mag );
+    int                FindWhichQ2Bin ( float fQ2 );
+    int       FindWhich_theta_Pm_qBin ( float ftheta_Pm_q );
     bool           AllPmissBinsFilled ();
     Int_t                GetNattempts () { return Nattempts; } ;
+    
+    // events loss
+    void   SetEventsLossIn10PmissBins ( float fPmiss3Mag , bool fAcceptEvent );
+    void   SetEventsLossIn10PmissBins_4Q2Bins ( float fPmiss3Mag , float fQ2, bool fAcceptEvent );
+    void   SetEventsLossIn10PmissBins_4theta_Pm_qBins ( float fPmiss3Mag , float ftheta_Pm_q, bool fAcceptEvent );
     
     // simple setters
     void                     SetNRand ( Int_t fNRand = 1 )                { NRand = fNRand; };
@@ -140,7 +146,7 @@ public:
     
     void         SetNAcceptedEvents ( int fNWantedEvents=100 ) { NWantedEvents=fNWantedEvents ;};
     
-    void               SetPmissBins () {
+    void        SetPmissBins () {
         float fPmissBins[5][2] = { {0.3,0.45}, {0.45,0.55}, {0.55,0.65}, {0.65,0.75}, {0.75,1.0} };
         for (int i=0;i<5;i++){
             for (int j=0;j<2;j++){
@@ -163,6 +169,27 @@ public:
         }
     } ;
 
+    void          Set4Q2Bins () {
+        float fQ2Bins[4][2] = { {0.,1.5} , {1.5,2.} , {2.,2.5} , {2.5,6.}};
+        for (int i=0;i<4;i++){
+            for (int j=0;j<2;j++){
+                Q2Bins[i][j]=fQ2Bins[i][j];
+            }
+        }
+    } ;
+    
+    void  Set4theta_Pm_qBins () {
+        float ftheta_Pm_qBins[4][2] = {{100,135}   , {135,145}   , {145,155}    , {155,180}};
+        for (int i=0;i<4;i++){
+            for (int j=0;j<2;j++){
+                theta_Pm_qBins[i][j]=ftheta_Pm_qBins[i][j];
+            }
+        }
+    } ;
+    
+
+    
+    
     ofstream    TextFile , OutRunNumberFile , RunsInfoFile;
     
     TChain      * InputT;
@@ -184,9 +211,22 @@ public:
     Int_t       NWantedPmissBins[5];
     Int_t       NAcceptedPmissBins[5];
     std::vector<int> EntriesInPmissBins[5];
+    
     // in 10 small Pmiss bins
     Int_t       NGen10PmissBins[10], NAcc10PmissBins[10];
     Int_t       NLoss10PmissBins[10];
+    // in bins of Q2 and Pmiss
+    Int_t       NGen10PmissBins_4Q2Bins[10][4], NAcc10PmissBins_4Q2Bins[10][4];
+    Int_t       NLoss10PmissBins_4Q2Bins[10][4];
+    Int_t       GetNGen10PmissBins_4Q2Bins(int i ,int j) {return NGen10PmissBins_4Q2Bins[i][j];};
+    Int_t       GetNAcc10PmissBins_4Q2Bins(int i ,int j) {return NAcc10PmissBins_4Q2Bins[i][j];};
+    Int_t       GetNLoss10PmissBins_4Q2Bins(int i ,int j) {return NLoss10PmissBins_4Q2Bins[i][j];};
+    // in bins of theta_Pm_q and Pmiss
+    Int_t       NGen10PmissBins_4theta_Pm_qBins[10][4], NAcc10PmissBins_4theta_Pm_qBins[10][4];
+    Int_t       NLoss10PmissBins_4theta_Pm_qBins[10][4];
+    Int_t       GetNGen10PmissBins_4theta_Pm_qBins(int i ,int j) {return NGen10PmissBins_4theta_Pm_qBins[i][j];};
+    Int_t       GetNAcc10PmissBins_4theta_Pm_qBins(int i ,int j) {return NAcc10PmissBins_4theta_Pm_qBins[i][j];};
+    Int_t       GetNLoss10PmissBins_4theta_Pm_qBins(int i ,int j) {return NLoss10PmissBins_4theta_Pm_qBins[i][j];};
     // -- - -- -- - --- - -- - -- - -- -- -- -- -- --- -- - -- - -
     
     Float_t     Q2      , Xb            , PoverQ    , Mmiss,    OrMott;
@@ -207,6 +247,7 @@ public:
     Float_t     Pm[2][3]    , Pm_size[2];                                           // Proton missing momentum magnitude
     Float_t     q[3]        , q_size;                                               // q momentum transfer
     Float_t     PmissBins[5][2], small10PmissBins[10][2];
+    Float_t     Q2Bins[4][2] , theta_Pm_qBins[4][2];
     Float_t     PrecResolution;
     
     TVector3    e                          ,       Pp1                     ,   Pp2             , Precoil;
