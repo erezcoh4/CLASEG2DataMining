@@ -1125,7 +1125,7 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
         gen_events = GenerateEvents( path , 0 , debug - 2 )
         gen_events.Set_protonAcceptacne( h )
         
-        gen_events.AddInputChain_eep("300<p(miss)<600 MeV/c")
+        gen_events.AddInputChain_eep("300<p(miss)<600 MeV/c",hyperparameters['target name'])
         gen_events.SetInputChain_eep()
         
         gen_events.SetNRand( NRand )
@@ -1153,13 +1153,14 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
         if 'gen' in option: #{
             
             # sample the geneated parameters uniformly within the ranges
-            gen_MeanX = 0.0
-            gen_MeanY = 0.0
-            gen_MeanZ = 0.1
-            gen_Sigma = np.random.uniform( np.min(hyperparameters['range_sigma_t']),np.max(hyperparameters['range_sigma_t']) )
+            gen_MeanX = hyperparameters['generated mean(x)']
+            gen_MeanY = hyperparameters['generated mean(y)']
+            gen_MeanZ = hyperparameters['generated mean(z)']
+            gen_Sigma_t = np.random.uniform( np.min(hyperparameters['range_sigma_t']),np.max(hyperparameters['range_sigma_t']) )
+            gen_SigmaZ = hyperparameters['generated sigma(z)']
             
-            if debug: print 'run',run,'gen_Sigma',gen_Sigma
-            gen_events.Set_eep_Parameters_MeanXYZ_Sigma( gen_MeanX , gen_MeanY , gen_MeanZ , gen_Sigma )
+            if debug: print 'run',run,'gen_Sigma_t',gen_Sigma_t,'gen_SigmaZ',gen_SigmaZ
+            gen_events.Set_eep_Parameters_MeanXYZ_Sigma( gen_MeanX , gen_MeanY , gen_MeanZ , gen_Sigma_t , gen_SigmaZ )
             gen_events.InitRun()
             Nevents = gen_events.DoGenerate_eepp_from_eep_SingleParameterSigma( run )
             if debug: print 'Nevents to analyze:',Nevents
@@ -1174,7 +1175,8 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
             results = pd.DataFrame({'run':int(run)
                                    ,'time':str(datetime.datetime.now().strftime("%Y%B%d"))
                                    ,'NentriesSimRun':ana_sim.GetEntries()
-                                   ,'gen_MeanX':gen_MeanX, 'gen_MeanY':gen_MeanY, 'gen_MeanZ':gen_MeanZ, 'gen_Sigma':gen_Sigma
+                                   ,'gen_MeanX':gen_MeanX, 'gen_MeanY':gen_MeanY, 'gen_MeanZ':gen_MeanZ
+                                   ,'gen_Sigma_t':gen_Sigma_t, 'gen_SigmaZ':gen_SigmaZ,
                                    }
                                    , index = [int(run)])
 
