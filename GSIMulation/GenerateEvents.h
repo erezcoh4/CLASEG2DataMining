@@ -95,12 +95,12 @@ public:
     void                    SetLimits ( Float_t , Float_t , Float_t , Float_t );
     void          SetHistThetaHistMag ( TH1F * , TH1F * );
     void           Set_eep_Parameters ( Float_t , Float_t , Float_t , Float_t , Float_t , Float_t , Float_t , Float_t );
-    void Set_eep_Parameters_MeanXYZ_Sigma (Float_t, Float_t, Float_t, Float_t );
+    void Set_eep_Parameters_MeanXYZ_Sigma (Float_t, Float_t, Float_t, Float_t, Float_t );
     
     void                 Set_eeN_tree ( TTree * feeNTree) { eeNTree = feeNTree;};
     void              OutputInfo2File ();
     void             OutPutToTextFile ( const int, TVector3*, int*, float*, int*);
-    void            AddInputChain_eep (TString ChainOption="300<p(miss)<600 MeV/c");
+    void            AddInputChain_eep (TString ChainOption="300<p(miss)<600 MeV/c", TString target_name="C");
     void            SetInputChain_eep ();
     void        ReleaseInputChain_eep ();
     void                    InitEvent ();
@@ -233,7 +233,7 @@ public:
     Float_t     ThetaPQ , theta_miss_q   , ThetaPmissPrecoil;
     Float_t     theta_Pmiss , phi_Pmiss;
     Float_t     theta_e ;
-    Float_t     MeanX   , MeanY, MeanZ, SigmaX, SigmaY, SigmaZ, Sigma;
+    Float_t     MeanX   , MeanY, MeanZ, SigmaX, SigmaY, SigmaZ, Sigma, Sigma_t;
     Float_t     a1      , a2 , b1  , b2  ;
     Float_t     Pmin    , Pmax  , Thetamin  , Thetamax;
     Float_t     Pmiss3Mag   , pcmX      , pcmY          , pcmT      , pcmZ  ;

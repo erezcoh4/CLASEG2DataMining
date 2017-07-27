@@ -34,11 +34,12 @@ void GenerateEvents::Set_eep_Parameters(Float_t fMeanX, Float_t fSigmaX,
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-void GenerateEvents::Set_eep_Parameters_MeanXYZ_Sigma(Float_t fMeanX, Float_t fMeanY, Float_t fMeanZ, Float_t fSigma ) {
+void GenerateEvents::Set_eep_Parameters_MeanXYZ_Sigma(Float_t fMeanX, Float_t fMeanY, Float_t fMeanZ, Float_t fSigma_t, Float_t fSigmaZ  ) {
     MeanX = fMeanX;
     MeanY = fMeanY;
     MeanZ = fMeanZ;
-    Sigma = fSigma;
+    Sigma_t = fSigma_t;
+    SigmaZ = fSigmaZ;
 }
 
 
@@ -62,7 +63,7 @@ void GenerateEvents::SetHistThetaHistMag( TH1F * fhistMag , TH1F * fhistTheta ){
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-void GenerateEvents::AddInputChain_eep(TString ChainOption){
+void GenerateEvents::AddInputChain_eep(TString ChainOption, TString target_name ){
     InputT  = new TChain("T");
     
     // Take 12C(e,e'p) SRC tree data
@@ -75,8 +76,8 @@ void GenerateEvents::AddInputChain_eep(TString ChainOption){
         InputT -> Add( Path + "/DATA/SRC_e2p_C_GoodRuns_coulomb.root");
     }
     else if (ChainOption == "300<p(miss)<600 MeV/c"){
-        InputT -> Add( Path + "/DATA/SRC_e1p_C_GoodRuns_coulomb.root");
-        InputT -> Add( Path + "/DATA/SRC_e2p_C_GoodRuns_coulomb.root");
+        InputT -> Add( Path + "/DATA/SRC_e1p_"+target_name+"_GoodRuns_coulomb.root");
+        InputT -> Add( Path + "/DATA/SRC_e2p_"+target_name+"_GoodRuns_coulomb.root");
     }
     InputNentries = InputT -> GetEntries();
 
@@ -617,9 +618,9 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep_SingleParameterSigma( Int_t fRunN
         for( int j = 0 ; j < NRand  ;  j++ ){    //MC event generation
             
             if(debug > 3) SHOW( j );
-            float Px = gRandom -> Gaus( MeanX  , Sigma );
-            float Py = gRandom -> Gaus( MeanY  , Sigma );
-            float Pz = gRandom -> Gaus( MeanZ  , Sigma );
+            float Px = gRandom -> Gaus( MeanX  , Sigma_t );
+            float Py = gRandom -> Gaus( MeanY  , Sigma_t );
+            float Pz = gRandom -> Gaus( MeanZ  , SigmaZ );
             
             Pcm_in_Pmiss_q_system.SetXYZ ( Px , Py , Pz );
             Precoil_in_Pmiss_q_system = Pcm_in_Pmiss_q_system - Pmiss_in_Pmiss_q_system;
