@@ -1155,11 +1155,11 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
             # sample the geneated parameters uniformly within the ranges
             gen_MeanX = hyperparameters['generated mean(x)']
             gen_MeanY = hyperparameters['generated mean(y)']
-            gen_MeanZ = hyperparameters['generated mean(z)']
             gen_Sigma_t = np.random.uniform( np.min(hyperparameters['range_sigma_t']),np.max(hyperparameters['range_sigma_t']) )
-            gen_SigmaZ = hyperparameters['generated sigma(z)']
+            gen_MeanZ = np.random.normal( hyperparameters['measured mean(z)'] , hyperparameters['N(uncertainties) in generation'] * hyperparameters['measured mean(z) err'] )
+            gen_SigmaZ = np.random.normal( hyperparameters['measured sigma(z)'] , hyperparameters['N(uncertainties) in generation'] * hyperparameters['measured sigma(z) err'] )
             
-            if debug: print 'run',run,'gen_Sigma_t',gen_Sigma_t,'gen_SigmaZ',gen_SigmaZ
+            if debug: print 'run',run,'gen_Sigma_t',gen_Sigma_t,'gen_MeanZ',gen_MeanZ,'gen_SigmaZ',gen_SigmaZ
             gen_events.Set_eep_Parameters_MeanXYZ_Sigma( gen_MeanX , gen_MeanY , gen_MeanZ , gen_Sigma_t , gen_SigmaZ )
             gen_events.InitRun()
             Nevents = gen_events.DoGenerate_eepp_from_eep_SingleParameterSigma( run )
@@ -1175,8 +1175,10 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
             results = pd.DataFrame({'run':int(run)
                                    ,'time':str(datetime.datetime.now().strftime("%Y%B%d"))
                                    ,'NentriesSimRun':ana_sim.GetEntries()
-                                   ,'gen_MeanX':gen_MeanX, 'gen_MeanY':gen_MeanY, 'gen_MeanZ':gen_MeanZ
-                                   ,'gen_Sigma_t':gen_Sigma_t, 'gen_SigmaZ':gen_SigmaZ,
+                                   ,'gen_MeanX':gen_MeanX,'gen_MeanY':gen_MeanY
+                                   ,'gen_MeanZ':gen_MeanZ
+                                   ,'gen_Sigma_t':gen_Sigma_t
+                                   ,'gen_SigmaZ':gen_SigmaZ,
                                    }
                                    , index = [int(run)])
 
