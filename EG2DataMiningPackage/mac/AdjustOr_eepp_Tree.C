@@ -1,8 +1,8 @@
 /*
- AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, int debug=1)
+ AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=true, int debug=1)
 
  usage:
- root -l mac/AdjustOr_eepp_Tree.C\(\12,false,true,0\)
+ root -l mac/AdjustOr_eepp_Tree.C\(\12,true,true,0\)
  - --- -- ---- - - -- ---- --- - --- -
  grab an (e,e'pp) tree from Or
  and adjust it to my analysis:
