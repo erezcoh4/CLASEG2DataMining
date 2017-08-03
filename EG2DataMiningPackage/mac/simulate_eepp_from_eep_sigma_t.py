@@ -7,6 +7,7 @@ from cm_tools import *
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=NoFiducials_300Pmiss600 -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=NoFiducials_allPmiss -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=allPmiss -v2
+    python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=300Pmiss600 -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extractOnly_C12 --DataType=NoFiducials_allPmiss -v6
     python mac/simulate_eepp_from_eep_sigma_t.py --option=generate_analyze -nruns=1 -v1
 '''
@@ -74,7 +75,7 @@ if 'generate' in flags.option: #{
                            'NgenMax':100000,                # maximal number of attempts
                            'do proton acceptance':True,
                            'do p(rec)>0.35 cut':True,
-                           'do p(rec) FV cuts':False,
+                           'do p(rec) FV cuts':True,
                            'do p(rec) resolution smearing':True,
                            'p(rec) resolution smearing':0.020, # [GeV/c] momentum resolution
                            'generated mean(x)':0.0,
@@ -82,7 +83,7 @@ if 'generate' in flags.option: #{
                            # take the longitudinal parameters as variable input to the simulation,
                            # distributed as a Gaussian around their measured value
                            # with a width that is N(uncertainties) times the uncertainty in the measured value
-                           'N(uncertainties) in generation': 3,
+                           'N(uncertainties) in generation': 5,
                            })
         
     ana_data = dict()
