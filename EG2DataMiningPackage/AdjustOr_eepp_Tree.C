@@ -76,14 +76,14 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
     TFile * OutFile;
     if (DoFiducialCuts){
         if (Do300Pmiss600){
-            OutFile = new TFile( Form("/Users/erezcohen/Desktop/DataMining/OrAnalysisTrees/AdjustedTrees/SRC_e2p_adjusted_300Pmiss600_%s.root",My_target.Data()) , "recreate");
+            OutFile = new TFile( Form("/Users/erezcohen/Desktop/DataMining/OrAnalysisTrees/AdjustedTrees/SRC_e2p_adjusted_300Pmiss600_%s_PrecFiducials.root",My_target.Data()) , "recreate");
         }
         else {
             OutFile = new TFile( Form("/Users/erezcohen/Desktop/DataMining/OrAnalysisTrees/AdjustedTrees/SRC_e2p_adjusted_%s.root",My_target.Data()) , "recreate");
         }
     } else {
         if (Do300Pmiss600){
-            OutFile = new TFile( Form("/Users/erezcohen/Desktop/DataMining/OrAnalysisTrees/AdjustedTrees/SRC_e2p_adjusted_300Pmiss600_%s_noFiducials.root",My_target.Data()) , "recreate");
+            OutFile = new TFile( Form("/Users/erezcohen/Desktop/DataMining/OrAnalysisTrees/AdjustedTrees/SRC_e2p_adjusted_300Pmiss600_%s_NoPrecFiducials.root",My_target.Data()) , "recreate");
         }
         else{
             OutFile = new TFile( Form("/Users/erezcohen/Desktop/DataMining/OrAnalysisTrees/AdjustedTrees/SRC_e2p_adjusted_%s_noFiducials.root",My_target.Data()) , "recreate");
