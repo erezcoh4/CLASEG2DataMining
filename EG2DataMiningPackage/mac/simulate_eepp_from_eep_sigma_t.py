@@ -87,7 +87,7 @@ if 'generate' in flags.option: #{
                            # take the longitudinal parameters as variable input to the simulation,
                            # distributed as a Gaussian around their measured value
                            # with a width that is N(uncertainties) times the uncertainty in the measured value
-                           'N(uncertainties) in generation': 5,
+                           'N(uncertainties) in generation': 1,
                            })
             
     for target_name,mean_z,mean_z_err,sigma_z,sigma_z_err in zip(['C','Al','Fe','Pb']
