@@ -1099,7 +1099,6 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
 # May-27, 2017
 def generate_runs_with_random_sigma( option='generate analyze delete',
                                     hyperparameters=None,
-                                    ana_data=dict(),
                                     debug=0,
                                     buildup_resultsFName='' ,
                                     reco_fitsFName='',
@@ -1138,7 +1137,7 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
         gen_events.Set10PmissBins()
         # set the desired number of events when the simulation ends in 5 Pmiss bins
         # as a 100 times the number of 12C (e,e'pp) events in each bin
-        gen_events.SetNAcceptedEvents( hyperparameters['Ntimes'] * ana_data['C12'].GetEntries() )
+        gen_events.SetNAcceptedEvents( hyperparameters['N(accepted-events)'] )
         # if we don't reach these numbers after generating NMAX events, the parameters should be discarded
         gen_events.SetNgenMax( hyperparameters['NgenMax'] )
         gen_events.MapInputEntriesInPmissBins()
