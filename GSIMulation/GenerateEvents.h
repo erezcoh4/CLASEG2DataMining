@@ -87,15 +87,20 @@ public:
                                        , bool DoGenTextFile = false);
     
     Int_t                        DoGenerate_eepp_from_eep ( Int_t run=1);
-    Int_t   DoGenerate_eepp_from_eep_SingleParameterSigma ( Int_t run=1);
+    Int_t   DoGenerate_eepp_from_eep_SingleParameterSigma ( Int_t run=1, TString rootFilenameSuffix="" );
     Int_t                   Generate_eepp_from_3dGaussian ( Int_t run=1);
 
     void          SetMyInputChain_eep ();
     void         SetRootTreeAddresses ();
     void                    SetLimits ( Float_t , Float_t , Float_t , Float_t );
     void          SetHistThetaHistMag ( TH1F * , TH1F * );
-    void           Set_eep_Parameters ( Float_t , Float_t , Float_t , Float_t , Float_t , Float_t , Float_t , Float_t );
-    void Set_eep_Parameters_MeanXYZ_Sigma (Float_t, Float_t, Float_t, Float_t, Float_t );
+    
+    
+    void                    Set_eep_Parameters (Float_t, Float_t, Float_t, Float_t, Float_t, Float_t, Float_t, Float_t );
+    void      Set_eep_Parameters_MeanXYZ_Sigma (Float_t, Float_t, Float_t, Float_t, Float_t);
+    void          Set_MeanZ_Pmiss_vanish_at_03 ()   {Do_PcmZ_Pmiss_vanish_at_03 = true;};
+    void Set_eep_Parameters_Pmiss_vanish_at_03 (Float_t, Float_t, Float_t, Float_t, Float_t);
+    
     
     void                 Set_eeN_tree ( TTree * feeNTree) { eeNTree = feeNTree;};
     void              OutputInfo2File ();
@@ -195,13 +200,13 @@ public:
     TChain      * InputT;
     
     TFile       * RootFile;
-    TTree       * RootTree , * eeNTree;
+    TTree       * RootTree , * eeNTree, * genTree;
 
     TRandom3    * gRandom;
  
     bool        Do_pAcceptance , Do_PrecFiducial, Do_PrecMinCut, AcceptEvent;
     bool        DoPrecResolution;
-    
+    bool        Do_PcmZ_Pmiss_vanish_at_03=false;
     
     Int_t       RunNumber   , Nevents   , NAcceptedEvents,  NWantedEvents, Nattempts;
     Int_t       NRand       , NPTheta   , NeTheta,  entry,  InputNentries;
@@ -233,8 +238,11 @@ public:
     Float_t     ThetaPQ , theta_miss_q   , ThetaPmissPrecoil;
     Float_t     theta_Pmiss , phi_Pmiss;
     Float_t     theta_e ;
+    
     Float_t     MeanX   , MeanY, MeanZ, SigmaX, SigmaY, SigmaZ, Sigma, Sigma_t;
     Float_t     a1      , a2 , b1  , b2  ;
+    Float_t     MeanZ_slope; // for PcmZ as a function of Pmiss vanish at 0.3
+    
     Float_t     Pmin    , Pmax  , Thetamin  , Thetamax;
     Float_t     Pmiss3Mag   , pcmX      , pcmY          , pcmT      , pcmZ  ;
     Float_t     Theta       , Mott      , DipoleFF2                 , rooWeight;

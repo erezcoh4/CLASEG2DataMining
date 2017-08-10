@@ -43,6 +43,18 @@ void GenerateEvents::Set_eep_Parameters_MeanXYZ_Sigma(Float_t fMeanX, Float_t fM
 }
 
 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void GenerateEvents::Set_eep_Parameters_Pmiss_vanish_at_03(Float_t fMeanX, Float_t fMeanY, Float_t fSigma_t, Float_t fSigmaZ, Float_t fMeanZ_slope) {
+    MeanX = fMeanX;
+    MeanY = fMeanY;
+    Sigma_t = fSigma_t;
+    SigmaZ = fSigmaZ;
+    // this is for
+    // p(cm)-z = slope * ( p(miss) - 0.3 )
+    MeanZ_slope = fMeanZ_slope;
+}
+
+
 
 
 
@@ -65,7 +77,6 @@ void GenerateEvents::SetHistThetaHistMag( TH1F * fhistMag , TH1F * fhistTheta ){
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void GenerateEvents::AddInputChain_eep(TString ChainOption, TString target_name ){
     InputT  = new TChain("T");
-    
     // Take 12C(e,e'p) SRC tree data
     if  (ChainOption == "Or' original trees"){
         InputT -> Add( Path + "/DATA/SRC_e1_C.root");
@@ -76,11 +87,10 @@ void GenerateEvents::AddInputChain_eep(TString ChainOption, TString target_name 
         InputT -> Add( Path + "/DATA/SRC_e2p_C_GoodRuns_coulomb.root");
     }
     else if (ChainOption == "300<p(miss)<600 MeV/c"){
-        InputT -> Add( Path + "/DATA/SRC_e1p_"+target_name+"_GoodRuns_coulomb.root");
-        InputT -> Add( Path + "/DATA/SRC_e2p_"+target_name+"_GoodRuns_coulomb.root");
+        InputT -> Add( Path + "/DATA_300Pmiss600/SRC_e1p_adjusted_300Pmiss600_"+target_name+"_PrecFiducials.root");
+        InputT -> Add( Path + "/DATA_300Pmiss600/SRC_e2p_adjusted_300Pmiss600_"+target_name+"_PrecFiducials.root");
     }
     InputNentries = InputT -> GetEntries();
-
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -554,14 +564,15 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep( Int_t fRunNumber ){
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-Int_t GenerateEvents::DoGenerate_eepp_from_eep_SingleParameterSigma( Int_t fRunNumber ){
+Int_t GenerateEvents::DoGenerate_eepp_from_eep_SingleParameterSigma( Int_t fRunNumber , TString rootFilenameSuffix ){
     
     RunNumber = fRunNumber ;
     NAcceptedEvents = Nevents = 0;
-    rootFilename = Form("%s/eg_rootfiles/run%d.root",Path.Data(),RunNumber);
+    rootFilename = Form("%s/eg_rootfiles/run%d%s.root",Path.Data(),RunNumber,rootFilenameSuffix.Data());
     if (debug>2) cout << "Generating " <<  rootFilename << endl;
     RootFile = new TFile( rootFilename ,"recreate" );
     RootTree = new TTree("anaTree","generated events");
+    genTree = new TTree("genTree","no acceptance no nothing. only generated features");
     SetRootTreeAddresses();
     int attempt=0;
     
@@ -618,9 +629,17 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep_SingleParameterSigma( Int_t fRunN
         for( int j = 0 ; j < NRand  ;  j++ ){    //MC event generation
             
             if(debug > 3) SHOW( j );
-            float Px = gRandom -> Gaus( MeanX  , Sigma_t );
-            float Py = gRandom -> Gaus( MeanY  , Sigma_t );
-            float Pz = gRandom -> Gaus( MeanZ  , SigmaZ );
+            float Px = gRandom -> Gaus( MeanX , Sigma_t );
+            float Py = gRandom -> Gaus( MeanY , Sigma_t );
+            
+            if (Do_PcmZ_Pmiss_vanish_at_03){
+                MeanZ = MeanZ_slope * ( Pmiss3Mag - 0.3 );
+            }
+            float Pz = gRandom -> Gaus( MeanZ , SigmaZ  );
+            if (debug>3){ // ToDo: change to debug>4
+                SHOW3( MeanX , MeanY , Sigma_t );
+                SHOW3( Pmiss3Mag , MeanZ , SigmaZ );
+            }
             
             Pcm_in_Pmiss_q_system.SetXYZ ( Px , Py , Pz );
             Precoil_in_Pmiss_q_system = Pcm_in_Pmiss_q_system - Pmiss_in_Pmiss_q_system;
@@ -680,10 +699,10 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep_SingleParameterSigma( Int_t fRunN
             }
             Debug(4,"passed  if ( PrecoilTheta <= 120 )");
             
-            
             if ( Do_PrecFiducial )  AcceptEvent = (pFiducCut[1]==1) ? AcceptEvent : false;
             if ( Do_PrecMinCut )    AcceptEvent = (Prec.P()>0.35) ? AcceptEvent : false;
             
+            genTree -> Fill();
             
             if (AcceptEvent){
                 Debug( 3 , Form("event in j=%d was accepted",j) );
@@ -1219,6 +1238,12 @@ void GenerateEvents::SetRootTreeAddresses(){
     RootTree -> Branch("rooWeight"           ,&rooWeight             , "rooWeight/F");
     RootTree -> Branch("Mott"                ,&OrMott                , "Mott/F"); // Or weight
 
+    // no acceptance no nothing. only generated features
+    genTree -> Branch("Pmiss3Mag"           ,&Pmiss3Mag             , "Pmiss3Mag/F");
+    genTree -> Branch("pcmX"                ,&pcmX                  , "pcmX/F");
+    genTree -> Branch("pcmY"                ,&pcmY                  , "pcmY/F");
+    genTree -> Branch("pcmT"                ,&pcmT                  , "pcmT/F");
+    genTree -> Branch("pcmZ"                ,&pcmZ                  , "pcmZ/F");
 
 }
 
