@@ -1207,12 +1207,12 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
                         if debug>2: print "results[rec+'_'"+reco_parameter_name+" + '_' + "+direction+"]:",results['rec' + '_' + reco_parameter_name + '_' + direction]
                     #}
                 #}
+                if do_results_file: stream_dataframe_to_file( results, buildup_resultsFName , float_format='%f' )
             #}
             ana_sim.CloseFile()
-            if do_results_file: stream_dataframe_to_file( results, buildup_resultsFName , float_format='%f' )
         #}
         if 'delete' in option:#{
-            delete_file( path + '/eg_rootfiles/run%d.root'%run  , debug )
+            delete_file( path + '/eg_rootfiles/run%d.root'%run+rootfilename_suffix  , debug )
         #}
         irun += 1
         print_important("completed run %d [%.0f"%(run,100.*float(irun)/Nruns) + "%]"+" at %4d-%02d-%02d %d:%d:%d"%time.localtime()[0:6] )
