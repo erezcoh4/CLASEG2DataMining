@@ -28,25 +28,31 @@ if 'extract' in flags.option: #{
         if 'NoPrecFiducials' in flags.DataType and '300Pmiss600' in flags.DataType: #{
             Fiducials = 'NoPrecFiducials'
             directory_name = '300Pmiss600'
+            print 'running ',Fiducials,'at',directory_name
             pMiss_max = 0.6
             ana[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_300Pmiss600_%s_NoPrecFiducials"%target )
         #}
-        elif 'NoFiducials' not in flags.DataType and '300Pmiss600' in flags.DataType: #{
+        elif '300Pmiss600' in flags.DataType: #{
             Fiducials = 'PrecFiducials'
             directory_name = '300Pmiss600'
+            print 'running ',Fiducials,'at',directory_name
             pMiss_max = 0.6
             ana[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_300Pmiss600_%s_PrecFiducials"%target )
         #}
-#        elif 'NoFiducials' in flags.DataType and 'allPmiss' in flags.DataType:#{
-#            directory_name = 'OrDataTrees'
-#            pMiss_max = 1.0
-#            ana[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s_noFiducials"%target )
-#        #}
-#        elif 'NoFiducials' not in flags.DataType and 'allPmiss' in flags.DataType: #{
-#            directory_name = 'OrDataTrees'
-#            pMiss_max = 1.0
-#            ana[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s"%target )
-#        #}
+        elif 'NoPrecFiducials' in flags.DataType and 'allPmiss' in flags.DataType:#{
+            Fiducials = 'NoPrecFiducials'
+            directory_name = 'OrDataTrees'
+            print 'running ',Fiducials,'at',directory_name
+            pMiss_max = 1.0
+            ana[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s_NoPrecFiducials"%target )
+        #}
+        elif 'allPmiss' in flags.DataType: #{
+            Fiducials = 'PrecFiducials'
+            directory_name = 'OrDataTrees'
+            print 'running ',Fiducials,'at',directory_name
+            pMiss_max = 1.0
+            ana[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s_PrecFiducials"%target )
+        #}
         cm_parameters = calc_cm_pars_sigma(ana[target],
                                            CMRooFitsName( ppPath + '/'+directory_name+'/%s_unweighted'%target ) ,
                                            CMRooFitsName( ppPath + '/'+directory_name+'/%s_weighted'%target ) ,
@@ -84,28 +90,41 @@ if 'generate' in flags.option: #{
                            'p(rec) resolution smearing':0.020, # [GeV/c] momentum resolution
                            'generated mean(x)':0.0,
                            'generated mean(y)':0.0,
+                           
+#                           'generation method': 'constant mean(z)',
+                           
                            # take the longitudinal parameters as variable input to the simulation,
                            # distributed as a Gaussian around their measured value
                            # with a width that is N(uncertainties) times the uncertainty in the measured value
-                           'N(uncertainties) in generation': 1,
+                           'generation method': 'mean(z) linear in Pmiss',
+                           'p(miss) fit-type': 'vanish at 0.3', # fit: p(cm)-z = slope * ( p(miss) - 0.3 )
+                           'maximal slope': 1.010,
+                           'minimal slope': 0.282,
+                           'N(uncertainties) in generation': 5,
                            })
-            
-    for target_name,mean_z,mean_z_err,sigma_z,sigma_z_err in zip(['C','Al','Fe','Pb']
-                                                                 # measured \mu(miss)
-                                                                 ,[0.106,0.118,0.149,0.177]
-                                                                 ,[0.009,0.015,0.010,0.025]
-                                                                 # measured \sigma(miss)
-                                                                 ,[0.147,0.141,0.151,0.169]
-                                                                 ,[0.006,0.010,0.007,0.018]
-                                                                 ):#{
-        hyperparameters['target name'] = target_name
-        hyperparameters['measured mean(z)'] = mean_z
-        #        hyperparameters['measured mean(z) err'] = mean_z_err
-        hyperparameters['measured mean(z) err'] = 0.075 # constant 75 MeV/c for all nuclei
-        hyperparameters['measured sigma(z)'] = sigma_z
-        #        hyperparameters['measured sigma(z) err'] = sigma_z_err
-        hyperparameters['measured sigma(z) err'] = 0.050 # constant 50 MeV/c for all nuclei
     
+    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err in zip(['C','Al','Fe','Pb']
+                                                                                ,['C12','Al27','Fe56','Pb208']
+                                                                                # for mean(z) that are constant in p(miss)
+                                                                                # measured \mu(miss)
+                                                                                ,[0.106,0.118,0.149,0.177]
+                                                                                ,[0.009,0.015,0.010,0.025]
+                                                                                # measured \sigma(miss)
+                                                                                ,[0.147,0.141,0.151,0.169]
+                                                                                ,[0.006,0.010,0.007,0.018]
+                                                                                ):#{
+        hyperparameters['target name'] = target_name
+        hyperparameters['my target name'] = my_taregt_name
+        # for method: 'constant mean(z)'
+#        hyperparameters['measured mean(z)'] = mean_z
+#        hyperparameters['measured mean(z) err'] = mean_z_err
+
+        hyperparameters['measured sigma(z)'] = sigma_z
+        hyperparameters['measured sigma(z) err'] = sigma_z_err
+        # for fixed mean and sigme to all nuclei
+        #        hyperparameters['measured mean(z) err'] = 0.075 # fixed 75 MeV/c for all nuclei
+        #        hyperparameters['measured sigma(z) err'] = 0.050 # fixed 50 MeV/c for all nuclei
+
         print_important( "grabbing "+target_name+"(e,e'p) and simulating" )
             
         test_name = 'simulation_300Pmiss600_%s_runs_%d_%d'%( hyperparameters['target name']
@@ -133,9 +152,9 @@ print
 ## with Prec Fiducial cuts
 ## measured \mu(miss)
 #,[0.100,0.119,0.147,0.166]
-#    ,[0.008,0.015,0.010,0.023]
-#        # measured \sigma(miss)
-#        ,[0.146,0.143,0.153,0.167]
-#            ,[0.006,0.010,0.007,0.017]
+#,[0.008,0.015,0.010,0.023]
+## measured \sigma(miss)
+#,[0.146,0.143,0.153,0.167]
+#,[0.006,0.010,0.007,0.017]
 
 

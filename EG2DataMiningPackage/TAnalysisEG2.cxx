@@ -28,6 +28,18 @@ TPlots("$DataMiningAnaFiles/Ana_" + fInFileName + ".root","anaTree",fInFileName,
     SetTree ((TTree*) InFile->Get( "anaTree" ));
 }
 
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+TAnalysisEG2::TAnalysisEG2(Int_t A, TString fInFileName, TString fInTreeName):
+TPlots( fInFileName  ,fInTreeName ,fInFileName , true ){
+    SetPath("");
+    SetInFileName( fInFileName );
+    SetSRCCuts("");
+    SetInFile( new TFile( fInFileName ));
+    SetTree ((TTree*) InFile->Get( fInTreeName ));
+}
+
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TAnalysisEG2::SetSRCCuts(TCut MainCut){ // last editted March-22 for pppSRC cuts
 

@@ -1124,7 +1124,7 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
         gen_events = GenerateEvents( path , 0 , debug - 2 )
         gen_events.Set_protonAcceptacne( h )
         
-        gen_events.AddInputChain_eep("300<p(miss)<600 MeV/c",hyperparameters['target name'])
+        gen_events.AddInputChain_eep("300<p(miss)<600 MeV/c",hyperparameters['my target name'])
         gen_events.SetInputChain_eep()
         
         gen_events.SetNRand( NRand )
@@ -1155,27 +1155,45 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
             gen_MeanX = hyperparameters['generated mean(x)']
             gen_MeanY = hyperparameters['generated mean(y)']
             gen_Sigma_t = np.random.uniform( np.min(hyperparameters['range_sigma_t']),np.max(hyperparameters['range_sigma_t']) )
-            gen_MeanZ = np.random.normal( hyperparameters['measured mean(z)'] , hyperparameters['N(uncertainties) in generation'] * hyperparameters['measured mean(z) err'] )
             gen_SigmaZ = np.random.normal( hyperparameters['measured sigma(z)'] , hyperparameters['N(uncertainties) in generation'] * hyperparameters['measured sigma(z) err'] )
             
-            if debug: print 'run',run,'gen_Sigma_t',gen_Sigma_t,'gen_MeanZ',gen_MeanZ,'gen_SigmaZ',gen_SigmaZ
-            gen_events.Set_eep_Parameters_MeanXYZ_Sigma( gen_MeanX , gen_MeanY , gen_MeanZ , gen_Sigma_t , gen_SigmaZ )
+            if hyperparameters['generation method']=='constant mean(z)': #{
+                gen_MeanZ = np.random.normal( hyperparameters['measured mean(z)'] , hyperparameters['N(uncertainties) in generation'] * hyperparameters['measured mean(z) err'] )
+            
+                if debug: print 'run',run,'gen_Sigma_t',gen_Sigma_t,'gen_MeanZ',gen_MeanZ,'gen_SigmaZ',gen_SigmaZ
+                gen_events.Set_eep_Parameters_MeanXYZ_Sigma( gen_MeanX , gen_MeanY , gen_MeanZ , gen_Sigma_t , gen_SigmaZ )
+                rootfilename_suffix = ""
+            
+            #}
+            elif hyperparameters['generation method']=='mean(z) linear in Pmiss': #{
+                # sample the geneated parameters uniformly within the ranges
+                average_slope = np.average( [hyperparameters['minimal slope'] , hyperparameters['maximal slope']] )
+                width_slope = average_slope - hyperparameters['minimal slope'] # its symmetric to (hyperparameters['maximal slope']-average_slope)
+                gen_MeanZ_slope  = np.random.normal( average_slope  , width_slope )
+            
+                if debug: print 'run',run,'gen_MeanX',gen_MeanX,'gen_MeanY',gen_MeanY,'gen_Sigma_t',gen_Sigma_t,'gen_SigmaZ',gen_SigmaZ,'gen_MeanZ_slope',gen_MeanZ_slope
+                gen_events.Set_MeanZ_Pmiss_vanish_at_03()
+                gen_events.Set_eep_Parameters_Pmiss_vanish_at_03( gen_MeanX , gen_MeanY , gen_Sigma_t , gen_SigmaZ , gen_MeanZ_slope )
+                rootfilename_suffix = "_"+hyperparameters['my target name']+"_SigmaT%.3f_SigmaZ%.3f_MeanZSlope%.3f"%(gen_Sigma_t,gen_SigmaZ,gen_MeanZ_slope)
+            #}
+            
             gen_events.InitRun()
-            Nevents = gen_events.DoGenerate_eepp_from_eep_SingleParameterSigma( run )
+            Nevents = gen_events.DoGenerate_eepp_from_eep_SingleParameterSigma( run , rootfilename_suffix )
             if debug: print 'Nevents to analyze:',Nevents
         #}
         
         # (2) analyze the simulated data (the 'run') similarly to the data - reconstructed parameters
         # ----------------------------
         if 'ana' in option: #{
-            if debug>1: print "analyzing run %d"%run
+            if debug>1: print "analyzing run %d"%run,rootfilename_suffix
             
-            ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run )
+            ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run+rootfilename_suffix )
             results = pd.DataFrame({'run':int(run)
                                    ,'time':str(datetime.datetime.now().strftime("%Y%B%d"))
                                    ,'NentriesSimRun':ana_sim.GetEntries()
                                    ,'gen_MeanX':gen_MeanX,'gen_MeanY':gen_MeanY
-                                   ,'gen_MeanZ':gen_MeanZ
+                                   ,'gen_MeanZ':gen_MeanZ if hyperparameters['generation method']=='constant mean(z)' else -1
+                                   ,'gen_MeanZ_slope':gen_MeanZ_slope if hyperparameters['generation method']=='mean(z) linear in Pmiss' else -1
                                    ,'gen_Sigma_t':gen_Sigma_t
                                    ,'gen_SigmaZ':gen_SigmaZ,
                                    }

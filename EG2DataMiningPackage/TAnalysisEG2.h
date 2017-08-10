@@ -40,6 +40,7 @@ public:
     TAnalysisEG2 (){    SetSRCCuts();   }
     TAnalysisEG2 ( TString fPath , TString fInFileName , TCut MainCut = "0 <= Xb" );
     TAnalysisEG2 ( TString fInFileName , TCut MainCut = "0 <= Xb" );
+    TAnalysisEG2 ( Int_t A, TString fInFileName , TString fInTreeName );
     
     
     
