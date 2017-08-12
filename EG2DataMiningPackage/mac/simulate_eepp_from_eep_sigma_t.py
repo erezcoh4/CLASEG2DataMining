@@ -3,7 +3,7 @@ from cm_tools import *
 '''
     usage:
     ---------------
-    python mac/simulate_eepp_from_eep_sigma_t.py --option=generate_analyze_delete -nruns=100 -v1
+    python mac/simulate_eepp_from_eep_sigma_t.py --option=generate_analyze -nruns=1 -v1
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=NoPrecFiducials_300Pmiss600 -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=PrecFiducials_300Pmiss600 -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=NoFiducials_allPmiss -v2
@@ -78,7 +78,10 @@ if 'generate' in flags.option: #{
     
     hyperparameters = dict({'start_run':flags.run,
                            'Nruns':flags.NumberOfRuns,
-                           'range_sigma_t':(0.0,0.3),       # around 0.160 (0,0.3)
+                           #   ToDo: CHANGE THIS BACK!!!
+                           # ----------------------------------------------------------
+                           'range_sigma_t':(0.27,0.3),       # around 0.160 (0,0.3)
+                           # ----------------------------------------------------------
                            'NRand':20,
                            'Ntimes':50,                     # wanted number of events, multiplied by the number of data events in 12C
                            'N(accepted-events)':15000,
@@ -90,6 +93,7 @@ if 'generate' in flags.option: #{
                            'p(rec) resolution smearing':0.020, # [GeV/c] momentum resolution
                            'generated mean(x)':0.0,
                            'generated mean(y)':0.0,
+                           'do print results':True,
                            
 #                           'generation method': 'constant mean(z)',
                            
@@ -103,16 +107,20 @@ if 'generate' in flags.option: #{
                            'N(uncertainties) in generation': 5,
                            })
     
-    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err in zip(['C','Al','Fe','Pb']
-                                                                                ,['C12','Al27','Fe56','Pb208']
-                                                                                # for mean(z) that are constant in p(miss)
-                                                                                # measured \mu(miss)
-                                                                                ,[0.106,0.118,0.149,0.177]
-                                                                                ,[0.009,0.015,0.010,0.025]
-                                                                                # measured \sigma(miss)
-                                                                                ,[0.147,0.141,0.151,0.169]
-                                                                                ,[0.006,0.010,0.007,0.018]
-                                                                                ):#{
+#    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err in zip(['C','Al','Fe','Pb']
+#                                                                                ,['C12','Al27','Fe56','Pb208']
+#                                                                                # for mean(z) that are constant in p(miss)
+#                                                                                # measured \mu(miss)
+#                                                                                ,[0.106,0.118,0.149,0.177]
+#                                                                                ,[0.009,0.015,0.010,0.025]
+#                                                                                # measured \sigma(miss)
+#                                                                                ,[0.147,0.141,0.151,0.169]
+#                                                                                ,[0.006,0.010,0.007,0.018]
+#                                                                                ):#{
+
+    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err in zip(['Pb'] ,['Pb208'],[0.177],[0.025],[0.169],[0.018]):#{
+
+
         hyperparameters['target name'] = target_name
         hyperparameters['my target name'] = my_taregt_name
         # for method: 'constant mean(z)'

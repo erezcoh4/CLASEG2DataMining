@@ -1187,9 +1187,14 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
         if 'ana' in option: #{
             if debug>1: print "analyzing run %d"%run,rootfilename_suffix
             
+            genfile = ROOT.TFile( path + '/eg_rootfiles/run%d'%run+rootfilename_suffix+'.root' )
+            NgenEntries = genfile.Get('genTree').GetEntries()
+            genfile.Close()
+            
             ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run+rootfilename_suffix )
             results = pd.DataFrame({'run':int(run)
                                    ,'time':str(datetime.datetime.now().strftime("%Y%B%d"))
+                                   ,'NgenEntries':NgenEntries
                                    ,'NentriesSimRun':ana_sim.GetEntries()
                                    ,'gen_MeanX':gen_MeanX,'gen_MeanY':gen_MeanY
                                    ,'gen_MeanZ':gen_MeanZ if hyperparameters['generation method']=='constant mean(z)' else -1
@@ -1206,6 +1211,10 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
                         results['rec' + '_' + reco_parameter_name + '_' + direction] = reco_parameters.get_value(0,reco_parameter_name + '_' + direction + '_unweighted')
                         if debug>2: print "results[rec+'_'"+reco_parameter_name+" + '_' + "+direction+"]:",results['rec' + '_' + reco_parameter_name + '_' + direction]
                     #}
+                #}
+                if hyperparameters['do print results']:#{
+                    print "results:"
+                    print results
                 #}
                 if do_results_file: stream_dataframe_to_file( results, buildup_resultsFName , float_format='%f' )
             #}
