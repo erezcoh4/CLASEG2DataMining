@@ -88,7 +88,7 @@ if 'generate' in flags.option: #{
                            'NgenMax':100000,                # maximal number of attempts
                            'do proton acceptance':True,
                            'do p(rec)>0.35 cut':True,
-                           'do p(rec) FV cuts':True,
+                           'do p(rec) FV cuts':False,
                            'do p(rec) resolution smearing':True,
                            'p(rec) resolution smearing':0.020, # [GeV/c] momentum resolution
                            'generated mean(x)':0.0,
