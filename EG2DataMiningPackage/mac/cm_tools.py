@@ -1197,7 +1197,7 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
                                    ,'NgenEntries':NgenEntries
                                    ,'NentriesSimRun':ana_sim.GetEntries()
                                    ,'gen_MeanX':gen_MeanX,'gen_MeanY':gen_MeanY
-                                   ,'gen_MeanZ':gen_MeanZ if hyperparameters['generation method']=='constant mean(z)' else -1
+                                   ,'gen_MeanZ':gen_MeanZ if hyperparameters['generation method']!='mean(z) linear in Pmiss' else -1
                                    ,'gen_MeanZ_slope':gen_MeanZ_slope if hyperparameters['generation method']=='mean(z) linear in Pmiss' else -1
                                    ,'gen_Sigma_t':gen_Sigma_t
                                    ,'gen_SigmaZ':gen_SigmaZ,
