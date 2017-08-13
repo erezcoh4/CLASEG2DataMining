@@ -111,12 +111,22 @@ if 'generate' in flags.option: #{
     for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err in zip(['C','Al','Fe','Pb']
                                                                                 ,['C12','Al27','Fe56','Pb208']
                                                                                 # for mean(z) that are constant in p(miss)
+#                                                                                ## with Prec Fiducial cuts
+#                                                                                # measured \mu(miss)
+#                                                                                ,[0.106,0.118,0.149,0.177]
+#                                                                                ,[0.009,0.015,0.010,0.025]
+#                                                                                # measured \sigma(miss)
+#                                                                                ,[0.147,0.141,0.151,0.169]
+#                                                                                ,[0.006,0.010,0.007,0.018]
+                                                                                
+                                                                                # with no Prec Fiducial cuts
                                                                                 # measured \mu(miss)
-                                                                                ,[0.106,0.118,0.149,0.177]
-                                                                                ,[0.009,0.015,0.010,0.025]
+                                                                                ,[0.100,0.119,0.147,0.166]
+                                                                                ,[0.008,0.015,0.010,0.023]
                                                                                 # measured \sigma(miss)
-                                                                                ,[0.147,0.141,0.151,0.169]
-                                                                                ,[0.006,0.010,0.007,0.018]
+                                                                                ,[0.146,0.143,0.153,0.167]
+                                                                                ,[0.006,0.010,0.007,0.017]
+                                                                                
                                                                                 ):#{
 
 #    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err in zip(['Pb'] ,['Pb208'],[0.177],[0.025],[0.169],[0.018]):#{
@@ -159,12 +169,5 @@ print_important( 'done simulate_eepp_from_eep_sigma_t.py' )
 print
 
 
-## with Prec Fiducial cuts
-## measured \mu(miss)
-#,[0.100,0.119,0.147,0.166]
-#,[0.008,0.015,0.010,0.023]
-## measured \sigma(miss)
-#,[0.146,0.143,0.153,0.167]
-#,[0.006,0.010,0.007,0.017]
 
 
