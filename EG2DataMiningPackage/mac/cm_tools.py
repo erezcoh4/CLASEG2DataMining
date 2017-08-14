@@ -1151,6 +1151,11 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
         # ----------------------------
         if 'gen' in option: #{
             
+            # set a new seed
+            fseed = int(np.random.uniform(1,100000))
+            gen_events.gRandom.SetSeed( fseed )
+            np.random.seed( fseed )
+            
             # sample the geneated parameters uniformly within the ranges
             gen_MeanX = hyperparameters['generated mean(x)']
             gen_MeanY = hyperparameters['generated mean(y)']
@@ -1221,7 +1226,7 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
             ana_sim.CloseFile()
         #}
         if 'delete' in option:#{
-            delete_file( path + '/eg_rootfiles/run%d.root'%run+rootfilename_suffix  , debug )
+            delete_file( path + '/eg_rootfiles/run%d'%run+rootfilename_suffix+'.root'  , debug )
         #}
         irun += 1
         print_important("completed run %d [%.0f"%(run,100.*float(irun)/Nruns) + "%]"+" at %4d-%02d-%02d %d:%d:%d"%time.localtime()[0:6] )
