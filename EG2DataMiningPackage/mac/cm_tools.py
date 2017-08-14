@@ -461,15 +461,24 @@ def calc_cm_pars_sigma( fana , unweightedRoofitsFName = '' , weightedRoofitsFNam
                                  , index=[0])
     #}
     else:#{
-        if len(ana)>0 and sum(ana.rooWeight)>0:#{
+        if len(ana)>0:#{
             sqrtN = sqrt(len(ana))
-            mean_x_unweighted , mean_x_weighted     = np.average( ana.pcmX ) , np.average( ana.pcmX , weights=ana.rooWeight )
-            sigma_x_unweighted, sigma_x_weighted    = np.sqrt(np.average( np.square( ana.pcmX-mean_x_unweighted) )) , np.sqrt(np.average( np.square(ana.pcmX-mean_x_weighted) , weights=ana.rooWeight  ))
-            mean_y_unweighted , mean_y_weighted     = np.average( ana.pcmY ) , np.average( ana.pcmY , weights=ana.rooWeight )
-            sigma_y_unweighted, sigma_y_weighted    = np.sqrt(np.average( np.square( ana.pcmY-mean_y_unweighted) )) , np.sqrt(np.average( np.square(ana.pcmY-mean_y_weighted) , weights=ana.rooWeight  ))
-            mean_z_unweighted , mean_z_weighted     = np.average( ana.pcmZ ) , np.average( ana.pcmZ , weights=ana.rooWeight )
-            sigma_z_unweighted, sigma_z_weighted    = np.sqrt(np.average( np.square( ana.pcmZ-mean_z_unweighted) )) , np.sqrt(np.average( np.square(ana.pcmZ-mean_z_weighted) , weights=ana.rooWeight  ))
+            mean_x_unweighted     = np.average( ana.pcmX )
+            sigma_x_unweighted    = np.sqrt(np.average( np.square( ana.pcmX-mean_x_unweighted) ))
+            mean_y_unweighted     = np.average( ana.pcmY )
+            sigma_y_unweighted    = np.sqrt(np.average( np.square( ana.pcmY-mean_y_unweighted) ))
+            mean_z_unweighted     = np.average( ana.pcmZ )
+            sigma_z_unweighted    = np.sqrt(np.average( np.square( ana.pcmZ-mean_z_unweighted) ))
         #}
+#        if len(ana)>0 and sum(ana.rooWeight)>0:#{
+#            sqrtN = sqrt(len(ana))
+#            mean_x_unweighted , mean_x_weighted     = np.average( ana.pcmX ) , np.average( ana.pcmX , weights=ana.rooWeight )
+#            sigma_x_unweighted, sigma_x_weighted    = np.sqrt(np.average( np.square( ana.pcmX-mean_x_unweighted) )) , np.sqrt(np.average( np.square(ana.pcmX-mean_x_weighted) , weights=ana.rooWeight  ))
+#            mean_y_unweighted , mean_y_weighted     = np.average( ana.pcmY ) , np.average( ana.pcmY , weights=ana.rooWeight )
+#            sigma_y_unweighted, sigma_y_weighted    = np.sqrt(np.average( np.square( ana.pcmY-mean_y_unweighted) )) , np.sqrt(np.average( np.square(ana.pcmY-mean_y_weighted) , weights=ana.rooWeight  ))
+#            mean_z_unweighted , mean_z_weighted     = np.average( ana.pcmZ ) , np.average( ana.pcmZ , weights=ana.rooWeight )
+#            sigma_z_unweighted, sigma_z_weighted    = np.sqrt(np.average( np.square( ana.pcmZ-mean_z_unweighted) )) , np.sqrt(np.average( np.square(ana.pcmZ-mean_z_weighted) , weights=ana.rooWeight  ))
+#        #}
         else:#{
             sqrtN  = 1
             mean_x_unweighted , mean_x_weighted     = -100,-100
@@ -483,9 +492,9 @@ def calc_cm_pars_sigma( fana , unweightedRoofitsFName = '' , weightedRoofitsFNam
                                  ,'mean_x_unweighted':mean_x_unweighted   ,'mean_xErr_unweighted':sigma_x_unweighted/sqrtN ,'sigma_x_unweighted':sigma_x_unweighted,'sigma_xErr_unweighted':0.02 # resolution uncertainty
                                  ,'mean_y_unweighted':mean_y_unweighted   ,'mean_yErr_unweighted':sigma_y_unweighted/sqrtN ,'sigma_y_unweighted':sigma_y_unweighted,'sigma_yErr_unweighted':0.02 # resolution uncertainty0
                                  ,'mean_z_unweighted':mean_z_unweighted   ,'mean_zErr_unweighted':sigma_z_unweighted/sqrtN ,'sigma_z_unweighted':sigma_z_unweighted,'sigma_zErr_unweighted':0.02 # resolution uncertainty
-                                 ,'mean_x_weighted':mean_x_weighted   ,'mean_xErr_weighted':sigma_x_weighted/sqrtN ,'sigma_x_weighted':sigma_x_weighted,'sigma_xErr_weighted':0.02 # resolution uncertainty
-                                 ,'mean_y_weighted':mean_y_weighted   ,'mean_yErr_weighted':sigma_y_weighted/sqrtN ,'sigma_y_weighted':sigma_y_weighted,'sigma_yErr_weighted':0.02 # resolution uncertainty0
-                                 ,'mean_z_weighted':mean_z_weighted   ,'mean_zErr_weighted':sigma_z_weighted/sqrtN ,'sigma_z_weighted':sigma_z_weighted,'sigma_zErr_weighted':0.02 # resolution uncertainty
+#                                 ,'mean_x_weighted':mean_x_weighted   ,'mean_xErr_weighted':sigma_x_weighted/sqrtN ,'sigma_x_weighted':sigma_x_weighted,'sigma_xErr_weighted':0.02 # resolution uncertainty
+#                                 ,'mean_y_weighted':mean_y_weighted   ,'mean_yErr_weighted':sigma_y_weighted/sqrtN ,'sigma_y_weighted':sigma_y_weighted,'sigma_yErr_weighted':0.02 # resolution uncertainty0
+#                                 ,'mean_z_weighted':mean_z_weighted   ,'mean_zErr_weighted':sigma_z_weighted/sqrtN ,'sigma_z_weighted':sigma_z_weighted,'sigma_zErr_weighted':0.02 # resolution uncertainty
                                  }
                                  , index=[0])
     #}
@@ -1140,7 +1149,7 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
         gen_events.SetNAcceptedEvents( hyperparameters['N(accepted-events)'] )
         # if we don't reach these numbers after generating NMAX events, the parameters should be discarded
         gen_events.SetNgenMax( hyperparameters['NgenMax'] )
-        gen_events.MapInputEntriesInPmissBins()
+        #        gen_events.MapInputEntriesInPmissBins()
     #}
     
     # event generation (and analysis) loop
@@ -1183,6 +1192,7 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
             #}
             
             gen_events.InitRun()
+            if debug: print 'gRandom seed for this run:',gen_events.gRandom.GetSeed()
             Nevents = gen_events.DoGenerate_eepp_from_eep_SingleParameterSigma( run , rootfilename_suffix )
             if debug: print 'Nevents to analyze:',Nevents
         #}
