@@ -499,6 +499,7 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep( Int_t fRunNumber ){
             pFiducCut.push_back( eg2dm->protonFiducial( Precoil , debug ) );
             auto PrecoilFiducialCut = eg2dm->protonFiducial( Precoil , debug );
             
+            
             // #IMPORTANT: the acceptance map that i've created i given in the lab frame
             Double_t PrecoilMag = Precoil.Mag() , PrecoilTheta = r2d*Precoil.Theta() , PrecoilPhi = r2d*Precoil.Phi();
             PrecoilPhi =  eg2dm->ChangePhiToPhiLab( PrecoilPhi ) ; // rescale phi angle to the range [-30,330]
@@ -659,7 +660,10 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep_SingleParameterSigma( Int_t fRunN
             Pcm.RotateZ  ( q_Phi );
             Pcm.RotateY  ( Pmiss_theta );
             Pcm.RotateZ  ( Pmiss_phi );
-            Precoil =   Pp2     = Pcm - Pmiss;
+            Precoil = Pp2 = Pcm - Pmiss;
+            
+            if (debug>3) SHOWTVector3(Precoil);
+            
             if (DoPrecResolution){ // smear the reconstructed momentum of the recoil proton by the CLAS resolution (20 MeV/c)
                 Precoil.SetMag( gRandom->Gaus( Precoil.Mag() , PrecResolution ) );
             }
@@ -686,6 +690,7 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep_SingleParameterSigma( Int_t fRunN
             // #IMPORTANT: the acceptance map that i've created i given in the lab frame
             Double_t PrecoilMag = Precoil.Mag() , PrecoilTheta = r2d*Precoil.Theta() , PrecoilPhi = r2d*Precoil.Phi();
             PrecoilPhi =  eg2dm->ChangePhiToPhiLab( PrecoilPhi ) ; // rescale phi angle to the range [-30,330]
+            
             if(debug > 3) SHOW3( PrecoilMag , PrecoilTheta , PrecoilPhi );
             if ( PrecoilTheta <= 120 ){
                 Debug(3 , "in if ( PrecoilTheta <= 120 )");
@@ -726,7 +731,7 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep_SingleParameterSigma( Int_t fRunN
         return NAcceptedEvents;
     }
     else if ( attempt == NgenMAX ) {
-        Printf("could not fulfill desired quantites in PmissBins (accepted %d (e,e'pp) events out of %d attempts)",NAcceptedEvents,attempt);
+        Printf("could not fulfill desired quonta (NAcceptedEvents=%d events, attempt=%d)",NAcceptedEvents,attempt);
         return -1;
     }
     else {
