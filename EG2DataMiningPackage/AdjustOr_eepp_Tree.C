@@ -142,6 +142,7 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
 
     // -- - - -- -- - -- -- -- - -- - - -- - -- -- - - -- - - -- --- -- - - --
     // for event generator
+    Int_t   OrTree_nmb;
     Float_t OrTree_Q2;
     Float_t OrTree_Xb;
     Float_t OrTree_Pe;
@@ -175,25 +176,30 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
 //    InTree -> SetBranchAddress("q"       ,           &OrTree_q);
     InTree -> SetBranchAddress("q_size"  ,           &OrTree_q_size);
     InTree -> SetBranchAddress("Pmiss_q_angle",      &OrTree_Pmiss_q_angle);
+    InTree -> SetBranchAddress("nmb",                &OrTree_nmb);
     
-    OutTree -> Branch("Q2"      ,           &OrTree_Q2                          , "Q2/F");
-    OutTree -> Branch("Xb"      ,           &OrTree_Xb                          , "Xb/F");
-    OutTree -> Branch("Pe"      ,           &OrTree_Pe                          , "Pe/F");
-    OutTree -> Branch("theta_e" ,           &OrTree_theta_e                     , "theta_e/F");
-    OutTree -> Branch("Pe_size" ,           &OrTree_Pe_size                     , "Pe_size/F");
-    OutTree -> Branch("Ep"      ,           &OrTree_Ep                          , "Ep/F");
-    OutTree -> Branch("Pp"      ,           &OrTree_Pp                          , "Pp/F");
-    OutTree -> Branch("Rp"      ,           &OrTree_Rp                          , "Rp/F");
-    OutTree -> Branch("Pp_size" ,           &OrTree_Pp_size                     , "Pp_size/F");
-    OutTree -> Branch("theta_Pmiss",        &OrTree_theta_Pmiss                 , "theta_Pmiss/F");
-    OutTree -> Branch("phi_Pmiss",          &OrTree_phi_Pmiss                   , "phi_Pmiss/F");
     
-    OutTree -> Branch("Pmiss_size",         &OrTree_Pmiss_size                  , "Pmiss_size/F");
-    OutTree -> Branch("q_size"  ,           &OrTree_q_size                      , "q_size/F");
-    OutTree -> Branch("Pmiss_q_angle",      &OrTree_Pmiss_q_angle               , "Pmiss_q_angle/F");
+    
     if (for_event_generator==true){
-        OutTree -> Branch("q"       ,           &OrTree_q                           , "q/F");
-        OutTree -> Branch("Pmiss"   ,           &OrTree_Pmiss                       , "Pmiss/F");
+        
+        OutTree -> Branch("nmb"     ,           &OrTree_nmb                         , "nmb/I");
+        OutTree -> Branch("Q2"      ,           &OrTree_Q2                          , "Q2/F");
+        OutTree -> Branch("Xb"      ,           &OrTree_Xb                          , "Xb/F");
+        OutTree -> Branch("Pe"      ,           &OrTree_Pe                          , "Pe[3]/F");
+        OutTree -> Branch("theta_e" ,           &OrTree_theta_e                     , "theta_e/F");
+        OutTree -> Branch("Pe_size" ,           &OrTree_Pe_size                     , "Pe_size[3]/F");
+        OutTree -> Branch("Ep"      ,           &OrTree_Ep                          , "Ep[nmb]/F");
+        OutTree -> Branch("Pp"      ,           &OrTree_Pp                          , "Pp[nmb][3]/F");
+        OutTree -> Branch("Rp"      ,           &OrTree_Rp                          , "Rp[nmb][3]/F");
+        OutTree -> Branch("Pp_size" ,           &OrTree_Pp_size                     , "Pp_size/F");
+        OutTree -> Branch("theta_Pmiss",        &OrTree_theta_Pmiss                 , "theta_Pmiss[nmb]/F");
+        OutTree -> Branch("phi_Pmiss",          &OrTree_phi_Pmiss                   , "phi_Pmiss[nmb]/F");
+        
+        OutTree -> Branch("Pmiss_size",         &OrTree_Pmiss_size                  , "Pmiss_size[nmb]/F");
+        OutTree -> Branch("q_size"  ,           &OrTree_q_size                      , "q_size/F");
+        OutTree -> Branch("Pmiss_q_angle",      &OrTree_Pmiss_q_angle               , "Pmiss_q_angle[nmb]/F");
+        OutTree -> Branch("q"       ,           &q_components                   , "q[3]/F");
+        OutTree -> Branch("Pmiss"   ,           &Pmiss_components               , "Pmiss[nmb][3]/F");
     }
     // -- - - -- -- - -- -- -- - -- - - -- - -- -- - - -- - - -- --- -- - - --
     
