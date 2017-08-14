@@ -497,7 +497,7 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep( Int_t fRunNumber ){
             
             // recoil proton fiducial cut
             pFiducCut.push_back( eg2dm->protonFiducial( Precoil , debug ) );
-            
+            auto PrecoilFiducialCut = eg2dm->protonFiducial( Precoil , debug );
             
             // #IMPORTANT: the acceptance map that i've created i given in the lab frame
             Double_t PrecoilMag = Precoil.Mag() , PrecoilTheta = r2d*Precoil.Theta() , PrecoilPhi = r2d*Precoil.Phi();
@@ -523,8 +523,8 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep( Int_t fRunNumber ){
             // ------------------------------------------------
             
             
-            if ( Do_PrecFiducial )  AcceptEvent = (pFiducCut[1]==1) ? AcceptEvent : false;
-            if ( Do_PrecMinCut )    AcceptEvent = (Prec.P()>0.35) ? AcceptEvent : false;
+            if ( Do_PrecFiducial )  AcceptEvent = (PrecoilFiducialCut == 1) ? AcceptEvent : false;
+            if ( Do_PrecMinCut )    AcceptEvent = (Prec.P() > 0.35) ? AcceptEvent : false;
 
             
             if (AcceptEvent){
@@ -581,7 +581,7 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep_SingleParameterSigma( Int_t fRunN
            &&   (NAcceptedEvents < NWantedEvents)
            ) {
         if ( debug>0 && attempt%(NgenMAX/100) == 0 ) {
-            Printf("NWantedEvents=%d , NAcceptedEvents=%d",NWantedEvents,NAcceptedEvents);
+            SHOW3(NWantedEvents,NAcceptedEvents,attempt);
             PrintLine();
         }
         InitEvent();
