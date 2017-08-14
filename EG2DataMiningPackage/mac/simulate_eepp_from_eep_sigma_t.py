@@ -105,7 +105,7 @@ if 'generate' in flags.option: #{
                            'N(uncertainties) in generation': 5,
                            })
     
-    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err in zip(['C','Al','Fe','Pb']
+    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err in zip(['C']#,'Al','Fe','Pb']
                                                                                 ,['C12','Al27','Fe56','Pb208']
                                                                                 # for mean(z) that are constant in p(miss)
 #                                                                                ## with Prec Fiducial cuts
