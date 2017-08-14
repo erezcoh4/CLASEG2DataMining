@@ -662,7 +662,14 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep_SingleParameterSigma( Int_t fRunN
             Pcm.RotateZ  ( Pmiss_phi );
             Precoil = Pp2 = Pcm - Pmiss;
             
-            if (debug>3) SHOWTVector3(Precoil);
+            if (debug>3) {
+                SHOW3(Pm[0][0],Pm[0][1],Pm[0][2]);
+                SHOWTVector3(Pcm_in_Pmiss_q_system);
+                
+                SHOWTVector3(Pcm);
+                SHOWTVector3(Pmiss);
+                SHOWTVector3(Precoil);
+            }
             
             if (DoPrecResolution){ // smear the reconstructed momentum of the recoil proton by the CLAS resolution (20 MeV/c)
                 Precoil.SetMag( gRandom->Gaus( Precoil.Mag() , PrecResolution ) );
