@@ -647,6 +647,8 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep_SingleParameterSigma( Int_t fRunN
             // for RooFits
             Pmiss3Mag = PmissMag;
             // here we already work in the Pmiss(z) - q(x-z) frame
+            // and the rootfile would have pcmX,pcmY,pcmZ in the frame to be analyzed,
+            // without the need to rotate vectors to another frame...
             pcmX = Px ;
             pcmY = Py ;
             pcmZ = Pz ;
