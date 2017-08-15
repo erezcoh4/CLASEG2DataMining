@@ -1163,8 +1163,8 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
             # set a new seed
             fseed = int(np.random.uniform(1,100000))
             gen_events.gRandom.SetSeed( fseed )
-            np.random.seed( fseed )
-            
+            #            np.random.seed( fseed )
+
             # sample the geneated parameters uniformly within the ranges
             gen_MeanX = hyperparameters['generated mean(x)']
             gen_MeanY = hyperparameters['generated mean(y)']
