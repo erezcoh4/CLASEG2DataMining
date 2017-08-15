@@ -85,44 +85,43 @@ if 'generate' in flags.option: #{
                            'NgenMax':100000,                # maximal number of attempts
                            'do proton acceptance':True,
                            'do p(rec)>0.35 cut':True,
-                           'do p(rec) FV cuts':False,
+                           'do p(rec) FV cuts':True,
                            'do p(rec) resolution smearing':True,
                            'p(rec) resolution smearing':0.020, # [GeV/c] momentum resolution
                            'generated mean(x)':0.0,
                            'generated mean(y)':0.0,
                            'do print results':True,
                            
-#                           'generation method': 'constant band',
+                           'generation method': 'mean(z) linear in Pmiss', # 'N(uncertainties) band around measured values' # 'constant band'
+                           
                            # take the longitudinal parameters as variable input to the simulation,
                            # distributed as a Gaussian around their measured value
                            # with a width that is N(uncertainties) times the uncertainty in the measured value
-#                           'generation method': 'mean(z) linear in Pmiss',
-#                           'p(miss) fit-type': 'vanish at 0.3', # fit: p(cm)-z = slope * ( p(miss) - 0.3 )
-#                           'maximal slope': 1.010,
-#                           'minimal slope': 0.282,
+                           'p(miss) fit-type': 'vanish at 0.3', # fit: p(cm)-z = slope * ( p(miss) - 0.3 )
+                           'maximal slope': 1.010,
+                           'minimal slope': 0.282,
                            
-                           'generation method': 'N(uncertainties) band around measured values',
                            'N(uncertainties) in generation': 5,
                            })
     
     for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err in zip(['C','Al','Fe','Pb']
                                                                                 ,['C12','Al27','Fe56','Pb208']
                                                                                 # for mean(z) that are constant in p(miss)
-#                                                                                ## with Prec Fiducial cuts
-#                                                                                # measured \mu(miss)
-#                                                                                ,[0.106,0.118,0.149,0.177]
-#                                                                                ,[0.009,0.015,0.010,0.025]
-#                                                                                # measured \sigma(miss)
-#                                                                                ,[0.147,0.141,0.151,0.169]
-#                                                                                ,[0.006,0.010,0.007,0.018]
-                                                                                
-                                                                                # with no Prec Fiducial cuts
+                                                                                ## with Prec Fiducial cuts
                                                                                 # measured \mu(miss)
-                                                                                ,[0.100,0.119,0.147,0.166]
-                                                                                ,[0.008,0.015,0.010,0.023]
+                                                                                ,[0.106,0.118,0.149,0.177]
+                                                                                ,[0.009,0.015,0.010,0.025]
                                                                                 # measured \sigma(miss)
-                                                                                ,[0.146,0.143,0.153,0.167]
-                                                                                ,[0.006,0.010,0.007,0.017]
+                                                                                ,[0.147,0.141,0.151,0.169]
+                                                                                ,[0.006,0.010,0.007,0.018]
+                                                                                
+#                                                                                # with no Prec Fiducial cuts
+#                                                                                # measured \mu(miss)
+#                                                                                ,[0.100,0.119,0.147,0.166]
+#                                                                                ,[0.008,0.015,0.010,0.023]
+#                                                                                # measured \sigma(miss)
+#                                                                                ,[0.146,0.143,0.153,0.167]
+#                                                                                ,[0.006,0.010,0.007,0.017]
                                                                                 
                                                                                 ):#{
 
