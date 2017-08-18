@@ -90,7 +90,7 @@ public:
     Int_t   DoGenerate_eepp_from_eep_SingleParameterSigma ( Int_t run=1, TString rootFilenameSuffix="" );
     Int_t                   Generate_eepp_from_3dGaussian ( Int_t run=1);
 
-    void          SetMyInputChain_eep ();
+//    void          SetMyInputChain_eep ();
     void         SetRootTreeAddresses ();
     void                    SetLimits ( Float_t , Float_t , Float_t , Float_t );
     void          SetHistThetaHistMag ( TH1F * , TH1F * );
@@ -131,6 +131,7 @@ public:
     void         Use_protonAcceptacne ( bool fDo_pAcceptance = false )    { Do_pAcceptance = fDo_pAcceptance;};
     void           SetDo_PrecFiducial ( bool fDo_PrecFiducial = false )   { Do_PrecFiducial = fDo_PrecFiducial;};
     void             SetDo_PrecMinCut ( bool fDo_PrecMinCut = false )     { Do_PrecMinCut = fDo_PrecMinCut;};
+    void             SetDoRandomEntry ( bool fDoRandomEntry=true )        { DoRandomEntry = fDoRandomEntry;};
     void           Use_PrecResolution ( bool dores=true,float fres=0.020) { DoPrecResolution = dores; PrecResolution = fres;} ;
     void         Set_protonAcceptacne ( TH3F * h)                         { h_protonAcceptance = h; };
     void               ComputeWeights ();
@@ -207,6 +208,7 @@ public:
     bool        Do_pAcceptance , Do_PrecFiducial, Do_PrecMinCut, AcceptEvent;
     bool        DoPrecResolution;
     bool        Do_PcmZ_Pmiss_vanish_at_03=false;
+    bool        DoRandomEntry=true;
     
     Int_t       RunNumber   , Nevents   , NAcceptedEvents,  NWantedEvents, Nattempts;
     Int_t       NRand       , NPTheta   , NeTheta,  entry,  InputNentries;
