@@ -379,8 +379,12 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep_SingleParameterSigma( Int_t fRunN
     int attempt=0;
     
     // generate events up to NgenMAX
-    while (     (attempt < NgenMAX)
-           &&   (NAcceptedEvents < NWantedEvents)
+    while (
+           // option (1): generate from random (e,e'p) entries
+           ( DoRandomEntry==true  && (attempt < NgenMAX) && (NAcceptedEvents < NWantedEvents) )
+           ||
+           // option (2): generate from the entire (e,e'p) sample
+           ( DoRandomEntry==false && (entry < InputNentries) && (attempt < NgenMAX) )
            ) {
         if ( debug>0 && attempt%(NgenMAX/100) == 0 ) {
             SHOW3(NWantedEvents,NAcceptedEvents,attempt);
@@ -543,15 +547,19 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep_SingleParameterSigma( Int_t fRunN
     RootFile -> Write();
     RootFile -> Close();
     
-    if ( NAcceptedEvents >= NWantedEvents ) {
+    if ( DoRandomEntry && (NAcceptedEvents >= NWantedEvents) ) {
         Printf("done generating %d (e,e'pp) events (out of %d attempts) to %s",NAcceptedEvents,attempt,rootFilename.Data());
         return NAcceptedEvents;
     }
-    else if ( attempt == NgenMAX ) {
+    else if ( DoRandomEntry && (attempt == NgenMAX) ) {
         Printf("could not fulfill desired quonta (NAcceptedEvents=%d events, attempt=%d)",NAcceptedEvents,attempt);
         return -1;
     }
-    else {
+    else if ( DoRandomEntry == false && (attempt < NgenMAX) ){
+        SHOW2(entry,attempt);
+        return NAcceptedEvents;
+    }
+    else if ( DoRandomEntry == false && (attempt >= NgenMAX) ){
         SHOW2(entry,attempt);
         return -1;
     }
