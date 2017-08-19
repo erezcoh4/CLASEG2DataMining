@@ -86,7 +86,7 @@ if 'generate' in flags.option: #{
                            'do random entry':False,
                            'do proton acceptance':True,
                            'do p(rec)>0.35 cut':True,
-                           'do p(rec) FV cuts':True,
+                           'do p(rec) FV cuts':False,
                            'do p(rec) resolution smearing':False, # we will lateer subtract 20+/-2 MeV/c from the results.
                            'p(rec) resolution smearing':0.020, # [GeV/c] momentum resolution
                            'generated mean(x)':0.0,
