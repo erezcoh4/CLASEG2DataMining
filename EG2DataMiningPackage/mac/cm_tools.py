@@ -454,6 +454,10 @@ def calc_cm_pars_sigma( fana , unweightedRoofitsFName = '' , weightedRoofitsFNam
                                  ,'mean_x_unweighted':unweighted[0],'mean_xErr_unweighted':unweighted[1],'sigma_x_unweighted':unweighted[2],'sigma_xErr_unweighted':unweighted[3]
                                  ,'mean_y_unweighted':unweighted[4],'mean_yErr_unweighted':unweighted[5],'sigma_y_unweighted':unweighted[6],'sigma_yErr_unweighted':unweighted[7]
                                  ,'mean_z_unweighted':unweighted[8],'mean_zErr_unweighted':unweighted[9],'sigma_z_unweighted':unweighted[10],'sigma_zErr_unweighted':unweighted[11]
+                                 ,'chi2red_x_unweighted':unweighted[12],'ndof_x_unweighted':unweighted[13]
+                                 ,'chi2red_y_unweighted':unweighted[14],'ndof_y_unweighted':unweighted[15]
+                                 ,'chi2red_z_unweighted':unweighted[16],'ndof_z_unweighted':unweighted[17]
+                                 
                                  ,'mean_x_weighted':weighted[0],'mean_xErr_weighted':weighted[1],'sigma_x_weighted':weighted[2],'sigma_xErr_weighted':weighted[3]
                                  ,'mean_y_weighted':weighted[4],'mean_yErr_weighted':weighted[5],'sigma_y_weighted':weighted[6],'sigma_yErr_weighted':weighted[7]
                                  ,'mean_z_weighted':weighted[8],'mean_zErr_weighted':weighted[9],'sigma_z_weighted':weighted[10],'sigma_zErr_weighted':weighted[11]
@@ -1141,6 +1145,7 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
         gen_events.SetDo_PrecMinCut ( hyperparameters['do p(rec)>0.35 cut'] )
         gen_events.SetDo_PrecFiducial ( hyperparameters['do p(rec) FV cuts'] ) # in the data we do not apply FV for p(recoil)
         gen_events.Use_PrecResolution ( hyperparameters['do p(rec) resolution smearing'] , hyperparameters['p(rec) resolution smearing'] )
+        gen_events.SetDoRandomEntry( hyperparameters['do random entry'] )
         
         gen_events.SetPmissBins()
         gen_events.Set10PmissBins()
@@ -1208,8 +1213,8 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
             ana_sim = TAnalysisEG2( path + '/eg_rootfiles', 'run%d'%run+rootfilename_suffix )
             results = pd.DataFrame({'run':int(run)
                                    ,'time':str(datetime.datetime.now().strftime("%Y%B%d"))
-                                   ,'NgenEntries':NgenEntries
-                                   ,'NentriesSimRun':ana_sim.GetEntries()
+                                   ,'Ngenenerated':NgenEntries
+                                   ,'Naccepted':ana_sim.GetEntries()
                                    ,'gen_MeanX':gen_MeanX,'gen_MeanY':gen_MeanY
                                    ,'gen_MeanZ':gen_MeanZ if hyperparameters['generation method']!='mean(z) linear in Pmiss' else -1
                                    ,'gen_MeanZ_slope':gen_MeanZ_slope if hyperparameters['generation method']=='mean(z) linear in Pmiss' else -1

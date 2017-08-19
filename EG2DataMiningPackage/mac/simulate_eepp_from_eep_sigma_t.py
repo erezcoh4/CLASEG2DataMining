@@ -4,8 +4,8 @@ from cm_tools import *
     usage:
     ---------------
     python mac/simulate_eepp_from_eep_sigma_t.py --option=generate_analyze -nruns=1 -v1
-    python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=NoPrecFiducials_300Pmiss600 -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=PrecFiducials_300Pmiss600 -v2
+    python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=NoPrecFiducials_300Pmiss600 -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=NoFiducials_allPmiss -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=allPmiss -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=300Pmiss600 -v2
@@ -82,17 +82,18 @@ if 'generate' in flags.option: #{
                            'NRand':20,
                            'Ntimes':50,                     # wanted number of events, multiplied by the number of data events in 12C
                            'N(accepted-events)':15000,
-                           'NgenMax':100000,                # maximal number of attempts
+                           'NgenMax':200000,                # maximal number of attempts
+                           'do random entry':False,
                            'do proton acceptance':True,
                            'do p(rec)>0.35 cut':True,
                            'do p(rec) FV cuts':True,
-                           'do p(rec) resolution smearing':True,
+                           'do p(rec) resolution smearing':False, # we will lateer subtract 20+/-2 MeV/c from the results.
                            'p(rec) resolution smearing':0.020, # [GeV/c] momentum resolution
                            'generated mean(x)':0.0,
                            'generated mean(y)':0.0,
                            'do print results':True,
                            
-                           'generation method': 'mean(z) linear in Pmiss', # 'N(uncertainties) band around measured values' # 'constant band'
+                           'generation method': 'N(uncertainties) band around measured values' # 'mean(z) linear in Pmiss', # 'constant band'
                            
                            # take the longitudinal parameters as variable input to the simulation,
                            # distributed as a Gaussian around their measured value

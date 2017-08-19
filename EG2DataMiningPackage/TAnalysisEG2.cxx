@@ -550,25 +550,36 @@ std::vector<Double_t> TAnalysisEG2::RooFitCM_1bin( Float_t PmissMin, Float_t Pmi
     TCut cut = Form("%f < Pmiss3Mag && Pmiss3Mag < %f" , PmissMin , PmissMax);
     
     // x direction
-    RooFit1D( Tree , "pcmX", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(1) : nullptr , Form("#bf{X} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , "rooWeight" );
+    Double_t     chi2_ndof_x[2] = {0.,0.};
+    RooFit1D( Tree , "pcmX", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(1) : nullptr , Form("#bf{X} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , "rooWeight" , chi2_ndof_x );
     results.push_back(PcmPars[0]); // mean
     results.push_back(PcmParsErr[0]); // mean - err
     results.push_back(PcmPars[1]); // sigma
     results.push_back(PcmParsErr[1]); // sigma - err
     
     // y direction
-    RooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(2) : nullptr , Form("#bf{Y} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , "rooWeight"  );
+    Double_t     chi2_ndof_y[2] = {0.,0.};
+    RooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(2) : nullptr , Form("#bf{Y} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , "rooWeight"  , chi2_ndof_y );
     results.push_back(PcmPars[0]); // mean
     results.push_back(PcmParsErr[0]); // mean - err
     results.push_back(PcmPars[1]); // sigma
     results.push_back(PcmParsErr[1]); // sigma - err
     
     // longitudinal direction
-    RooFit1D( Tree , "pcmZ", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(3) : nullptr , Form("#bf{Z} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , "rooWeight"  );
+    Double_t     chi2_ndof_z[2] = {0.,0.};
+    RooFit1D( Tree , "pcmZ", cut , PcmPars , PcmParsErr , PlotFits , debug, PlotFits ? c->cd(3) : nullptr , Form("#bf{Z} {%.2f<p(miss)<%.2f GeV/c, %lld}" , PmissMin , PmissMax , Tree->GetEntries(cut)) , DoWeight , "rooWeight" , chi2_ndof_z );
     results.push_back(PcmPars[0]); // mean
     results.push_back(PcmParsErr[0]); // mean - err
     results.push_back(PcmPars[1]); // sigma
     results.push_back(PcmParsErr[1]); // sigma - err
+    
+    // lastly, we return the goodness of fit
+    results.push_back(chi2_ndof_x[0]); // chi2
+    results.push_back(chi2_ndof_x[1]); // ndof
+    results.push_back(chi2_ndof_y[0]); // chi2
+    results.push_back(chi2_ndof_y[1]); // ndof
+    results.push_back(chi2_ndof_z[0]); // chi2
+    results.push_back(chi2_ndof_z[1]); // ndof
     
     return results;
 }
