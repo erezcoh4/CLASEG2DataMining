@@ -86,14 +86,14 @@ if 'generate' in flags.option: #{
                            'do random entry':False,
                            'do proton acceptance':True,
                            'do p(rec)>0.35 cut':True,
-                           'do p(rec) FV cuts':False,
+                           'do p(rec) FV cuts':True,
                            'do p(rec) resolution smearing':False, # we will lateer subtract 20+/-2 MeV/c from the results.
                            'p(rec) resolution smearing':0.020, # [GeV/c] momentum resolution
                            'generated mean(x)':0.0,
                            'generated mean(y)':0.0,
                            'do print results':True,
                            
-                           'generation method': 'N(uncertainties) band around measured values' , # 'mean(z) linear in Pmiss', # 'constant band' ,
+                           'generation method': 'constant band' , # 'N(uncertainties) band around measured values' , # 'mean(z) linear in Pmiss', #
                            
                            # take the longitudinal parameters as variable input to the simulation,
                            # distributed as a Gaussian around their measured value
@@ -139,8 +139,10 @@ if 'generate' in flags.option: #{
         hyperparameters['measured sigma(z) err'] = sigma_z_err
         
         # for fixed mean and sigme to all nuclei
-        #        hyperparameters['measured mean(z) err'] = 0.075 # fixed 75 MeV/c for all nuclei
-        #        hyperparameters['measured sigma(z) err'] = 0.050 # fixed 50 MeV/c for all nuclei
+        if hyperparameters['generation method'] ==  'constant band': #{
+            hyperparameters['measured mean(z) err band'] = 0.075 # fixed 75 MeV/c for all nuclei
+            hyperparameters['measured sigma(z) err band'] = 0.050 # fixed 50 MeV/c for all nuclei
+        #}
 
         print_important( "grabbing "+target_name+"(e,e'p) and simulating" )
             
