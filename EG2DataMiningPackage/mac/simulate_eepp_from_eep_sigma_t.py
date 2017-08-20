@@ -93,7 +93,7 @@ if 'generate' in flags.option: #{
                            'generated mean(y)':0.0,
                            'do print results':True,
                            
-                           'generation method': 'mean(z) linear in Pmiss', #'constant band' , # 'N(uncertainties) band around measured values' , # 
+                           'generation method': 'N(uncertainties) band around measured values' , # 'mean(z) linear in Pmiss', #'constant band' , #
                            
                            # take the longitudinal parameters as variable input to the simulation,
                            # distributed as a Gaussian around their measured value
