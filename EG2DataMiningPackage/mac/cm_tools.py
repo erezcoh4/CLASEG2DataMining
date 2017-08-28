@@ -442,6 +442,7 @@ def calc_cm_pars_sigma( fana , unweightedRoofitsFName = '' , weightedRoofitsFNam
         print 'leaving calc_cm_parameters'
         return pd.DataFrame() , False
     #}
+    
     ana = read_root( str(fana.GetFileName()) , key='anaTree' , columns=['pcmX','pcmY','pcmZ','Pmiss3Mag','rooWeight']  )
 
     if DoSaveCanvas:#{
@@ -510,12 +511,20 @@ def calc_cm_pars_sigma( fana , unweightedRoofitsFName = '' , weightedRoofitsFNam
         print_filename(weightedRoofitsFName,"Mott-weighted rooFits at")
         print_line()
     #}
-    print "calculated cm parameters for " + fana.InFileName
-    if debug>1:
-        print "reconstructed cm parameters"
-        if debug>5:
-            print 'df_result:',df_result
 
+    if debug>0:#{
+        print "in calc_cm_pars_sigma(fana)"
+        print "filename:",str(fana.GetFileName())
+        print "fana.GetTree().GetName():",fana.GetTree().GetName()
+        print "fana.GetTree().GetEntries():",fana.GetTree().GetEntries()
+        print "len(ana):",len(ana)
+    #}
+
+    print "calculated cm parameters for " + fana.InFileName
+    if debug>1:#{
+        print "reconstructed cm parameters"
+        if debug>5: print 'df_result:',df_result
+    #}
     garbage_list = [ ana ]
     del garbage_list
     return df_result
@@ -1239,6 +1248,9 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
                         results['rec' + '_' + reco_parameter_name + '_' + direction] = reco_parameters.get_value(0,reco_parameter_name + '_' + direction + '_unweighted')
                         if debug>2: print "results[rec+'_'"+reco_parameter_name+" + '_' + "+direction+"]:",results['rec' + '_' + reco_parameter_name + '_' + direction]
                     #}
+                #}
+                if debug>0:#{
+                    if np.abs(reco_parameters.get_value(0,'sigma_x_unweighted')-gen_Sigma_t)<0.02: print_important("!! rec_sigma_x-gen_Sigma_t = %.3f !!"%(reco_parameters.get_value(0,'sigma_x_unweighted')-gen_Sigma_t))
                 #}
                 if hyperparameters['do print results']:#{
                     print "results:"
