@@ -1182,11 +1182,24 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
             gen_MeanX = hyperparameters['generated mean(x)']
             gen_MeanY = hyperparameters['generated mean(y)']
             gen_Sigma_t = np.random.uniform( np.min(hyperparameters['range_sigma_t']),np.max(hyperparameters['range_sigma_t']) )
-            gen_SigmaZ = np.random.normal( hyperparameters['measured sigma(z)'] , hyperparameters['N(uncertainties) in generation'] * hyperparameters['measured sigma(z) err'] )
             
             if hyperparameters['generation method']=='N(uncertainties) band around measured values': #{
                 gen_MeanZ = np.random.normal( hyperparameters['measured mean(z)'] , hyperparameters['N(uncertainties) in generation'] * hyperparameters['measured mean(z) err'] )
+                gen_SigmaZ = np.random.normal( hyperparameters['measured sigma(z)'] , hyperparameters['N(uncertainties) in generation'] * hyperparameters['measured sigma(z) err'] )
             
+                if debug: print 'run',run,'gen_Sigma_t',gen_Sigma_t,'gen_MeanZ',gen_MeanZ,'gen_SigmaZ',gen_SigmaZ
+                gen_events.Set_eep_Parameters_MeanXYZ_Sigma( gen_MeanX , gen_MeanY , gen_MeanZ , gen_Sigma_t , gen_SigmaZ )
+                rootfilename_suffix = "_"+hyperparameters['my target name']+"_SigmaT%.3f_SigmaZ%.3f_MeanZ%.3f"%(gen_Sigma_t,gen_SigmaZ,gen_MeanZ)
+            #}
+            elif hyperparameters['generation method']=='unifrom N(uncertainties) band around measured': #{
+                mean_z_mid = hyperparameters['measured mean(z)']
+                mean_z_lim = hyperparameters['N(uncertainties) in generation'] * hyperparameters['measured mean(z) err']
+                gen_MeanZ = np.random.uniform( mean_z_mid - mean_z_lim ,  mean_z_mid + mean_z_lim )
+                
+                sigma_z_mid = hyperparameters['measured sigma(z)']
+                sigma_z_lim = hyperparameters['N(uncertainties) in generation'] * hyperparameters['measured sigma(z) err']
+                gen_SigmaZ = np.random.uniform( sigma_z_mid - sigma_z_lim ,  sigma_z_mid + sigma_z_lim )
+
                 if debug: print 'run',run,'gen_Sigma_t',gen_Sigma_t,'gen_MeanZ',gen_MeanZ,'gen_SigmaZ',gen_SigmaZ
                 gen_events.Set_eep_Parameters_MeanXYZ_Sigma( gen_MeanX , gen_MeanY , gen_MeanZ , gen_Sigma_t , gen_SigmaZ )
                 rootfilename_suffix = "_"+hyperparameters['my target name']+"_SigmaT%.3f_SigmaZ%.3f_MeanZ%.3f"%(gen_Sigma_t,gen_SigmaZ,gen_MeanZ)
@@ -1206,12 +1219,14 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
                 average_slope = np.average( [hyperparameters['minimal slope'] , hyperparameters['maximal slope']] )
                 width_slope = average_slope - hyperparameters['minimal slope'] # its symmetric to (hyperparameters['maximal slope']-average_slope)
                 gen_MeanZ_slope  = np.random.normal( average_slope  , width_slope )
-            
+                gen_SigmaZ = np.random.normal( hyperparameters['measured sigma(z)'] , hyperparameters['N(uncertainties) in generation'] * hyperparameters['measured sigma(z) err'] )
+
                 if debug: print 'run',run,'gen_MeanX',gen_MeanX,'gen_MeanY',gen_MeanY,'gen_Sigma_t',gen_Sigma_t,'gen_SigmaZ',gen_SigmaZ,'gen_MeanZ_slope',gen_MeanZ_slope
                 gen_events.Set_MeanZ_Pmiss_vanish_at_03()
                 gen_events.Set_eep_Parameters_Pmiss_vanish_at_03( gen_MeanX , gen_MeanY , gen_Sigma_t , gen_SigmaZ , gen_MeanZ_slope )
                 rootfilename_suffix = "_"+hyperparameters['my target name']+"_SigmaT%.3f_SigmaZ%.3f_MeanZSlope%.3f"%(gen_Sigma_t,gen_SigmaZ,gen_MeanZ_slope)
             #}
+            
             
             gen_events.InitRun()
             if debug: print 'gRandom seed for this run:',gen_events.gRandom.GetSeed()
