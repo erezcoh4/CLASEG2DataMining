@@ -102,7 +102,7 @@ if 'generate' in flags.option: #{
                            'maximal slope': 1.010,
                            'minimal slope': 0.282,
                            
-                           'N(uncertainties) in generation': 3,
+                           'N(uncertainties) in generation': 1,
                            })
     
     for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err in zip(['C','Al','Fe','Pb']
