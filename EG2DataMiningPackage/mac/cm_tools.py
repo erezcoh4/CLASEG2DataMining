@@ -1230,7 +1230,7 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
             #}
             elif hyperparameters['generation method']=='const mean(z), N(uncertainties) band around measured sigma(z)':#{
                 gen_MeanZ = hyperparameters['const mean(z)']
-                gen_SigmaZ = np.random.normal( hyperparameters['measured sigma(z)'] , hyperparameters['measured sigma(z) err band'] )
+                gen_SigmaZ = np.random.normal( hyperparameters['measured sigma(z)'] , hyperparameters['N(uncertainties) in generation'] * hyperparameters['measured sigma(z) err'] )
                 if debug: print 'run',run,'gen_Sigma_t',gen_Sigma_t,'gen_MeanZ',gen_MeanZ,'gen_SigmaZ',gen_SigmaZ
                 gen_events.Set_eep_Parameters_MeanXYZ_Sigma( gen_MeanX , gen_MeanY , gen_MeanZ , gen_Sigma_t , gen_SigmaZ )
                 rootfilename_suffix = "_"+hyperparameters['my target name']+"_SigmaT%.3f_SigmaZ%.3f_MeanZ%.3f"%(gen_Sigma_t,gen_SigmaZ,gen_MeanZ)
@@ -1242,7 +1242,7 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
                 while gen_MeanZ > gen_MeanZ_max:#{
                     gen_MeanZ = np.random.normal( hyperparameters['measured mean(z)'] , hyperparameters['N(uncertainties) in generation'] * hyperparameters['measured mean(z) err'] )
                 #}
-                gen_SigmaZ = np.random.normal( hyperparameters['measured sigma(z)'] , hyperparameters['measured sigma(z) err band'] )
+                gen_SigmaZ = np.random.normal( hyperparameters['measured sigma(z)'] , hyperparameters['N(uncertainties) in generation'] * hyperparameters['measured sigma(z) err'] )
                 if debug: print 'run',run,'gen_Sigma_t',gen_Sigma_t,'gen_MeanZ',gen_MeanZ,'gen_SigmaZ',gen_SigmaZ
                 gen_events.Set_eep_Parameters_MeanXYZ_Sigma( gen_MeanX , gen_MeanY , gen_MeanZ , gen_Sigma_t , gen_SigmaZ )
                 rootfilename_suffix = "_"+hyperparameters['my target name']+"_SigmaT%.3f_SigmaZ%.3f_MeanZ%.3f"%(gen_Sigma_t,gen_SigmaZ,gen_MeanZ)
