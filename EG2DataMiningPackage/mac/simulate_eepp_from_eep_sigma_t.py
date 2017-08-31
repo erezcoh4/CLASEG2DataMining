@@ -93,7 +93,8 @@ if 'generate' in flags.option: #{
                            'generated mean(y)':0.0,
                            'do print results':True,
                            # -- - - -- -- --- -- - -- - -- - - --- - -- - -
-                           'generation method': 'N(uncertainties) band around measured values' , # 'unifrom N(uncertainties) band around measured' , #  'mean(z) linear in Pmiss', #'constant band' , #
+                           'generation method': 'const mean(z), N(uncertainties) band around measured sigma(z)' ,
+                           #'N(uncertainties) band around measured values' , # 'unifrom N(uncertainties) band around measured' , #  'mean(z) linear in Pmiss', #'constant band' , #
                            # -- - - -- -- --- -- - -- - -- - - --- - -- - -
                            # take the longitudinal parameters as variable input to the simulation,
                            # distributed as a Gaussian around their measured value
@@ -102,30 +103,25 @@ if 'generate' in flags.option: #{
                            'maximal slope': 1.010,
                            'minimal slope': 0.282,
                            
-                           'N(uncertainties) in generation': 1,
+                           'N(uncertainties) in generation': 5,
                            })
+                           
+    if hyperparameters['do p(rec) FV cuts']==True:#{
+        measured_mean_z     = [0.106,0.118,0.149,0.177]
+        measured_mean_z_err = [0.009,0.015,0.010,0.025]
+        measured_sigma_z    = [0.147,0.141,0.151,0.169]
+        measured_sigma_z_err= [0.006,0.010,0.007,0.018]
+    #}
+    elif hyperparameters['do p(rec) FV cuts']==False:#{
+        measured_mean_z     = [0.100,0.119,0.147,0.166]
+        measured_mean_z_err = [0.008,0.015,0.010,0.023]
+        measured_sigma_z    = [0.146,0.143,0.153,0.167]
+        measured_sigma_z_err= [0.006,0.010,0.007,0.018]
+    #}
     
     for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err in zip(['C','Al','Fe','Pb']
                                                                                 ,['C12','Al27','Fe56','Pb208']
-                                                                                
-                                                                                # with Prec Fiducial cuts
-                                                                                # measured \mu(miss)
-                                                                                ,[0.106,0.118,0.149,0.177]
-                                                                                ,[0.009,0.015,0.010,0.025]
-                                                                                # measured \sigma(miss)
-                                                                                ,[0.147,0.141,0.151,0.169]
-                                                                                ,[0.006,0.010,0.007,0.018]
-                                                                                
-#                                                                                # with no Prec Fiducial cuts
-#                                                                                # measured \mu(miss)
-#                                                                                ,[0.100,0.119,0.147,0.166]
-#                                                                                ,[0.008,0.015,0.010,0.023]
-#                                                                                # measured \sigma(miss)
-#                                                                                ,[0.146,0.143,0.153,0.167]
-#                                                                                ,[0.006,0.010,0.007,0.017]
-                                                                                
-                                                                                ):#{
-
+                                                                                ,measured_mean_z,measured_mean_z_err,measured_sigma_z,measured_sigma_z_err):#{
 #    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err in zip(['Pb'] ,['Pb208'],[0.177],[0.025],[0.169],[0.018]):#{
 
 
@@ -138,6 +134,11 @@ if 'generate' in flags.option: #{
         hyperparameters['measured sigma(z)'] = sigma_z
         hyperparameters['measured sigma(z) err'] = sigma_z_err
         
+        
+        # for fixed mean and sigme to all nuclei
+        if 'const mean(z)' in hyperparameters['generation method']: #{
+            hyperparameters['const mean(z)'] = hyperparameters['measured mean(z)']
+        #}
         # for fixed mean and sigme to all nuclei
         if hyperparameters['generation method'] ==  'constant band': #{
             hyperparameters['measured mean(z) err band'] = 0.075 # fixed 75 MeV/c for all nuclei
