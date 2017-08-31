@@ -137,7 +137,7 @@ if 'generate' in flags.option: #{
         
         # for fixed mean and sigme to all nuclei
         if 'const mean(z)' in hyperparameters['generation method']: #{
-            hyperparameters['const mean(z)'] = hyperparameters['measured mean(z)']
+            hyperparameters['const mean(z)'] = 0.3 # hyperparameters['measured mean(z)']
         #}
         # for fixed mean and sigme to all nuclei
         if hyperparameters['generation method'] ==  'constant band': #{
