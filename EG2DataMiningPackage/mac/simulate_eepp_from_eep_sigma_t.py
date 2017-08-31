@@ -93,7 +93,8 @@ if 'generate' in flags.option: #{
                            'generated mean(y)':0.0,
                            'do print results':True,
                            # -- - - -- -- --- -- - -- - -- - - --- - -- - -
-                           'generation method': 'const mean(z), N(uncertainties) band around measured sigma(z)' ,
+                           'generation method': 'max mean(z), N(uncertainties) band around measured sigma(z)' ,
+                           #'const mean(z), N(uncertainties) band around measured sigma(z)' ,
                            #'N(uncertainties) band around measured values' , # 'unifrom N(uncertainties) band around measured' , #  'mean(z) linear in Pmiss', #'constant band' , #
                            # -- - - -- -- --- -- - -- - -- - - --- - -- - -
                            # take the longitudinal parameters as variable input to the simulation,
@@ -137,7 +138,10 @@ if 'generate' in flags.option: #{
         
         # for fixed mean and sigme to all nuclei
         if 'const mean(z)' in hyperparameters['generation method']: #{
-            hyperparameters['const mean(z)'] = 0.3 # hyperparameters['measured mean(z)']
+            hyperparameters['const mean(z)'] = 0.3
+        #}
+        if 'max mean(z)' in hyperparameters['generation method']: #{
+            hyperparameters['max mean(z)'] = 0.3
         #}
         # for fixed mean and sigme to all nuclei
         if hyperparameters['generation method'] ==  'constant band': #{
