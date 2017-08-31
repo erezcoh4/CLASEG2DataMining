@@ -445,64 +445,83 @@ def calc_cm_pars_sigma( fana , unweightedRoofitsFName = '' , weightedRoofitsFNam
     
     ana = read_root( str(fana.GetFileName()) , key='anaTree' , columns=['pcmX','pcmY','pcmZ','Pmiss3Mag','rooWeight']  )
 
+    # ToDo: I've changed from (DoSaveCanvas) to (DoSaveCanvas == True or DoSaveCanvas==False). Keep it?
     if DoSaveCanvas:#{
         canvas_unweighted = fana.CreateCanvas( "RooFit plots - unweighted" , "Divide" , 3 , 1 )
         unweighted = fana.RooFitCM_1bin( 0.3 , pMiss_max , False , True, flags.verbose, canvas_unweighted )
         canvas_weighted = fana.CreateCanvas( "RooFit plots - Mott weighted" , "Divide" , 3 , 1 )
         weighted = fana.RooFitCM_1bin( 0.3 , pMiss_max , True , True, flags.verbose, canvas_weighted )
 
-        df_result = pd.DataFrame({'Nevts':len(ana)
-                                 ,'mean_x_unweighted':unweighted[0],'mean_xErr_unweighted':unweighted[1],'sigma_x_unweighted':unweighted[2],'sigma_xErr_unweighted':unweighted[3]
-                                 ,'mean_y_unweighted':unweighted[4],'mean_yErr_unweighted':unweighted[5],'sigma_y_unweighted':unweighted[6],'sigma_yErr_unweighted':unweighted[7]
-                                 ,'mean_z_unweighted':unweighted[8],'mean_zErr_unweighted':unweighted[9],'sigma_z_unweighted':unweighted[10],'sigma_zErr_unweighted':unweighted[11]
-                                 ,'chi2red_x_unweighted':unweighted[12],'ndof_x_unweighted':unweighted[13]
-                                 ,'chi2red_y_unweighted':unweighted[14],'ndof_y_unweighted':unweighted[15]
-                                 ,'chi2red_z_unweighted':unweighted[16],'ndof_z_unweighted':unweighted[17]
-                                 
-                                 ,'mean_x_weighted':weighted[0],'mean_xErr_weighted':weighted[1],'sigma_x_weighted':weighted[2],'sigma_xErr_weighted':weighted[3]
-                                 ,'mean_y_weighted':weighted[4],'mean_yErr_weighted':weighted[5],'sigma_y_weighted':weighted[6],'sigma_yErr_weighted':weighted[7]
-                                 ,'mean_z_weighted':weighted[8],'mean_zErr_weighted':weighted[9],'sigma_z_weighted':weighted[10],'sigma_zErr_weighted':weighted[11]
-                                 }
-                                 , index=[0])
+#        df_result = pd.DataFrame({'Nevts':len(ana)
+#                                 ,'mean_x_unweighted':unweighted[0],'mean_xErr_unweighted':unweighted[1],'sigma_x_unweighted':unweighted[2],'sigma_xErr_unweighted':unweighted[3]
+#                                 ,'mean_y_unweighted':unweighted[4],'mean_yErr_unweighted':unweighted[5],'sigma_y_unweighted':unweighted[6],'sigma_yErr_unweighted':unweighted[7]
+#                                 ,'mean_z_unweighted':unweighted[8],'mean_zErr_unweighted':unweighted[9],'sigma_z_unweighted':unweighted[10],'sigma_zErr_unweighted':unweighted[11]
+#                                 ,'chi2red_x_unweighted':unweighted[12],'ndof_x_unweighted':unweighted[13]
+#                                 ,'chi2red_y_unweighted':unweighted[14],'ndof_y_unweighted':unweighted[15]
+#                                 ,'chi2red_z_unweighted':unweighted[16],'ndof_z_unweighted':unweighted[17]
+#                                 
+#                                 ,'mean_x_weighted':weighted[0],'mean_xErr_weighted':weighted[1],'sigma_x_weighted':weighted[2],'sigma_xErr_weighted':weighted[3]
+#                                 ,'mean_y_weighted':weighted[4],'mean_yErr_weighted':weighted[5],'sigma_y_weighted':weighted[6],'sigma_yErr_weighted':weighted[7]
+#                                 ,'mean_z_weighted':weighted[8],'mean_zErr_weighted':weighted[9],'sigma_z_weighted':weighted[10],'sigma_zErr_weighted':weighted[11]
+#                                 }
+#                                 , index=[0])
     #}
     else:#{
-        if len(ana)>0:#{
-            sqrtN = sqrt(len(ana))
-            mean_x_unweighted     = np.average( ana.pcmX )
-            sigma_x_unweighted    = np.sqrt(np.average( np.square( ana.pcmX-mean_x_unweighted) ))
-            mean_y_unweighted     = np.average( ana.pcmY )
-            sigma_y_unweighted    = np.sqrt(np.average( np.square( ana.pcmY-mean_y_unweighted) ))
-            mean_z_unweighted     = np.average( ana.pcmZ )
-            sigma_z_unweighted    = np.sqrt(np.average( np.square( ana.pcmZ-mean_z_unweighted) ))
-        #}
-#        if len(ana)>0 and sum(ana.rooWeight)>0:#{
-#            sqrtN = sqrt(len(ana))
-#            mean_x_unweighted , mean_x_weighted     = np.average( ana.pcmX ) , np.average( ana.pcmX , weights=ana.rooWeight )
-#            sigma_x_unweighted, sigma_x_weighted    = np.sqrt(np.average( np.square( ana.pcmX-mean_x_unweighted) )) , np.sqrt(np.average( np.square(ana.pcmX-mean_x_weighted) , weights=ana.rooWeight  ))
-#            mean_y_unweighted , mean_y_weighted     = np.average( ana.pcmY ) , np.average( ana.pcmY , weights=ana.rooWeight )
-#            sigma_y_unweighted, sigma_y_weighted    = np.sqrt(np.average( np.square( ana.pcmY-mean_y_unweighted) )) , np.sqrt(np.average( np.square(ana.pcmY-mean_y_weighted) , weights=ana.rooWeight  ))
-#            mean_z_unweighted , mean_z_weighted     = np.average( ana.pcmZ ) , np.average( ana.pcmZ , weights=ana.rooWeight )
-#            sigma_z_unweighted, sigma_z_weighted    = np.sqrt(np.average( np.square( ana.pcmZ-mean_z_unweighted) )) , np.sqrt(np.average( np.square(ana.pcmZ-mean_z_weighted) , weights=ana.rooWeight  ))
-#        #}
-        else:#{
-            sqrtN  = 1
-            mean_x_unweighted , mean_x_weighted     = -100,-100
-            sigma_x_unweighted, sigma_x_weighted    = -100,-100
-            mean_y_unweighted , mean_y_weighted     = -100,-100
-            sigma_y_unweighted, sigma_y_weighted    = -100,-100
-            mean_z_unweighted , mean_z_weighted     = -100,-100
-            sigma_z_unweighted, sigma_z_weighted    = -100,-100
-        #}
-        df_result = pd.DataFrame({'Nevts':len(ana)
-                                 ,'mean_x_unweighted':mean_x_unweighted   ,'mean_xErr_unweighted':sigma_x_unweighted/sqrtN ,'sigma_x_unweighted':sigma_x_unweighted,'sigma_xErr_unweighted':0.02 # resolution uncertainty
-                                 ,'mean_y_unweighted':mean_y_unweighted   ,'mean_yErr_unweighted':sigma_y_unweighted/sqrtN ,'sigma_y_unweighted':sigma_y_unweighted,'sigma_yErr_unweighted':0.02 # resolution uncertainty0
-                                 ,'mean_z_unweighted':mean_z_unweighted   ,'mean_zErr_unweighted':sigma_z_unweighted/sqrtN ,'sigma_z_unweighted':sigma_z_unweighted,'sigma_zErr_unweighted':0.02 # resolution uncertainty
-#                                 ,'mean_x_weighted':mean_x_weighted   ,'mean_xErr_weighted':sigma_x_weighted/sqrtN ,'sigma_x_weighted':sigma_x_weighted,'sigma_xErr_weighted':0.02 # resolution uncertainty
-#                                 ,'mean_y_weighted':mean_y_weighted   ,'mean_yErr_weighted':sigma_y_weighted/sqrtN ,'sigma_y_weighted':sigma_y_weighted,'sigma_yErr_weighted':0.02 # resolution uncertainty0
-#                                 ,'mean_z_weighted':mean_z_weighted   ,'mean_zErr_weighted':sigma_z_weighted/sqrtN ,'sigma_z_weighted':sigma_z_weighted,'sigma_zErr_weighted':0.02 # resolution uncertainty
-                                 }
-                                 , index=[0])
+        unweighted = fana.RooFitCM_1bin( 0.3 , pMiss_max , False , False, flags.verbose )
+        weighted = fana.RooFitCM_1bin( 0.3 , pMiss_max , True , False, flags.verbose )
     #}
+    df_result = pd.DataFrame({'Nevts':len(ana)
+                         ,'mean_x_unweighted':unweighted[0],'mean_xErr_unweighted':unweighted[1],'sigma_x_unweighted':unweighted[2],'sigma_xErr_unweighted':unweighted[3]
+                         ,'mean_y_unweighted':unweighted[4],'mean_yErr_unweighted':unweighted[5],'sigma_y_unweighted':unweighted[6],'sigma_yErr_unweighted':unweighted[7]
+                         ,'mean_z_unweighted':unweighted[8],'mean_zErr_unweighted':unweighted[9],'sigma_z_unweighted':unweighted[10],'sigma_zErr_unweighted':unweighted[11]
+                         ,'chi2red_x_unweighted':unweighted[12],'ndof_x_unweighted':unweighted[13]
+                         ,'chi2red_y_unweighted':unweighted[14],'ndof_y_unweighted':unweighted[15]
+                         ,'chi2red_z_unweighted':unweighted[16],'ndof_z_unweighted':unweighted[17]
+                         
+                         ,'mean_x_weighted':weighted[0],'mean_xErr_weighted':weighted[1],'sigma_x_weighted':weighted[2],'sigma_xErr_weighted':weighted[3]
+                         ,'mean_y_weighted':weighted[4],'mean_yErr_weighted':weighted[5],'sigma_y_weighted':weighted[6],'sigma_yErr_weighted':weighted[7]
+                         ,'mean_z_weighted':weighted[8],'mean_zErr_weighted':weighted[9],'sigma_z_weighted':weighted[10],'sigma_zErr_weighted':weighted[11]
+                         }
+                         , index=[0])
+
+#    else:#{
+#        if len(ana)>0:#{
+#            sqrtN = sqrt(len(ana))
+#            mean_x_unweighted     = np.average( ana.pcmX )
+#            sigma_x_unweighted    = np.sqrt(np.average( np.square( ana.pcmX-mean_x_unweighted) ))
+#            mean_y_unweighted     = np.average( ana.pcmY )
+#            sigma_y_unweighted    = np.sqrt(np.average( np.square( ana.pcmY-mean_y_unweighted) ))
+#            mean_z_unweighted     = np.average( ana.pcmZ )
+#            sigma_z_unweighted    = np.sqrt(np.average( np.square( ana.pcmZ-mean_z_unweighted) ))
+#        #}
+##        if len(ana)>0 and sum(ana.rooWeight)>0:#{
+##            sqrtN = sqrt(len(ana))
+##            mean_x_unweighted , mean_x_weighted     = np.average( ana.pcmX ) , np.average( ana.pcmX , weights=ana.rooWeight )
+##            sigma_x_unweighted, sigma_x_weighted    = np.sqrt(np.average( np.square( ana.pcmX-mean_x_unweighted) )) , np.sqrt(np.average( np.square(ana.pcmX-mean_x_weighted) , weights=ana.rooWeight  ))
+##            mean_y_unweighted , mean_y_weighted     = np.average( ana.pcmY ) , np.average( ana.pcmY , weights=ana.rooWeight )
+##            sigma_y_unweighted, sigma_y_weighted    = np.sqrt(np.average( np.square( ana.pcmY-mean_y_unweighted) )) , np.sqrt(np.average( np.square(ana.pcmY-mean_y_weighted) , weights=ana.rooWeight  ))
+##            mean_z_unweighted , mean_z_weighted     = np.average( ana.pcmZ ) , np.average( ana.pcmZ , weights=ana.rooWeight )
+##            sigma_z_unweighted, sigma_z_weighted    = np.sqrt(np.average( np.square( ana.pcmZ-mean_z_unweighted) )) , np.sqrt(np.average( np.square(ana.pcmZ-mean_z_weighted) , weights=ana.rooWeight  ))
+##        #}
+#        else:#{
+#            sqrtN  = 1
+#            mean_x_unweighted , mean_x_weighted     = -100,-100
+#            sigma_x_unweighted, sigma_x_weighted    = -100,-100
+#            mean_y_unweighted , mean_y_weighted     = -100,-100
+#            sigma_y_unweighted, sigma_y_weighted    = -100,-100
+#            mean_z_unweighted , mean_z_weighted     = -100,-100
+#            sigma_z_unweighted, sigma_z_weighted    = -100,-100
+#        #}
+#        df_result = pd.DataFrame({'Nevts':len(ana)
+#                                 ,'mean_x_unweighted':mean_x_unweighted   ,'mean_xErr_unweighted':sigma_x_unweighted/sqrtN ,'sigma_x_unweighted':sigma_x_unweighted,'sigma_xErr_unweighted':0.02 # resolution uncertainty
+#                                 ,'mean_y_unweighted':mean_y_unweighted   ,'mean_yErr_unweighted':sigma_y_unweighted/sqrtN ,'sigma_y_unweighted':sigma_y_unweighted,'sigma_yErr_unweighted':0.02 # resolution uncertainty0
+#                                 ,'mean_z_unweighted':mean_z_unweighted   ,'mean_zErr_unweighted':sigma_z_unweighted/sqrtN ,'sigma_z_unweighted':sigma_z_unweighted,'sigma_zErr_unweighted':0.02 # resolution uncertainty
+##                                 ,'mean_x_weighted':mean_x_weighted   ,'mean_xErr_weighted':sigma_x_weighted/sqrtN ,'sigma_x_weighted':sigma_x_weighted,'sigma_xErr_weighted':0.02 # resolution uncertainty
+##                                 ,'mean_y_weighted':mean_y_weighted   ,'mean_yErr_weighted':sigma_y_weighted/sqrtN ,'sigma_y_weighted':sigma_y_weighted,'sigma_yErr_weighted':0.02 # resolution uncertainty0
+##                                 ,'mean_z_weighted':mean_z_weighted   ,'mean_zErr_weighted':sigma_z_weighted/sqrtN ,'sigma_z_weighted':sigma_z_weighted,'sigma_zErr_weighted':0.02 # resolution uncertainty
+#                                 }
+#                                 , index=[0])
+#    #}
 
     if DoSaveCanvas:#{
         canvas_unweighted.SaveAs(unweightedRoofitsFName)
@@ -1258,13 +1277,14 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
 
             if Nevents!=-1: #{  Nevents==-1 means that the generation of events could not be completed (too bad of acceptance)
                 reco_parameters = calc_cm_pars_sigma( ana_sim )
-                for reco_parameter_name in ['mean','sigma']: #{
-                    for direction in ['x','y','z']: #{
+                for direction in ['x','y','z']: #{
+                    for reco_parameter_name in ['mean','sigma']: #{
                         results['rec' + '_' + reco_parameter_name + '_' + direction] = reco_parameters.get_value(0,reco_parameter_name + '_' + direction + '_unweighted')
                         if debug>2: print "results[rec+'_'"+reco_parameter_name+" + '_' + "+direction+"]:",results['rec' + '_' + reco_parameter_name + '_' + direction]
                     #}
+                    results['chi2red' + '_' + direction] = reco_parameters.get_value(0,'chi2red' + '_' + direction + '_unweighted')
                 #}
-                if debug>0:#{
+                if debug>3:#{
                     if np.abs(reco_parameters.get_value(0,'sigma_x_unweighted')-gen_Sigma_t)<0.02: print_important("!! rec_sigma_x-gen_Sigma_t = %.3f !!"%(reco_parameters.get_value(0,'sigma_x_unweighted')-gen_Sigma_t))
                 #}
                 if hyperparameters['do print results']:#{
