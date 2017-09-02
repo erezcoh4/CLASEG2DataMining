@@ -531,6 +531,10 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep_SingleParameterSigma( Int_t fRunN
             if ( Do_PrecFiducial )  AcceptEvent = (PrecoilFiducialCut==1) ? AcceptEvent : false;
             if ( Do_PrecMinCut )    AcceptEvent = (Prec.P()>0.35) ? AcceptEvent : false;
             
+            
+            Precoil3Mag = Precoil.Mag();
+            theta_PleadPrecoil = TMath::RadToDeg()*Precoil.Angle( Pmiss );
+            
             genTree -> Fill();
             
             if (AcceptEvent){
@@ -1071,12 +1075,19 @@ void GenerateEvents::SetRootTreeAddresses(){
     RootTree -> Branch("rooWeight"           ,&rooWeight             , "rooWeight/F");
     RootTree -> Branch("Mott"                ,&OrMott                , "Mott/F"); // Or weight
 
+    RootTree -> Branch("Precoil3Mag"         ,&Precoil3Mag           , "Precoil3Mag/F");
+    RootTree -> Branch("theta_PleadPrecoil"  ,&theta_PleadPrecoil    , "theta_PleadPrecoil/F");
+
+    
     // no acceptance no nothing. only generated features
     genTree -> Branch("Pmiss3Mag"           ,&Pmiss3Mag             , "Pmiss3Mag/F");
     genTree -> Branch("pcmX"                ,&pcmX                  , "pcmX/F");
     genTree -> Branch("pcmY"                ,&pcmY                  , "pcmY/F");
     genTree -> Branch("pcmT"                ,&pcmT                  , "pcmT/F");
     genTree -> Branch("pcmZ"                ,&pcmZ                  , "pcmZ/F");
+
+    genTree -> Branch("Precoil3Mag"         ,&Precoil3Mag           , "Precoil3Mag/F");
+    genTree -> Branch("theta_PleadPrecoil"  ,&theta_PleadPrecoil    , "theta_PleadPrecoil/F");
 
 }
 

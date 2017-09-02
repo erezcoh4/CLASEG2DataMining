@@ -259,6 +259,10 @@ public:
     Float_t     PmissBins[5][2], small10PmissBins[10][2];
     Float_t     Q2Bins[4][2] , theta_Pm_qBins[4][2];
     Float_t     PrecResolution;
+    Float_t     Precoil3Mag=0, theta_PleadPrecoil=0;
+
+    
+    
     
     TVector3    e                          ,       Pp1                     ,   Pp2             , Precoil;
     TVector3    Rp1                        ,       Rp2;                                                    // proton vertex
