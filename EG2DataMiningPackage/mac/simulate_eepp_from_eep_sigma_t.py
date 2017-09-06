@@ -78,7 +78,7 @@ if 'generate' in flags.option: #{
     
     hyperparameters = dict({'start_run':flags.run,
                            'Nruns':flags.NumberOfRuns,
-                           'range_sigma_t':(0.150,0.153),       # around 0.160 (0,0.3)
+                           'range_sigma_t':(0.0,0.3),       # around 0.160 (0,0.3)
                            'NRand':20,
                            'Ntimes':50,                     # wanted number of events, multiplied by the number of data events in 12C
                            'N(accepted-events)':15000,
@@ -112,7 +112,7 @@ if 'generate' in flags.option: #{
                            })
                            
     if hyperparameters['do p(rec) FV cuts']==True:#{
-        measured_mean_z     = [0.106,0.118,0.149,0.377]
+        measured_mean_z     = [0.2106,0.118,0.149,0.177]
         measured_mean_z_err = [0.009,0.015,0.010,0.025]
         measured_sigma_z    = [0.147,0.141,0.151,0.169]
         measured_sigma_z_err= [0.006,0.010,0.007,0.018]
