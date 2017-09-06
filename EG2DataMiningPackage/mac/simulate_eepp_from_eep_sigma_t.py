@@ -5,11 +5,11 @@ from cm_tools import *
     ---------------
     python mac/simulate_eepp_from_eep_sigma_t.py --option=generate_analyze -nruns=1 -v1
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=PrecFiducials_300Pmiss600 -v2
+    python mac/simulate_eepp_from_eep_sigma_t.py --option=extractOnly_C12 --DataType=PrecFiducials_300Pmiss600 -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=NoPrecFiducials_300Pmiss600 -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=NoFiducials_allPmiss -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=allPmiss -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=300Pmiss600 -v2
-    python mac/simulate_eepp_from_eep_sigma_t.py --option=extractOnly_C12 --DataType=NoFiducials_allPmiss -v6
     python mac/simulate_eepp_from_eep_sigma_t.py --option=generate_analyze -nruns=1 -v1
 '''
     
@@ -93,9 +93,14 @@ if 'generate' in flags.option: #{
                            'generated mean(y)':0.0,
                            'do print results':True,
                            # -- - - -- -- --- -- - -- - -- - - --- - -- - -
-                           'generation method': 'max mean(z), N(uncertainties) band around measured sigma(z)' ,
+                           'generation method': 'N(uncertainties) band around measured values' ,
+                           #'max mean(z), N(uncertainties) band around measured sigma(z)' ,
                            #'const mean(z), N(uncertainties) band around measured sigma(z)' ,
-                           #'N(uncertainties) band around measured values' , # 'unifrom N(uncertainties) band around measured' , #  'mean(z) linear in Pmiss', #'constant band' , #
+                           #'N(uncertainties) band around measured values' ,
+                           #'unifrom N(uncertainties) band around measured' ,
+                           #'mean(z) linear in Pmiss',
+                           #'constant band' ,
+                           
                            # -- - - -- -- --- -- - -- - -- - - --- - -- - -
                            # take the longitudinal parameters as variable input to the simulation,
                            # distributed as a Gaussian around their measured value
