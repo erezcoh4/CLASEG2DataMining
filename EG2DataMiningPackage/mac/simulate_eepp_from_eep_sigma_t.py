@@ -112,7 +112,7 @@ if 'generate' in flags.option: #{
                            })
                            
     if hyperparameters['do p(rec) FV cuts']==True:#{
-        measured_mean_z     = [0.2106,0.118,0.149,0.177]
+        measured_mean_z     = [0.106,0.118,0.149,0.177]
         measured_mean_z_err = [0.009,0.015,0.010,0.025]
         measured_sigma_z    = [0.147,0.141,0.151,0.169]
         measured_sigma_z_err= [0.006,0.010,0.007,0.018]
@@ -124,7 +124,7 @@ if 'generate' in flags.option: #{
         measured_sigma_z_err= [0.006,0.010,0.007,0.018]
     #}
     
-    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err in zip(['C','Al','Fe','Pb']
+    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err in zip(['C']#,'Al','Fe','Pb']
                                                                                 ,['C12','Al27','Fe56','Pb208']
                                                                                 ,measured_mean_z,measured_mean_z_err,measured_sigma_z,measured_sigma_z_err):#{
 #    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err in zip(['Pb'] ,['Pb208'],[0.177],[0.025],[0.169],[0.018]):#{
