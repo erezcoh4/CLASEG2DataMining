@@ -12,7 +12,7 @@ from scipy.stats import skew
 from scipy.signal import argrelextrema
 from scipy.stats import binom_test
 from ndtest import *
-from lmfit import  Model
+#from lmfit import  Model
 
 sqrt2pi = np.sqrt(2*np.pi)
 
@@ -440,7 +440,7 @@ def gaussian_pdf( x=None, mean_gauss=None , sigma_gauss=None  ):#{
 def gaussian(x, amp, mean_gauss, sigma_gauss):
     "1-d gaussian: gaussian(x, amp, cen, wid)"
     return (amp/(sqrt(2*np.pi)*sigma_gauss)) * np.exp(-(x-mean_gauss)**2 /(2*sigma_gauss**2))
-gmodel = Model(gaussian)
+#gmodel = Model(gaussian)
 # ------------------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------------------- #
