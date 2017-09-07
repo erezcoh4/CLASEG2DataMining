@@ -504,7 +504,7 @@ def calc_cm_pars_sigma( fana , unweightedRoofitsFName = '' , weightedRoofitsFNam
 
     #}
     else:#{
-        unweighted = fana.RooFitCM_1bin( 0.3 , pMiss_max , False , False, flags.verbose )
+        unweighted = fana.FastRooFitCM_1bin( 0.3 , pMiss_max )
 #        weighted = fana.RooFitCM_1bin( 0.3 , pMiss_max , True , False, flags.verbose )
     #}
     df_result = pd.DataFrame({'Nevts':len(ana)

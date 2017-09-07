@@ -585,6 +585,55 @@ std::vector<Double_t> TAnalysisEG2::RooFitCM_1bin( Float_t PmissMin, Float_t Pmi
 }
 
 
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+std::vector<Double_t> TAnalysisEG2::FastRooFitCM_1bin( Float_t PmissMin, Float_t PmissMax){
+    // returns a parameter matrix: (μ-x,𝜎-x,μ-y,𝜎-y,μ-z,𝜎-z) and their uncertainties (𝚫μ-x,𝚫𝜎-x,𝚫μ-y,𝚫𝜎-y,𝚫μ-z,𝚫𝜎-z)
+    // if PlotFits=true, it also plots the RooFits into three pads: start_cd, start_cd1 , start_cd2
+    
+    Double_t    PcmPars[2] = { 0 , 0.14 } ,   PcmParsErr[2] = { 0 , 0 };
+    std::vector<Double_t> results;
+    
+    TCut cut = Form("%f < Pmiss3Mag && Pmiss3Mag < %f" , PmissMin , PmissMax);
+    
+    // x direction
+    Double_t     chi2_ndof_x[2] = {0.,0.};
+    FastRooFit1D( Tree , "pcmX", cut , PcmPars , PcmParsErr , chi2_ndof_x );
+    results.push_back(PcmPars[0]); // mean
+    results.push_back(PcmParsErr[0]); // mean - err
+    results.push_back(PcmPars[1]); // sigma
+    results.push_back(PcmParsErr[1]); // sigma - err
+    
+    // y direction
+    Double_t     chi2_ndof_y[2] = {0.,0.};
+    FastRooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , chi2_ndof_y );
+    results.push_back(PcmPars[0]); // mean
+    results.push_back(PcmParsErr[0]); // mean - err
+    results.push_back(PcmPars[1]); // sigma
+    results.push_back(PcmParsErr[1]); // sigma - err
+    
+    // longitudinal direction
+    Double_t     chi2_ndof_z[2] = {0.,0.};
+    FastRooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , chi2_ndof_z );
+    results.push_back(PcmPars[0]); // mean
+    results.push_back(PcmParsErr[0]); // mean - err
+    results.push_back(PcmPars[1]); // sigma
+    results.push_back(PcmParsErr[1]); // sigma - err
+    
+    // lastly, we return the goodness of fit
+    results.push_back(chi2_ndof_x[0]); // chi2
+    results.push_back(chi2_ndof_x[1]); // ndof
+    results.push_back(chi2_ndof_y[0]); // chi2
+    results.push_back(chi2_ndof_y[1]); // ndof
+    results.push_back(chi2_ndof_z[0]); // chi2
+    results.push_back(chi2_ndof_z[1]); // ndof
+    
+    return results;
+}
+
+
+
 //
 ////....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //std::vector<Double_t> TAnalysisEG2::FastRooFitCM( Float_t PmissMin, Float_t PmissMax, bool DoWeight , bool PlotFits, int debug, TCanvas * c, Int_t start_cd ){
