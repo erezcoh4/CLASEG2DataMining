@@ -598,37 +598,42 @@ std::vector<Double_t> TAnalysisEG2::FastRooFitCM_1bin( Float_t PmissMin, Float_t
     TCut cut = Form("%f < Pmiss3Mag && Pmiss3Mag < %f" , PmissMin , PmissMax);
     
     // x direction
-    Double_t     chi2_ndof_x[2] = {0.,0.};
-    FastRooFit1D( Tree , "pcmX", cut , PcmPars , PcmParsErr , chi2_ndof_x );
+    Double_t chi2_ndof_x[2] = {0.,0.};
+    Double_t chi2_x = FastRooFit1D( Tree , "pcmX", cut , PcmPars , PcmParsErr , chi2_ndof_x );
     results.push_back(PcmPars[0]); // mean
     results.push_back(PcmParsErr[0]); // mean - err
     results.push_back(PcmPars[1]); // sigma
     results.push_back(PcmParsErr[1]); // sigma - err
     
     // y direction
-    Double_t     chi2_ndof_y[2] = {0.,0.};
-    FastRooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , chi2_ndof_y );
+    Double_t chi2_ndof_y[2] = {0.,0.};
+    Double_t chi2_y = FastRooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , chi2_ndof_y );
     results.push_back(PcmPars[0]); // mean
     results.push_back(PcmParsErr[0]); // mean - err
     results.push_back(PcmPars[1]); // sigma
     results.push_back(PcmParsErr[1]); // sigma - err
     
     // longitudinal direction
-    Double_t     chi2_ndof_z[2] = {0.,0.};
-    FastRooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , chi2_ndof_z );
+    Double_t chi2_ndof_z[2] = {0.,0.};
+    Double_t chi2_z = FastRooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , chi2_ndof_z );
     results.push_back(PcmPars[0]); // mean
     results.push_back(PcmParsErr[0]); // mean - err
     results.push_back(PcmPars[1]); // sigma
     results.push_back(PcmParsErr[1]); // sigma - err
     
     // lastly, we return the goodness of fit
-    results.push_back(chi2_ndof_x[0]); // chi2
+    results.push_back(chi2_ndof_x[0]); // chi2red
     results.push_back(chi2_ndof_x[1]); // ndof
-    results.push_back(chi2_ndof_y[0]); // chi2
+    results.push_back(chi2_ndof_y[0]); // chi2red
     results.push_back(chi2_ndof_y[1]); // ndof
-    results.push_back(chi2_ndof_z[0]); // chi2
+    results.push_back(chi2_ndof_z[0]); // chi2red
     results.push_back(chi2_ndof_z[1]); // ndof
+
     
+    results.push_back(chi2_x); // total chi2
+    results.push_back(chi2_y); // total chi2
+    results.push_back(chi2_z); // total chi2
+
     return results;
 }
 
