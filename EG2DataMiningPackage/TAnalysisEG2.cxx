@@ -599,7 +599,7 @@ std::vector<Double_t> TAnalysisEG2::FastRooFitCM_1bin( Float_t PmissMin, Float_t
     
     // x direction
     Double_t chi2_ndof_x[2] = {0.,0.};
-    Double_t chi2_x = FastRooFit1D( Tree , "pcmX", cut , PcmPars , PcmParsErr , chi2_ndof_x );
+    Double_t minNLogLikelihood_x = FastRooFit1D( Tree , "pcmX", cut , PcmPars , PcmParsErr , chi2_ndof_x );
     results.push_back(PcmPars[0]); // mean
     results.push_back(PcmParsErr[0]); // mean - err
     results.push_back(PcmPars[1]); // sigma
@@ -607,7 +607,7 @@ std::vector<Double_t> TAnalysisEG2::FastRooFitCM_1bin( Float_t PmissMin, Float_t
     
     // y direction
     Double_t chi2_ndof_y[2] = {0.,0.};
-    Double_t chi2_y = FastRooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , chi2_ndof_y );
+    Double_t minNLogLikelihood_y = FastRooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , chi2_ndof_y );
     results.push_back(PcmPars[0]); // mean
     results.push_back(PcmParsErr[0]); // mean - err
     results.push_back(PcmPars[1]); // sigma
@@ -615,7 +615,7 @@ std::vector<Double_t> TAnalysisEG2::FastRooFitCM_1bin( Float_t PmissMin, Float_t
     
     // longitudinal direction
     Double_t chi2_ndof_z[2] = {0.,0.};
-    Double_t chi2_z = FastRooFit1D( Tree , "pcmY", cut , PcmPars , PcmParsErr , chi2_ndof_z );
+    Double_t minNLogLikelihood_z = FastRooFit1D( Tree , "pcmZ", cut , PcmPars , PcmParsErr , chi2_ndof_z );
     results.push_back(PcmPars[0]); // mean
     results.push_back(PcmParsErr[0]); // mean - err
     results.push_back(PcmPars[1]); // sigma
@@ -630,9 +630,9 @@ std::vector<Double_t> TAnalysisEG2::FastRooFitCM_1bin( Float_t PmissMin, Float_t
     results.push_back(chi2_ndof_z[1]); // ndof
 
     
-    results.push_back(chi2_x); // total chi2
-    results.push_back(chi2_y); // total chi2
-    results.push_back(chi2_z); // total chi2
+    results.push_back(minNLogLikelihood_x); // min N Log(Likelihood)
+    results.push_back(minNLogLikelihood_y); // min N Log(Likelihood)
+    results.push_back(minNLogLikelihood_z); // min N Log(Likelihood)
 
     return results;
 }
