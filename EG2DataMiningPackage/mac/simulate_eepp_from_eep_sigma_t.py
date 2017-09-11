@@ -78,7 +78,7 @@ if 'generate' in flags.option: #{
     
     hyperparameters = dict({'start_run':flags.run,
                            'Nruns':flags.NumberOfRuns,
-                           'range_sigma_t':(0.0,0.3),       # around 0.160 (0,0.3)
+                           'range_sigma_t':(0.027,0.0273),       # around 0.160 (0,0.3)
                            'NRand':20,
                            'Ntimes':50,                     # wanted number of events, multiplied by the number of data events in 12C
                            'N(accepted-events)':15000,
@@ -124,11 +124,11 @@ if 'generate' in flags.option: #{
         measured_sigma_z_err= [0.006,0.010,0.007,0.018]
     #}
     
-    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err,NRand in zip(['C','Al','Fe','Pb']
-                                                                                      ,['C12','Al27','Fe56','Pb208']
-                                                                                      ,measured_mean_z,measured_mean_z_err,measured_sigma_z,measured_sigma_z_err
-                                                                                      ,[20,70,20,70]):#{
-#    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err in zip(['Pb'] ,['Pb208'],[0.177],[0.025],[0.169],[0.018]):#{
+#    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err,NRand in zip(['C','Al','Fe','Pb']
+#                                                                                      ,['C12','Al27','Fe56','Pb208']
+#                                                                                      ,measured_mean_z,measured_mean_z_err,measured_sigma_z,measured_sigma_z_err
+#                                                                                      ,[20,70,20,70]):#{
+    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err,NRand in zip(['Pb'] ,['Pb208'],[0.177],[0.025],[0.169],[0.018],[70]):#{
 
 
         hyperparameters['NRand'] = NRand
