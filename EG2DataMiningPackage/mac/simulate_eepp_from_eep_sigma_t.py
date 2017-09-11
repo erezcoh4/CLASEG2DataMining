@@ -78,7 +78,7 @@ if 'generate' in flags.option: #{
     
     hyperparameters = dict({'start_run':flags.run,
                            'Nruns':flags.NumberOfRuns,
-                           'range_sigma_t':(0.027,0.0273),       # around 0.160 (0,0.3)
+                           'range_sigma_t':(0.110,0.15),       # around 0.160 (0,0.3)
                            'NRand':20,
                            'Ntimes':50,                     # wanted number of events, multiplied by the number of data events in 12C
                            'N(accepted-events)':15000,
