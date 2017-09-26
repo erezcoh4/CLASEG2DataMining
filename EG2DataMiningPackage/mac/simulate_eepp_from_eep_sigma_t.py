@@ -107,7 +107,6 @@ if 'generate' in flags.option: #{
                            'p(miss) fit-type': 'vanish at 0.3', # fit: p(cm)-z = slope * ( p(miss) - 0.3 )
                            'maximal slope': 1.010,
                            'minimal slope': 0.282,
-                           
                            'N(uncertainties) in generation': 5,
                            })
                            
@@ -124,11 +123,11 @@ if 'generate' in flags.option: #{
         measured_sigma_z_err= [0.006,0.010,0.007,0.018]
     #}
     
-#    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err,NRand in zip(['C','Al','Fe','Pb']
-#                                                                                      ,['C12','Al27','Fe56','Pb208']
-#                                                                                      ,measured_mean_z,measured_mean_z_err,measured_sigma_z,measured_sigma_z_err
-#                                                                                      ,[20,70,20,70]):#{
-    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err,NRand in zip(['Pb'] ,['Pb208'],[0.177],[0.025],[0.169],[0.018],[70]):#{
+    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err,NRand in zip(['C','Al','Fe','Pb']
+                                                                                      ,['C12','Al27','Fe56','Pb208']
+                                                                                      ,measured_mean_z,measured_mean_z_err,measured_sigma_z,measured_sigma_z_err
+                                                                                      ,[20,70,20,70]):#{
+#    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err,NRand in zip(['Pb'] ,['Pb208'],[0.177],[0.025],[0.169],[0.018],[70]):#{
 
 
         hyperparameters['NRand'] = NRand
