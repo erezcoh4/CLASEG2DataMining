@@ -73,8 +73,13 @@ if 'extract' in flags.option: #{
 # generate runs with different \sigma (for acceptance correction)
 # ----------------------------------------------------------
 if 'generate' in flags.option: #{
-    
-    
+
+    ana_data = dict()
+    for target in targets:#{
+        # CONTINUE HERE: CHECK TO SEE IF THIS IS REALLY THE FILE TO COMPARE AND IT WORKS FINE
+        ana_data[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_300Pmiss600_%s_PrecFiducials"%target )
+    #}
+
     
     hyperparameters = dict({'start_run':flags.run,
                            'Nruns':flags.NumberOfRuns,
@@ -166,7 +171,8 @@ if 'generate' in flags.option: #{
                                         hyperparameters=hyperparameters,
                                         debug=flags.verbose,
                                         buildup_resultsFName=buildup_resultsFName( full_path ),
-                                        do_results_file=True
+                                        do_results_file=True,
+                                        ana_data=ana_data
                                         )
         print_important( "done "+target_name+"(e,e'p) simulations ")
         print_xline()
