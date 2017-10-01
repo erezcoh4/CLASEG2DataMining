@@ -1178,20 +1178,34 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
 #} CONTINUE HERE
 # ------------------------------------------------------------------------------- #
 # Sep-29,2017
-def ks_Pval_scores_sigma(ana_sim=None, ana_data=dict()):
+def ks_Pval_scores_sigma(ana_sim=None, ana_data_target=None,debug=0):
+    '''
+        comparing N(e,e'pp) data events with random N(e,e'pp) events from the simulation
+        in x/y/z directions independently,
+        using the KS test, to give a Pval that they were generated from the same parent distribution.
+        
+        return: 
+                ks_pval_scores: dict() of Pval in x/y/z directions
+    '''
     
-    df_sim = tree2array( ana_sim.GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
-    ks_pval_scores_target_array , ks_pval_scores_longitudinal_target_array = [] , []
-    ks_pval_scores_target = dict()
-    df_data = tree2array( ana_data[target].GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
+    df_data = tree2array( ana_data_target.GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
+    Neepp_data = len(df_data)
 
-    # compare x, y, & z directions
+    df_sim = tree2array( ana_sim.GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
+    df_sim_reduced = np.random.choice( df_sim , Neepp_data )
+
+
     ks_pval_scores = dict()
-    for i_dir,direction in enumerate(['X','Y']): #{
+    for direction,dir_name in zip(['X','Y','Z'],['x','y','z']): #{
         Pcm_data = df_data['pcm'+direction]
-        Pcm_sim = df_sim['pcm'+direction]
+        Pcm_sim  = df_sim_reduced['pcm'+direction]
         D_KS , Pval_KS = ks_2samp( Pcm_data , Pcm_sim )
-        ks_pval_scores[direction] = Pval_KS
+        ks_pval_scores[dir_name] = Pval_KS
+    #}
+    if debug>1: #{
+        print "len(df_data):",len(df_data)
+        print "len(df_sim_reduced):",len(df_sim_reduced)
+        print "ks_pval_scores:",ks_pval_scores
     #}
     return ks_pval_scores
 # ------------------------------------------------------------------------------- #
@@ -1206,7 +1220,7 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
                                     buildup_resultsFName='' ,
                                     reco_fitsFName='',
                                     do_results_file=True,
-                                    ana_data=dict()
+                                    ana_data_target=None
                                     ):#{
     
     from definitions import path
@@ -1330,7 +1344,7 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
             
             
             gen_events.InitRun()
-            if debug: print 'gRandom seed for this run:',gen_events.gRandom.GetSeed()
+            if debug>1: print 'gRandom seed for this run:',gen_events.gRandom.GetSeed()
             Nevents = gen_events.DoGenerate_eepp_from_eep_SingleParameterSigma( run , rootfilename_suffix )
             if debug: print 'Nevents to analyze:',Nevents
         #}
@@ -1359,7 +1373,7 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
 
             if Nevents!=-1: #{  Nevents==-1 means that the generation of events could not be completed (too bad of acceptance)
                 reco_parameters = calc_cm_pars_sigma( ana_sim )
-                ks_pval_scores = ks_Pval_scores_sigma( ana_sim=ana_sim , ana_data=ana_data )
+                ks_pval_scores = ks_Pval_scores_sigma( ana_sim=ana_sim , ana_data_target=ana_data_target , debug=debug)
                 for direction in ['x','y','z']: #{
                     for reco_parameter_name in ['mean','sigma']: #{
                         results['rec' + '_' + reco_parameter_name + '_' + direction] = reco_parameters.get_value(0,reco_parameter_name + '_' + direction + '_unweighted')
@@ -1370,7 +1384,9 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
                         results['minNLogLikelihood' + '_' + direction] = reco_parameters.get_value(0,'minNLogLikelihood' + '_' + direction + '_unweighted')
                         results['ks_local_Pval_'+direction] = ks_pval_scores[direction]
                 #}
-                results['ks_gloabal_Pval_xyz'] = ks_pval_scores[direction]
+                results['ks_gloabal_Pval_xyz_Fisher'] = Fisher_combination_Pvals([ks_pval_scores['x'],ks_pval_scores['y'],ks_pval_scores['z']])
+                results['ks_gloabal_Pval_xyz_Average'] = np.average([ks_pval_scores['x'],ks_pval_scores['y'],ks_pval_scores['z']])
+                
                 if debug>3:#{
                     if np.abs(reco_parameters.get_value(0,'sigma_x_unweighted')-gen_Sigma_t)<0.02: print_important("!! rec_sigma_x-gen_Sigma_t = %.3f !!"%(reco_parameters.get_value(0,'sigma_x_unweighted')-gen_Sigma_t))
                 #}

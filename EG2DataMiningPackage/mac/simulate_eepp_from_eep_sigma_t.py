@@ -76,7 +76,6 @@ if 'generate' in flags.option: #{
 
     ana_data = dict()
     for target in targets:#{
-        # CONTINUE HERE: CHECK TO SEE IF THIS IS REALLY THE FILE TO COMPARE AND IT WORKS FINE
         ana_data[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_300Pmiss600_%s_PrecFiducials"%target )
     #}
 
@@ -120,6 +119,8 @@ if 'generate' in flags.option: #{
         measured_mean_z_err = [0.009,0.015,0.010,0.025]
         measured_sigma_z    = [0.147,0.141,0.151,0.169]
         measured_sigma_z_err= [0.006,0.010,0.007,0.018]
+        eep_events          = [7598 ,2573 ,8558 ,2635 ]
+        eepp_events         = [266  ,88   ,227  ,45   ]
     #}
     elif hyperparameters['do p(rec) FV cuts']==False:#{
         measured_mean_z     = [0.100,0.119,0.147,0.166]
@@ -128,10 +129,11 @@ if 'generate' in flags.option: #{
         measured_sigma_z_err= [0.006,0.010,0.007,0.018]
     #}
     
-    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err,NRand in zip(['C','Al','Fe','Pb']
-                                                                                      ,['C12','Al27','Fe56','Pb208']
-                                                                                      ,measured_mean_z,measured_mean_z_err,measured_sigma_z,measured_sigma_z_err
-                                                                                      ,[20,70,20,70]):#{
+    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err,NRand,Neep,Neepp in zip(['C','Al','Fe','Pb']
+                                                                                                 ,['C12','Al27','Fe56','Pb208']
+                                                                                                 ,measured_mean_z,measured_mean_z_err,measured_sigma_z,measured_sigma_z_err
+                                                                                                 ,[20,70,20,70]
+                                                                                                 ,eep_events,eepp_events):#{
 #    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err,NRand in zip(['Pb'] ,['Pb208'],[0.177],[0.025],[0.169],[0.018],[70]):#{
 
 
@@ -144,8 +146,11 @@ if 'generate' in flags.option: #{
         hyperparameters['measured mean(z) err'] = mean_z_err
         hyperparameters['measured sigma(z)'] = sigma_z
         hyperparameters['measured sigma(z) err'] = sigma_z_err
-        
-        
+
+        hyperparameters['Neep'] = Neep
+        hyperparameters['Neepp'] = Neepp
+
+
         # for fixed mean and sigme to all nuclei
         if 'const mean(z)' in hyperparameters['generation method']: #{
             hyperparameters['const mean(z)'] = 0.3
@@ -172,7 +177,7 @@ if 'generate' in flags.option: #{
                                         debug=flags.verbose,
                                         buildup_resultsFName=buildup_resultsFName( full_path ),
                                         do_results_file=True,
-                                        ana_data=ana_data
+                                        ana_data_target=ana_data[target]
                                         )
         print_important( "done "+target_name+"(e,e'p) simulations ")
         print_xline()
