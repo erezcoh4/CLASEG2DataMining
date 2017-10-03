@@ -2,6 +2,7 @@ from definitions import *
 from root_numpy import hist2array , tree2array
 from root_pandas import to_root
 from scipy.stats import ks_2samp
+from scipy.stats import chisquare
 from matplotlib.ticker import LinearLocator
 from matplotlib.ticker import NullFormatter
 
@@ -1174,8 +1175,6 @@ def generate_runs_with_random_parameters( option='', hyperparameters=None,
 
 
 
-
-#} CONTINUE HERE
 # ------------------------------------------------------------------------------- #
 # Sep-29,2017
 def ks_Pval_scores_sigma(ana_sim=None, ana_data_target=None,debug=0):
@@ -1199,7 +1198,7 @@ def ks_Pval_scores_sigma(ana_sim=None, ana_data_target=None,debug=0):
     for direction,dir_name in zip(['X','Y','Z'],['x','y','z']): #{
         Pcm_data = df_data['pcm'+direction]
         Pcm_sim  = df_sim_reduced['pcm'+direction]
-        D_KS , Pval_KS = ks_2samp( Pcm_data , Pcm_sim )
+        D_KS , Pval_KS = ks_2samp( Pcm_data , Pcm_sim ) # If the KS statistic is small, or the p-value is high, then we cannot reject the hypothesis that the distributions of the two samples are the same.
         ks_pval_scores[dir_name] = Pval_KS
     #}
     if debug>1: #{
@@ -1210,6 +1209,48 @@ def ks_Pval_scores_sigma(ana_sim=None, ana_data_target=None,debug=0):
     return ks_pval_scores
 # ------------------------------------------------------------------------------- #
 
+
+
+
+# ------------------------------------------------------------------------------- #
+# Sep-29,2017
+def chi2_scores_sigma(ana_sim=None, ana_data_target=None,debug=0):
+    '''
+        comparing N(e,e'pp) data events with random N(e,e'pp) events from the simulation
+        in x/y/z directions independently,
+        using the chi2 test, to give a Pval that they were generated from the same parent distribution.
+        
+        return:
+        chi2_scores: dict() of chi2 and Pval in x/y/z directions
+        '''
+    
+    df_data = tree2array( ana_data_target.GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
+    Neepp_data = len(df_data)
+    
+    df_sim = tree2array( ana_sim.GetTree() , branches=['pcmX','pcmY','pcmZ','Pmiss3Mag'] )
+    df_sim_reduced = np.random.choice( df_sim , Neepp_data )
+    
+    
+    chi2_scores = dict()
+    for direction,dir_name in zip(['X','Y','Z'],['x','y','z']): #{
+        Pcm_data = df_data['pcm'+direction]
+        h_data , edges = np.histogram(Pcm_data , bins=10)
+        Pcm_sim  = df_sim_reduced['pcm'+direction]
+        h_sim , edges = np.histogram(Pcm_sim , bins=10)
+        chi2 , Pval = chisquare( h_data , h_sim )
+#        if debug>2: print "h_sim:",h_sim
+#        if debug>2: print "h_data:",h_data
+#        if debug>2: print "direction, chi2 , Pval:",dir_name, chi2 , Pval
+        chi2_scores['chi2_'+dir_name] = chi2
+        chi2_scores['chi2_Pval_'+dir_name] = Pval
+    #}
+    if debug>1: #{
+        print "len(df_data):",len(df_data)
+        print "len(df_sim_reduced):",len(df_sim_reduced)
+        print "chi2_scores:",chi2_scores
+    #}
+    return chi2_scores
+# ------------------------------------------------------------------------------- #
 
 
 # ------------------------------------------------------------------------------- #
@@ -1372,8 +1413,11 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
                                    , index = [int(run)])
 
             if Nevents!=-1: #{  Nevents==-1 means that the generation of events could not be completed (too bad of acceptance)
+                
                 reco_parameters = calc_cm_pars_sigma( ana_sim )
                 ks_pval_scores = ks_Pval_scores_sigma( ana_sim=ana_sim , ana_data_target=ana_data_target , debug=debug)
+                chi2_scores = chi2_scores_sigma( ana_sim=ana_sim , ana_data_target=ana_data_target , debug=debug)
+                
                 for direction in ['x','y','z']: #{
                     for reco_parameter_name in ['mean','sigma']: #{
                         results['rec' + '_' + reco_parameter_name + '_' + direction] = reco_parameters.get_value(0,reco_parameter_name + '_' + direction + '_unweighted')
@@ -1383,6 +1427,8 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
                         results['ndof' + '_' + direction] = reco_parameters.get_value(0,'ndof' + '_' + direction + '_unweighted')
                         results['minNLogLikelihood' + '_' + direction] = reco_parameters.get_value(0,'minNLogLikelihood' + '_' + direction + '_unweighted')
                         results['ks_local_Pval_'+direction] = ks_pval_scores[direction]
+                        results['chi2_'+direction] = chi2_scores['chi2_'+direction]
+                        results['chi2_Pval_'+direction] = chi2_scores['chi2_Pval_'+direction]
                 #}
                 results['ks_gloabal_Pval_xyz_Fisher'] = Fisher_combination_Pvals([ks_pval_scores['x'],ks_pval_scores['y'],ks_pval_scores['z']])
                 results['ks_gloabal_Pval_xyz_Average'] = np.average([ks_pval_scores['x'],ks_pval_scores['y'],ks_pval_scores['z']])
