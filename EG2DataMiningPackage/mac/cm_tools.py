@@ -1213,7 +1213,27 @@ def ks_Pval_scores_sigma(ana_sim=None, ana_data_target=None,debug=0):
 
 
 # ------------------------------------------------------------------------------- #
-# Sep-29,2017
+# Oct-4, 2017
+def chisquare_2sample( h1=None , h2=None , Nbins=10 ):#{
+    '''
+    compute the chi2 statistics for two histograms, h1 and h2, of the SAME binning
+    (they must have the same binning)
+    
+    return:
+            chi2red: reduced chi2 of the comparison
+    '''
+
+    chi2 = 0
+    for bin in range(Nbins-1): #{
+        sigma1_sq = h1[bin] if h1[bin]>0 else 1
+        sigma2_sq = h2[bin] if h2[bin]>0 else 1
+        stat = float(np.square( h1[bin] - h2[bin] )) / ( sigma1_sq + sigma2_sq )
+        chi2 += stat
+    #}
+    chi2red = chi2/(Nbins - 1)
+    return chi2red
+#}
+
 def chi2_scores_sigma(ana_sim=None, ana_data_target=None,debug=0):
     '''
         comparing N(e,e'pp) data events with random N(e,e'pp) events from the simulation
@@ -1232,17 +1252,21 @@ def chi2_scores_sigma(ana_sim=None, ana_data_target=None,debug=0):
     
     
     chi2_scores = dict()
+    bins = np.linspace(-0.4,0.8,16)
     for direction,dir_name in zip(['X','Y','Z'],['x','y','z']): #{
         Pcm_data = df_data['pcm'+direction]
-        h_data , edges = np.histogram(Pcm_data , bins=10)
+        h_data , edges = np.histogram(Pcm_data , bins=bins)
         Pcm_sim  = df_sim_reduced['pcm'+direction]
-        h_sim , edges = np.histogram(Pcm_sim , bins=10)
-        chi2 , Pval = chisquare( h_data , h_sim )
-#        if debug>2: print "h_sim:",h_sim
-#        if debug>2: print "h_data:",h_data
-#        if debug>2: print "direction, chi2 , Pval:",dir_name, chi2 , Pval
-        chi2_scores['chi2_'+dir_name] = chi2
-        chi2_scores['chi2_Pval_'+dir_name] = Pval
+        h_sim , edges = np.histogram(Pcm_sim , bins=bins)
+        #        chi2 , Pval = chisquare( h_data , h_sim )
+        chi2red_data_sim = chisquare_2sample( h_data , h_sim , len(bins) )
+        if debug>2: #{
+            print "h_sim:",h_sim
+            print "h_data:",h_data
+            print "direction, chi2red:",dir_name, chi2red_data_sim
+        #}
+        chi2_scores['chi2red_data_sim_'+dir_name] = chi2red_data_sim
+#        chi2_scores['chi2_Pval_'+dir_name] = Pval
     #}
     if debug>1: #{
         print "len(df_data):",len(df_data)
@@ -1427,8 +1451,8 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
                         results['ndof' + '_' + direction] = reco_parameters.get_value(0,'ndof' + '_' + direction + '_unweighted')
                         results['minNLogLikelihood' + '_' + direction] = reco_parameters.get_value(0,'minNLogLikelihood' + '_' + direction + '_unweighted')
                         results['ks_local_Pval_'+direction] = ks_pval_scores[direction]
-                        results['chi2_'+direction] = chi2_scores['chi2_'+direction]
-                        results['chi2_Pval_'+direction] = chi2_scores['chi2_Pval_'+direction]
+                        results['chi2red_data_sim_'+direction] = chi2_scores['chi2red_data_sim_'+direction]
+                        #                        results['chi2_Pval_'+direction] = chi2_scores['chi2_Pval_'+direction]
                 #}
                 results['ks_gloabal_Pval_xyz_Fisher'] = Fisher_combination_Pvals([ks_pval_scores['x'],ks_pval_scores['y'],ks_pval_scores['z']])
                 results['ks_gloabal_Pval_xyz_Average'] = np.average([ks_pval_scores['x'],ks_pval_scores['y'],ks_pval_scores['z']])
