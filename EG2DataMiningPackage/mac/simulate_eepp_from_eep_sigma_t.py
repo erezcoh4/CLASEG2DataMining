@@ -129,12 +129,12 @@ if 'generate' in flags.option: #{
         measured_sigma_z_err= [0.006,0.010,0.007,0.018]
     #}
     
-    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err,NRand,Neep,Neepp in zip(['C','Al','Fe','Pb']
-                                                                                                 ,['C12','Al27','Fe56','Pb208']
-                                                                                                 ,measured_mean_z,measured_mean_z_err,measured_sigma_z,measured_sigma_z_err
-                                                                                                 ,[20,70,20,70]
-                                                                                                 ,eep_events,eepp_events):#{
-#    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err,NRand,Neep,Neepp in zip(['Pb'] ,['Pb208'],[0.177],[0.025],[0.169],[0.018],[70],[2635],[45]):#{
+#    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err,NRand,Neep,Neepp in zip(['C','Al','Fe','Pb']
+#                                                                                                 ,['C12','Al27','Fe56','Pb208']
+#                                                                                                 ,measured_mean_z,measured_mean_z_err,measured_sigma_z,measured_sigma_z_err
+#                                                                                                 ,[20,70,20,70]
+#                                                                                                 ,eep_events,eepp_events):#{
+    for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err,NRand,Neep,Neepp in zip(['Pb'] ,['Pb208'],[0.177],[0.025],[0.169],[0.018],[70],[2635],[45]):#{
 
 
         hyperparameters['NRand'] = NRand

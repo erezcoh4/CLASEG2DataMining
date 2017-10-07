@@ -1260,9 +1260,9 @@ def chi2_scores_sigma(ana_sim=None, ana_data_target=None,debug=0):
         h_sim , edges = np.histogram(Pcm_sim , bins=bins)
         #        chi2 , Pval = chisquare( h_data , h_sim )
         chi2red_data_sim = chisquare_2sample( h_data , h_sim , len(bins) )
-        if debug>2: #{
-            print "h_sim:",h_sim
-            print "h_data:",h_data
+        if debug>-2: #{
+            print "h_data:",repr(h_data)
+            print "h_sim:",repr(h_sim)
             print "direction, chi2red:",dir_name, chi2red_data_sim
         #}
         chi2_scores['chi2red_data_sim_'+dir_name] = chi2red_data_sim
