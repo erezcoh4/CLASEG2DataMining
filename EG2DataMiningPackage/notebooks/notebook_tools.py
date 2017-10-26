@@ -19,13 +19,84 @@ from matplotlib.offsetbox import AnchoredText
 from scipy.signal import savgol_filter
 from scipy.stats import norm
 from scipy import stats
-
+from scipy.interpolate import interp1d
 
 
 dm  = TEG2dm()
 
 path = "/Users/erezcohen/Desktop/DataMining"
 my_hot_cmap = gp.reverse_colourmap(mpl.cm.hot)
+
+
+ColleCalc = pd.DataFrame({'A':[4,12 , 27 , 56 , 208],
+                        'allpairs':[110,141,146,147.5,145.5],# average of HO and WS
+                        'nl00':[110,157,166,173.,177.5]},# average of HO and WS
+                         index = ['$^{4}$He','$^{12}$C','$^{27}$Al','$^{56}$Fe','$^{208}$Pb'])
+CiofiCalc = pd.DataFrame({'A':[4 , 12 , 40 , 56 , 208], # 3 , 
+                        's_t':[90 , 138.6174 , 142.6555 , 132.5117 , 151.3311]}, # 0.0724
+                         index = ['$^{4}$He','$^{12}$C','$^{40}$Ca','$^{56}$Fe','$^{208}$Pb']) # '$^{3}$He',
+MonizCalc = pd.DataFrame({'A':[12 , 40 , 208],
+                        '3kF/4':[165.8 , 188.3 , 198.8]},
+                         index = ['$^{12}$C','$^{40}$Ca','$^{208}$Pb'])
+BNL_Data = pd.DataFrame({'A':[12],'sigma_t_final':[0.143],'sigma_t_final_Err':[0.017]},index = ['$^{12}$C'])
+HallA_Data = pd.DataFrame({'A':[12],'sigma_t_final':[0.136],'sigma_t_final_Err':[0.020]},index = ['$^{12}$C'])
+Korover_Data = pd.DataFrame({'A':[4],'sigma_t_final':[0.100],'sigma_t_final_Err':[0.020]},index = ['$^{4}$He'])
+WI_Data = pd.DataFrame({'A':[ 12 , 27 , 56 , 208], 
+                        'sigma_t_final':[0.158 , 0.156 , 0.181 , 0.174], 
+                        'sigma_t_final_Err':[0.012 , 0.019 , 0.011 , 0.016]}, 
+                         index = ['$^{12}$C','$^{27}$Al','$^{56}$Fe','$^{208}$Pb']) 
+
+# ----------------------------------------------------------
+def plot_data(data , ax=None, direction='t', Ashift=0, fmt='o', marker='^',color='red',
+                       markersize=15, linewidth=4, 
+                       vary=None , varyerr=None , label=None , facecolors=None ):
+    ax.errorbar((data['A']+Ashift), 
+                y=1000*data['sigma_'+direction+'_final'],
+                yerr=1000*data['sigma_'+direction+'_final_Err'],                
+                color=color, marker=marker,markersize=markersize,linewidth=linewidth
+                , fmt=fmt,label=label)
+# ----------------------------------------------------------
+
+
+# ----------------------------------------------------------
+def plot_data_assymetric(data , unc_name='tot', ax=None, direction='t', Ashift=0, fmt='o', marker='^',color='red',
+                       markersize=15, linewidth=4, capthick=0, capsize=5,
+                       vary=None , varyerr=None , label=None , facecolors=None ):
+    ax.errorbar((data['A']+Ashift), 
+                y=1000*data['sigma_'+direction+'_final'],
+                yerr=[1000*data['sigma_'+direction+'_final_dw_err_'+unc_name],1000*data['sigma_'+direction+'_final_up_err_'+unc_name]],
+                color=color, marker=marker,markersize=markersize,linewidth=linewidth,capthick=capthick,capsize=capsize,
+                fmt=fmt,label=label)        
+# ----------------------------------------------------------
+
+    
+# ----------------------------------------------------------
+def plot_calculation_line( data , varx='A',kind='nearest' , vary=None , color='blue' ,linestyle='--', label=None, linewidth=4):
+    x = data[varx]
+    y = data[vary]
+    itp = interp1d(x,y, kind='linear')
+    if kind is None:
+        f = interp1d( x , y )
+    else:
+        f = interp1d( x , y ,kind=kind)
+    window_size, poly_order = 101, 4
+    xnew = np.linspace(x.min(),x.max(), num=500, endpoint=True)
+    yy_sg = savgol_filter(itp(xnew), window_size, poly_order)
+    plt.plot( xnew, yy_sg, linestyle, color=color , label=label, linewidth=linewidth )
+    # return the interpolation of the line
+    return f
+# ----------------------------------------------------------
+
+# ----------------------------------------------------------
+def find_x_poly(poly,y0,xmin=0,xmax=0.4):
+    p = np.poly1d(poly)
+    roots = (p - y0).roots
+    x_poly=-1
+    for root in roots:
+        if xmin<root and root<xmax:
+            x_poly = root
+    return x_poly
+# ----------------------------------------------------------
 
 # ----------------------------------------------------------
 def calc_PvalTotal(data=None):
@@ -40,34 +111,6 @@ def calc_PvalTotal(data=None):
             ])
 # ----------------------------------------------------------
 
-
-
-
-# ----------------------------------------------------------
-def plot_data(data , Ashift=0, fmt='o', marker='^',color='red',
-              markersize=20, linewidth=4,
-              vary=None , varyerr=None , label=None , mulfac=1):
-    ax.errorbar((data['A']+Ashift), mulfac*data[vary], yerr=mulfac*data[varyerr],
-                color=color, marker=marker,markersize=markersize,linewidth=linewidth, fmt=fmt,label=label)
-# ----------------------------------------------------------
-
-
-# ----------------------------------------------------------
-def plot_calculation_line( data , varx='A',kind='nearest' , vary=None , color='blue' , label=None, linewidth=4):
-    x = data[varx]
-    y = data[vary]
-    itp = interp1d(x,y, kind='linear')
-    
-    if kind is None:
-        f = interp1d( x , y )
-    else:
-        f = interp1d( x , y ,kind=kind)
-    
-    window_size, poly_order = 101, 4
-    xnew = np.linspace(x.min(),x.max(), num=500, endpoint=True)
-    yy_sg = savgol_filter(itp(xnew), window_size, poly_order)
-    plt.plot( xnew, yy_sg, '--', color=color , label=label, linewidth=linewidth )
-# ----------------------------------------------------------
 
 
 

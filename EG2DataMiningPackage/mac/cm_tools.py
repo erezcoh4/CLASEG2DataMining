@@ -1486,3 +1486,45 @@ def generate_runs_with_random_sigma( option='generate analyze delete',
 # ------------------------------------------------------------------------------- #
 
 
+
+
+# ------------------------------------------------------------------------------- #
+# Oct-24, 2017
+# generate a Pseudo-data sample of (e,e'pp) events
+def generate_with_fixed_parameters( hpars=None, # hyperparameters
+                                    debug=0,
+                                    ):#{
+    from definitions import path
+    pAcceptacneFile = ROOT.TFile( path + "/GSIM_DATA/PrecoilAcceptance.root" )
+    path = path + "/Analysis_DATA/ppSRCcm"
+    h = pAcceptacneFile.Get("hRescaled")
+    gen_events = GenerateEvents( path , 0 , debug - 2 )
+    gen_events.Set_protonAcceptacne( h )
+    gen_events.AddInputChain_eep("300<p(miss)<600 MeV/c",hpars['my target name'])
+    gen_events.SetInputChain_eep()
+
+    gen_events.SetNRand( hpars['NRand'] )
+    gen_events.Use_protonAcceptacne( hpars['do proton acceptance'] )
+    gen_events.SetDo_PrecMinCut ( hpars['do p(rec)>0.35 cut'] )
+    gen_events.SetDo_PrecFiducial ( hpars['do p(rec) FV cuts'] ) # in the data we do not apply FV for p(recoil)
+    gen_events.SetDoRandomEntry( hpars['do random entry'] )
+        
+    gen_events.SetNAcceptedEvents( hpars['N(accepted)'] )
+    
+    gen_MeanX , gen_MeanY , gen_MeanZ , gen_Sigma_t , gen_SigmaZ = hpars['mean(x)'] , hpars['mean(y)'] , hpars['mean(z)'] , hpars['sigma(t)'] , hpars['sigma(z)']
+    gen_events.Set_eep_Parameters_MeanXYZ_Sigma( gen_MeanX , gen_MeanY , gen_MeanZ , gen_Sigma_t , gen_SigmaZ )
+    rootfilename_suffix = "_"+hpars['my target name']+"_SigmaT%.3f_SigmaZ%.3f_MeanZ%.3f"%(gen_Sigma_t,gen_SigmaZ,gen_MeanZ)
+    gen_events.InitRun()
+    
+    if debug: print "ready to simulate",hpars['N(accepted)'],"C(e,e'pp)event"
+    Nevents = gen_events.DoGenerate_eepp_from_eep_SingleParameterSigma( int(hpars['run']) , rootfilename_suffix )
+    if debug: print 'Nevents to analyze:',Nevents
+#}
+
+
+
+
+
+
+
+
