@@ -101,8 +101,8 @@ if 'generate' in flags.option: #{
                            #'generation method': 'max mean(z), N(uncertainties) band around measured sigma(z)' ,
                            #'generation method': 'const mean(z), N(uncertainties) band around measured sigma(z)' ,
                            #'generation method': 'unifrom N(uncertainties) band around measured' ,
-                           #'generation method': 'mean(z) linear in Pmiss',
-                           'generation method': 'constant band' ,
+                           'generation method': 'mean(z) linear in Pmiss',
+                           #'generation method': 'constant band' ,
                            # -- - - -- -- --- -- - -- - -- - - --- - -- - -
                            # take the longitudinal parameters as variable input to the simulation,
                            # distributed as a Gaussian around their measured value
