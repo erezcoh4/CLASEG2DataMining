@@ -1,5 +1,6 @@
 
-import ROOT , time , os, sys , math , datetime , gc 
+import ROOT , time , os, sys , math , datetime , gc , shutil
+
 sys.path.insert(0, '/Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
 sys.path.insert(0, '/home/erez/larlite/UserDev/mySoftware/MySoftwarePackage/mac')
 sys.path.insert(0, '../../GSIMulation')

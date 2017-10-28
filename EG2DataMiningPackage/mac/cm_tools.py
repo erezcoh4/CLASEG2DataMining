@@ -1508,7 +1508,7 @@ def generate_with_fixed_parameters( hpars=None, # hyperparameters
     gen_events.SetDo_PrecMinCut ( hpars['do p(rec)>0.35 cut'] )
     gen_events.SetDo_PrecFiducial ( hpars['do p(rec) FV cuts'] ) # in the data we do not apply FV for p(recoil)
     gen_events.SetDoRandomEntry( hpars['do random entry'] )
-        
+    gen_events.SetNgenMax(10000)
     gen_events.SetNAcceptedEvents( hpars['N(accepted)'] )
     
     gen_MeanX , gen_MeanY , gen_MeanZ , gen_Sigma_t , gen_SigmaZ = hpars['mean(x)'] , hpars['mean(y)'] , hpars['mean(z)'] , hpars['sigma(t)'] , hpars['sigma(z)']
@@ -1519,6 +1519,8 @@ def generate_with_fixed_parameters( hpars=None, # hyperparameters
     if debug: print "ready to simulate",hpars['N(accepted)'],"C(e,e'pp)event"
     Nevents = gen_events.DoGenerate_eepp_from_eep_SingleParameterSigma( int(hpars['run']) , rootfilename_suffix )
     if debug: print 'Nevents to analyze:',Nevents
+    file_name = "run%d%s.root"%(int(hpars['run']),rootfilename_suffix)
+    return Nevents,file_name
 #}
 
 
