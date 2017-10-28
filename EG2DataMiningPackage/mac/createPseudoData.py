@@ -14,8 +14,8 @@ from cm_tools import *
 PseudoDataPath = "/Users/erezcohen/Desktop/DataMining/Analysis_DATA/ppSRCcm/PseudoData/"
 
 hpars = dict({
-             'target name':'C',
-             'my target name':'C12',
+             'target name':'Pb',#'C',
+             'my target name':'Pb208',#'C12',
              
              # flags
              # -- - - -- -- --- -- - -- - -- - - --- - -- - -
@@ -30,13 +30,13 @@ hpars = dict({
              'run':flags.run,
              'mean(x)':0.0,
              'mean(y)':0.0,
-             'sigma(t)':0.143,
-             'mean(z)':0.13,
-             'sigma(z)':0.15,
+             'sigma(t)':0.156,#0.143, for C
+             'mean(z)':0.2,#0.13, for C
+             'sigma(z)':0.17,#0.15, for C
              
              # accepted, post-CLAS
              # -- - - -- -- --- -- - -- - -- - - --- - -- - -
-             'N(accepted)':266, # the number of events in C(e,e'pp) data
+             'N(accepted)':45 # 266, # the number of events in A(e,e'pp) data
              })
 
 # - - -- - - -- - - -- -- - -- --- -- - - --- - -- - -- -- -- -- - --- -
@@ -64,7 +64,7 @@ elif flags.option=="MultipleRuns":#{
                                        )
         if Nevents>1:#{
             source_to_cp = "/Users/erezcohen/Desktop/DataMining/Analysis_DATA/ppSRCcm/eg_rootfiles/"+file_name
-            destination = PseudoDataPath+file_name
+            destination = PseudoDataPath + hpars['my target name'] + "/" + file_name
             print 'copying ',source_to_cp,'to',destination
             shutil.copyfile(source_to_cp, destination)
         #}

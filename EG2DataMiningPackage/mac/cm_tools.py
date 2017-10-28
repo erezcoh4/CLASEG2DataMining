@@ -1516,12 +1516,13 @@ def generate_with_fixed_parameters( hpars=None, # hyperparameters
     rootfilename_suffix = "_"+hpars['my target name']+"_SigmaT%.3f_SigmaZ%.3f_MeanZ%.3f"%(gen_Sigma_t,gen_SigmaZ,gen_MeanZ)
     gen_events.InitRun()
     
-    if debug: print "ready to simulate",hpars['N(accepted)'],"C(e,e'pp)event"
+    if debug: print "ready to simulate",hpars['N(accepted)'],"%s(e,e'pp)event"%(hpars['my target name'])
     Nevents = gen_events.DoGenerate_eepp_from_eep_SingleParameterSigma( int(hpars['run']) , rootfilename_suffix )
     if debug: print 'Nevents to analyze:',Nevents
     file_name = "run%d%s.root"%(int(hpars['run']),rootfilename_suffix)
     return Nevents,file_name
 #}
+# ------------------------------------------------------------------------------- #
 
 
 
