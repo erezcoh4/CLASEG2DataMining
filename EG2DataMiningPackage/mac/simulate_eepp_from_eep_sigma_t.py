@@ -90,18 +90,21 @@ if 'generate' in flags.option: #{
                            'do random entry':False,
                            'do proton acceptance':True,
                            'do p(rec)>0.35 cut':True,
-                           'do p(rec) FV cuts':True,
+                           # !!!!!
+                           # I Changed to No ficuial cuts! (Oct-28)
+                           # !!!!!
+                           'do p(rec) FV cuts':False,
                            'do p(rec) resolution smearing':False, # we will lateer subtract 20+/-2 MeV/c from the results.
                            'p(rec) resolution smearing':0.020, # [GeV/c] momentum resolution
                            'generated mean(x)':0.0,
                            'generated mean(y)':0.0,
                            'do print results':True,
                            # -- - - -- -- --- -- - -- - -- - - --- - -- - -
-                           #'generation method': 'N(uncertainties) band around measured values' ,
+                           'generation method': 'N(uncertainties) band around measured values' ,
                            #'generation method': 'max mean(z), N(uncertainties) band around measured sigma(z)' ,
                            #'generation method': 'const mean(z), N(uncertainties) band around measured sigma(z)' ,
                            #'generation method': 'unifrom N(uncertainties) band around measured' ,
-                           'generation method': 'mean(z) linear in Pmiss',
+                           #'generation method': 'mean(z) linear in Pmiss',
                            #'generation method': 'constant band' ,
                            # -- - - -- -- --- -- - -- - -- - - --- - -- - -
                            # take the longitudinal parameters as variable input to the simulation,
