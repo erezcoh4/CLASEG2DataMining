@@ -116,12 +116,12 @@ if 'generate' in flags.option: #{
                            'N(uncertainties) in generation': 5,
                            })
                            
+    eep_events          = [7598 ,2573 ,8558 ,2635 ]
     if hyperparameters['do p(rec) FV cuts']==True:#{
         measured_mean_z     = [0.106,0.118,0.149,0.177]
         measured_mean_z_err = [0.009,0.015,0.010,0.025]
         measured_sigma_z    = [0.147,0.141,0.151,0.169]
         measured_sigma_z_err= [0.006,0.010,0.007,0.018]
-        eep_events          = [7598 ,2573 ,8558 ,2635 ]
         eepp_events         = [266  ,88   ,227  ,45   ]
     #}
     elif hyperparameters['do p(rec) FV cuts']==False:#{
@@ -129,6 +129,7 @@ if 'generate' in flags.option: #{
         measured_mean_z_err = [0.008,0.015,0.010,0.023]
         measured_sigma_z    = [0.146,0.143,0.153,0.167]
         measured_sigma_z_err= [0.006,0.010,0.007,0.018]
+        eepp_events         = [294  ,93   ,247  ,49   ]
     #}
     
     for target_name,my_taregt_name,mean_z,mean_z_err,sigma_z,sigma_z_err,NRand,Neep,Neepp in zip(['C','Al','Fe','Pb']
