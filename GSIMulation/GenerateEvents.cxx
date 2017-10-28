@@ -377,7 +377,9 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep_SingleParameterSigma( Int_t fRunN
     genTree = new TTree("genTree","no acceptance no nothing. only generated features");
     SetRootTreeAddresses();
     int attempt=0;
-    
+    if ( debug>0) {
+        SHOW4(DoRandomEntry,attempt,NgenMAX,NAcceptedEvents);
+    }
     // generate events up to NgenMAX
     while (
            // option (1): generate from random (e,e'p) entries
@@ -550,6 +552,7 @@ Int_t GenerateEvents::DoGenerate_eepp_from_eep_SingleParameterSigma( Int_t fRunN
     }
     RootFile -> Write();
     RootFile -> Close();
+    Printf("stopped generating %d (e,e'pp) events (out of %d attempts) to %s",NAcceptedEvents,attempt,rootFilename.Data());
     
     if ( DoRandomEntry && (NAcceptedEvents >= NWantedEvents) ) {
         Printf("done generating %d (e,e'pp) events (out of %d attempts) to %s",NAcceptedEvents,attempt,rootFilename.Data());
