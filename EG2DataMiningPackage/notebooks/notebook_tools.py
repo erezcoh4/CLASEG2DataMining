@@ -38,12 +38,12 @@ CiofiCalc = pd.DataFrame({'A':[4 , 12 , 40 , 56 , 208], # 3 ,
 MonizCalc = pd.DataFrame({'A':[12 , 40 , 208],
                         '3kF/4':[165.8 , 188.3 , 198.8]},
                          index = ['$^{12}$C','$^{40}$Ca','$^{208}$Pb'])
-BNL_Data = pd.DataFrame({'A':[12],'sigma_t_final':[0.143],'sigma_t_final_Err':[0.017]},index = ['$^{12}$C'])
-HallA_Data = pd.DataFrame({'A':[12],'sigma_t_final':[0.136],'sigma_t_final_Err':[0.020]},index = ['$^{12}$C'])
-Korover_Data = pd.DataFrame({'A':[4],'sigma_t_final':[0.100],'sigma_t_final_Err':[0.020]},index = ['$^{4}$He'])
+BNL_Data = pd.DataFrame({'A':[12],'sigma_t_final':[0.143],'sigma_t_final_err':[0.017]},index = ['$^{12}$C'])
+HallA_Data = pd.DataFrame({'A':[12],'sigma_t_final':[0.136],'sigma_t_final_err':[0.020]},index = ['$^{12}$C'])
+Korover_Data = pd.DataFrame({'A':[4],'sigma_t_final':[0.100],'sigma_t_final_err':[0.020]},index = ['$^{4}$He'])
 WI_Data = pd.DataFrame({'A':[ 12 , 27 , 56 , 208], 
                         'sigma_t_final':[0.158 , 0.156 , 0.181 , 0.174], 
-                        'sigma_t_final_Err':[0.012 , 0.019 , 0.011 , 0.016]}, 
+                        'sigma_t_final_err':[0.012 , 0.019 , 0.011 , 0.016]}, 
                          index = ['$^{12}$C','$^{27}$Al','$^{56}$Fe','$^{208}$Pb']) 
 
 # ----------------------------------------------------------
