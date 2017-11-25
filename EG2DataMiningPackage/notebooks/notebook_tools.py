@@ -52,7 +52,7 @@ def plot_data(data , ax=None, direction='t', Ashift=0, fmt='o', marker='^',color
                        vary=None , varyerr=None , label=None , facecolors=None ):
     ax.errorbar((data['A']+Ashift), 
                 y=1000*data['sigma_'+direction+'_final'],
-                yerr=1000*data['sigma_'+direction+'_final_Err'],                
+                yerr=1000*data['sigma_'+direction+'_final_err'],                
                 color=color, marker=marker,markersize=markersize,linewidth=linewidth
                 , fmt=fmt,label=label)
 # ----------------------------------------------------------
