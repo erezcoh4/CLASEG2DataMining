@@ -13,7 +13,7 @@ DataType    = flags.DataType
 FileName    = DataType+"_%s"% dm.Target(A)
 scheme      = TSchemeDATA( DataType , eg2_data_path , schemed_eg2_data_path , FileName , "T" , flags.verbose )
 pMin , pMax = 0.3 , 0.7
-XbMin = 0.8
+XbMin = 0.5
 
 # ------------------------------------------------------------------ #
 # May-1
