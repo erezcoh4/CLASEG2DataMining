@@ -643,7 +643,7 @@ namespace {
     static const char* includePaths[] = {
 "/Users/erezcohen/larlite/UserDev/mySoftware",
 "/Users/erezcohen/larlite/UserDev/CLASEG2DataMining/GSIMulation",
-"/usr/local/Cellar/root6/6.06.02/include/root",
+"/usr/local/include/root",
 "/Users/erezcohen/larlite/UserDev/CLASEG2DataMining/EG2DataMiningPackage/",
 0
     };

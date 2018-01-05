@@ -140,258 +140,205 @@ T3pSimulation.o: T3pSimulation.cxx T3pSimulation.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__split_buffer \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/numeric \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/fstream \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRotation.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TObject.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Rtypes.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RtypesCore.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RConfig.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RVersion.h \
+  /usr/local/include/root/TRotation.h /usr/local/include/root/TObject.h \
+  /usr/local/include/root/Rtypes.h /usr/local/include/root/RtypesCore.h \
+  /usr/local/include/root/RConfig.h /usr/local/include/root/RVersion.h \
   /usr/include/AvailabilityMacros.h /usr/include/TargetConditionals.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/DllImport.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Rtypeinfo.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/snprintf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/strlcpy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGenericClassInfo.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSchemaHelper.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TStorage.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVersionCheck.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Riosfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBuffer.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVector3.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TError.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVector2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrix.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixF.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixT.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTBase.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TNamed.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TString.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMathBase.h \
+  /usr/local/include/root/DllImport.h \
+  /usr/local/include/root/Rtypeinfo.h /usr/local/include/root/snprintf.h \
+  /usr/local/include/root/strlcpy.h \
+  /usr/local/include/root/TGenericClassInfo.h \
+  /usr/local/include/root/TSchemaHelper.h \
+  /usr/local/include/root/TStorage.h \
+  /usr/local/include/root/TVersionCheck.h \
+  /usr/local/include/root/Riosfwd.h /usr/local/include/root/TBuffer.h \
+  /usr/local/include/root/TVector3.h /usr/local/include/root/TError.h \
+  /usr/local/include/root/TVector2.h /usr/local/include/root/TMatrix.h \
+  /usr/local/include/root/TMatrixF.h /usr/local/include/root/TMatrixT.h \
+  /usr/local/include/root/TMatrixTBase.h \
+  /usr/local/include/root/TNamed.h /usr/local/include/root/TString.h \
+  /usr/local/include/root/TMathBase.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cmath \
-  /usr/local/Cellar/root6/6.06.02/include/root/RStringView.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RConfigure.h \
+  /usr/local/include/root/RStringView.h \
+  /usr/local/include/root/RConfigure.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/experimental/string_view \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/experimental/__config \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFBasefwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDBasefwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVectorFfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVectorDfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTUtils.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFUtils.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFUtilsfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTimeStamp.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TStopwatch.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSystem.h \
+  /usr/local/include/root/TMatrixFBasefwd.h \
+  /usr/local/include/root/TMatrixDBasefwd.h \
+  /usr/local/include/root/TVectorFfwd.h \
+  /usr/local/include/root/TVectorDfwd.h \
+  /usr/local/include/root/TMatrixTUtils.h \
+  /usr/local/include/root/TMatrixFfwd.h \
+  /usr/local/include/root/TMatrixFUtils.h \
+  /usr/local/include/root/TMatrixFUtilsfwd.h \
+  /usr/local/include/root/TTimeStamp.h \
+  /usr/local/include/root/TStopwatch.h /usr/local/include/root/TSystem.h \
   /usr/include/fcntl.h /usr/include/sys/fcntl.h \
   /usr/include/sys/_types/_o_sync.h /usr/include/sys/_types/_o_dsync.h \
   /usr/include/sys/_types/_s_ifmt.h /usr/include/sys/_types/_filesec_t.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TInetAddress.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTimer.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSysEvtHandler.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TQObject.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSeqCollection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCollection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TIterator.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TQObjectEmitVA.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TQConnection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Varargs.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TInterpreter.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDictionary.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/ESTLType.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualMutex.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTime.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/ThreadLocalStorage.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLine.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttLine.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttBBox2D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/GuiTypes.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPoint.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrow.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttFill.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TFile.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDirectoryFile.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDirectory.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDatime.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUUID.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMap.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/THashTable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUrl.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTree.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBranch.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TObjArray.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDataType.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttMarker.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayD.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArray.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayI.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TClass.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TObjString.h \
+  /usr/local/include/root/TInetAddress.h \
+  /usr/local/include/root/TTimer.h \
+  /usr/local/include/root/TSysEvtHandler.h \
+  /usr/local/include/root/TQObject.h /usr/local/include/root/TList.h \
+  /usr/local/include/root/TSeqCollection.h \
+  /usr/local/include/root/TCollection.h \
+  /usr/local/include/root/TIterator.h \
+  /usr/local/include/root/TQObjectEmitVA.h \
+  /usr/local/include/root/TQConnection.h \
+  /usr/local/include/root/Varargs.h \
+  /usr/local/include/root/TInterpreter.h \
+  /usr/local/include/root/TDictionary.h \
+  /usr/local/include/root/ESTLType.h \
+  /usr/local/include/root/TVirtualMutex.h \
+  /usr/local/include/root/TTime.h \
+  /usr/local/include/root/ThreadLocalStorage.h \
+  /usr/local/include/root/TLine.h /usr/local/include/root/TAttLine.h \
+  /usr/local/include/root/TAttBBox2D.h \
+  /usr/local/include/root/GuiTypes.h /usr/local/include/root/TPoint.h \
+  /usr/local/include/root/TArrow.h /usr/local/include/root/TAttFill.h \
+  /usr/local/include/root/TFile.h \
+  /usr/local/include/root/TDirectoryFile.h \
+  /usr/local/include/root/TDirectory.h /usr/local/include/root/TDatime.h \
+  /usr/local/include/root/TUUID.h /usr/local/include/root/TMap.h \
+  /usr/local/include/root/THashTable.h /usr/local/include/root/TUrl.h \
+  /usr/local/include/root/TTree.h /usr/local/include/root/TBranch.h \
+  /usr/local/include/root/TObjArray.h \
+  /usr/local/include/root/TDataType.h \
+  /usr/local/include/root/TAttMarker.h /usr/local/include/root/TArrayD.h \
+  /usr/local/include/root/TArray.h /usr/local/include/root/TArrayI.h \
+  /usr/local/include/root/TClass.h /usr/local/include/root/TObjString.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/map \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__tree \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/set \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/unordered_set \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__hash_table \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualTreePlayer.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TROOT.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCanvas.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPad.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualPad.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttPad.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualX.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttText.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Buttons.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttCanvas.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCanvasImp.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TF1.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TFormula.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBits.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMethodCall.h \
+  /usr/local/include/root/TVirtualTreePlayer.h \
+  /usr/local/include/root/TROOT.h /usr/local/include/root/TCanvas.h \
+  /usr/local/include/root/TPad.h /usr/local/include/root/TVirtualPad.h \
+  /usr/local/include/root/TAttPad.h /usr/local/include/root/TVirtualX.h \
+  /usr/local/include/root/TAttText.h /usr/local/include/root/Buttons.h \
+  /usr/local/include/root/TAttCanvas.h \
+  /usr/local/include/root/TCanvasImp.h /usr/local/include/root/TF1.h \
+  /usr/local/include/root/TFormula.h /usr/local/include/root/TBits.h \
+  /usr/local/include/root/TMethodCall.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/list \
-  /usr/local/Cellar/root6/6.06.02/include/root/Math/ParamFunctor.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TF2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TF12.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH1F.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH1.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAxis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttAxis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayC.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayS.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayF.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Foption.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TFitResultPtr.h \
+  /usr/local/include/root/Math/ParamFunctor.h \
+  /usr/local/include/root/TF2.h /usr/local/include/root/TF12.h \
+  /usr/local/include/root/TH1F.h /usr/local/include/root/TH1.h \
+  /usr/local/include/root/TAxis.h /usr/local/include/root/TAttAxis.h \
+  /usr/local/include/root/TArrayC.h /usr/local/include/root/TArrayS.h \
+  /usr/local/include/root/TArrayF.h /usr/local/include/root/Foption.h \
+  /usr/local/include/root/TFitResultPtr.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/float.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH2F.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH3F.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH3.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAtt3D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TProfile.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TStyle.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TColor.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMultiGraph.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGraphErrors.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGraph.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLegend.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPave.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBox.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPaveStats.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPaveText.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TText.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TChain.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLeaf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMath.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCut.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLorentzVector.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPie.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLatex.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TEllipse.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPolyLine3D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRandom2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRandom.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/THStack.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSpectrum.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSpectrum2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUnfoldSys.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUnfold.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH1D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH2D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSpline.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSparse.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTSparse.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSparsefwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDUtils.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDUtilsfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixD.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCutG.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGeoSphere.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGeoBBox.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGeoShape.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGaxis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRandom3.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGlobalFunc.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCmdArg.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooLinkedList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooLinkedListElem.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooHashTable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRealVar.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsRealLValue.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsReal.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsArg.h \
-  /usr/include/assert.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/THashList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRefArray.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TProcessID.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPrintable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRefCountList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCache.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooLinkedListIter.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNameReg.h \
+  /usr/local/include/root/TH2F.h /usr/local/include/root/TH2.h \
+  /usr/local/include/root/TH3F.h /usr/local/include/root/TH3.h \
+  /usr/local/include/root/TAtt3D.h /usr/local/include/root/TProfile.h \
+  /usr/local/include/root/TStyle.h /usr/local/include/root/TColor.h \
+  /usr/local/include/root/TMultiGraph.h \
+  /usr/local/include/root/TGraphErrors.h \
+  /usr/local/include/root/TGraph.h /usr/local/include/root/TLegend.h \
+  /usr/local/include/root/TPave.h /usr/local/include/root/TBox.h \
+  /usr/local/include/root/TPaveStats.h \
+  /usr/local/include/root/TPaveText.h /usr/local/include/root/TText.h \
+  /usr/local/include/root/TChain.h /usr/local/include/root/TLeaf.h \
+  /usr/local/include/root/TMath.h /usr/local/include/root/TCut.h \
+  /usr/local/include/root/TLorentzVector.h \
+  /usr/local/include/root/TPie.h /usr/local/include/root/TLatex.h \
+  /usr/local/include/root/TEllipse.h \
+  /usr/local/include/root/TPolyLine3D.h \
+  /usr/local/include/root/TRandom2.h /usr/local/include/root/TRandom.h \
+  /usr/local/include/root/THStack.h /usr/local/include/root/TSpectrum.h \
+  /usr/local/include/root/TSpectrum2.h \
+  /usr/local/include/root/TUnfoldSys.h /usr/local/include/root/TUnfold.h \
+  /usr/local/include/root/TH1D.h /usr/local/include/root/TH2D.h \
+  /usr/local/include/root/TSpline.h \
+  /usr/local/include/root/TMatrixDSparse.h \
+  /usr/local/include/root/TMatrixTSparse.h \
+  /usr/local/include/root/TMatrixDSparsefwd.h \
+  /usr/local/include/root/TMatrixDUtils.h \
+  /usr/local/include/root/TMatrixDUtilsfwd.h \
+  /usr/local/include/root/TMatrixD.h \
+  /usr/local/include/root/TMatrixDfwd.h /usr/local/include/root/TCutG.h \
+  /usr/local/include/root/TGeoSphere.h \
+  /usr/local/include/root/TGeoBBox.h /usr/local/include/root/TGeoShape.h \
+  /usr/local/include/root/TGaxis.h /usr/local/include/root/TRandom3.h \
+  /usr/local/include/root/RooGlobalFunc.h \
+  /usr/local/include/root/RooCmdArg.h \
+  /usr/local/include/root/RooLinkedList.h \
+  /usr/local/include/root/RooLinkedListElem.h \
+  /usr/local/include/root/RooHashTable.h \
+  /usr/local/include/root/RooRealVar.h \
+  /usr/local/include/root/RooAbsRealLValue.h \
+  /usr/local/include/root/RooAbsReal.h \
+  /usr/local/include/root/RooAbsArg.h /usr/include/assert.h \
+  /usr/local/include/root/THashList.h \
+  /usr/local/include/root/TRefArray.h \
+  /usr/local/include/root/TProcessID.h \
+  /usr/local/include/root/RooPrintable.h \
+  /usr/local/include/root/RooRefCountList.h \
+  /usr/local/include/root/RooAbsCache.h \
+  /usr/local/include/root/RooLinkedListIter.h \
+  /usr/local/include/root/RooNameReg.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/deque \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/stack \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCurve.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPlotable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooArgSet.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCollection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooArgList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNumber.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsLValue.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsBinning.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooUniformBinning.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooSharedPropertiesList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooSharedProperties.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRealVarSharedProperties.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooDataSet.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsData.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooFormulaVar.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooFormula.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/v5/TFormula.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooListProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooTrace.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSym.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTSym.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSymfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooDirItem.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooDataHist.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNameSet.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCacheManager.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooMsgService.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNormSetCache.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCacheElement.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGaussian.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsPdf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooObjCacheManager.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRealProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooArgProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooConstVar.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGenericPdf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPolynomial.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooChi2Var.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsOptTestStatistic.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsTestStatistic.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooSetProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCategoryProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCategory.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCatType.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCategoryLValue.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooMinuit.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPlot.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooList.h \
+  /usr/local/include/root/RooCurve.h \
+  /usr/local/include/root/RooPlotable.h \
+  /usr/local/include/root/RooArgSet.h \
+  /usr/local/include/root/RooAbsCollection.h \
+  /usr/local/include/root/RooArgList.h \
+  /usr/local/include/root/RooNumber.h \
+  /usr/local/include/root/RooAbsLValue.h \
+  /usr/local/include/root/RooAbsBinning.h \
+  /usr/local/include/root/RooUniformBinning.h \
+  /usr/local/include/root/RooSharedPropertiesList.h \
+  /usr/local/include/root/RooSharedProperties.h \
+  /usr/local/include/root/RooRealVarSharedProperties.h \
+  /usr/local/include/root/RooDataSet.h \
+  /usr/local/include/root/RooAbsData.h \
+  /usr/local/include/root/RooFormulaVar.h \
+  /usr/local/include/root/RooFormula.h \
+  /usr/local/include/root/v5/TFormula.h \
+  /usr/local/include/root/RooListProxy.h \
+  /usr/local/include/root/RooAbsProxy.h \
+  /usr/local/include/root/RooTrace.h \
+  /usr/local/include/root/TMatrixDSym.h \
+  /usr/local/include/root/TMatrixTSym.h \
+  /usr/local/include/root/TMatrixDSymfwd.h \
+  /usr/local/include/root/RooDirItem.h \
+  /usr/local/include/root/RooDataHist.h \
+  /usr/local/include/root/RooNameSet.h \
+  /usr/local/include/root/RooCacheManager.h \
+  /usr/local/include/root/RooMsgService.h \
+  /usr/local/include/root/RooNormSetCache.h \
+  /usr/local/include/root/RooAbsCacheElement.h \
+  /usr/local/include/root/RooGaussian.h \
+  /usr/local/include/root/RooAbsPdf.h \
+  /usr/local/include/root/RooObjCacheManager.h \
+  /usr/local/include/root/RooRealProxy.h \
+  /usr/local/include/root/RooArgProxy.h \
+  /usr/local/include/root/RooConstVar.h \
+  /usr/local/include/root/RooGenericPdf.h \
+  /usr/local/include/root/RooPolynomial.h \
+  /usr/local/include/root/RooChi2Var.h \
+  /usr/local/include/root/RooAbsOptTestStatistic.h \
+  /usr/local/include/root/RooAbsTestStatistic.h \
+  /usr/local/include/root/RooSetProxy.h \
+  /usr/local/include/root/RooCategoryProxy.h \
+  /usr/local/include/root/RooAbsCategory.h \
+  /usr/local/include/root/RooCatType.h \
+  /usr/local/include/root/RooAbsCategoryLValue.h \
+  /usr/local/include/root/RooMinuit.h /usr/local/include/root/RooPlot.h \
+  /usr/local/include/root/RooList.h \
   /Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/TCalculations.h \
   /Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/TAnalysis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooFitResult.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRootIOCtor.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGaussModel.h \
+  /usr/local/include/root/RooFitResult.h \
+  /usr/local/include/root/TRootIOCtor.h \
+  /usr/local/include/root/RooGaussModel.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/complex \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/sstream \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooResolutionModel.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooMath.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooComplex.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMinuit.h \
-  TCalcPhysVarsEG2.h \
+  /usr/local/include/root/RooResolutionModel.h \
+  /usr/local/include/root/RooMath.h /usr/local/include/root/RooComplex.h \
+  /usr/local/include/root/TMinuit.h TCalcPhysVarsEG2.h \
   /Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/ppElastic.h
 TAnalysisEG2.o: TAnalysisEG2.cxx TAnalysisEG2.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/iostream \
@@ -535,257 +482,205 @@ TAnalysisEG2.o: TAnalysisEG2.cxx TAnalysisEG2.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__split_buffer \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/numeric \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/fstream \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRotation.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TObject.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Rtypes.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RtypesCore.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RConfig.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RVersion.h \
+  /usr/local/include/root/TRotation.h /usr/local/include/root/TObject.h \
+  /usr/local/include/root/Rtypes.h /usr/local/include/root/RtypesCore.h \
+  /usr/local/include/root/RConfig.h /usr/local/include/root/RVersion.h \
   /usr/include/AvailabilityMacros.h /usr/include/TargetConditionals.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/DllImport.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Rtypeinfo.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/snprintf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/strlcpy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGenericClassInfo.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSchemaHelper.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TStorage.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVersionCheck.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Riosfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBuffer.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVector3.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TError.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVector2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrix.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixF.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixT.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTBase.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TNamed.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TString.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMathBase.h \
+  /usr/local/include/root/DllImport.h \
+  /usr/local/include/root/Rtypeinfo.h /usr/local/include/root/snprintf.h \
+  /usr/local/include/root/strlcpy.h \
+  /usr/local/include/root/TGenericClassInfo.h \
+  /usr/local/include/root/TSchemaHelper.h \
+  /usr/local/include/root/TStorage.h \
+  /usr/local/include/root/TVersionCheck.h \
+  /usr/local/include/root/Riosfwd.h /usr/local/include/root/TBuffer.h \
+  /usr/local/include/root/TVector3.h /usr/local/include/root/TError.h \
+  /usr/local/include/root/TVector2.h /usr/local/include/root/TMatrix.h \
+  /usr/local/include/root/TMatrixF.h /usr/local/include/root/TMatrixT.h \
+  /usr/local/include/root/TMatrixTBase.h \
+  /usr/local/include/root/TNamed.h /usr/local/include/root/TString.h \
+  /usr/local/include/root/TMathBase.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cmath \
-  /usr/local/Cellar/root6/6.06.02/include/root/RStringView.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RConfigure.h \
+  /usr/local/include/root/RStringView.h \
+  /usr/local/include/root/RConfigure.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/experimental/string_view \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/experimental/__config \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFBasefwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDBasefwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVectorFfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVectorDfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTUtils.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFUtils.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFUtilsfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTimeStamp.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TStopwatch.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSystem.h \
+  /usr/local/include/root/TMatrixFBasefwd.h \
+  /usr/local/include/root/TMatrixDBasefwd.h \
+  /usr/local/include/root/TVectorFfwd.h \
+  /usr/local/include/root/TVectorDfwd.h \
+  /usr/local/include/root/TMatrixTUtils.h \
+  /usr/local/include/root/TMatrixFfwd.h \
+  /usr/local/include/root/TMatrixFUtils.h \
+  /usr/local/include/root/TMatrixFUtilsfwd.h \
+  /usr/local/include/root/TTimeStamp.h \
+  /usr/local/include/root/TStopwatch.h /usr/local/include/root/TSystem.h \
   /usr/include/fcntl.h /usr/include/sys/fcntl.h \
   /usr/include/sys/_types/_o_sync.h /usr/include/sys/_types/_o_dsync.h \
   /usr/include/sys/_types/_s_ifmt.h /usr/include/sys/_types/_filesec_t.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TInetAddress.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTimer.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSysEvtHandler.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TQObject.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSeqCollection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCollection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TIterator.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TQObjectEmitVA.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TQConnection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Varargs.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TInterpreter.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDictionary.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/ESTLType.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualMutex.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTime.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/ThreadLocalStorage.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLine.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttLine.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttBBox2D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/GuiTypes.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPoint.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrow.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttFill.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TFile.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDirectoryFile.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDirectory.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDatime.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUUID.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMap.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/THashTable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUrl.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTree.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBranch.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TObjArray.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDataType.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttMarker.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayD.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArray.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayI.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TClass.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TObjString.h \
+  /usr/local/include/root/TInetAddress.h \
+  /usr/local/include/root/TTimer.h \
+  /usr/local/include/root/TSysEvtHandler.h \
+  /usr/local/include/root/TQObject.h /usr/local/include/root/TList.h \
+  /usr/local/include/root/TSeqCollection.h \
+  /usr/local/include/root/TCollection.h \
+  /usr/local/include/root/TIterator.h \
+  /usr/local/include/root/TQObjectEmitVA.h \
+  /usr/local/include/root/TQConnection.h \
+  /usr/local/include/root/Varargs.h \
+  /usr/local/include/root/TInterpreter.h \
+  /usr/local/include/root/TDictionary.h \
+  /usr/local/include/root/ESTLType.h \
+  /usr/local/include/root/TVirtualMutex.h \
+  /usr/local/include/root/TTime.h \
+  /usr/local/include/root/ThreadLocalStorage.h \
+  /usr/local/include/root/TLine.h /usr/local/include/root/TAttLine.h \
+  /usr/local/include/root/TAttBBox2D.h \
+  /usr/local/include/root/GuiTypes.h /usr/local/include/root/TPoint.h \
+  /usr/local/include/root/TArrow.h /usr/local/include/root/TAttFill.h \
+  /usr/local/include/root/TFile.h \
+  /usr/local/include/root/TDirectoryFile.h \
+  /usr/local/include/root/TDirectory.h /usr/local/include/root/TDatime.h \
+  /usr/local/include/root/TUUID.h /usr/local/include/root/TMap.h \
+  /usr/local/include/root/THashTable.h /usr/local/include/root/TUrl.h \
+  /usr/local/include/root/TTree.h /usr/local/include/root/TBranch.h \
+  /usr/local/include/root/TObjArray.h \
+  /usr/local/include/root/TDataType.h \
+  /usr/local/include/root/TAttMarker.h /usr/local/include/root/TArrayD.h \
+  /usr/local/include/root/TArray.h /usr/local/include/root/TArrayI.h \
+  /usr/local/include/root/TClass.h /usr/local/include/root/TObjString.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/map \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__tree \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/set \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/unordered_set \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__hash_table \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualTreePlayer.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TROOT.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCanvas.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPad.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualPad.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttPad.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualX.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttText.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Buttons.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttCanvas.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCanvasImp.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TF1.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TFormula.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBits.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMethodCall.h \
+  /usr/local/include/root/TVirtualTreePlayer.h \
+  /usr/local/include/root/TROOT.h /usr/local/include/root/TCanvas.h \
+  /usr/local/include/root/TPad.h /usr/local/include/root/TVirtualPad.h \
+  /usr/local/include/root/TAttPad.h /usr/local/include/root/TVirtualX.h \
+  /usr/local/include/root/TAttText.h /usr/local/include/root/Buttons.h \
+  /usr/local/include/root/TAttCanvas.h \
+  /usr/local/include/root/TCanvasImp.h /usr/local/include/root/TF1.h \
+  /usr/local/include/root/TFormula.h /usr/local/include/root/TBits.h \
+  /usr/local/include/root/TMethodCall.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/list \
-  /usr/local/Cellar/root6/6.06.02/include/root/Math/ParamFunctor.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TF2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TF12.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH1F.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH1.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAxis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttAxis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayC.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayS.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayF.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Foption.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TFitResultPtr.h \
+  /usr/local/include/root/Math/ParamFunctor.h \
+  /usr/local/include/root/TF2.h /usr/local/include/root/TF12.h \
+  /usr/local/include/root/TH1F.h /usr/local/include/root/TH1.h \
+  /usr/local/include/root/TAxis.h /usr/local/include/root/TAttAxis.h \
+  /usr/local/include/root/TArrayC.h /usr/local/include/root/TArrayS.h \
+  /usr/local/include/root/TArrayF.h /usr/local/include/root/Foption.h \
+  /usr/local/include/root/TFitResultPtr.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/float.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH2F.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH3F.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH3.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAtt3D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TProfile.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TStyle.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TColor.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMultiGraph.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGraphErrors.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGraph.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLegend.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPave.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBox.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPaveStats.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPaveText.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TText.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TChain.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLeaf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMath.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCut.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLorentzVector.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPie.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLatex.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TEllipse.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPolyLine3D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRandom2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRandom.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/THStack.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSpectrum.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSpectrum2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUnfoldSys.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUnfold.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH1D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH2D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSpline.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSparse.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTSparse.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSparsefwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDUtils.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDUtilsfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixD.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCutG.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGeoSphere.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGeoBBox.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGeoShape.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGaxis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRandom3.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGlobalFunc.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCmdArg.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooLinkedList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooLinkedListElem.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooHashTable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRealVar.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsRealLValue.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsReal.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsArg.h \
-  /usr/include/assert.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/THashList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRefArray.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TProcessID.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPrintable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRefCountList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCache.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooLinkedListIter.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNameReg.h \
+  /usr/local/include/root/TH2F.h /usr/local/include/root/TH2.h \
+  /usr/local/include/root/TH3F.h /usr/local/include/root/TH3.h \
+  /usr/local/include/root/TAtt3D.h /usr/local/include/root/TProfile.h \
+  /usr/local/include/root/TStyle.h /usr/local/include/root/TColor.h \
+  /usr/local/include/root/TMultiGraph.h \
+  /usr/local/include/root/TGraphErrors.h \
+  /usr/local/include/root/TGraph.h /usr/local/include/root/TLegend.h \
+  /usr/local/include/root/TPave.h /usr/local/include/root/TBox.h \
+  /usr/local/include/root/TPaveStats.h \
+  /usr/local/include/root/TPaveText.h /usr/local/include/root/TText.h \
+  /usr/local/include/root/TChain.h /usr/local/include/root/TLeaf.h \
+  /usr/local/include/root/TMath.h /usr/local/include/root/TCut.h \
+  /usr/local/include/root/TLorentzVector.h \
+  /usr/local/include/root/TPie.h /usr/local/include/root/TLatex.h \
+  /usr/local/include/root/TEllipse.h \
+  /usr/local/include/root/TPolyLine3D.h \
+  /usr/local/include/root/TRandom2.h /usr/local/include/root/TRandom.h \
+  /usr/local/include/root/THStack.h /usr/local/include/root/TSpectrum.h \
+  /usr/local/include/root/TSpectrum2.h \
+  /usr/local/include/root/TUnfoldSys.h /usr/local/include/root/TUnfold.h \
+  /usr/local/include/root/TH1D.h /usr/local/include/root/TH2D.h \
+  /usr/local/include/root/TSpline.h \
+  /usr/local/include/root/TMatrixDSparse.h \
+  /usr/local/include/root/TMatrixTSparse.h \
+  /usr/local/include/root/TMatrixDSparsefwd.h \
+  /usr/local/include/root/TMatrixDUtils.h \
+  /usr/local/include/root/TMatrixDUtilsfwd.h \
+  /usr/local/include/root/TMatrixD.h \
+  /usr/local/include/root/TMatrixDfwd.h /usr/local/include/root/TCutG.h \
+  /usr/local/include/root/TGeoSphere.h \
+  /usr/local/include/root/TGeoBBox.h /usr/local/include/root/TGeoShape.h \
+  /usr/local/include/root/TGaxis.h /usr/local/include/root/TRandom3.h \
+  /usr/local/include/root/RooGlobalFunc.h \
+  /usr/local/include/root/RooCmdArg.h \
+  /usr/local/include/root/RooLinkedList.h \
+  /usr/local/include/root/RooLinkedListElem.h \
+  /usr/local/include/root/RooHashTable.h \
+  /usr/local/include/root/RooRealVar.h \
+  /usr/local/include/root/RooAbsRealLValue.h \
+  /usr/local/include/root/RooAbsReal.h \
+  /usr/local/include/root/RooAbsArg.h /usr/include/assert.h \
+  /usr/local/include/root/THashList.h \
+  /usr/local/include/root/TRefArray.h \
+  /usr/local/include/root/TProcessID.h \
+  /usr/local/include/root/RooPrintable.h \
+  /usr/local/include/root/RooRefCountList.h \
+  /usr/local/include/root/RooAbsCache.h \
+  /usr/local/include/root/RooLinkedListIter.h \
+  /usr/local/include/root/RooNameReg.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/deque \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/stack \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCurve.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPlotable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooArgSet.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCollection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooArgList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNumber.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsLValue.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsBinning.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooUniformBinning.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooSharedPropertiesList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooSharedProperties.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRealVarSharedProperties.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooDataSet.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsData.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooFormulaVar.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooFormula.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/v5/TFormula.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooListProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooTrace.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSym.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTSym.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSymfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooDirItem.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooDataHist.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNameSet.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCacheManager.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooMsgService.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNormSetCache.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCacheElement.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGaussian.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsPdf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooObjCacheManager.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRealProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooArgProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooConstVar.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGenericPdf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPolynomial.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooChi2Var.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsOptTestStatistic.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsTestStatistic.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooSetProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCategoryProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCategory.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCatType.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCategoryLValue.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooMinuit.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPlot.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooList.h \
+  /usr/local/include/root/RooCurve.h \
+  /usr/local/include/root/RooPlotable.h \
+  /usr/local/include/root/RooArgSet.h \
+  /usr/local/include/root/RooAbsCollection.h \
+  /usr/local/include/root/RooArgList.h \
+  /usr/local/include/root/RooNumber.h \
+  /usr/local/include/root/RooAbsLValue.h \
+  /usr/local/include/root/RooAbsBinning.h \
+  /usr/local/include/root/RooUniformBinning.h \
+  /usr/local/include/root/RooSharedPropertiesList.h \
+  /usr/local/include/root/RooSharedProperties.h \
+  /usr/local/include/root/RooRealVarSharedProperties.h \
+  /usr/local/include/root/RooDataSet.h \
+  /usr/local/include/root/RooAbsData.h \
+  /usr/local/include/root/RooFormulaVar.h \
+  /usr/local/include/root/RooFormula.h \
+  /usr/local/include/root/v5/TFormula.h \
+  /usr/local/include/root/RooListProxy.h \
+  /usr/local/include/root/RooAbsProxy.h \
+  /usr/local/include/root/RooTrace.h \
+  /usr/local/include/root/TMatrixDSym.h \
+  /usr/local/include/root/TMatrixTSym.h \
+  /usr/local/include/root/TMatrixDSymfwd.h \
+  /usr/local/include/root/RooDirItem.h \
+  /usr/local/include/root/RooDataHist.h \
+  /usr/local/include/root/RooNameSet.h \
+  /usr/local/include/root/RooCacheManager.h \
+  /usr/local/include/root/RooMsgService.h \
+  /usr/local/include/root/RooNormSetCache.h \
+  /usr/local/include/root/RooAbsCacheElement.h \
+  /usr/local/include/root/RooGaussian.h \
+  /usr/local/include/root/RooAbsPdf.h \
+  /usr/local/include/root/RooObjCacheManager.h \
+  /usr/local/include/root/RooRealProxy.h \
+  /usr/local/include/root/RooArgProxy.h \
+  /usr/local/include/root/RooConstVar.h \
+  /usr/local/include/root/RooGenericPdf.h \
+  /usr/local/include/root/RooPolynomial.h \
+  /usr/local/include/root/RooChi2Var.h \
+  /usr/local/include/root/RooAbsOptTestStatistic.h \
+  /usr/local/include/root/RooAbsTestStatistic.h \
+  /usr/local/include/root/RooSetProxy.h \
+  /usr/local/include/root/RooCategoryProxy.h \
+  /usr/local/include/root/RooAbsCategory.h \
+  /usr/local/include/root/RooCatType.h \
+  /usr/local/include/root/RooAbsCategoryLValue.h \
+  /usr/local/include/root/RooMinuit.h /usr/local/include/root/RooPlot.h \
+  /usr/local/include/root/RooList.h \
   /Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/TCalculations.h \
   /Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/TAnalysis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooFitResult.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRootIOCtor.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGaussModel.h \
+  /usr/local/include/root/RooFitResult.h \
+  /usr/local/include/root/TRootIOCtor.h \
+  /usr/local/include/root/RooGaussModel.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/complex \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/sstream \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooResolutionModel.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooMath.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooComplex.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMinuit.h
+  /usr/local/include/root/RooResolutionModel.h \
+  /usr/local/include/root/RooMath.h /usr/local/include/root/RooComplex.h \
+  /usr/local/include/root/TMinuit.h
 TCalcPhysVarsEG2.o: TCalcPhysVarsEG2.cxx TCalcPhysVarsEG2.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/iostream \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__config \
@@ -928,257 +823,205 @@ TCalcPhysVarsEG2.o: TCalcPhysVarsEG2.cxx TCalcPhysVarsEG2.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__split_buffer \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/numeric \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/fstream \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRotation.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TObject.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Rtypes.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RtypesCore.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RConfig.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RVersion.h \
+  /usr/local/include/root/TRotation.h /usr/local/include/root/TObject.h \
+  /usr/local/include/root/Rtypes.h /usr/local/include/root/RtypesCore.h \
+  /usr/local/include/root/RConfig.h /usr/local/include/root/RVersion.h \
   /usr/include/AvailabilityMacros.h /usr/include/TargetConditionals.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/DllImport.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Rtypeinfo.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/snprintf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/strlcpy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGenericClassInfo.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSchemaHelper.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TStorage.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVersionCheck.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Riosfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBuffer.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVector3.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TError.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVector2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrix.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixF.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixT.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTBase.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TNamed.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TString.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMathBase.h \
+  /usr/local/include/root/DllImport.h \
+  /usr/local/include/root/Rtypeinfo.h /usr/local/include/root/snprintf.h \
+  /usr/local/include/root/strlcpy.h \
+  /usr/local/include/root/TGenericClassInfo.h \
+  /usr/local/include/root/TSchemaHelper.h \
+  /usr/local/include/root/TStorage.h \
+  /usr/local/include/root/TVersionCheck.h \
+  /usr/local/include/root/Riosfwd.h /usr/local/include/root/TBuffer.h \
+  /usr/local/include/root/TVector3.h /usr/local/include/root/TError.h \
+  /usr/local/include/root/TVector2.h /usr/local/include/root/TMatrix.h \
+  /usr/local/include/root/TMatrixF.h /usr/local/include/root/TMatrixT.h \
+  /usr/local/include/root/TMatrixTBase.h \
+  /usr/local/include/root/TNamed.h /usr/local/include/root/TString.h \
+  /usr/local/include/root/TMathBase.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cmath \
-  /usr/local/Cellar/root6/6.06.02/include/root/RStringView.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RConfigure.h \
+  /usr/local/include/root/RStringView.h \
+  /usr/local/include/root/RConfigure.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/experimental/string_view \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/experimental/__config \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFBasefwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDBasefwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVectorFfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVectorDfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTUtils.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFUtils.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFUtilsfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTimeStamp.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TStopwatch.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSystem.h \
+  /usr/local/include/root/TMatrixFBasefwd.h \
+  /usr/local/include/root/TMatrixDBasefwd.h \
+  /usr/local/include/root/TVectorFfwd.h \
+  /usr/local/include/root/TVectorDfwd.h \
+  /usr/local/include/root/TMatrixTUtils.h \
+  /usr/local/include/root/TMatrixFfwd.h \
+  /usr/local/include/root/TMatrixFUtils.h \
+  /usr/local/include/root/TMatrixFUtilsfwd.h \
+  /usr/local/include/root/TTimeStamp.h \
+  /usr/local/include/root/TStopwatch.h /usr/local/include/root/TSystem.h \
   /usr/include/fcntl.h /usr/include/sys/fcntl.h \
   /usr/include/sys/_types/_o_sync.h /usr/include/sys/_types/_o_dsync.h \
   /usr/include/sys/_types/_s_ifmt.h /usr/include/sys/_types/_filesec_t.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TInetAddress.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTimer.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSysEvtHandler.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TQObject.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSeqCollection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCollection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TIterator.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TQObjectEmitVA.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TQConnection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Varargs.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TInterpreter.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDictionary.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/ESTLType.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualMutex.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTime.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/ThreadLocalStorage.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLine.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttLine.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttBBox2D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/GuiTypes.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPoint.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrow.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttFill.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TFile.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDirectoryFile.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDirectory.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDatime.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUUID.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMap.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/THashTable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUrl.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTree.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBranch.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TObjArray.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDataType.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttMarker.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayD.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArray.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayI.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TClass.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TObjString.h \
+  /usr/local/include/root/TInetAddress.h \
+  /usr/local/include/root/TTimer.h \
+  /usr/local/include/root/TSysEvtHandler.h \
+  /usr/local/include/root/TQObject.h /usr/local/include/root/TList.h \
+  /usr/local/include/root/TSeqCollection.h \
+  /usr/local/include/root/TCollection.h \
+  /usr/local/include/root/TIterator.h \
+  /usr/local/include/root/TQObjectEmitVA.h \
+  /usr/local/include/root/TQConnection.h \
+  /usr/local/include/root/Varargs.h \
+  /usr/local/include/root/TInterpreter.h \
+  /usr/local/include/root/TDictionary.h \
+  /usr/local/include/root/ESTLType.h \
+  /usr/local/include/root/TVirtualMutex.h \
+  /usr/local/include/root/TTime.h \
+  /usr/local/include/root/ThreadLocalStorage.h \
+  /usr/local/include/root/TLine.h /usr/local/include/root/TAttLine.h \
+  /usr/local/include/root/TAttBBox2D.h \
+  /usr/local/include/root/GuiTypes.h /usr/local/include/root/TPoint.h \
+  /usr/local/include/root/TArrow.h /usr/local/include/root/TAttFill.h \
+  /usr/local/include/root/TFile.h \
+  /usr/local/include/root/TDirectoryFile.h \
+  /usr/local/include/root/TDirectory.h /usr/local/include/root/TDatime.h \
+  /usr/local/include/root/TUUID.h /usr/local/include/root/TMap.h \
+  /usr/local/include/root/THashTable.h /usr/local/include/root/TUrl.h \
+  /usr/local/include/root/TTree.h /usr/local/include/root/TBranch.h \
+  /usr/local/include/root/TObjArray.h \
+  /usr/local/include/root/TDataType.h \
+  /usr/local/include/root/TAttMarker.h /usr/local/include/root/TArrayD.h \
+  /usr/local/include/root/TArray.h /usr/local/include/root/TArrayI.h \
+  /usr/local/include/root/TClass.h /usr/local/include/root/TObjString.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/map \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__tree \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/set \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/unordered_set \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__hash_table \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualTreePlayer.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TROOT.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCanvas.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPad.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualPad.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttPad.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualX.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttText.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Buttons.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttCanvas.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCanvasImp.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TF1.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TFormula.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBits.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMethodCall.h \
+  /usr/local/include/root/TVirtualTreePlayer.h \
+  /usr/local/include/root/TROOT.h /usr/local/include/root/TCanvas.h \
+  /usr/local/include/root/TPad.h /usr/local/include/root/TVirtualPad.h \
+  /usr/local/include/root/TAttPad.h /usr/local/include/root/TVirtualX.h \
+  /usr/local/include/root/TAttText.h /usr/local/include/root/Buttons.h \
+  /usr/local/include/root/TAttCanvas.h \
+  /usr/local/include/root/TCanvasImp.h /usr/local/include/root/TF1.h \
+  /usr/local/include/root/TFormula.h /usr/local/include/root/TBits.h \
+  /usr/local/include/root/TMethodCall.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/list \
-  /usr/local/Cellar/root6/6.06.02/include/root/Math/ParamFunctor.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TF2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TF12.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH1F.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH1.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAxis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttAxis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayC.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayS.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayF.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Foption.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TFitResultPtr.h \
+  /usr/local/include/root/Math/ParamFunctor.h \
+  /usr/local/include/root/TF2.h /usr/local/include/root/TF12.h \
+  /usr/local/include/root/TH1F.h /usr/local/include/root/TH1.h \
+  /usr/local/include/root/TAxis.h /usr/local/include/root/TAttAxis.h \
+  /usr/local/include/root/TArrayC.h /usr/local/include/root/TArrayS.h \
+  /usr/local/include/root/TArrayF.h /usr/local/include/root/Foption.h \
+  /usr/local/include/root/TFitResultPtr.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/float.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH2F.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH3F.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH3.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAtt3D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TProfile.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TStyle.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TColor.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMultiGraph.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGraphErrors.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGraph.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLegend.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPave.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBox.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPaveStats.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPaveText.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TText.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TChain.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLeaf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMath.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCut.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLorentzVector.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPie.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLatex.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TEllipse.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPolyLine3D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRandom2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRandom.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/THStack.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSpectrum.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSpectrum2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUnfoldSys.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUnfold.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH1D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH2D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSpline.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSparse.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTSparse.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSparsefwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDUtils.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDUtilsfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixD.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCutG.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGeoSphere.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGeoBBox.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGeoShape.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGaxis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRandom3.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGlobalFunc.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCmdArg.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooLinkedList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooLinkedListElem.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooHashTable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRealVar.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsRealLValue.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsReal.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsArg.h \
-  /usr/include/assert.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/THashList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRefArray.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TProcessID.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPrintable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRefCountList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCache.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooLinkedListIter.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNameReg.h \
+  /usr/local/include/root/TH2F.h /usr/local/include/root/TH2.h \
+  /usr/local/include/root/TH3F.h /usr/local/include/root/TH3.h \
+  /usr/local/include/root/TAtt3D.h /usr/local/include/root/TProfile.h \
+  /usr/local/include/root/TStyle.h /usr/local/include/root/TColor.h \
+  /usr/local/include/root/TMultiGraph.h \
+  /usr/local/include/root/TGraphErrors.h \
+  /usr/local/include/root/TGraph.h /usr/local/include/root/TLegend.h \
+  /usr/local/include/root/TPave.h /usr/local/include/root/TBox.h \
+  /usr/local/include/root/TPaveStats.h \
+  /usr/local/include/root/TPaveText.h /usr/local/include/root/TText.h \
+  /usr/local/include/root/TChain.h /usr/local/include/root/TLeaf.h \
+  /usr/local/include/root/TMath.h /usr/local/include/root/TCut.h \
+  /usr/local/include/root/TLorentzVector.h \
+  /usr/local/include/root/TPie.h /usr/local/include/root/TLatex.h \
+  /usr/local/include/root/TEllipse.h \
+  /usr/local/include/root/TPolyLine3D.h \
+  /usr/local/include/root/TRandom2.h /usr/local/include/root/TRandom.h \
+  /usr/local/include/root/THStack.h /usr/local/include/root/TSpectrum.h \
+  /usr/local/include/root/TSpectrum2.h \
+  /usr/local/include/root/TUnfoldSys.h /usr/local/include/root/TUnfold.h \
+  /usr/local/include/root/TH1D.h /usr/local/include/root/TH2D.h \
+  /usr/local/include/root/TSpline.h \
+  /usr/local/include/root/TMatrixDSparse.h \
+  /usr/local/include/root/TMatrixTSparse.h \
+  /usr/local/include/root/TMatrixDSparsefwd.h \
+  /usr/local/include/root/TMatrixDUtils.h \
+  /usr/local/include/root/TMatrixDUtilsfwd.h \
+  /usr/local/include/root/TMatrixD.h \
+  /usr/local/include/root/TMatrixDfwd.h /usr/local/include/root/TCutG.h \
+  /usr/local/include/root/TGeoSphere.h \
+  /usr/local/include/root/TGeoBBox.h /usr/local/include/root/TGeoShape.h \
+  /usr/local/include/root/TGaxis.h /usr/local/include/root/TRandom3.h \
+  /usr/local/include/root/RooGlobalFunc.h \
+  /usr/local/include/root/RooCmdArg.h \
+  /usr/local/include/root/RooLinkedList.h \
+  /usr/local/include/root/RooLinkedListElem.h \
+  /usr/local/include/root/RooHashTable.h \
+  /usr/local/include/root/RooRealVar.h \
+  /usr/local/include/root/RooAbsRealLValue.h \
+  /usr/local/include/root/RooAbsReal.h \
+  /usr/local/include/root/RooAbsArg.h /usr/include/assert.h \
+  /usr/local/include/root/THashList.h \
+  /usr/local/include/root/TRefArray.h \
+  /usr/local/include/root/TProcessID.h \
+  /usr/local/include/root/RooPrintable.h \
+  /usr/local/include/root/RooRefCountList.h \
+  /usr/local/include/root/RooAbsCache.h \
+  /usr/local/include/root/RooLinkedListIter.h \
+  /usr/local/include/root/RooNameReg.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/deque \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/stack \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCurve.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPlotable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooArgSet.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCollection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooArgList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNumber.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsLValue.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsBinning.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooUniformBinning.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooSharedPropertiesList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooSharedProperties.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRealVarSharedProperties.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooDataSet.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsData.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooFormulaVar.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooFormula.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/v5/TFormula.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooListProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooTrace.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSym.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTSym.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSymfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooDirItem.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooDataHist.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNameSet.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCacheManager.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooMsgService.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNormSetCache.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCacheElement.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGaussian.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsPdf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooObjCacheManager.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRealProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooArgProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooConstVar.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGenericPdf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPolynomial.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooChi2Var.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsOptTestStatistic.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsTestStatistic.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooSetProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCategoryProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCategory.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCatType.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCategoryLValue.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooMinuit.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPlot.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooList.h \
+  /usr/local/include/root/RooCurve.h \
+  /usr/local/include/root/RooPlotable.h \
+  /usr/local/include/root/RooArgSet.h \
+  /usr/local/include/root/RooAbsCollection.h \
+  /usr/local/include/root/RooArgList.h \
+  /usr/local/include/root/RooNumber.h \
+  /usr/local/include/root/RooAbsLValue.h \
+  /usr/local/include/root/RooAbsBinning.h \
+  /usr/local/include/root/RooUniformBinning.h \
+  /usr/local/include/root/RooSharedPropertiesList.h \
+  /usr/local/include/root/RooSharedProperties.h \
+  /usr/local/include/root/RooRealVarSharedProperties.h \
+  /usr/local/include/root/RooDataSet.h \
+  /usr/local/include/root/RooAbsData.h \
+  /usr/local/include/root/RooFormulaVar.h \
+  /usr/local/include/root/RooFormula.h \
+  /usr/local/include/root/v5/TFormula.h \
+  /usr/local/include/root/RooListProxy.h \
+  /usr/local/include/root/RooAbsProxy.h \
+  /usr/local/include/root/RooTrace.h \
+  /usr/local/include/root/TMatrixDSym.h \
+  /usr/local/include/root/TMatrixTSym.h \
+  /usr/local/include/root/TMatrixDSymfwd.h \
+  /usr/local/include/root/RooDirItem.h \
+  /usr/local/include/root/RooDataHist.h \
+  /usr/local/include/root/RooNameSet.h \
+  /usr/local/include/root/RooCacheManager.h \
+  /usr/local/include/root/RooMsgService.h \
+  /usr/local/include/root/RooNormSetCache.h \
+  /usr/local/include/root/RooAbsCacheElement.h \
+  /usr/local/include/root/RooGaussian.h \
+  /usr/local/include/root/RooAbsPdf.h \
+  /usr/local/include/root/RooObjCacheManager.h \
+  /usr/local/include/root/RooRealProxy.h \
+  /usr/local/include/root/RooArgProxy.h \
+  /usr/local/include/root/RooConstVar.h \
+  /usr/local/include/root/RooGenericPdf.h \
+  /usr/local/include/root/RooPolynomial.h \
+  /usr/local/include/root/RooChi2Var.h \
+  /usr/local/include/root/RooAbsOptTestStatistic.h \
+  /usr/local/include/root/RooAbsTestStatistic.h \
+  /usr/local/include/root/RooSetProxy.h \
+  /usr/local/include/root/RooCategoryProxy.h \
+  /usr/local/include/root/RooAbsCategory.h \
+  /usr/local/include/root/RooCatType.h \
+  /usr/local/include/root/RooAbsCategoryLValue.h \
+  /usr/local/include/root/RooMinuit.h /usr/local/include/root/RooPlot.h \
+  /usr/local/include/root/RooList.h \
   /Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/TCalculations.h \
   /Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/TAnalysis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooFitResult.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRootIOCtor.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGaussModel.h \
+  /usr/local/include/root/RooFitResult.h \
+  /usr/local/include/root/TRootIOCtor.h \
+  /usr/local/include/root/RooGaussModel.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/complex \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/sstream \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooResolutionModel.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooMath.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooComplex.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMinuit.h
+  /usr/local/include/root/RooResolutionModel.h \
+  /usr/local/include/root/RooMath.h /usr/local/include/root/RooComplex.h \
+  /usr/local/include/root/TMinuit.h
 TEG2dm.o: TEG2dm.cxx TEG2dm.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/iostream \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__config \
@@ -1320,257 +1163,205 @@ TEG2dm.o: TEG2dm.cxx TEG2dm.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__split_buffer \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/numeric \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/fstream \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRotation.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TObject.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Rtypes.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RtypesCore.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RConfig.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RVersion.h \
+  /usr/local/include/root/TRotation.h /usr/local/include/root/TObject.h \
+  /usr/local/include/root/Rtypes.h /usr/local/include/root/RtypesCore.h \
+  /usr/local/include/root/RConfig.h /usr/local/include/root/RVersion.h \
   /usr/include/AvailabilityMacros.h /usr/include/TargetConditionals.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/DllImport.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Rtypeinfo.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/snprintf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/strlcpy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGenericClassInfo.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSchemaHelper.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TStorage.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVersionCheck.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Riosfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBuffer.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVector3.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TError.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVector2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrix.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixF.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixT.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTBase.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TNamed.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TString.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMathBase.h \
+  /usr/local/include/root/DllImport.h \
+  /usr/local/include/root/Rtypeinfo.h /usr/local/include/root/snprintf.h \
+  /usr/local/include/root/strlcpy.h \
+  /usr/local/include/root/TGenericClassInfo.h \
+  /usr/local/include/root/TSchemaHelper.h \
+  /usr/local/include/root/TStorage.h \
+  /usr/local/include/root/TVersionCheck.h \
+  /usr/local/include/root/Riosfwd.h /usr/local/include/root/TBuffer.h \
+  /usr/local/include/root/TVector3.h /usr/local/include/root/TError.h \
+  /usr/local/include/root/TVector2.h /usr/local/include/root/TMatrix.h \
+  /usr/local/include/root/TMatrixF.h /usr/local/include/root/TMatrixT.h \
+  /usr/local/include/root/TMatrixTBase.h \
+  /usr/local/include/root/TNamed.h /usr/local/include/root/TString.h \
+  /usr/local/include/root/TMathBase.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cmath \
-  /usr/local/Cellar/root6/6.06.02/include/root/RStringView.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RConfigure.h \
+  /usr/local/include/root/RStringView.h \
+  /usr/local/include/root/RConfigure.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/experimental/string_view \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/experimental/__config \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFBasefwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDBasefwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVectorFfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVectorDfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTUtils.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFUtils.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFUtilsfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTimeStamp.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TStopwatch.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSystem.h \
+  /usr/local/include/root/TMatrixFBasefwd.h \
+  /usr/local/include/root/TMatrixDBasefwd.h \
+  /usr/local/include/root/TVectorFfwd.h \
+  /usr/local/include/root/TVectorDfwd.h \
+  /usr/local/include/root/TMatrixTUtils.h \
+  /usr/local/include/root/TMatrixFfwd.h \
+  /usr/local/include/root/TMatrixFUtils.h \
+  /usr/local/include/root/TMatrixFUtilsfwd.h \
+  /usr/local/include/root/TTimeStamp.h \
+  /usr/local/include/root/TStopwatch.h /usr/local/include/root/TSystem.h \
   /usr/include/fcntl.h /usr/include/sys/fcntl.h \
   /usr/include/sys/_types/_o_sync.h /usr/include/sys/_types/_o_dsync.h \
   /usr/include/sys/_types/_s_ifmt.h /usr/include/sys/_types/_filesec_t.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TInetAddress.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTimer.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSysEvtHandler.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TQObject.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSeqCollection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCollection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TIterator.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TQObjectEmitVA.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TQConnection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Varargs.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TInterpreter.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDictionary.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/ESTLType.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualMutex.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTime.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/ThreadLocalStorage.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLine.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttLine.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttBBox2D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/GuiTypes.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPoint.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrow.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttFill.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TFile.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDirectoryFile.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDirectory.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDatime.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUUID.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMap.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/THashTable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUrl.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTree.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBranch.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TObjArray.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDataType.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttMarker.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayD.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArray.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayI.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TClass.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TObjString.h \
+  /usr/local/include/root/TInetAddress.h \
+  /usr/local/include/root/TTimer.h \
+  /usr/local/include/root/TSysEvtHandler.h \
+  /usr/local/include/root/TQObject.h /usr/local/include/root/TList.h \
+  /usr/local/include/root/TSeqCollection.h \
+  /usr/local/include/root/TCollection.h \
+  /usr/local/include/root/TIterator.h \
+  /usr/local/include/root/TQObjectEmitVA.h \
+  /usr/local/include/root/TQConnection.h \
+  /usr/local/include/root/Varargs.h \
+  /usr/local/include/root/TInterpreter.h \
+  /usr/local/include/root/TDictionary.h \
+  /usr/local/include/root/ESTLType.h \
+  /usr/local/include/root/TVirtualMutex.h \
+  /usr/local/include/root/TTime.h \
+  /usr/local/include/root/ThreadLocalStorage.h \
+  /usr/local/include/root/TLine.h /usr/local/include/root/TAttLine.h \
+  /usr/local/include/root/TAttBBox2D.h \
+  /usr/local/include/root/GuiTypes.h /usr/local/include/root/TPoint.h \
+  /usr/local/include/root/TArrow.h /usr/local/include/root/TAttFill.h \
+  /usr/local/include/root/TFile.h \
+  /usr/local/include/root/TDirectoryFile.h \
+  /usr/local/include/root/TDirectory.h /usr/local/include/root/TDatime.h \
+  /usr/local/include/root/TUUID.h /usr/local/include/root/TMap.h \
+  /usr/local/include/root/THashTable.h /usr/local/include/root/TUrl.h \
+  /usr/local/include/root/TTree.h /usr/local/include/root/TBranch.h \
+  /usr/local/include/root/TObjArray.h \
+  /usr/local/include/root/TDataType.h \
+  /usr/local/include/root/TAttMarker.h /usr/local/include/root/TArrayD.h \
+  /usr/local/include/root/TArray.h /usr/local/include/root/TArrayI.h \
+  /usr/local/include/root/TClass.h /usr/local/include/root/TObjString.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/map \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__tree \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/set \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/unordered_set \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__hash_table \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualTreePlayer.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TROOT.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCanvas.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPad.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualPad.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttPad.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualX.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttText.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Buttons.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttCanvas.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCanvasImp.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TF1.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TFormula.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBits.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMethodCall.h \
+  /usr/local/include/root/TVirtualTreePlayer.h \
+  /usr/local/include/root/TROOT.h /usr/local/include/root/TCanvas.h \
+  /usr/local/include/root/TPad.h /usr/local/include/root/TVirtualPad.h \
+  /usr/local/include/root/TAttPad.h /usr/local/include/root/TVirtualX.h \
+  /usr/local/include/root/TAttText.h /usr/local/include/root/Buttons.h \
+  /usr/local/include/root/TAttCanvas.h \
+  /usr/local/include/root/TCanvasImp.h /usr/local/include/root/TF1.h \
+  /usr/local/include/root/TFormula.h /usr/local/include/root/TBits.h \
+  /usr/local/include/root/TMethodCall.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/list \
-  /usr/local/Cellar/root6/6.06.02/include/root/Math/ParamFunctor.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TF2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TF12.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH1F.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH1.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAxis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttAxis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayC.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayS.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayF.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Foption.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TFitResultPtr.h \
+  /usr/local/include/root/Math/ParamFunctor.h \
+  /usr/local/include/root/TF2.h /usr/local/include/root/TF12.h \
+  /usr/local/include/root/TH1F.h /usr/local/include/root/TH1.h \
+  /usr/local/include/root/TAxis.h /usr/local/include/root/TAttAxis.h \
+  /usr/local/include/root/TArrayC.h /usr/local/include/root/TArrayS.h \
+  /usr/local/include/root/TArrayF.h /usr/local/include/root/Foption.h \
+  /usr/local/include/root/TFitResultPtr.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/float.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH2F.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH3F.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH3.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAtt3D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TProfile.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TStyle.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TColor.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMultiGraph.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGraphErrors.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGraph.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLegend.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPave.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBox.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPaveStats.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPaveText.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TText.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TChain.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLeaf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMath.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCut.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLorentzVector.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPie.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLatex.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TEllipse.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPolyLine3D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRandom2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRandom.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/THStack.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSpectrum.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSpectrum2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUnfoldSys.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUnfold.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH1D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH2D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSpline.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSparse.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTSparse.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSparsefwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDUtils.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDUtilsfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixD.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCutG.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGeoSphere.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGeoBBox.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGeoShape.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGaxis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRandom3.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGlobalFunc.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCmdArg.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooLinkedList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooLinkedListElem.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooHashTable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRealVar.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsRealLValue.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsReal.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsArg.h \
-  /usr/include/assert.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/THashList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRefArray.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TProcessID.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPrintable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRefCountList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCache.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooLinkedListIter.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNameReg.h \
+  /usr/local/include/root/TH2F.h /usr/local/include/root/TH2.h \
+  /usr/local/include/root/TH3F.h /usr/local/include/root/TH3.h \
+  /usr/local/include/root/TAtt3D.h /usr/local/include/root/TProfile.h \
+  /usr/local/include/root/TStyle.h /usr/local/include/root/TColor.h \
+  /usr/local/include/root/TMultiGraph.h \
+  /usr/local/include/root/TGraphErrors.h \
+  /usr/local/include/root/TGraph.h /usr/local/include/root/TLegend.h \
+  /usr/local/include/root/TPave.h /usr/local/include/root/TBox.h \
+  /usr/local/include/root/TPaveStats.h \
+  /usr/local/include/root/TPaveText.h /usr/local/include/root/TText.h \
+  /usr/local/include/root/TChain.h /usr/local/include/root/TLeaf.h \
+  /usr/local/include/root/TMath.h /usr/local/include/root/TCut.h \
+  /usr/local/include/root/TLorentzVector.h \
+  /usr/local/include/root/TPie.h /usr/local/include/root/TLatex.h \
+  /usr/local/include/root/TEllipse.h \
+  /usr/local/include/root/TPolyLine3D.h \
+  /usr/local/include/root/TRandom2.h /usr/local/include/root/TRandom.h \
+  /usr/local/include/root/THStack.h /usr/local/include/root/TSpectrum.h \
+  /usr/local/include/root/TSpectrum2.h \
+  /usr/local/include/root/TUnfoldSys.h /usr/local/include/root/TUnfold.h \
+  /usr/local/include/root/TH1D.h /usr/local/include/root/TH2D.h \
+  /usr/local/include/root/TSpline.h \
+  /usr/local/include/root/TMatrixDSparse.h \
+  /usr/local/include/root/TMatrixTSparse.h \
+  /usr/local/include/root/TMatrixDSparsefwd.h \
+  /usr/local/include/root/TMatrixDUtils.h \
+  /usr/local/include/root/TMatrixDUtilsfwd.h \
+  /usr/local/include/root/TMatrixD.h \
+  /usr/local/include/root/TMatrixDfwd.h /usr/local/include/root/TCutG.h \
+  /usr/local/include/root/TGeoSphere.h \
+  /usr/local/include/root/TGeoBBox.h /usr/local/include/root/TGeoShape.h \
+  /usr/local/include/root/TGaxis.h /usr/local/include/root/TRandom3.h \
+  /usr/local/include/root/RooGlobalFunc.h \
+  /usr/local/include/root/RooCmdArg.h \
+  /usr/local/include/root/RooLinkedList.h \
+  /usr/local/include/root/RooLinkedListElem.h \
+  /usr/local/include/root/RooHashTable.h \
+  /usr/local/include/root/RooRealVar.h \
+  /usr/local/include/root/RooAbsRealLValue.h \
+  /usr/local/include/root/RooAbsReal.h \
+  /usr/local/include/root/RooAbsArg.h /usr/include/assert.h \
+  /usr/local/include/root/THashList.h \
+  /usr/local/include/root/TRefArray.h \
+  /usr/local/include/root/TProcessID.h \
+  /usr/local/include/root/RooPrintable.h \
+  /usr/local/include/root/RooRefCountList.h \
+  /usr/local/include/root/RooAbsCache.h \
+  /usr/local/include/root/RooLinkedListIter.h \
+  /usr/local/include/root/RooNameReg.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/deque \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/stack \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCurve.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPlotable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooArgSet.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCollection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooArgList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNumber.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsLValue.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsBinning.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooUniformBinning.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooSharedPropertiesList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooSharedProperties.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRealVarSharedProperties.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooDataSet.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsData.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooFormulaVar.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooFormula.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/v5/TFormula.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooListProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooTrace.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSym.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTSym.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSymfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooDirItem.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooDataHist.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNameSet.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCacheManager.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooMsgService.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNormSetCache.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCacheElement.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGaussian.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsPdf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooObjCacheManager.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRealProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooArgProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooConstVar.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGenericPdf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPolynomial.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooChi2Var.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsOptTestStatistic.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsTestStatistic.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooSetProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCategoryProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCategory.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCatType.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCategoryLValue.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooMinuit.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPlot.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooList.h \
+  /usr/local/include/root/RooCurve.h \
+  /usr/local/include/root/RooPlotable.h \
+  /usr/local/include/root/RooArgSet.h \
+  /usr/local/include/root/RooAbsCollection.h \
+  /usr/local/include/root/RooArgList.h \
+  /usr/local/include/root/RooNumber.h \
+  /usr/local/include/root/RooAbsLValue.h \
+  /usr/local/include/root/RooAbsBinning.h \
+  /usr/local/include/root/RooUniformBinning.h \
+  /usr/local/include/root/RooSharedPropertiesList.h \
+  /usr/local/include/root/RooSharedProperties.h \
+  /usr/local/include/root/RooRealVarSharedProperties.h \
+  /usr/local/include/root/RooDataSet.h \
+  /usr/local/include/root/RooAbsData.h \
+  /usr/local/include/root/RooFormulaVar.h \
+  /usr/local/include/root/RooFormula.h \
+  /usr/local/include/root/v5/TFormula.h \
+  /usr/local/include/root/RooListProxy.h \
+  /usr/local/include/root/RooAbsProxy.h \
+  /usr/local/include/root/RooTrace.h \
+  /usr/local/include/root/TMatrixDSym.h \
+  /usr/local/include/root/TMatrixTSym.h \
+  /usr/local/include/root/TMatrixDSymfwd.h \
+  /usr/local/include/root/RooDirItem.h \
+  /usr/local/include/root/RooDataHist.h \
+  /usr/local/include/root/RooNameSet.h \
+  /usr/local/include/root/RooCacheManager.h \
+  /usr/local/include/root/RooMsgService.h \
+  /usr/local/include/root/RooNormSetCache.h \
+  /usr/local/include/root/RooAbsCacheElement.h \
+  /usr/local/include/root/RooGaussian.h \
+  /usr/local/include/root/RooAbsPdf.h \
+  /usr/local/include/root/RooObjCacheManager.h \
+  /usr/local/include/root/RooRealProxy.h \
+  /usr/local/include/root/RooArgProxy.h \
+  /usr/local/include/root/RooConstVar.h \
+  /usr/local/include/root/RooGenericPdf.h \
+  /usr/local/include/root/RooPolynomial.h \
+  /usr/local/include/root/RooChi2Var.h \
+  /usr/local/include/root/RooAbsOptTestStatistic.h \
+  /usr/local/include/root/RooAbsTestStatistic.h \
+  /usr/local/include/root/RooSetProxy.h \
+  /usr/local/include/root/RooCategoryProxy.h \
+  /usr/local/include/root/RooAbsCategory.h \
+  /usr/local/include/root/RooCatType.h \
+  /usr/local/include/root/RooAbsCategoryLValue.h \
+  /usr/local/include/root/RooMinuit.h /usr/local/include/root/RooPlot.h \
+  /usr/local/include/root/RooList.h \
   /Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/TCalculations.h \
   /Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/TAnalysis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooFitResult.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRootIOCtor.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGaussModel.h \
+  /usr/local/include/root/RooFitResult.h \
+  /usr/local/include/root/TRootIOCtor.h \
+  /usr/local/include/root/RooGaussModel.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/complex \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/sstream \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooResolutionModel.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooMath.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooComplex.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMinuit.h
+  /usr/local/include/root/RooResolutionModel.h \
+  /usr/local/include/root/RooMath.h /usr/local/include/root/RooComplex.h \
+  /usr/local/include/root/TMinuit.h
 TSchemeDATA.o: TSchemeDATA.cxx TSchemeDATA.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/iostream \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__config \
@@ -1713,254 +1504,202 @@ TSchemeDATA.o: TSchemeDATA.cxx TSchemeDATA.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__split_buffer \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/numeric \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/fstream \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRotation.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TObject.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Rtypes.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RtypesCore.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RConfig.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RVersion.h \
+  /usr/local/include/root/TRotation.h /usr/local/include/root/TObject.h \
+  /usr/local/include/root/Rtypes.h /usr/local/include/root/RtypesCore.h \
+  /usr/local/include/root/RConfig.h /usr/local/include/root/RVersion.h \
   /usr/include/AvailabilityMacros.h /usr/include/TargetConditionals.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/DllImport.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Rtypeinfo.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/snprintf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/strlcpy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGenericClassInfo.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSchemaHelper.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TStorage.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVersionCheck.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Riosfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBuffer.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVector3.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TError.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVector2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrix.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixF.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixT.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTBase.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TNamed.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TString.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMathBase.h \
+  /usr/local/include/root/DllImport.h \
+  /usr/local/include/root/Rtypeinfo.h /usr/local/include/root/snprintf.h \
+  /usr/local/include/root/strlcpy.h \
+  /usr/local/include/root/TGenericClassInfo.h \
+  /usr/local/include/root/TSchemaHelper.h \
+  /usr/local/include/root/TStorage.h \
+  /usr/local/include/root/TVersionCheck.h \
+  /usr/local/include/root/Riosfwd.h /usr/local/include/root/TBuffer.h \
+  /usr/local/include/root/TVector3.h /usr/local/include/root/TError.h \
+  /usr/local/include/root/TVector2.h /usr/local/include/root/TMatrix.h \
+  /usr/local/include/root/TMatrixF.h /usr/local/include/root/TMatrixT.h \
+  /usr/local/include/root/TMatrixTBase.h \
+  /usr/local/include/root/TNamed.h /usr/local/include/root/TString.h \
+  /usr/local/include/root/TMathBase.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cmath \
-  /usr/local/Cellar/root6/6.06.02/include/root/RStringView.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RConfigure.h \
+  /usr/local/include/root/RStringView.h \
+  /usr/local/include/root/RConfigure.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/experimental/string_view \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/experimental/__config \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFBasefwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDBasefwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVectorFfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVectorDfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTUtils.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFUtils.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixFUtilsfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTimeStamp.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TStopwatch.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSystem.h \
+  /usr/local/include/root/TMatrixFBasefwd.h \
+  /usr/local/include/root/TMatrixDBasefwd.h \
+  /usr/local/include/root/TVectorFfwd.h \
+  /usr/local/include/root/TVectorDfwd.h \
+  /usr/local/include/root/TMatrixTUtils.h \
+  /usr/local/include/root/TMatrixFfwd.h \
+  /usr/local/include/root/TMatrixFUtils.h \
+  /usr/local/include/root/TMatrixFUtilsfwd.h \
+  /usr/local/include/root/TTimeStamp.h \
+  /usr/local/include/root/TStopwatch.h /usr/local/include/root/TSystem.h \
   /usr/include/fcntl.h /usr/include/sys/fcntl.h \
   /usr/include/sys/_types/_o_sync.h /usr/include/sys/_types/_o_dsync.h \
   /usr/include/sys/_types/_s_ifmt.h /usr/include/sys/_types/_filesec_t.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TInetAddress.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTimer.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSysEvtHandler.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TQObject.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSeqCollection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCollection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TIterator.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TQObjectEmitVA.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TQConnection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Varargs.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TInterpreter.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDictionary.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/ESTLType.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualMutex.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTime.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/ThreadLocalStorage.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLine.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttLine.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttBBox2D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/GuiTypes.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPoint.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrow.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttFill.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TFile.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDirectoryFile.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDirectory.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDatime.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUUID.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMap.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/THashTable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUrl.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TTree.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBranch.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TObjArray.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TDataType.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttMarker.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayD.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArray.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayI.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TClass.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TObjString.h \
+  /usr/local/include/root/TInetAddress.h \
+  /usr/local/include/root/TTimer.h \
+  /usr/local/include/root/TSysEvtHandler.h \
+  /usr/local/include/root/TQObject.h /usr/local/include/root/TList.h \
+  /usr/local/include/root/TSeqCollection.h \
+  /usr/local/include/root/TCollection.h \
+  /usr/local/include/root/TIterator.h \
+  /usr/local/include/root/TQObjectEmitVA.h \
+  /usr/local/include/root/TQConnection.h \
+  /usr/local/include/root/Varargs.h \
+  /usr/local/include/root/TInterpreter.h \
+  /usr/local/include/root/TDictionary.h \
+  /usr/local/include/root/ESTLType.h \
+  /usr/local/include/root/TVirtualMutex.h \
+  /usr/local/include/root/TTime.h \
+  /usr/local/include/root/ThreadLocalStorage.h \
+  /usr/local/include/root/TLine.h /usr/local/include/root/TAttLine.h \
+  /usr/local/include/root/TAttBBox2D.h \
+  /usr/local/include/root/GuiTypes.h /usr/local/include/root/TPoint.h \
+  /usr/local/include/root/TArrow.h /usr/local/include/root/TAttFill.h \
+  /usr/local/include/root/TFile.h \
+  /usr/local/include/root/TDirectoryFile.h \
+  /usr/local/include/root/TDirectory.h /usr/local/include/root/TDatime.h \
+  /usr/local/include/root/TUUID.h /usr/local/include/root/TMap.h \
+  /usr/local/include/root/THashTable.h /usr/local/include/root/TUrl.h \
+  /usr/local/include/root/TTree.h /usr/local/include/root/TBranch.h \
+  /usr/local/include/root/TObjArray.h \
+  /usr/local/include/root/TDataType.h \
+  /usr/local/include/root/TAttMarker.h /usr/local/include/root/TArrayD.h \
+  /usr/local/include/root/TArray.h /usr/local/include/root/TArrayI.h \
+  /usr/local/include/root/TClass.h /usr/local/include/root/TObjString.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/map \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__tree \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/set \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/unordered_set \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__hash_table \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualTreePlayer.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TROOT.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCanvas.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPad.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualPad.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttPad.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TVirtualX.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttText.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Buttons.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttCanvas.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCanvasImp.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TF1.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TFormula.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBits.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMethodCall.h \
+  /usr/local/include/root/TVirtualTreePlayer.h \
+  /usr/local/include/root/TROOT.h /usr/local/include/root/TCanvas.h \
+  /usr/local/include/root/TPad.h /usr/local/include/root/TVirtualPad.h \
+  /usr/local/include/root/TAttPad.h /usr/local/include/root/TVirtualX.h \
+  /usr/local/include/root/TAttText.h /usr/local/include/root/Buttons.h \
+  /usr/local/include/root/TAttCanvas.h \
+  /usr/local/include/root/TCanvasImp.h /usr/local/include/root/TF1.h \
+  /usr/local/include/root/TFormula.h /usr/local/include/root/TBits.h \
+  /usr/local/include/root/TMethodCall.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/list \
-  /usr/local/Cellar/root6/6.06.02/include/root/Math/ParamFunctor.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TF2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TF12.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH1F.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH1.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAxis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAttAxis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayC.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayS.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TArrayF.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/Foption.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TFitResultPtr.h \
+  /usr/local/include/root/Math/ParamFunctor.h \
+  /usr/local/include/root/TF2.h /usr/local/include/root/TF12.h \
+  /usr/local/include/root/TH1F.h /usr/local/include/root/TH1.h \
+  /usr/local/include/root/TAxis.h /usr/local/include/root/TAttAxis.h \
+  /usr/local/include/root/TArrayC.h /usr/local/include/root/TArrayS.h \
+  /usr/local/include/root/TArrayF.h /usr/local/include/root/Foption.h \
+  /usr/local/include/root/TFitResultPtr.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/float.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH2F.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH3F.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH3.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TAtt3D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TProfile.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TStyle.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TColor.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMultiGraph.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGraphErrors.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGraph.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLegend.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPave.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TBox.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPaveStats.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPaveText.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TText.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TChain.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLeaf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMath.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCut.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLorentzVector.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPie.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TLatex.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TEllipse.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TPolyLine3D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRandom2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRandom.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/THStack.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSpectrum.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSpectrum2.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUnfoldSys.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TUnfold.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH1D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TH2D.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TSpline.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSparse.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTSparse.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSparsefwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDUtils.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDUtilsfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixD.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TCutG.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGeoSphere.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGeoBBox.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGeoShape.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TGaxis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRandom3.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGlobalFunc.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCmdArg.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooLinkedList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooLinkedListElem.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooHashTable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRealVar.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsRealLValue.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsReal.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsArg.h \
-  /usr/include/assert.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/THashList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRefArray.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TProcessID.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPrintable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRefCountList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCache.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooLinkedListIter.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNameReg.h \
+  /usr/local/include/root/TH2F.h /usr/local/include/root/TH2.h \
+  /usr/local/include/root/TH3F.h /usr/local/include/root/TH3.h \
+  /usr/local/include/root/TAtt3D.h /usr/local/include/root/TProfile.h \
+  /usr/local/include/root/TStyle.h /usr/local/include/root/TColor.h \
+  /usr/local/include/root/TMultiGraph.h \
+  /usr/local/include/root/TGraphErrors.h \
+  /usr/local/include/root/TGraph.h /usr/local/include/root/TLegend.h \
+  /usr/local/include/root/TPave.h /usr/local/include/root/TBox.h \
+  /usr/local/include/root/TPaveStats.h \
+  /usr/local/include/root/TPaveText.h /usr/local/include/root/TText.h \
+  /usr/local/include/root/TChain.h /usr/local/include/root/TLeaf.h \
+  /usr/local/include/root/TMath.h /usr/local/include/root/TCut.h \
+  /usr/local/include/root/TLorentzVector.h \
+  /usr/local/include/root/TPie.h /usr/local/include/root/TLatex.h \
+  /usr/local/include/root/TEllipse.h \
+  /usr/local/include/root/TPolyLine3D.h \
+  /usr/local/include/root/TRandom2.h /usr/local/include/root/TRandom.h \
+  /usr/local/include/root/THStack.h /usr/local/include/root/TSpectrum.h \
+  /usr/local/include/root/TSpectrum2.h \
+  /usr/local/include/root/TUnfoldSys.h /usr/local/include/root/TUnfold.h \
+  /usr/local/include/root/TH1D.h /usr/local/include/root/TH2D.h \
+  /usr/local/include/root/TSpline.h \
+  /usr/local/include/root/TMatrixDSparse.h \
+  /usr/local/include/root/TMatrixTSparse.h \
+  /usr/local/include/root/TMatrixDSparsefwd.h \
+  /usr/local/include/root/TMatrixDUtils.h \
+  /usr/local/include/root/TMatrixDUtilsfwd.h \
+  /usr/local/include/root/TMatrixD.h \
+  /usr/local/include/root/TMatrixDfwd.h /usr/local/include/root/TCutG.h \
+  /usr/local/include/root/TGeoSphere.h \
+  /usr/local/include/root/TGeoBBox.h /usr/local/include/root/TGeoShape.h \
+  /usr/local/include/root/TGaxis.h /usr/local/include/root/TRandom3.h \
+  /usr/local/include/root/RooGlobalFunc.h \
+  /usr/local/include/root/RooCmdArg.h \
+  /usr/local/include/root/RooLinkedList.h \
+  /usr/local/include/root/RooLinkedListElem.h \
+  /usr/local/include/root/RooHashTable.h \
+  /usr/local/include/root/RooRealVar.h \
+  /usr/local/include/root/RooAbsRealLValue.h \
+  /usr/local/include/root/RooAbsReal.h \
+  /usr/local/include/root/RooAbsArg.h /usr/include/assert.h \
+  /usr/local/include/root/THashList.h \
+  /usr/local/include/root/TRefArray.h \
+  /usr/local/include/root/TProcessID.h \
+  /usr/local/include/root/RooPrintable.h \
+  /usr/local/include/root/RooRefCountList.h \
+  /usr/local/include/root/RooAbsCache.h \
+  /usr/local/include/root/RooLinkedListIter.h \
+  /usr/local/include/root/RooNameReg.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/deque \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/stack \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCurve.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPlotable.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooArgSet.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCollection.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooArgList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNumber.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsLValue.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsBinning.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooUniformBinning.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooSharedPropertiesList.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooSharedProperties.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRealVarSharedProperties.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooDataSet.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsData.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooFormulaVar.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooFormula.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/v5/TFormula.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooListProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooTrace.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSym.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixTSym.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMatrixDSymfwd.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooDirItem.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooDataHist.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNameSet.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCacheManager.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooMsgService.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooNormSetCache.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCacheElement.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGaussian.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsPdf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooObjCacheManager.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooRealProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooArgProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooConstVar.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGenericPdf.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPolynomial.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooChi2Var.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsOptTestStatistic.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsTestStatistic.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooSetProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCategoryProxy.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCategory.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooCatType.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooAbsCategoryLValue.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooMinuit.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooPlot.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooList.h \
+  /usr/local/include/root/RooCurve.h \
+  /usr/local/include/root/RooPlotable.h \
+  /usr/local/include/root/RooArgSet.h \
+  /usr/local/include/root/RooAbsCollection.h \
+  /usr/local/include/root/RooArgList.h \
+  /usr/local/include/root/RooNumber.h \
+  /usr/local/include/root/RooAbsLValue.h \
+  /usr/local/include/root/RooAbsBinning.h \
+  /usr/local/include/root/RooUniformBinning.h \
+  /usr/local/include/root/RooSharedPropertiesList.h \
+  /usr/local/include/root/RooSharedProperties.h \
+  /usr/local/include/root/RooRealVarSharedProperties.h \
+  /usr/local/include/root/RooDataSet.h \
+  /usr/local/include/root/RooAbsData.h \
+  /usr/local/include/root/RooFormulaVar.h \
+  /usr/local/include/root/RooFormula.h \
+  /usr/local/include/root/v5/TFormula.h \
+  /usr/local/include/root/RooListProxy.h \
+  /usr/local/include/root/RooAbsProxy.h \
+  /usr/local/include/root/RooTrace.h \
+  /usr/local/include/root/TMatrixDSym.h \
+  /usr/local/include/root/TMatrixTSym.h \
+  /usr/local/include/root/TMatrixDSymfwd.h \
+  /usr/local/include/root/RooDirItem.h \
+  /usr/local/include/root/RooDataHist.h \
+  /usr/local/include/root/RooNameSet.h \
+  /usr/local/include/root/RooCacheManager.h \
+  /usr/local/include/root/RooMsgService.h \
+  /usr/local/include/root/RooNormSetCache.h \
+  /usr/local/include/root/RooAbsCacheElement.h \
+  /usr/local/include/root/RooGaussian.h \
+  /usr/local/include/root/RooAbsPdf.h \
+  /usr/local/include/root/RooObjCacheManager.h \
+  /usr/local/include/root/RooRealProxy.h \
+  /usr/local/include/root/RooArgProxy.h \
+  /usr/local/include/root/RooConstVar.h \
+  /usr/local/include/root/RooGenericPdf.h \
+  /usr/local/include/root/RooPolynomial.h \
+  /usr/local/include/root/RooChi2Var.h \
+  /usr/local/include/root/RooAbsOptTestStatistic.h \
+  /usr/local/include/root/RooAbsTestStatistic.h \
+  /usr/local/include/root/RooSetProxy.h \
+  /usr/local/include/root/RooCategoryProxy.h \
+  /usr/local/include/root/RooAbsCategory.h \
+  /usr/local/include/root/RooCatType.h \
+  /usr/local/include/root/RooAbsCategoryLValue.h \
+  /usr/local/include/root/RooMinuit.h /usr/local/include/root/RooPlot.h \
+  /usr/local/include/root/RooList.h \
   /Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/TCalculations.h \
   /Users/erezcohen/larlite/UserDev/mySoftware/MySoftwarePackage/TAnalysis.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooFitResult.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TRootIOCtor.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooGaussModel.h \
+  /usr/local/include/root/RooFitResult.h \
+  /usr/local/include/root/TRootIOCtor.h \
+  /usr/local/include/root/RooGaussModel.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/complex \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/sstream \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooResolutionModel.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooMath.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/RooComplex.h \
-  /usr/local/Cellar/root6/6.06.02/include/root/TMinuit.h
+  /usr/local/include/root/RooResolutionModel.h \
+  /usr/local/include/root/RooMath.h /usr/local/include/root/RooComplex.h \
+  /usr/local/include/root/TMinuit.h
