@@ -633,6 +633,8 @@ std::vector<Double_t> TAnalysisEG2::FastRooFitCM_1bin( Float_t PmissMin, Float_t
     results.push_back(minNLogLikelihood_x); // min N Log(Likelihood)
     results.push_back(minNLogLikelihood_y); // min N Log(Likelihood)
     results.push_back(minNLogLikelihood_z); // min N Log(Likelihood)
+    
+    cout << "results.size()" << results.size() << endl;
 
     return results;
 }

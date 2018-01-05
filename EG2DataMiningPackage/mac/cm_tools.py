@@ -508,6 +508,7 @@ def calc_cm_pars_sigma( fana , unweightedRoofitsFName = '' , weightedRoofitsFNam
         unweighted = fana.FastRooFitCM_1bin( 0.3 , pMiss_max )
 #        weighted = fana.RooFitCM_1bin( 0.3 , pMiss_max , True , False, flags.verbose )
     #}
+    print 'unweighted.size():',unweighted.size()
     df_result = pd.DataFrame({'Nevts':len(ana)
                              ,'mean_x_unweighted':unweighted[0],'mean_xErr_unweighted':unweighted[1],'sigma_x_unweighted':unweighted[2],'sigma_xErr_unweighted':unweighted[3]
                              ,'mean_y_unweighted':unweighted[4],'mean_yErr_unweighted':unweighted[5],'sigma_y_unweighted':unweighted[6],'sigma_yErr_unweighted':unweighted[7]
@@ -515,7 +516,7 @@ def calc_cm_pars_sigma( fana , unweightedRoofitsFName = '' , weightedRoofitsFNam
                              ,'chi2red_x_unweighted':unweighted[12],'ndof_x_unweighted':unweighted[13]
                              ,'chi2red_y_unweighted':unweighted[14],'ndof_y_unweighted':unweighted[15]
                              ,'chi2red_z_unweighted':unweighted[16],'ndof_z_unweighted':unweighted[17]
-                             ,'minNLogLikelihood_x_unweighted':unweighted[18],'minNLogLikelihood_y_unweighted':unweighted[19],'minNLogLikelihood_z_unweighted':unweighted[20]
+#                             ,'minNLogLikelihood_x_unweighted':unweighted[18],'minNLogLikelihood_y_unweighted':unweighted[19],'minNLogLikelihood_z_unweighted':unweighted[20]
                          }
                          , index=[0])
 

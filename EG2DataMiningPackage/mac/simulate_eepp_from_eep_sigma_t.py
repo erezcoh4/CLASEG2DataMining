@@ -5,6 +5,7 @@ from cm_tools import *
     ---------------
     python mac/simulate_eepp_from_eep_sigma_t.py --option=generate_analyze -nruns=1 -v1
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=PrecFiducials_300Pmiss600 -v2
+    python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=PrecFiducials_300Pmiss1000 -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extractOnly_C12 --DataType=PrecFiducials_300Pmiss600 -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=NoPrecFiducials_300Pmiss600 -v2
     python mac/simulate_eepp_from_eep_sigma_t.py --option=extract_all_targets --DataType=NoFiducials_allPmiss -v2
@@ -39,6 +40,13 @@ if 'extract' in flags.option: #{
             pMiss_max = 0.6
             ana[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_300Pmiss600_%s_PrecFiducials"%target )
         #}
+        elif '300Pmiss1000' in flags.DataType: #{
+            Fiducials = 'PrecFiducials'
+            directory_name = '300Pmiss1000'
+            print 'running ',Fiducials,'at',directory_name
+            pMiss_max = 1.0
+            ana[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s_PrecFiducials"%target )
+        #}
         elif 'NoPrecFiducials' in flags.DataType and 'allPmiss' in flags.DataType:#{
             Fiducials = 'NoPrecFiducials'
             directory_name = 'OrDataTrees'
@@ -48,11 +56,12 @@ if 'extract' in flags.option: #{
         #}
         elif 'allPmiss' in flags.DataType: #{
             Fiducials = 'PrecFiducials'
-            directory_name = 'OrDataTrees'
+            directory_name = '300Pmiss1000'
             print 'running ',Fiducials,'at',directory_name
             pMiss_max = 1.0
             ana[target] = TAnalysisEG2( path + "/OrAnalysisTrees/AdjustedTrees" , "SRC_e2p_adjusted_%s_PrecFiducials"%target )
         #}
+        print 'ana:',ana
         cm_parameters = calc_cm_pars_sigma(ana[target],
                                            CMRooFitsName( ppPath + '/'+directory_name+'/%s_unweighted'%target ) ,
                                            CMRooFitsName( ppPath + '/'+directory_name+'/%s_weighted'%target ) ,
