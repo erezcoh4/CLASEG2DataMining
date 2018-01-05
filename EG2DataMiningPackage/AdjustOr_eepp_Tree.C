@@ -15,6 +15,7 @@
 // globals
 Float_t         q_phi, Pmiss_phi, Pmiss_theta, rooWeight, Q2;
 Float_t         Mott, DipoleFF2;
+Float_t         Plead_P , Plead_theta , Plead_phi, Precoil_P, Precoil_theta , Precoil_phi;
 TVector3        Pcm3Vector, Prec3Vector;
 TLorentzVector  Plead, Pmiss, Precoil, q, Pcm, e;
 TLorentzVector  Beam( 0 , 0 , 5.014 , 5.014 );
@@ -131,6 +132,12 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
     OutTree -> Branch("rooWeight"           ,&rooWeight             , "rooWeight/F");
     OutTree -> Branch("Mott"                ,&Mott                  , "Mott/F");
     OutTree -> Branch("DipoleFF2"           ,&DipoleFF2             , "DipoleFF2/F");
+    OutTree -> Branch("Precoil_P"           ,&Precoil_P             , "Precoil_P/F");
+    OutTree -> Branch("Precoil_theta"       ,&Precoil_theta         , "Precoil_theta/F");
+    OutTree -> Branch("Precoil_phi"         ,&Precoil_phi           , "Precoil_phi/F");
+    OutTree -> Branch("Plead_P"           ,&Plead_P             , "Plead_P/F");
+    OutTree -> Branch("Plead_theta"       ,&Plead_theta         , "Plead_theta/F");
+    OutTree -> Branch("Plead_phi"         ,&Plead_phi           , "Plead_phi/F");
     OutTree -> Branch("Pcm"                 ,&Pcm);
     OutTree -> Branch("Precoil"             ,&Precoil);
     OutTree -> Branch("Plead"               ,&Plead);
@@ -237,6 +244,12 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
             
             Plead = TLorentzVector( Pp_components[0][0] , Pp_components[0][1] , Pp_components[0][2] , Ep[0] );
             Precoil = TLorentzVector( Pp_components[1][0] , Pp_components[1][1] , Pp_components[1][2] , Ep[1] );
+            
+            Plead_P = Plead.P();  Plead_theta = Plead.Theta();
+            Plead_phi = eg2dm->ChangePhiToPhiLab( r2d*Plead.Phi() ) ;
+            Precoil_P = Precoil.P();  Precoil_theta = Precoil.Theta();
+            Precoil_phi = eg2dm->ChangePhiToPhiLab( r2d*Precoil.Phi() ) ;
+
             Prec3Vector = Precoil.Vect();
             
             Int_t PrecoilFiducial = eg2dm->protonFiducial( Precoil.Vect() , debug );
