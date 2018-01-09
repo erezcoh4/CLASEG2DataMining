@@ -1,5 +1,12 @@
 /*
- AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=true, int eep_or_eepp=2, bool for_event_generator=false, int debug=1)
+ AdjustOr_eepp_Tree(
+ int A=12
+ , bool DoFiducialCuts=true
+ , bool Do300Pmiss600=true
+ , int eep_or_eepp=2
+ , bool for_event_generator=false
+ , int debug=1
+ )
 
  usage:
  root -l AdjustOr_eepp_Tree.C\(\12,true,true,1,true,0\)
@@ -16,6 +23,7 @@
 Float_t         q_phi, Pmiss_phi, Pmiss_theta, rooWeight, Q2;
 Float_t         Mott, DipoleFF2;
 Float_t         Plead_P , Plead_theta , Plead_phi, Precoil_P, Precoil_theta , Precoil_phi;
+Float_t         electron_phi, electron_theta;
 TVector3        Pcm3Vector, Prec3Vector;
 TLorentzVector  Plead, Pmiss, Precoil, q, Pcm, e;
 TLorentzVector  Beam( 0 , 0 , 5.014 , 5.014 );
@@ -98,7 +106,9 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
             OutFile = new TFile( OutFilePath + Form("SRC_e%dp_adjusted_300Pmiss600_%s_PrecFiducials.root",eep_or_eepp,My_target.Data()) , "recreate");
         }
         else {
-            OutFile = new TFile( OutFilePath + Form("SRC_e%dp_adjusted_%s_PrecFiducials.root",eep_or_eepp,My_target.Data()) , "recreate");
+            cout << OutFilePath + Form("SRC_e%dp_adjusted_300Pmiss1000_%s_PrecFiducials.root",eep_or_eepp,My_target.Data()) << endl;
+            OutFile = new TFile( OutFilePath + Form("SRC_e%dp_adjusted_300Pmiss1000_%s_PrecFiducials.root",eep_or_eepp,My_target.Data()) , "recreate");
+//            OutFile = new TFile( OutFilePath + Form("SRC_e%dp_adjusted_%s_PrecFiducials.root",eep_or_eepp,My_target.Data()) , "recreate");
         }
     } else {
         if (Do300Pmiss600){
@@ -135,9 +145,12 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
     OutTree -> Branch("Precoil_P"           ,&Precoil_P             , "Precoil_P/F");
     OutTree -> Branch("Precoil_theta"       ,&Precoil_theta         , "Precoil_theta/F");
     OutTree -> Branch("Precoil_phi"         ,&Precoil_phi           , "Precoil_phi/F");
-    OutTree -> Branch("Plead_P"           ,&Plead_P             , "Plead_P/F");
-    OutTree -> Branch("Plead_theta"       ,&Plead_theta         , "Plead_theta/F");
-    OutTree -> Branch("Plead_phi"         ,&Plead_phi           , "Plead_phi/F");
+    OutTree -> Branch("Plead_P"             ,&Plead_P               , "Plead_P/F");
+    OutTree -> Branch("Plead_theta"         ,&Plead_theta           , "Plead_theta/F");
+    OutTree -> Branch("Plead_phi"           ,&Plead_phi             , "Plead_phi/F");
+    OutTree -> Branch("electron_theta"      ,&electron_theta        , "electron_theta/F");
+    OutTree -> Branch("electron_phi"        ,&electron_phi          , "electron_phi/F");
+    
     OutTree -> Branch("Pcm"                 ,&Pcm);
     OutTree -> Branch("Precoil"             ,&Precoil);
     OutTree -> Branch("Plead"               ,&Plead);
@@ -239,6 +252,8 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
         {
             q = TLorentzVector( q_components[0] , q_components[1] , q_components[2] , Nu );
             e = Beam - q;
+            electron_theta = e.Theta() ;
+            electron_phi = eg2dm->ChangePhiToPhiLab( r2d*e.Phi() ) ;
             Q2 = -q.Mag2();
             ComputeWeights();
             

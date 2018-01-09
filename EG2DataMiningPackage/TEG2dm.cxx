@@ -226,7 +226,7 @@ Int_t TEG2dm::protonFiducial( TVector3 pMomentum , int debug ){
             P3 = P3_b[sector][k];
             mom = mag;
             b = P0 + P1 * mom * exp( P2 * pow( mom - P3 , 2 ) ) ;
-
+            
             
             Delta_phi[k] = a * (1 - 1./( ((theta - theta_min)/b) + 1 ) );
         }
