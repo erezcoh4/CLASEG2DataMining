@@ -21,7 +21,7 @@
 
 // globals
 Float_t         q_phi, Pmiss_phi, Pmiss_theta, rooWeight, Q2;
-Float_t         Mott, DipoleFF2;
+Float_t         Mott, DipoleFF2, omega;
 Float_t         Plead_P , Plead_theta , Plead_phi, Precoil_P, Precoil_theta , Precoil_phi;
 Float_t         electron_phi, electron_theta;
 TVector3        Pcm3Vector, Prec3Vector;
@@ -135,6 +135,7 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
     
     
     Float_t Pmiss3Mag, pcmX, pcmY, pcmZ;
+    OutTree -> Branch("omega"               ,&omega                 , "omega/F");
     OutTree -> Branch("Pmiss3Mag"           ,&Pmiss3Mag             , "Pmiss3Mag/F");
     OutTree -> Branch("pcmX"                ,&pcmX                  , "pcmX/F");
     OutTree -> Branch("pcmY"                ,&pcmY                  , "pcmY/F");
@@ -251,6 +252,7 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
             )
         {
             q = TLorentzVector( q_components[0] , q_components[1] , q_components[2] , Nu );
+            omega = Nu;
             e = Beam - q;
             electron_theta = e.Theta() ;
             electron_phi = eg2dm->ChangePhiToPhiLab( r2d*e.Phi() ) ;
