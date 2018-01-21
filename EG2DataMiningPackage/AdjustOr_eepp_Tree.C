@@ -9,7 +9,7 @@
  )
 
  usage:
- root -l AdjustOr_eepp_Tree.C\(\12,true,true,1,true,0\)
+ root -l AdjustOr_eepp_Tree.C\(\12,true,true,2,true,0\)
  - --- -- ---- - - -- ---- --- - --- -
  grab an (e,e'p) or (e,e'pp) tree from Or
  and adjust it to my analysis:
@@ -23,7 +23,7 @@
 Float_t         q_phi, Pmiss_phi, Pmiss_theta, rooWeight, Q2;
 Float_t         Mott, DipoleFF2, omega;
 Float_t         Plead_P , Plead_theta , Plead_phi, Precoil_P, Precoil_theta , Precoil_phi;
-Float_t         electron_phi, electron_theta;
+Float_t         electron_phi, electron_theta, Emiss;
 TVector3        Pcm3Vector, Prec3Vector;
 TLorentzVector  Plead, Pmiss, Precoil, q, Pcm, e;
 TLorentzVector  Beam( 0 , 0 , 5.014 , 5.014 );
@@ -137,6 +137,7 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
     Float_t Pmiss3Mag, pcmX, pcmY, pcmZ;
     OutTree -> Branch("omega"               ,&omega                 , "omega/F");
     OutTree -> Branch("Pmiss3Mag"           ,&Pmiss3Mag             , "Pmiss3Mag/F");
+    OutTree -> Branch("Emiss"               ,&Emiss                 , "Emiss/F");
     OutTree -> Branch("pcmX"                ,&pcmX                  , "pcmX/F");
     OutTree -> Branch("pcmY"                ,&pcmY                  , "pcmY/F");
     OutTree -> Branch("pcmZ"                ,&pcmZ                  , "pcmZ/F");
@@ -273,7 +274,7 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
             if ( (eep_or_eepp==1) || ( ( eep_or_eepp==2 ) && ( PrecoilFiducial || DoFiducialCuts==false )) ){
                 Pmiss.SetVectMag( TVector3( Pmiss_components[0][0] , Pmiss_components[0][1] , Pmiss_components[0][2] ) , 0.938 );
                 Pmiss3Mag = Pmiss.P();
-                
+                Emiss = Pmiss.E();
                 
                 if ( (Do300Pmiss600 && Pmiss3Mag < 0.6) || (!Do300Pmiss600) ){
                     Pcm = Pmiss + Precoil;

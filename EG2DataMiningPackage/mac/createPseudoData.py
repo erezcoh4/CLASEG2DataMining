@@ -4,7 +4,7 @@ from cm_tools import *
     usage:
     ---------------
     
-    python mac/createPseudoData.py --option=SingleRun -r3
+    python mac/createPseudoData.py --option=SingleRun --DataType=C12 -r5
     python mac/createPseudoData.py --option=MultipleRuns -nruns=10
 '''
 
@@ -13,31 +13,35 @@ from cm_tools import *
 
 PseudoDataPath = "/Users/erezcohen/Desktop/DataMining/Analysis_DATA/ppSRCcm/PseudoData/"
 
-hpars = dict({
-             'target name':'Pb',#'C',
-             'my target name':'Pb208',#'C12',
-             
-             # flags
-             # -- - - -- -- --- -- - -- - -- - - --- - -- - -
-             'do random entry':True,
-             'do proton acceptance':True,
-             'do p(rec)>0.35 cut':True,
-             'do p(rec) FV cuts':True,
-             'NRand':1,
 
-             # generation, pre-CLAS
-             # -- - - -- -- --- -- - -- - -- - - --- - -- - -
-             'run':flags.run,
-             'mean(x)':0.0,
-             'mean(y)':0.0,
-             'sigma(t)':0.156,#0.143, for C
-             'mean(z)':0.2,#0.13, for C
-             'sigma(z)':0.17,#0.15, for C
-             
-             # accepted, post-CLAS
-             # -- - - -- -- --- -- - -- - -- - - --- - -- - -
-             'N(accepted)':45 # 266, # the number of events in A(e,e'pp) data
-             })
+hpars_C = dict({'target name':'C', 'my target name':'C12',
+               'sigma(t)':0.143,
+               'mean(z)':0.130, 'sigma(z)':0.150,
+               # -- - - -- -- --- -- - -- - -- - - --- - -- - -
+               'N(accepted)':266, # the number of events in A(e,e'pp) data - accepted, post-CLAS
+               })
+hpars_Pb = dict({'target name':'Pb', 'my target name':'Pb208',
+               'sigma(t)':0.156,
+               'mean(z)':0.180,'sigma(z)':0.17,
+               # -- - - -- -- --- -- - -- - -- - - --- - -- - -
+               'N(accepted)':45 # accepted, post-CLAS
+               })
+
+if flags.DataType=='C12': hpars=hpars_C
+if flags.DataType=='Pb208': hpars=hpars_Pb
+
+# flags
+# -- - - -- -- --- -- - -- - -- - - --- - -- - -
+hpars['do random entry']=True
+hpars['do proton acceptance']=True
+hpars['do p(rec)>0.35 cut']=True
+hpars['do p(rec) FV cuts']=True
+hpars['NRand']=1
+# generation, pre-CLAS
+# -- - - -- -- --- -- - -- - -- - - --- - -- - -
+hpars['run']=flags.run
+hpars['mean(x)']=0.0
+hpars['mean(y)']=0.0
 
 # - - -- - - -- - - -- -- - -- --- -- - - --- - -- - -- -- -- -- - --- -
 if flags.option=="SingleRun":#{
