@@ -24,6 +24,8 @@ Float_t         q_phi, Pmiss_phi, Pmiss_theta, rooWeight, Q2;
 Float_t         Mott, DipoleFF2, omega;
 Float_t         Plead_P , Plead_theta , Plead_phi, Precoil_P, Precoil_theta , Precoil_phi;
 Float_t         electron_phi, electron_theta, Emiss;
+Float_t         Pe_P, Pe_theta, Pe_phi;
+Float_t         Pe_x, Pe_y, Pe_z;
 TVector3        Pcm3Vector, Prec3Vector;
 TLorentzVector  Plead, Pmiss, Precoil, q, Pcm, e;
 TLorentzVector  Beam( 0 , 0 , 5.014 , 5.014 );
@@ -150,8 +152,14 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
     OutTree -> Branch("Plead_P"             ,&Plead_P               , "Plead_P/F");
     OutTree -> Branch("Plead_theta"         ,&Plead_theta           , "Plead_theta/F");
     OutTree -> Branch("Plead_phi"           ,&Plead_phi             , "Plead_phi/F");
+    OutTree -> Branch("Pe_P"                ,&Pe_P                  , "Pe_P/F");
+    OutTree -> Branch("Pe_theta"            ,&electron_theta        , "Pe_theta/F");
+    OutTree -> Branch("Pe_phi"              ,&electron_phi          , "Pe_phi/F");
     OutTree -> Branch("electron_theta"      ,&electron_theta        , "electron_theta/F");
     OutTree -> Branch("electron_phi"        ,&electron_phi          , "electron_phi/F");
+    OutTree -> Branch("Pe_x"                ,&Pe_x                  , "Pe_x/F");
+    OutTree -> Branch("Pe_y"                ,&Pe_y                  , "Pe_y/F");
+    OutTree -> Branch("Pe_z"                ,&Pe_z                  , "Pe_z/F");
     
     OutTree -> Branch("Pcm"                 ,&Pcm);
     OutTree -> Branch("Precoil"             ,&Precoil);
@@ -257,6 +265,12 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
             e = Beam - q;
             electron_theta = e.Theta() ;
             electron_phi = eg2dm->ChangePhiToPhiLab( r2d*e.Phi() ) ;
+            Pe_P        = e.P();
+            Pe_theta    = e.Theta();
+            Pe_phi      = e.Phi();
+            Pe_x        = e.Px();
+            Pe_y        = e.Py();
+            Pe_z        = e.Pz();
             Q2 = -q.Mag2();
             ComputeWeights();
             
