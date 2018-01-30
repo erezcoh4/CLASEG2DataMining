@@ -887,139 +887,139 @@ Int_t GenerateEvents::DoGenerate( TString Type,
                                  bool DoReeNFromTree, bool DoReeNFromDist, bool DoFlateeN){
     // return the number of events
     SHOW3( DoReeNFromTree , DoReeNFromDist , DoFlateeN );
-//
-//    NAcceptedEvents = Nevents = 0;
-//    txtFilename     = Form("%s/eg_txtfiles/run%d.txt",Path.Data(),RunNumber);
-//    rootFilename    = Form("%s/eg_rootfiles/run%d.root",Path.Data(),RunNumber);
-//    if (DoGenTextFile){
-//        cout << "Generating " << txtFilename << endl;
-//        TextFile.open(txtFilename);
-//    }
-//    if (DoGetRootFile){
-//        cout << "Generating " <<  rootFilename << endl;
-//        RootFile = new TFile( rootFilename ,"recreate" );
-//    }
-//    RootTree = new TTree("anaTree","generated events");
-//    SetRootTreeAddresses();
-//    
-//    if (Type == "(e,e')" ){
-//        Printf("generating (e,e')");
-//        TVector3 e;     // N is a baryon: p/n/𝚫
-//        RootTree -> Branch( "e"         ,"TVector3" ,&e);
-//        Double_t mag , theta , phi;
-//        TVector3 * momentum = new TVector3[1];
-//        
-//        int charge[1]   = { -1      };
-//        float mass[1]   = { 0.000511};
-//        int pid[1]      = { 11      };
-//        
-//        for (int entry = 0 ; entry < NeTheta ; entry++ ) {
-//            if ( entry%(NeTheta/10) == 0 ) std::cout  << (int)(100*(double)entry/NeTheta) << "%\n";
-//            theta  = Thetamin + (Thetamax-Thetamin)*gRandom->Uniform();
-//            mag    = Pmin + (Pmax-Pmin)*gRandom->Uniform();
-//            for ( int rand = 0 ; rand < NRand ; rand++ ) {
-//                phi    = 360.*gRandom->Uniform();         // uniform angle between 0 and 360 degrees
-//                e.SetMagThetaPhi ( mag , (TMath::Pi()/180.)*theta , (TMath::Pi()/180.)*phi );
-//                momentum[0] = e;
-//                if (DoGenTextFile) OutPutToTextFile(1, momentum , charge ,mass , pid );
-//                RootTree -> Fill();
-//            }
-//        }
-//        
-//    }
-//    
+
+    NAcceptedEvents = Nevents = 0;
+    txtFilename     = Form("%s/eg_txtfiles/run%d.txt",Path.Data(),RunNumber);
+    rootFilename    = Form("%s/eg_rootfiles/run%d.root",Path.Data(),RunNumber);
+    if (DoGenTextFile){
+        cout << "Generating " << txtFilename << endl;
+        TextFile.open(txtFilename);
+    }
+    if (DoGetRootFile){
+        cout << "Generating " <<  rootFilename << endl;
+        RootFile = new TFile( rootFilename ,"recreate" );
+    }
+    RootTree = new TTree("anaTree","generated events");
+    SetRootTreeAddresses();
+    
+    if (Type == "(e,e')" ){
+        Printf("generating (e,e')");
+        TVector3 e;     // N is a baryon: p/n/𝚫
+        RootTree -> Branch( "e"         ,"TVector3" ,&e);
+        Double_t mag , theta , phi;
+        TVector3 * momentum = new TVector3[1];
+        
+        int charge[1]   = { -1      };
+        float mass[1]   = { 0.000511};
+        int pid[1]      = { 11      };
+        
+        for (int entry = 0 ; entry < NeTheta ; entry++ ) {
+            if ( entry%(NeTheta/10) == 0 ) std::cout  << (int)(100*(double)entry/NeTheta) << "%\n";
+            theta  = Thetamin + (Thetamax-Thetamin)*gRandom->Uniform();
+            mag    = Pmin + (Pmax-Pmin)*gRandom->Uniform();
+            for ( int rand = 0 ; rand < NRand ; rand++ ) {
+                phi    = 360.*gRandom->Uniform();         // uniform angle between 0 and 360 degrees
+                e.SetMagThetaPhi ( mag , (TMath::Pi()/180.)*theta , (TMath::Pi()/180.)*phi );
+                momentum[0] = e;
+                if (DoGenTextFile) OutPutToTextFile(1, momentum , charge ,mass , pid );
+                RootTree -> Fill();
+            }
+        }
+        
+    }
+    
 //    else if (Type == "(e,e'pp)" ){
 //        
 //        DoGenerateRun_eepp( RunNumber,  DoGetRootFile, DoGenTextFile);
 //        
 //    }
-//    
-//    else if (Type == "(e,e'B)"){
-//        Printf("(e,e'%s)",BaryonName.Data());
-//        TVector3 e , N;     // N is a baryon: p/n/𝚫
-//        RootTree -> Branch( BaryonName  ,"TVector3" ,&N);
-//        RootTree -> Branch( "e"         ,"TVector3" ,&e);
-//        Float_t mag , theta;
-//        TVector3 * momentum     = new TVector3[2];
-//        
-//        int charge[2]           = { -1          , (BaryonName == "p") ? 1       : ((BaryonName == "n") ? 0      : 2)        };
-//        float mass[2]           = { 0.000511    ,  static_cast<float>((BaryonName == "p") ? 0.938   : ((BaryonName == "n") ? 0.939  : 1.232))    };
-//        int pid[2]              = { 11          , (BaryonName == "p") ? 2212    : ((BaryonName == "n") ? 2112   : 2214)     };
-//        
-//        
-//        //------- TAKE DATA FROM TREE --------------//
-//        if (DoReeNFromTree){
-//            Printf("(e,e'%s) from Tree",BaryonName.Data());
-//
-//            Float_t PeMag, Theta_e, Phi_e ;//   , PpMag , Theta_p;
-//            eeNTree -> SetBranchAddress("P_e"       ,   &PeMag);
-//            eeNTree -> SetBranchAddress("theta_e"   ,   &Theta_e);
-//            eeNTree -> SetBranchAddress("phi_e"     ,   &Phi_e);
-//            eeNTree -> SetBranchAddress("P_N"       ,   &mag);
-//            eeNTree -> SetBranchAddress("theta_N"   ,   &theta);
-//            Int_t Nentries = (Int_t)eeNTree->GetEntries();
-//            for (int entry = 0 ; entry < Nentries ; entry++ ) {
-//                if ( entry%(Nentries/10) == 0 ) std::cout  << (int)(100*(float)entry/Nentries) << "%\n";
-//                eeNTree -> GetEntry(entry);
-//                if(debug > 2) SHOW3( PeMag , Theta_e , Phi_e );
-//                e.SetMagThetaPhi(PeMag,(TMath::Pi()/180.)*Theta_e,(TMath::Pi()/180.)*Phi_e);
-//                momentum[0] = e;
-//                for ( int rand = 0 ; rand < NRand ; rand++ ) {
-//                    Double_t phi    = 360.*gRandom->Uniform();         // uniform angle between 0 and 360 degrees
-//                    if(debug > 2) SHOW3( mag , (TMath::Pi()/180.)*theta , (TMath::Pi()/180.)*phi );
-//                    N.SetMagThetaPhi ( mag , (TMath::Pi()/180.)*theta , (TMath::Pi()/180.)*phi);
-//                    momentum[1] = N;
-//                    if (DoGenTextFile) OutPutToTextFile(2, momentum , charge ,mass , pid );
-//                    RootTree -> Fill();
-//                }
-//            }
-//        }
-//        
-//        //------- CREATE NEW DATA --------------//
-//        else {
-//            Printf("(e,e'%s) from scratch",BaryonName.Data());
-//
-//            TVector3 e(-0.137*4.306 , -0.339*4.306 , 0.956*4.306 ); // a single electron that passes RECSIS cuts...
-//            momentum[0] = e;
-//            for (int entry = 0 ; entry < NPTheta ; entry++ ) {
-//                if ( entry%(NPTheta/10) == 0 ) std::cout  << (int)(100*(double)entry/NPTheta) << "%\n";
-//                if (DoFlateeN){ // flat distributions
-//                    theta  = Thetamin + (Thetamax-Thetamin)*gRandom->Uniform();
-//                    mag    = Pmin + (Pmax-Pmin)*gRandom->Uniform();
-//                } else if (DoReeNFromDist){  // take from file histograms
-//                    theta  = histTheta ->GetRandom();
-//                    mag    = histMag   ->GetRandom();
-//                }
-//                for ( int rand = 0 ; rand < NRand ; rand++ ) {
-//                    Double_t phi    = 360.*gRandom->Uniform();         // uniform angle between 0 and 360 degrees
-//                    N.SetMagThetaPhi ( mag , (TMath::Pi()/180.)*theta , (TMath::Pi()/180.)*phi);
-//                    momentum[1] = N;
-//                    if (DoGenTextFile) OutPutToTextFile(2, momentum , charge ,mass , pid );
-//                    RootTree -> Fill();
-//                }
-//            }
-//            
-//        }
-//    }
-//    if (DoGetRootFile){
-//
-//        RootFile -> Write();
-//        RootFile -> Close();
-//    }
-//    
-//    if (DoGenTextFile){
-//        
-//        TextFile.close();
-//        
-//    }
-//    
-//    //    if (debug > 2) cout << "Out to Run Number File..." << endl;
-//    //    OutRunNumberFile.open(runsFilename);
-//    //    OutRunNumberFile << RunNumber << "\n" ;
-//    //    OutRunNumberFile.close();
-//    Printf("done generating events to %s",rootFilename.Data());
-//    //    if (InputT) delete InputT;
-//    return Nevents;
+    
+    else if (Type == "(e,e'B)"){
+        Printf("(e,e'%s)",BaryonName.Data());
+        TVector3 e , N;     // N is a baryon: p/n/𝚫
+        RootTree -> Branch( BaryonName  ,"TVector3" ,&N);
+        RootTree -> Branch( "e"         ,"TVector3" ,&e);
+        Float_t mag , theta;
+        TVector3 * momentum     = new TVector3[2];
+        
+        int charge[2]           = { -1          , (BaryonName == "p") ? 1       : ((BaryonName == "n") ? 0      : 2)        };
+        float mass[2]           = { 0.000511    ,  static_cast<float>((BaryonName == "p") ? 0.938   : ((BaryonName == "n") ? 0.939  : 1.232))    };
+        int pid[2]              = { 11          , (BaryonName == "p") ? 2212    : ((BaryonName == "n") ? 2112   : 2214)     };
+        
+        
+        //------- TAKE DATA FROM TREE --------------//
+        if (DoReeNFromTree){
+            Printf("(e,e'%s) from Tree",BaryonName.Data());
+
+            Float_t PeMag, Theta_e, Phi_e ;//   , PpMag , Theta_p;
+            eeNTree -> SetBranchAddress("P_e"       ,   &PeMag);
+            eeNTree -> SetBranchAddress("theta_e"   ,   &Theta_e);
+            eeNTree -> SetBranchAddress("phi_e"     ,   &Phi_e);
+            eeNTree -> SetBranchAddress("P_N"       ,   &mag);
+            eeNTree -> SetBranchAddress("theta_N"   ,   &theta);
+            Int_t Nentries = (Int_t)eeNTree->GetEntries();
+            for (int entry = 0 ; entry < Nentries ; entry++ ) {
+                if ( entry%(Nentries/10) == 0 ) std::cout  << (int)(100*(float)entry/Nentries) << "%\n";
+                eeNTree -> GetEntry(entry);
+                if(debug > 2) SHOW3( PeMag , Theta_e , Phi_e );
+                e.SetMagThetaPhi(PeMag,(TMath::Pi()/180.)*Theta_e,(TMath::Pi()/180.)*Phi_e);
+                momentum[0] = e;
+                for ( int rand = 0 ; rand < NRand ; rand++ ) {
+                    Double_t phi    = 360.*gRandom->Uniform();         // uniform angle between 0 and 360 degrees
+                    if(debug > 2) SHOW3( mag , (TMath::Pi()/180.)*theta , (TMath::Pi()/180.)*phi );
+                    N.SetMagThetaPhi ( mag , (TMath::Pi()/180.)*theta , (TMath::Pi()/180.)*phi);
+                    momentum[1] = N;
+                    if (DoGenTextFile) OutPutToTextFile(2, momentum , charge ,mass , pid );
+                    RootTree -> Fill();
+                }
+            }
+        }
+        
+        //------- CREATE NEW DATA --------------//
+        else {
+            Printf("(e,e'%s) from scratch",BaryonName.Data());
+
+            TVector3 e(-0.137*4.306 , -0.339*4.306 , 0.956*4.306 ); // a single electron that passes RECSIS cuts...
+            momentum[0] = e;
+            for (int entry = 0 ; entry < NPTheta ; entry++ ) {
+                if ( entry%(NPTheta/10) == 0 ) std::cout  << (int)(100*(double)entry/NPTheta) << "%\n";
+                if (DoFlateeN){ // flat distributions
+                    theta  = Thetamin + (Thetamax-Thetamin)*gRandom->Uniform();
+                    mag    = Pmin + (Pmax-Pmin)*gRandom->Uniform();
+                } else if (DoReeNFromDist){  // take from file histograms
+                    theta  = histTheta ->GetRandom();
+                    mag    = histMag   ->GetRandom();
+                }
+                for ( int rand = 0 ; rand < NRand ; rand++ ) {
+                    Double_t phi    = 360.*gRandom->Uniform();         // uniform angle between 0 and 360 degrees
+                    N.SetMagThetaPhi ( mag , (TMath::Pi()/180.)*theta , (TMath::Pi()/180.)*phi);
+                    momentum[1] = N;
+                    if (DoGenTextFile) OutPutToTextFile(2, momentum , charge ,mass , pid );
+                    RootTree -> Fill();
+                }
+            }
+            
+        }
+    }
+    if (DoGetRootFile){
+
+        RootFile -> Write();
+        RootFile -> Close();
+    }
+    
+    if (DoGenTextFile){
+        
+        TextFile.close();
+        
+    }
+    
+    //    if (debug > 2) cout << "Out to Run Number File..." << endl;
+    //    OutRunNumberFile.open(runsFilename);
+    //    OutRunNumberFile << RunNumber << "\n" ;
+    //    OutRunNumberFile.close();
+    Printf("done generating events to %s",rootFilename.Data());
+    //    if (InputT) delete InputT;
+    return Nevents;
 }
 
 
