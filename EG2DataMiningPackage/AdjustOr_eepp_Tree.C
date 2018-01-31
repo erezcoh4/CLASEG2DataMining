@@ -27,7 +27,9 @@ Float_t         Mott, DipoleFF2, omega;
 Float_t         Plead_P , Plead_theta , Plead_phi, Precoil_P, Precoil_theta , Precoil_phi;
 Float_t         electron_phi, electron_theta, Emiss;
 Float_t         Pe_P, Pe_theta, Pe_phi;
+Float_t         Prec_x, Prec_y, Prec_z;
 Float_t         Pe_x, Pe_y, Pe_z;
+Float_t         DPePrec_x, DPePrec_y, DPePrec_z;
 TVector3        Pcm3Vector, Prec3Vector;
 TLorentzVector  Plead, Pmiss, Precoil, q, Pcm, e;
 TLorentzVector  Beam( 0 , 0 , 5.014 , 5.014 );
@@ -162,6 +164,12 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
     OutTree -> Branch("Pe_x"                ,&Pe_x                  , "Pe_x/F");
     OutTree -> Branch("Pe_y"                ,&Pe_y                  , "Pe_y/F");
     OutTree -> Branch("Pe_z"                ,&Pe_z                  , "Pe_z/F");
+    OutTree -> Branch("Prec_x"                ,&Prec_x                  , "Prec_x/F");
+    OutTree -> Branch("Prec_y"                ,&Prec_y                  , "Prec_y/F");
+    OutTree -> Branch("Prec_z"                ,&Prec_z                  , "Prec_z/F");
+    OutTree -> Branch("DPePrec_x"                ,&DPePrec_x                  , "DPePrec_x/F");
+    OutTree -> Branch("DPePrec_y"                ,&DPePrec_y                  , "DPePrec_y/F");
+    OutTree -> Branch("DPePrec_z"                ,&DPePrec_z                  , "DPePrec_z/F");
     
     OutTree -> Branch("Pcm"                 ,&Pcm);
     OutTree -> Branch("Precoil"             ,&Precoil);
@@ -283,6 +291,14 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
             Plead_phi = eg2dm->ChangePhiToPhiLab( r2d*Plead.Phi() ) ;
             Precoil_P = Precoil.P();  Precoil_theta = Precoil.Theta();
             Precoil_phi = eg2dm->ChangePhiToPhiLab( r2d*Precoil.Phi() ) ;
+
+            Prec_x = Precoil.Px();
+            Prec_y = Precoil.Py();
+            Prec_z = Precoil.Pz();
+
+            DPePrec_x = Pe_x - Prec_x;
+            DPePrec_y = Pe_y - Prec_y;
+            DPePrec_z = Pe_z - Prec_z;
 
             Prec3Vector = Precoil.Vect();
             
