@@ -9,7 +9,9 @@
  )
 
  usage:
+ -----
  root -l AdjustOr_eepp_Tree.C\(\12,true,true,2,true,0\)
+ root -l AdjustOr_eepp_Tree.C\(\12\) && root -l AdjustOr_eepp_Tree.C\(\27\) && root -l AdjustOr_eepp_Tree.C\(\56\) && root -l AdjustOr_eepp_Tree.C\(\208\)
  - --- -- ---- - - -- ---- --- - --- -
  grab an (e,e'p) or (e,e'pp) tree from Or
  and adjust it to my analysis:
