@@ -29,7 +29,7 @@ Float_t         electron_phi, electron_theta, Emiss;
 Float_t         Pe_P, Pe_theta, Pe_phi;
 Float_t         Prec_x, Prec_y, Prec_z;
 Float_t         Pe_x, Pe_y, Pe_z;
-Float_t         DPePrec_x, DPePrec_y, DPePrec_z;
+Float_t         DPePrec_x, DPePrec_y, DPePrec_z, DPePrec_phi, DPePrec_theta, DPePrec_P;
 TVector3        Pcm3Vector, Prec3Vector;
 TLorentzVector  Plead, Pmiss, Precoil, q, Pcm, e;
 TLorentzVector  Beam( 0 , 0 , 5.014 , 5.014 );
@@ -164,12 +164,15 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
     OutTree -> Branch("Pe_x"                ,&Pe_x                  , "Pe_x/F");
     OutTree -> Branch("Pe_y"                ,&Pe_y                  , "Pe_y/F");
     OutTree -> Branch("Pe_z"                ,&Pe_z                  , "Pe_z/F");
-    OutTree -> Branch("Prec_x"                ,&Prec_x                  , "Prec_x/F");
-    OutTree -> Branch("Prec_y"                ,&Prec_y                  , "Prec_y/F");
-    OutTree -> Branch("Prec_z"                ,&Prec_z                  , "Prec_z/F");
-    OutTree -> Branch("DPePrec_x"                ,&DPePrec_x                  , "DPePrec_x/F");
-    OutTree -> Branch("DPePrec_y"                ,&DPePrec_y                  , "DPePrec_y/F");
-    OutTree -> Branch("DPePrec_z"                ,&DPePrec_z                  , "DPePrec_z/F");
+    OutTree -> Branch("Prec_x"              ,&Prec_x                , "Prec_x/F");
+    OutTree -> Branch("Prec_y"              ,&Prec_y                , "Prec_y/F");
+    OutTree -> Branch("Prec_z"              ,&Prec_z                , "Prec_z/F");
+    OutTree -> Branch("DPePrec_x"           ,&DPePrec_x             , "DPePrec_x/F");
+    OutTree -> Branch("DPePrec_y"           ,&DPePrec_y             , "DPePrec_y/F");
+    OutTree -> Branch("DPePrec_z"           ,&DPePrec_z             , "DPePrec_z/F");
+    OutTree -> Branch("DPePrec_P"           ,&DPePrec_P             , "DPePrec_P/F");
+    OutTree -> Branch("DPePrec_phi"         ,&DPePrec_phi           , "DPePrec_phi/F");
+    OutTree -> Branch("DPePrec_theta"       ,&DPePrec_theta         , "DPePrec_theta/F");
     
     OutTree -> Branch("Pcm"                 ,&Pcm);
     OutTree -> Branch("Precoil"             ,&Precoil);
@@ -205,15 +208,9 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
     InTree -> SetBranchAddress("Pe"      ,           &OrTree_Pe);
     InTree -> SetBranchAddress("theta_e" ,           &OrTree_theta_e);
     InTree -> SetBranchAddress("Pe_size" ,           &OrTree_Pe_size);
-//    InTree -> SetBranchAddress("Ep"      ,           &OrTree_Ep);
-//    InTree -> SetBranchAddress("Pp"      ,           &OrTree_Pp);
-//    InTree -> SetBranchAddress("Rp"      ,           &OrTree_Rp);           // proton vertex
-//    InTree -> SetBranchAddress("Pp_size" ,           &OrTree_Pp_size);
-//    InTree -> SetBranchAddress("Pmiss"   ,           &OrTree_Pmiss);
     InTree -> SetBranchAddress("theta_Pmiss",        &OrTree_theta_Pmiss);
     InTree -> SetBranchAddress("phi_Pmiss",          &OrTree_phi_Pmiss);
     InTree -> SetBranchAddress("Pmiss_size",         &OrTree_Pmiss_size);
-//    InTree -> SetBranchAddress("q"       ,           &OrTree_q);
     InTree -> SetBranchAddress("q_size"  ,           &OrTree_q_size);
     InTree -> SetBranchAddress("Pmiss_q_angle",      &OrTree_Pmiss_q_angle);
     InTree -> SetBranchAddress("nmb",                &OrTree_nmb);
@@ -299,7 +296,10 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
             DPePrec_x = Pe_x - Prec_x;
             DPePrec_y = Pe_y - Prec_y;
             DPePrec_z = Pe_z - Prec_z;
-
+            DPePrec_phi     = e.Phi() - Precoil.Phi();
+            DPePrec_theta   = e.Theta() - Precoil.Theta();
+            DPePrec_P       = e.P() - Precoil.P();
+            
             Prec3Vector = Precoil.Vect();
             
             Int_t PrecoilFiducial = eg2dm->protonFiducial( Precoil.Vect() , debug );
