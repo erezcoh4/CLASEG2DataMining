@@ -39,13 +39,13 @@ bool ep_acceptance(int gsim_run=2000,int debug=2){
     t->SetBranchAddress("Phi_g"         , &phi_g);
     t->SetBranchAddress("Momentum_g"    , &p_g);
     t->SetBranchAddress("Theta_g"       , &theta_g);
-    t->SetBranchAddress("id_g"          , &id_g);
+    t->SetBranchAddress("particle_g"    , &Id_g);
     
     t->SetBranchAddress("Number"        , &Number);
     t->SetBranchAddress("Phi"           , &phi);
     t->SetBranchAddress("Momentum"      , &p);
     t->SetBranchAddress("Theta"         , &theta);
-    t->SetBranchAddress("id"            , &id);
+    t->SetBranchAddress("particle"      , &Id);
 
     ofstream output_data_file;
     output_data_file.open(Form("/Users/erezcohen/Desktop/DataMining/GSIM_DATA/csv_files/output_data_run%d.csv",gsim_run));
