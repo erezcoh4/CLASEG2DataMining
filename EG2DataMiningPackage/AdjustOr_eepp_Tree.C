@@ -12,6 +12,7 @@
  -----
  root -l AdjustOr_eepp_Tree.C\(\12,true,true,2,true,0\)
  root -l AdjustOr_eepp_Tree.C\(\12\) && root -l AdjustOr_eepp_Tree.C\(\27\) && root -l AdjustOr_eepp_Tree.C\(\56\) && root -l AdjustOr_eepp_Tree.C\(\208\)
+ root -l AdjustOr_eepp_Tree.C\(\12,false,true,1\) && root -l AdjustOr_eepp_Tree.C\(\27,false,true,1\) && root -l AdjustOr_eepp_Tree.C\(\56,false,true,1\) && root -l AdjustOr_eepp_Tree.C\(\208,false,true,1\)
  - --- -- ---- - - -- ---- --- - --- -
  grab an (e,e'p) or (e,e'pp) tree from Or
  and adjust it to my analysis:
@@ -328,8 +329,8 @@ void AdjustOr_eepp_Tree(int A=12, bool DoFiducialCuts=true, bool Do300Pmiss600=t
                     if (debug){
                         Printf("vertex(p(lead))-z: %.2f, vertex(p(recoil))-z:%.2f",Rp[0][2],Rp[1][2]);
                         Printf("p(lead): %.2f",Pp_size[0]);
-                        Printf("p(recoil): %.2f",Pp_size[1]);
-                        Pcm3Vector.Print();
+                        // Printf("p(recoil): %.2f",Pp_size[1]);
+                        // Pcm3Vector.Print();
                         PrintLine();
                     }
                 }
