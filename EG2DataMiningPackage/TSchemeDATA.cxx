@@ -231,6 +231,7 @@ void TSchemeDATA::SRCXb(int fTargetType , float fXbMin, int fNpMin, int fNpMax, 
 }
 
 
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TSchemeDATA::CreateOutTree(){
     OutFile = new TFile(Form("%s/Schemed_%s_%s.root",SchemedPath.Data(),SchemeType.Data(),InFileName.Data()),"recreate");
@@ -241,6 +242,7 @@ void TSchemeDATA::CreateOutTree(){
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void TSchemeDATA::WriteOutFile(){
     Printf("\nOutTree has %d entries",(int)OutTree->GetEntries());
+    cout << "wrote output file: " << Form("%s/Schemed_%s_%s.root",SchemedPath.Data(),SchemeType.Data(),InFileName.Data()) << endl;
     OutTree -> AutoSave();
     OutFile -> Write();
     OutFile -> Close();

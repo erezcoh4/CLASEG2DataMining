@@ -83,7 +83,10 @@ public:
     // for 3N SRC studies
     Float_t thetaMiss23 , phiMiss23 , thetaLeadRec  , theta23;
     Float_t m23         , T23       , k23           , E_R;
+    Float_t q_          , k_t       , beta          , m_S;
+    Float_t W2_3N       , alpha_3N;
     
+
     
     Double_t            k0          , kCMmag        , Px            , Py        , Pz ;
     
@@ -106,6 +109,7 @@ public:
     TLorentzVector      q           , q_g       , NucleonAtRest     , TargetAtRest  ;
     TLorentzVector      Plead       , Plead_g   , Pmiss     , Pmiss_g , Pcm   , Prec , PcmFinalState;
     TLorentzVector      PmissRct    , Nlead     , Nmiss     ;
+    TLorentzVector      p_S;
     std::vector<TLorentzVector>  protons , protons_g , protonsLab;
 
     

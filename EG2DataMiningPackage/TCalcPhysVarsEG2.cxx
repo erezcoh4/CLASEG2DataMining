@@ -164,6 +164,10 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("T23"                 ,&T23                   , "T23/F");
     OutTree -> Branch("k23"                 ,&k23                   , "k23/F");
     OutTree -> Branch("E_R"                 ,&E_R                   , "E_R/F");
+    OutTree -> Branch("alpha_3N"            ,&alpha_3N              , "alpha_3N/F");
+    OutTree -> Branch("W2_3N"               ,&W2_3N                 , "W2_3N/F");
+    OutTree -> Branch("k_t"                 ,&k_t                   , "k_t/F");
+    OutTree -> Branch("beta"                ,&beta                  , "beta/F");
 
     
     // TVector3 branches
@@ -242,16 +246,18 @@ void TCalcPhysVarsEG2::InitEvent(){
     if (!protons_g.empty()) protons_g.clear();
     if (!pFiducCut_g.empty()) pFiducCut_g.clear();
 
+    m_S = 0;
     Np = NpBack = NpCumulative = NpCumulativeSRC = 0;
     Pmiss = Plead = Plead_g = TLorentzVector();
     Wmiss.SetVectM( TVector3() , 3. * Mp  );
-
+    p_S = TLorentzVector();
 
     // see how much the W2 peak is broadened because of motion of three nucleons as a whole
     // add 3-momentum for the nucleons and, put with exp(-(k/k0)^2, k0 ~ 150-200 MeV/c
     kCMmag = rand.Gaus( 0 , k0 );
     rand.Sphere( Px , Py , Pz , kCMmag );
     WmissWithCm.SetVectM( TVector3(Px , Py , Pz) , 3. * Mp  );
+    k_t = beta = q_ = W2_3N = alpha_3N = 0;
 
     // maybe interesting to see how much answer changes if 3m_N is changed to 3m_N - epsilon where epsilon ~ 40 MeV
     WmissCmEps.SetVectM( TVector3(Px , Py , Pz) , 3. * Mp - 0.040 );
@@ -353,6 +359,8 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     alpha_q     = LCfraction(q , q , A_over_mA);
     sum_alpha   = -alpha_q;
     
+    
+    
 
     // c.m. momentum
     Wmiss      += q;
@@ -408,12 +416,15 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     //    if (Np==2) {
     //        p12Randomize();
     //    }
-    // if we have 3 protons, randomize protons 2 and 3
+    
     if (Np==3) {
-        p23Randomize();
+        p23Randomize(); // if we have 3 protons, randomize protons 2 and 3
         PmissRct    = q - protons.at(1) - protons.at(2);
         thetaMiss23 = r2d*Pmiss.Vect().Angle(Prec.Vect());
         phiMiss23   = 90 - r2d*( Pmiss.Vect().Angle(protons.at(1).Vect().Cross(protons.at(2).Vect()).Unit()) );
+        theta23     = r2d*protons.at(1).Vect().Angle(protons.at(2).Vect());
+        
+        
         Wmiss       += protons.at(0);
         WmissWithCm += protons.at(0);
         WmissCmEps  += protons.at(0);
@@ -422,6 +433,25 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         T23 = sqrt( m23 * m23 + Pmiss.P() * Pmiss.P() ) - 2 * Mp ;
         k23 = 0.5*sqrt( m23 * m23 - 4 * Mp * Mp );
         E_R = q.E() - (Plead.E() - Mp);
+        
+        
+        
+        // comparison with Misak' predictions
+        p_S         = (protons.at(1) + protons.at(2));
+        q_          = q.E() - q.P();
+        // k_t = P2 - (P2 * Ps) Ps
+        TVector3  P2 = protons.at(2).Vect();
+        TVector3  P2_along_Ps = p_S.Vect().Unit() * (protons.at(2).Vect().Dot( p_S.Vect().Unit() ));
+        k_t         = (P2 - P2_along_Ps).Mag() ;
+        beta        = (protons.at(2).E() - protons.at(2).P())/(p_S.E() - p_S.P());
+        m_S         = sqrt( 4.*(Mp*Mp + k_t*k_t) / (beta * (2. - beta)) );
+        W2_3N       = Q2*(3.-Xb)/Xb + 9*Mp*Mp;
+        alpha_3N    = 3. - ( (q_ + 3*Mp)/(2.*Mp) )*( 1 + ( m_S*m_S - Mp*Mp )/(3.*W2_3N)
+                                                    + sqrt( (1. - ( m_S+Mp )*( m_S+Mp )/(3.*W2_3N) ) * (1. - ( m_S-Mp )*( m_S-Mp )/(3.*W2_3N) ) ) );
+        //        cout << "in event " << entry << " Np==3!" << endl;
+        //        SHOW3( Q2 , Xb , q_ );
+        //        SHOW4( k_t , beta , m_S , W2_3N );
+        //        SHOW( alpha_3N );
     }
     thetaLeadRec = Plead.Vect().Angle(Prec.Vect());
     theta_rec_q  = q.Vect().Angle(Prec.Vect());
@@ -442,12 +472,12 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     ComputeWeights();
     if (debug > 2) Printf("got roofit c.m. ");
     
-    // finally, fill the TTree output
-    // problem with plugging std::vector<TLorentzVector> into the root file is solved by pushing back into the protons vector only before filling...
-    std::vector <TLorentzVector> protons_vector = protons;    protons.clear();
-    for (auto & proton:protons_vector)  protons.push_back( proton );
-    std::vector <TLorentzVector> protonsLab_vector = protonsLab;    protonsLab.clear();
-    for (auto & protonLab:protonsLab_vector)  protonsLab.push_back( protonLab );
+//    // finally, fill the TTree output
+//    // problem with plugging std::vector<TLorentzVector> into the root file is solved by pushing back into the protons vector only before filling...
+//    std::vector <TLorentzVector> protons_vector = protons;    protons.clear();
+//    for (auto & proton:protons_vector)  protons.push_back( proton );
+//    std::vector <TLorentzVector> protonsLab_vector = protonsLab;    protonsLab.clear();
+//    for (auto & protonLab:protonsLab_vector)  protonsLab.push_back( protonLab );
     
     SetCuts();
     
@@ -787,6 +817,7 @@ void TCalcPhysVarsEG2::PrintData(int entry){
     SHOW3(TpMiss , theta_pq , p_over_q);
     // SHOW3(NpBack , NpCumulative , NpCumulativeSRC );
     //    SHOW3(pcmX , pcmY , pcmZ);
+    SHOW3(W2_3N , k_t , alpha_3N);
     EndEventBlock();
 }
 

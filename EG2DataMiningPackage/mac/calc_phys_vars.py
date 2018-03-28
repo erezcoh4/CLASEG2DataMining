@@ -2,7 +2,9 @@
 '''
     usage:
     --------
+    python mac/calc_phys_vars.py -werez --option="q(z) - Pmiss(x-z) frame" -scheme=SRCXb --DataType=DATA -evf=1 -p1000 -A12
     python mac/calc_phys_vars.py -werez --option="q(z) - Pmiss(x-z) frame" -scheme=SRCXb --DataType=NoCTofDATA -evf=1 -p5000 -A12
+    python mac/calc_phys_vars.py -werez --option="q(z) - Pmiss(x-z) frame" -scheme=pppSRCCut --DataType=NoCTofDATA -evf=1 -p1000 -A12
     python mac/calc_phys_vars.py -werez --option=ppSRC -scheme=SRCXb --DataType=DATA -evf=1 -p10000 -v2 -A12
     python mac/calc_phys_vars.py --DataType=GSIM -evf=0.01 -p10000 -r80
     python mac/calc_phys_vars.py -A12 --DataType=New_NoCTofDATA --SchemedType=TwoSlowProtons -evf=1 -p10000
