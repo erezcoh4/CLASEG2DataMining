@@ -167,7 +167,8 @@ void TCalcPhysVarsEG2::InitOutputTree(){
     OutTree -> Branch("alpha_3N"            ,&alpha_3N              , "alpha_3N/F");
     OutTree -> Branch("W2_3N"               ,&W2_3N                 , "W2_3N/F");
     OutTree -> Branch("k_t"                 ,&k_t                   , "k_t/F");
-    OutTree -> Branch("beta"                ,&beta                  , "beta/F");
+    OutTree -> Branch("beta_1"              ,&beta_1                , "beta_1/F");
+    OutTree -> Branch("beta_2"              ,&beta_2                , "beta_2/F");
 
     
     // TVector3 branches
@@ -257,7 +258,7 @@ void TCalcPhysVarsEG2::InitEvent(){
     kCMmag = rand.Gaus( 0 , k0 );
     rand.Sphere( Px , Py , Pz , kCMmag );
     WmissWithCm.SetVectM( TVector3(Px , Py , Pz) , 3. * Mp  );
-    k_t = beta = q_ = W2_3N = alpha_3N = 0;
+    k_t = beta_1 = beta_2 = q_ = W2_3N = alpha_3N = 0;
 
     // maybe interesting to see how much answer changes if 3m_N is changed to 3m_N - epsilon where epsilon ~ 40 MeV
     WmissCmEps.SetVectM( TVector3(Px , Py , Pz) , 3. * Mp - 0.040 );
@@ -375,8 +376,6 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
     // A(e,e'p)X missing energy
     Mrec        = mA - Np * Mp;            // taking out the 1 proton off the initial target
     Trec        = sqrt( Pmiss.P()*Pmiss.P() + Mrec*Mrec ) - Mrec;
-    Emiss       = Nu - Trec;
-
 
     
     if (debug > 2) Printf("starting to sort the protons and loop over them");
@@ -390,6 +389,11 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         Plead = protons.at(0);            // now Plead is calculated in q-Pmiss frame
         theta_pq = r2d * Plead.Vect().Angle(q.Vect());
         p_over_q = Plead.P() / q.P();
+        
+        // Misak' mail from May-5, 2018
+        // E_m = q_0 + T_f - p_m^2/(2(A-1)*m_N)
+        float T_f   = Plead.E() - Mp;
+        Emiss       = Nu - T_f - Pmiss.P()*Pmiss.P()/(2.*(A-1.)*Mp);
     }
     // define Precoil:
     // for 2p-SRC, we want at least one proton above 350 MeV/c, and then call it Precoil
@@ -443,11 +447,15 @@ void TCalcPhysVarsEG2::ComputePhysVars(int entry){
         TVector3  P2 = protons.at(2).Vect();
         TVector3  P2_along_Ps = p_S.Vect().Unit() * (protons.at(2).Vect().Dot( p_S.Vect().Unit() ));
         k_t         = (P2 - P2_along_Ps).Mag() ;
-        beta        = (protons.at(2).E() - protons.at(2).P())/(p_S.E() - p_S.P());
-        m_S         = sqrt( 4.*(Mp*Mp + k_t*k_t) / (beta * (2. - beta)) );
+        
+        beta_1      = LCfraction(protons.at(1) , q , A_over_mA ); //(protons.at(1).E() - protons.at(1).P())/(p_S.E() - p_S.P());
+        beta_2      = LCfraction(protons.at(2) , q , A_over_mA ); //(protons.at(2).E() - protons.at(2).P())/(p_S.E() - p_S.P());
+        m_S         = sqrt( 4.*(Mp*Mp + k_t*k_t) / (beta_1 * (2. - beta_1)) );
         W2_3N       = Q2*(3.-Xb)/Xb + 9*Mp*Mp;
-        alpha_3N    = 3. - ( (q_ + 3*Mp)/(2.*Mp) )*( 1 + ( m_S*m_S - Mp*Mp )/(3.*W2_3N)
-                                                    + sqrt( (1. - ( m_S+Mp )*( m_S+Mp )/(3.*W2_3N) ) * (1. - ( m_S-Mp )*( m_S-Mp )/(3.*W2_3N) ) ) );
+        
+        float _sqrt_      = sqrt( (1. - ( m_S+Mp )*( m_S+Mp )/(W2_3N) ) * (1. - ( m_S-Mp )*( m_S-Mp )/(W2_3N) ) );
+        
+        alpha_3N    = 3. - ( (q_ + 3*Mp)/(2.*Mp) )*( 1 + ( m_S*m_S - Mp*Mp )/(W2_3N) + _sqrt_ );
         //        cout << "in event " << entry << " Np==3!" << endl;
         //        SHOW3( Q2 , Xb , q_ );
         //        SHOW4( k_t , beta , m_S , W2_3N );
@@ -687,7 +695,7 @@ void TCalcPhysVarsEG2::loop_protons(){
         
         
         // A(e,e'p)X missing energy
-        Emiss      -= protons.back().E() - Mp;
+        // Emiss -= protons.back().E() - Mp;
         
         
         // Invariant mass of the system produced in the interaction of balancing nucleon with a virtual photon

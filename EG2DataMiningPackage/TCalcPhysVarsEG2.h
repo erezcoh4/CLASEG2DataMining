@@ -83,7 +83,7 @@ public:
     // for 3N SRC studies
     Float_t thetaMiss23 , phiMiss23 , thetaLeadRec  , theta23;
     Float_t m23         , T23       , k23           , E_R;
-    Float_t q_          , k_t       , beta          , m_S;
+    Float_t q_          , k_t       , beta_1        , beta_2    , m_S;
     Float_t W2_3N       , alpha_3N;
     
 

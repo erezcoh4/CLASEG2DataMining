@@ -52,7 +52,5 @@ calc.Close()
 print "done filling %d events" % int(flags.evnts_frac*Nentries)
 print "wrote file " + OutFileName
 
-
-
-
-
+os.system('say "Hey, Erez, I am done".')
+os.system('say "I computed physical observables for %d events".'%(flags.evnts_frac*Nentries))
