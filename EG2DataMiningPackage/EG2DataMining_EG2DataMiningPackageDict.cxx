@@ -40,6 +40,7 @@ namespace std {} using namespace std;
 // Header files passed as explicit arguments
 #include "T3pSimulation.h"
 #include "TAnalysisEG2.h"
+#include "TCalcGSIMVarsEG2.h"
 #include "TCalcPhysVarsEG2.h"
 #include "TEG2dm.h"
 #include "TLorentzVectorDict.h"
@@ -273,6 +274,51 @@ namespace ROOT {
 } // end of namespace ROOT
 
 namespace ROOT {
+   static TClass *TCalcGSIMVarsEG2_Dictionary();
+   static void TCalcGSIMVarsEG2_TClassManip(TClass*);
+   static void *new_TCalcGSIMVarsEG2(void *p = 0);
+   static void *newArray_TCalcGSIMVarsEG2(Long_t size, void *p);
+   static void delete_TCalcGSIMVarsEG2(void *p);
+   static void deleteArray_TCalcGSIMVarsEG2(void *p);
+   static void destruct_TCalcGSIMVarsEG2(void *p);
+
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::TCalcGSIMVarsEG2*)
+   {
+      ::TCalcGSIMVarsEG2 *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::TCalcGSIMVarsEG2));
+      static ::ROOT::TGenericClassInfo 
+         instance("TCalcGSIMVarsEG2", "TCalcGSIMVarsEG2.h", 29,
+                  typeid(::TCalcGSIMVarsEG2), DefineBehavior(ptr, ptr),
+                  &TCalcGSIMVarsEG2_Dictionary, isa_proxy, 4,
+                  sizeof(::TCalcGSIMVarsEG2) );
+      instance.SetNew(&new_TCalcGSIMVarsEG2);
+      instance.SetNewArray(&newArray_TCalcGSIMVarsEG2);
+      instance.SetDelete(&delete_TCalcGSIMVarsEG2);
+      instance.SetDeleteArray(&deleteArray_TCalcGSIMVarsEG2);
+      instance.SetDestructor(&destruct_TCalcGSIMVarsEG2);
+      return &instance;
+   }
+   TGenericClassInfo *GenerateInitInstance(const ::TCalcGSIMVarsEG2*)
+   {
+      return GenerateInitInstanceLocal((::TCalcGSIMVarsEG2*)0);
+   }
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::TCalcGSIMVarsEG2*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+
+   // Dictionary for non-ClassDef classes
+   static TClass *TCalcGSIMVarsEG2_Dictionary() {
+      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::TCalcGSIMVarsEG2*)0x0)->GetClass();
+      TCalcGSIMVarsEG2_TClassManip(theClass);
+   return theClass;
+   }
+
+   static void TCalcGSIMVarsEG2_TClassManip(TClass* ){
+   }
+
+} // end of namespace ROOT
+
+namespace ROOT {
    // Wrappers around operator new
    static void *new_TEG2dm(void *p) {
       return  p ? new(p) ::TEG2dm : new ::TEG2dm;
@@ -376,6 +422,27 @@ namespace ROOT {
       ((current_t*)p)->~current_t();
    }
 } // end of namespace ROOT for class ::T3pSimulation
+
+namespace ROOT {
+   // Wrappers around operator new
+   static void *new_TCalcGSIMVarsEG2(void *p) {
+      return  p ? new(p) ::TCalcGSIMVarsEG2 : new ::TCalcGSIMVarsEG2;
+   }
+   static void *newArray_TCalcGSIMVarsEG2(Long_t nElements, void *p) {
+      return p ? new(p) ::TCalcGSIMVarsEG2[nElements] : new ::TCalcGSIMVarsEG2[nElements];
+   }
+   // Wrapper around operator delete
+   static void delete_TCalcGSIMVarsEG2(void *p) {
+      delete ((::TCalcGSIMVarsEG2*)p);
+   }
+   static void deleteArray_TCalcGSIMVarsEG2(void *p) {
+      delete [] ((::TCalcGSIMVarsEG2*)p);
+   }
+   static void destruct_TCalcGSIMVarsEG2(void *p) {
+      typedef ::TCalcGSIMVarsEG2 current_t;
+      ((current_t*)p)->~current_t();
+   }
+} // end of namespace ROOT for class ::TCalcGSIMVarsEG2
 
 namespace ROOT {
    static TClass *vectorlEintgR_Dictionary();
@@ -634,6 +701,7 @@ namespace {
     static const char* headers[] = {
 "T3pSimulation.h",
 "TAnalysisEG2.h",
+"TCalcGSIMVarsEG2.h",
 "TCalcPhysVarsEG2.h",
 "TEG2dm.h",
 "TLorentzVectorDict.h",
@@ -662,6 +730,7 @@ class __attribute__((annotate("$clingAutoload$TSchemeDATA.h")))  TSchemeDATA;
 class __attribute__((annotate("$clingAutoload$T3pSimulation.h")))  TCalcPhysVarsEG2;
 class __attribute__((annotate("$clingAutoload$TAnalysisEG2.h")))  TAnalysisEG2;
 class __attribute__((annotate("$clingAutoload$T3pSimulation.h")))  T3pSimulation;
+class __attribute__((annotate("$clingAutoload$TCalcGSIMVarsEG2.h")))  TCalcGSIMVarsEG2;
 )DICTFWDDCLS";
     static const char* payloadCode = R"DICTPAYLOAD(
 
@@ -672,6 +741,7 @@ class __attribute__((annotate("$clingAutoload$T3pSimulation.h")))  T3pSimulation
 #define _BACKWARD_BACKWARD_WARNING_H
 #include "T3pSimulation.h"
 #include "TAnalysisEG2.h"
+#include "TCalcGSIMVarsEG2.h"
 #include "TCalcPhysVarsEG2.h"
 #include "TEG2dm.h"
 #include "TLorentzVectorDict.h"
@@ -682,6 +752,7 @@ class __attribute__((annotate("$clingAutoload$T3pSimulation.h")))  T3pSimulation
     static const char* classesHeaders[]={
 "T3pSimulation", payloadCode, "@",
 "TAnalysisEG2", payloadCode, "@",
+"TCalcGSIMVarsEG2", payloadCode, "@",
 "TCalcPhysVarsEG2", payloadCode, "@",
 "TEG2dm", payloadCode, "@",
 "TSchemeDATA", payloadCode, "@",
