@@ -3,7 +3,7 @@
     usage:
     --------
     make && python mac/calc_gsim_vars.py -werez --run=5001 --DataType=MC -evf=1 -p1000 -A56
-    python mac/calc_gsim_vars.py -werez --run=5001 --DataType=MC -evf=1 -p1000 -A56 --print_mod=1
+    python mac/calc_gsim_vars.py -werez --run=5001 --DataType=MC -evf=1 -p1000 -A56 --print_mod=100
     
 '''
 from definitions import *
